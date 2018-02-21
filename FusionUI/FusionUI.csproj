@@ -1,0 +1,174 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="14.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{C8A88228-E78D-4782-9504-39118E29B8AD}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>FusionUI</RootNamespace>
+    <AssemblyName>FusionUI</AssemblyName>
+    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
+    <PublishUrl>publish\</PublishUrl>
+    <Install>true</Install>
+    <InstallFrom>Disk</InstallFrom>
+    <UpdateEnabled>false</UpdateEnabled>
+    <UpdateMode>Foreground</UpdateMode>
+    <UpdateInterval>7</UpdateInterval>
+    <UpdateIntervalUnits>Days</UpdateIntervalUnits>
+    <UpdatePeriodically>false</UpdatePeriodically>
+    <UpdateRequired>false</UpdateRequired>
+    <MapFileExtensions>true</MapFileExtensions>
+    <ApplicationRevision>0</ApplicationRevision>
+    <ApplicationVersion>1.0.0.%2a</ApplicationVersion>
+    <IsWebBootstrapper>false</IsWebBootstrapper>
+    <UseApplicationTrust>false</UseApplicationTrust>
+    <BootstrapperEnabled>true</BootstrapperEnabled>
+    <TargetFrameworkProfile />
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <PlatformTarget>x64</PlatformTarget>
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <UseVSHostingProcess>true</UseVSHostingProcess>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup>
+    <StartupObject />
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Net.Http" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="AbstractTimeManager.cs" />
+    <Compile Include="AppInterface.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="UI\ComplexNode.cs" />
+    <Compile Include="UI\ControllableFrame.cs" />
+    <Compile Include="UI\Elements\Button.cs" />
+    <Compile Include="UI\Elements\Checkbox.cs" />
+    <Compile Include="UI\Elements\ConfirmWindow.cs" />
+    <Compile Include="UI\Elements\DropDown\DropDownSelector.cs" />
+    <Compile Include="UI\Elements\DropDown\DropDownSelectorRow.cs" />
+    <Compile Include="UI\Elements\DropDown\DropDownSelectorTextRow.cs" />
+    <Compile Include="UI\Elements\DropDown\DropDownSelectorTextureRow.cs" />
+    <Compile Include="UI\Elements\DropDown\SelectorList.cs" />
+    <Compile Include="UI\Elements\Editbox.cs" />
+    <Compile Include="UI\Elements\TextFormatting\FormatTextBlock.Tags.cs" />
+    <Compile Include="UI\Elements\Label.cs" />
+    <Compile Include="UI\Elements\Legenda\ILegend.cs" />
+    <Compile Include="UI\Elements\Legenda\ListLegend.cs" />
+    <Compile Include="UI\Elements\Legenda\PaletteLegend.cs" />
+    <Compile Include="UI\Elements\Legenda\PaletteLegendExplicitColor.cs" />
+    <Compile Include="UI\Elements\Plot.cs" />
+    <Compile Include="UI\Elements\Progresbar.cs" />
+    <Compile Include="UI\Elements\RadioButton.cs" />
+    <Compile Include="UI\Elements\RadioButtonElement.cs" />
+    <Compile Include="UI\Elements\RadioButtonGroup.cs" />
+    <Compile Include="UI\Elements\RichTextBlock.cs" />
+    <Compile Include="UI\Elements\Scroll.cs" />
+    <Compile Include="UI\Elements\SetterValueFrame.cs" />
+    <Compile Include="UI\Elements\Slider.cs" />
+    <Compile Include="UI\Elements\Table.cs" />
+    <Compile Include="UI\Elements\TabViewer.cs" />
+    <Compile Include="UI\Elements\TextFormatting\FormatTextBlock.TextDraw.cs" />
+    <Compile Include="UI\Elements\TimeLine.cs" />
+    <Compile Include="UI\Elements\TimeSelector.cs" />
+    <Compile Include="UI\Elements\TimeSelectorScroll.cs" />
+    <Compile Include="UI\Elements\Tooltip.cs" />
+    <Compile Include="UI\Elements\TreeNode.cs" />
+    <Compile Include="UI\Elements\WindowFixed.cs" />
+    <Compile Include="UI\Factories\ButtonFactory.cs" />
+    <Compile Include="UI\Factories\CAlendarFactory.cs" />
+    <Compile Include="UI\Factories\CheckboxFactory.cs" />
+    <Compile Include="UI\Factories\ColorPickerFactory.cs" />
+    <Compile Include="UI\Factories\ContextMenuFactory.cs" />
+    <Compile Include="UI\Factories\EditboxFactory.cs" />
+    <Compile Include="UI\Factories\InfoBlockFactory.cs" />
+    <Compile Include="UI\Factories\PaletteFactory.cs" />
+    <Compile Include="UI\Factories\PopupFactory.cs" />
+    <Compile Include="UI\Factories\ProgressbarFactory.cs" />
+    <Compile Include="UI\Factories\RadioButtonFactory.cs" />
+    <Compile Include="UI\Factories\SelectorFactory.cs" />
+    <Compile Include="UI\Factories\SliderFactory.cs" />
+    <Compile Include="UI\Factories\TextBlockFactory.cs" />
+    <Compile Include="UI\Factories\UIContainer.cs" />
+    <Compile Include="UI\FolderBrowserDialogEx.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="UI\ForecastMenu.cs" />
+    <Compile Include="UI\FreeFrame.cs" />
+    <Compile Include="UI\LayoutFrame.cs" />
+    <Compile Include="UI\MainFrame.cs" />
+    <Compile Include="UI\Plots2_0\PlotCanvas.cs" />
+    <Compile Include="UI\Plots2_0\PlotData.cs" />
+    <Compile Include="UI\Plots2_0\PlotLegend.cs" />
+    <Compile Include="UI\Plots2_0\PlotScale.cs" />
+    <Compile Include="UI\Plots2_0\PlotTree.cs" />
+    <Compile Include="UI\Plots2_0\PlotViewer.cs" />
+    <Compile Include="UI\Plots\Plot.cs" />
+    <Compile Include="UI\Plots\PlotData.cs" />
+    <Compile Include="UI\Plots\PlotLegend.cs" />
+    <Compile Include="UI\Plots\PlotScale.cs" />
+    <Compile Include="UI\ScalableFrame.cs" />
+    <Compile Include="UI\TimeLineControlPanel.cs" />
+    <Compile Include="UI\UIConfig.cs" />
+    <Compile Include="UI\Window.cs" />
+    <Compile Include="UI\WindowScroll.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="App.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Fusion\Fusion.csproj">
+      <Project>{085c9e62-cddf-4b95-994d-085c74fa90fc}</Project>
+      <Name>Fusion</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <BootstrapperPackage Include=".NETFramework,Version=v4.5.2">
+      <Visible>False</Visible>
+      <ProductName>Microsoft .NET Framework 4.5.2 %28x86 and x64%29</ProductName>
+      <Install>true</Install>
+    </BootstrapperPackage>
+    <BootstrapperPackage Include="Microsoft.Net.Framework.3.5.SP1">
+      <Visible>False</Visible>
+      <ProductName>.NET Framework 3.5 SP1</ProductName>
+      <Install>false</Install>
+    </BootstrapperPackage>
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>
