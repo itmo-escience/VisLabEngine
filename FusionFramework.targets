@@ -8,15 +8,15 @@
         <ContentFiles Include="$(ProjectDir)..\FusionContent\*.*"/>
     </ItemGroup>
 	
-	<PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x64'">
-		<FusionBinaryTargetFolder>$(registry:HKEY_CURRENT_USER\Software\FusionEngine@BinaryDirRelease)</FusionBinaryTargetFolder>
-		<FusionContentTargetFolder>$(registry:HKEY_CURRENT_USER\Software\FusionEngine@ContentDir)</FusionContentTargetFolder>
+	<PropertyGroup>
+		<FusionBinaryTargetFolder>$(SolutionDir)FusionEngine/$(Platform)/$(Configuration)</FusionBinaryTargetFolder>
+		<FusionContentTargetFolder>$(SolutionDir)FusionEngine/Content</FusionContentTargetFolder>
 	</PropertyGroup>
 
-	<PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x64'">
+  <!--<PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x64'">
 		<FusionBinaryTargetFolder>$(registry:HKEY_CURRENT_USER\Software\FusionEngine@BinaryDirDebug)</FusionBinaryTargetFolder>
 		<FusionContentTargetFolder>$(registry:HKEY_CURRENT_USER\Software\FusionEngine@ContentDir)</FusionContentTargetFolder>
-	</PropertyGroup>
+	</PropertyGroup>-->
 
 	<Target Name="AfterBuild" >
 		<Message Text="echo Copying Fusion Engine files" Importance="high"/>

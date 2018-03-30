@@ -1,0 +1,20 @@
+<Project DefaultTargets="Compile"
+    xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+
+	<!-- Include core RELEASE assemblies --> 
+    <ItemGroup>
+		<Reference Include="Fusion">
+		  <HintPath>$(SolutionDir)FusionEngine/$(Platform)/$(Configuration)\Fusion.dll</HintPath>
+		</Reference>
+		<Reference Include="Fusion.Build">
+		  <HintPath>$(SolutionDir)FusionEngine/$(Platform)/$(Configuration)\Fusion.Build.dll</HintPath>
+		</Reference>
+		<Reference Include="BEPUphysics">
+		  <HintPath>$(SolutionDir)FusionEngine/$(Platform)/$(Configuration)\BEPUphysics.dll</HintPath>
+		</Reference>
+		<Reference Include="BEPUutilities">
+		  <HintPath>$(SolutionDir)FusionEngine/$(Platform)/$(Configuration)\BEPUutilities.dll</HintPath>
+		</Reference>
+    </ItemGroup>
+
+</Project>
