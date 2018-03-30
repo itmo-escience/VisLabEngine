@@ -10,7 +10,8 @@
 	
 	<PropertyGroup>
 		<FusionBinaryTargetFolder>$(SolutionDir)FusionEngine/$(Platform)/$(Configuration)</FusionBinaryTargetFolder>
-		<FusionContentTargetFolder>$(SolutionDir)FusionEngine/Content</FusionContentTargetFolder>
+		<FusionContentTargetFolder>$(SolutionDir)FusionEngine/FusionContent</FusionContentTargetFolder>
+		<FusionToolsFolder>$(SolutionDir)FusionEngine/Tools</FusionToolsFolder>
 	</PropertyGroup>
 
   <!--<PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x64'">
@@ -24,7 +25,7 @@
 		<Message Text="Content Output : $(FusionContentTargetFolder)" Importance="high"/>
 		<Copy SourceFiles="@(FusionOutputFiles)" DestinationFolder="$(FusionBinaryTargetFolder)" SkipUnchangedFiles="false"/>
 		<Copy SourceFiles="@(ThirdPartyFiles)" DestinationFolder="$(FusionBinaryTargetFolder)" SkipUnchangedFiles="false"/>
-		<Copy SourceFiles="@(ToolBoxFiles)" DestinationFolder="$(FusionBinaryTargetFolder)" SkipUnchangedFiles="false"/>
+		<Copy SourceFiles="@(ToolBoxFiles)" DestinationFolder="$(FusionToolsFolder)" SkipUnchangedFiles="false"/>
 		<Copy SourceFiles="@(ContentFiles)" DestinationFolder="$(FusionContentTargetFolder)" SkipUnchangedFiles="false"/>
 		<Message Text="echo Done." Importance="high"/>
 	</Target>
