@@ -25,6 +25,8 @@ double log(double x)
 	r += (x *= dDiv(mxx, 9.0));
 	r += (x *= dDiv(mxx, 10.0));
 	r += (x *= dDiv(mxx, 11.0));
+    
+    return r;
 }
 
 

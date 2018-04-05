@@ -43,6 +43,7 @@ namespace Fusion.Engine.Graphics.GIS
             SHOW_FRAMES = 0x0001,
             FIX_WATER = 0x0002,
             YANDEX = 0x0004,
+            TESSELLATE = 0x0008,
         }
 
         StructuredBuffer instDataGpu;
@@ -68,8 +69,8 @@ namespace Fusion.Engine.Graphics.GIS
 
             frame = Game.Content.Load<Texture2D>("redframe.tga");
             shader = Game.Content.Load<Ubershader>("globe.TileBatch.hlsl");
-            factory = shader.CreateFactory(typeof(TileFlags), Primitive.TriangleList, VertexInputElement.FromStructure<InstPoint>(), BlendState.AlphaBlend, RasterizerState.CullCW, DepthStencilState.Default);
-            factoryWire = shader.CreateFactory(typeof(TileFlags), Primitive.TriangleList, VertexInputElement.FromStructure<InstPoint>(), BlendState.AlphaBlend, RasterizerState.Wireframe, DepthStencilState.Default);
+            factory = shader.CreateFactory(typeof(TileFlags), Primitive.PatchList4CP, VertexInputElement.FromStructure<InstPoint>(), BlendState.AlphaBlend, RasterizerState.CullCW, DepthStencilState.Default);
+            factoryWire = shader.CreateFactory(typeof(TileFlags), Primitive.PatchList4CP, VertexInputElement.FromStructure<InstPoint>(), BlendState.AlphaBlend, RasterizerState.Wireframe, DepthStencilState.Default);
 
             instDataGpu = new StructuredBuffer(engine.GraphicsDevice, typeof(InstStruct), tilesLimit, StructuredBufferFlags.None);
 
@@ -94,18 +95,24 @@ namespace Fusion.Engine.Graphics.GIS
             var dev = Game.GraphicsDevice;
 
             dev.VertexShaderConstants[0] = constBuffer;
+            dev.HullShaderConstants[0] = constBuffer;
+            dev.DomainShaderConstants[0] = constBuffer;
             dev.PixelShaderConstants[0] = constBuffer;
             dev.PixelShaderSamplers[0] = SamplerState.AnisotropicClamp;
             dev.PixelShaderResources[0] = TileContainer.Atlas;
             dev.PixelShaderResources[1] = frame;
 
 
-            TileFlags flags = Game.Keyboard.IsKeyDown(Keys.M) && Game.Keyboard.IsKeyDown(Keys.LeftAlt) ? TileFlags.SHOW_FRAMES : 0;
+            TileFlags flags = Game.Keyboard.IsKeyDown(Keys.M) /*&& Game.Keyboard.IsKeyDown(Keys.LeftAlt)*/ ? TileFlags.SHOW_FRAMES : 0;
 
             flags |= FixWater ? TileFlags.FIX_WATER : 0;
             flags |= yandexMercator ? TileFlags.YANDEX : 0;
+            if (!Game.Keyboard.IsKeyDown(Keys.T))
+            {
+                flags |= TileFlags.TESSELLATE;
+            }           
 
-            dev.PipelineState = Game.Keyboard.IsKeyDown(Keys.M) && Game.Keyboard.IsKeyDown(Keys.LeftAlt) ? factoryWire[(int)flags] : factory[(int)flags];
+            dev.PipelineState = Game.Keyboard.IsKeyDown(Keys.M)/* && Game.Keyboard.IsKeyDown(Keys.LeftAlt)*/ ? factoryWire[(int)flags] : factory[(int)flags];
             //dev.PipelineState = factory[0];
             lock (tilesLock)
             {
@@ -137,10 +144,18 @@ namespace Fusion.Engine.Graphics.GIS
                     //dev.PixelShaderResources[0] = tex;
                 }
                 instData.Sort((s1, s2) => (s1.x == s2.x) ? s1.y.CompareTo(s2.y) : s1.x.CompareTo(s2.x));
+                var id = instData;
+                    //.Where(a =>
+                    //DVector3.Dot(
+                    //    DVector3.Normalize(GeoHelper.SphericalToCartesian(
+                    //        (CurrentMapSource.Projection.TileToWorldPos(a.x + 0.5f, a.y + 0.5f, (int) a.level)))),
+                    //    DVector3.Normalize(camera.CameraPosition)) > -0.1f).ToList();
                 if (instData.Count > 0)
                 {
-                    instDataGpu.SetData(instData.ToArray(), 0, Math.Min(instData.Count, tilesLimit));
+                    instDataGpu.SetData(id.ToArray(), 0, Math.Min(id.Count, tilesLimit));
                     dev.VertexShaderResources[2] = instDataGpu;
+                    dev.HullShaderResources[2] = instDataGpu;
+                    dev.DomainShaderResources[2] = instDataGpu;
                     dev.SetupVertexInput(tileVertexBuffer, tileIndexBuffer);
                     dev.DrawInstancedIndexed(tileIndexBuffer.Capacity, Math.Min(instData.Count, tilesLimit), 0, 0, 0);
                 }
@@ -194,14 +209,14 @@ namespace Fusion.Engine.Graphics.GIS
         static void CalculateVertices(out InstPoint[] vertices, out int[] indeces, int density)
 
         {
-            int RowsCount = density + 2;
+            int RowsCount = density + 1;
             int ColumnsCount = RowsCount;
 
             //var el = Game.GetService<LayerService>().ElevationLayer;
 
             var verts = new List<InstPoint>();
-            float step = 1.0f / (density + 1);
-            double dStep = 1.0 / (double)(density + 1);
+            float step = 1.0f / (RowsCount - 1);
+            double dStep = 1.0 / (double)(RowsCount - 1);
 
             for (int row = 0; row < RowsCount; row++)
             {
@@ -228,12 +243,13 @@ namespace Fusion.Engine.Graphics.GIS
                 for (int col = 0; col < ColumnsCount - 1; col++)
                 {
                     tindexes.Add(col + row * ColumnsCount);
-                    tindexes.Add(col + (row + 1) * ColumnsCount);
-                    tindexes.Add(col + 1 + row * ColumnsCount);
-
-                    tindexes.Add(col + 1 + row * ColumnsCount);
-                    tindexes.Add(col + (row + 1) * ColumnsCount);
+                    tindexes.Add(col + 1 + row * ColumnsCount);                    
                     tindexes.Add(col + 1 + (row + 1) * ColumnsCount);
+                    tindexes.Add(col + (row + 1) * ColumnsCount);
+
+                    //tindexes.Add(col + 1 + row * ColumnsCount);
+                    //tindexes.Add(col + (row + 1) * ColumnsCount);
+                    //tindexes.Add(col + 1 + (row + 1) * ColumnsCount);
                 }
             }
 

@@ -17,7 +17,7 @@ namespace Fusion.Engine.Graphics.GIS
         int lowestLod = 9;
         int minLod = 3;
 
-        int tileDensity = 10;
+        int tileDensity = 8;
 
         class Node
         {
