@@ -7,7 +7,8 @@ namespace FusionUI.UI.Factories
 {
     public static class CalendarFactory
     {
-        public static UIContainer<TimeSelector> HorizontalCalendarHolder(FrameProcessor ui, float OffsetX, float OffsetY, ScalableFrame parent, string label, Action<DateTime> selectAction,
+        public static UIContainer<TimeSelector> HorizontalCalendarHolder(FrameProcessor ui, float OffsetX, float OffsetY, ScalableFrame parent, 
+            string label, Action<DateTime> selectAction, 
             DateTime initialDate, DateTime startDate, DateTime endDate, out TimeSelector TimeSelector)
         {
             UIContainer<TimeSelector> holder = new UIContainer<TimeSelector>(ui, parent.UnitPaddingLeft, 0, parent.UnitWidth - parent.UnitPaddingLeft - parent.UnitPaddingRight,
@@ -25,7 +26,7 @@ namespace FusionUI.UI.Factories
 
             TimeSelector = new TimeSelector(ui, offset, OffsetY, width,
                 UIConfig.UnitFilterWindowElementHeight, UIConfig.InactiveColor, selectAction, UIConfig.BorderColor,
-                startDate, initialDate, endDate);
+                initialDate, startDate, endDate);
             holder.Item = TimeSelector;       
             holder.Add(labelFrame);
             holder.Add(TimeSelector);

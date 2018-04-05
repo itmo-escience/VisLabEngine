@@ -85,7 +85,8 @@ namespace FusionUI.UI.Elements
             TimeHolder.Current= date.ToString("HH:mm");            
         }
 
-        public TimeSelector(FrameProcessor ui, float x, float y, float w, float h, Color backColor, Action<DateTime> selectAction, Color borderColor, DateTime initialDate, DateTime minDate, DateTime maxDate) : base(ui, x, y, w, h, "", backColor)
+        public TimeSelector(FrameProcessor ui, float x, float y, float w, float h, Color backColor, Action<DateTime> selectAction, 
+            Color borderColor, DateTime initialDate, DateTime minDate, DateTime maxDate) : base(ui, x, y, w, h, "", backColor)
         {
             BorderColor = borderColor;            
 
