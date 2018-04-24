@@ -32,6 +32,7 @@ namespace Fusion.Engine.Graphics.GIS
 			Dark				= 10,
 			MoiseevMap			= 11,
 			DarkV9				= 12,
+			LightMap			= 13,
 		}
 
 		public BaseMapSource CurrentMapSource { get; internal set; }
@@ -52,6 +53,7 @@ namespace Fusion.Engine.Graphics.GIS
 			MapSources.Add(new Dark(Game)				);
 			MapSources.Add(new MoiseevMap(Game)			);
 			MapSources.Add(new DarkV9(Game)				);
+			MapSources.Add(new LightMap(Game)			);
 		}
 
 	    public MapSource CurrentMapSourecEnum;
