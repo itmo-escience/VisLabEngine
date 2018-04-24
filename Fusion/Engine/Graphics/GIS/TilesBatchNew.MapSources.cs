@@ -55,8 +55,6 @@ namespace Fusion.Engine.Graphics.GIS
 			MapSources.Add(new MoiseevMap(Game)			);
 			MapSources.Add(new DarkV9(Game)				);
 			MapSources.Add(new LightMap(Game)			);
-		}
-
         }
 
 	    public MapSource CurrentMapSourecEnum;
