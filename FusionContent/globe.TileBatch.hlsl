@@ -1,6 +1,6 @@
 #include "globe.Include.hlsl"
 
-Texture2DArray	DiffuseMap		: register(t0);
+Texture2DArray	Atlas		: register(t0);
 Texture2D		FrameMap		: register(t1);
 SamplerState	Sampler			: register(s0);
 
@@ -30,6 +30,7 @@ struct INST_INPUT {
 	uint level ;
 	uint density ;
 	uint texIndex ;
+    uint heightmapIndex ;
 	float3 dummy;
 };
 
@@ -40,7 +41,7 @@ struct VS_OUTPUT {
 	float3 Normal		: TEXCOORD1		;
 	float  CapFade		: TEXCOORD2		;
     uint instid             : TEXCOORD3     ;
-	uint Index 			: TEXCOORD4		;
+	uint2 Index 			: TEXCOORD4		;
     float4 xydd		    : TEXCOORD5     ;	
     float  Distance     : TEXCOORD6     ;
     uint4  lonlat     : TEXCOORD7     ;
@@ -83,7 +84,7 @@ VS_OUTPUT VSMain ( VS_INPUT v, uint id : SV_InstanceID )
 	double lat		= innerPos.y;
 		
 	output.Tex		=	v.Tex;
-	output.Index    =   InstData[id].texIndex;
+	output.Index    =   uint2(InstData[id].texIndex, InstData[id].heightmapIndex);
     asuint(lon, output.lonlat.x, output.lonlat.y);
     asuint(lat, output.lonlat.z, output.lonlat.w);
 	if (lat < -1.47) 
@@ -146,7 +147,7 @@ double dlerp(double x, double y, double t) {
 
 float GetTessFactorForDistanceAndLevel(float distance, int level) {
 	if (distance > 0) {
-		return 6 - clamp(level + log2(distance) - 14, 0, 6);
+		return 6 - clamp(level + log2(distance) - 16, 0, 6);
 	} else {
 		return 0;
 	}
@@ -211,26 +212,28 @@ VS_OUTPUT DSMain(PATCH_OUTPUT input, float2 uvwCoord : SV_DomainLocation, const 
 	VS_OUTPUT output = (VS_OUTPUT)0;	
     int id = patch[0].instid;
 	
-    double2 innerPos = getInnerPos(InstData[id].x, InstData[id].y, lerp(patch[0].xydd.x, patch[2].xydd.x, uvwCoord.x), lerp(patch[0].xydd.y, patch[2].xydd.y, uvwCoord.y), InstData[id].level, InstData[id].density);
-	double lon		= innerPos.x;
-	double lat		= innerPos.y;
-	
-	float4 heightData = 0;//HeightMap.SampleLevel(Sampler, output.Tex.xy, 0) * 256;
-	float height = 0;//-10 + ((heightData.r * 256 * 256 + heightData.g * 256 + heightData.b) * 0.1 * 0.001);
-	if (height < 0) height = 0;	
-       
-	double3 cPos	= SphericalToDecart(double2(lon, lat), 6378.137 + height);
 
-	double3 normPos = cPos*0.000156785594;
-	float3	normal	= normalize(float3(normPos));
 	
-	double3 cameraPos =  double3(asdouble(Stage.CameraX[0], Stage.CameraX[1]), asdouble(Stage.CameraY[0], Stage.CameraY[1]), asdouble(Stage.CameraZ[0], Stage.CameraZ[1]));
-	double posX = cPos.x - cameraPos.x;
-	double posY = cPos.y - cameraPos.y;
-	double posZ = cPos.z - cameraPos.z;
-	output.Position = mul(float4(posX, posY, posZ, 1), Stage.ViewProj);				
+	
+	//if (height < 0) height = 0;	
+       
+	
 	#ifdef TESSELLATE
-    if (1) {
+    {
+        double2 innerPos = getInnerPos(InstData[id].x, InstData[id].y, lerp(patch[0].xydd.x, patch[2].xydd.x, uvwCoord.x), lerp(patch[0].xydd.y, patch[2].xydd.y, uvwCoord.y), InstData[id].level, InstData[id].density);
+        double lon		= innerPos.x;
+        double lat		= innerPos.y;
+        
+        double3 cPos	= SphericalToDecart(double2(lon, lat), 6378.137);
+        double3 normPos = cPos*0.000156785594;
+        float3	normal	= normalize(float3(normPos));
+        
+        double3 cameraPos =  double3(asdouble(Stage.CameraX[0], Stage.CameraX[1]), asdouble(Stage.CameraY[0], Stage.CameraY[1]), asdouble(Stage.CameraZ[0], Stage.CameraZ[1]));
+        double posX = cPos.x - cameraPos.x;
+        double posY = cPos.y - cameraPos.y;
+        double posZ = cPos.z - cameraPos.z;
+        output.Position = mul(float4(posX, posY, posZ, 1), Stage.ViewProj);				
+        
         float dist = length(float3(posX, posY, posZ));		
 		float tess = GetTessFactorForDistanceAndLevel(dist, InstData[id].level + log2(InstData[id].density));		
 		
@@ -240,28 +243,34 @@ VS_OUTPUT DSMain(PATCH_OUTPUT input, float2 uvwCoord : SV_DomainLocation, const 
 		}
 		if (uvwCoord.y * (1 << input.tess) % 2 > 0.000001) {
 			uvwCoord.y -= morph * (1.0f / (1 << input.tess));		
-		}
-        
-        double2 innerPos = getInnerPos(InstData[id].x, InstData[id].y, lerp(patch[0].xydd.x, patch[2].xydd.x, uvwCoord.x), lerp(patch[0].xydd.y, patch[2].xydd.y, uvwCoord.y), InstData[id].level, InstData[id].density);
-        double lon		= innerPos.x;
-        double lat		= innerPos.y;
-        
-        double3 cPos	= SphericalToDecart(double2(lon, lat), 6378.137 + height);
-
-        double3 normPos = cPos*0.000156785594;
-        float3	normal	= normalize(float3(normPos));
-        
-        double3 cameraPos =  double3(asdouble(Stage.CameraX[0], Stage.CameraX[1]), asdouble(Stage.CameraY[0], Stage.CameraY[1]), asdouble(Stage.CameraZ[0], Stage.CameraZ[1]));
-        double posX = cPos.x - cameraPos.x;
-        double posY = cPos.y - cameraPos.y;
-        double posZ = cPos.z - cameraPos.z;
-        output.Position = mul(float4(posX, posY, posZ, 1), Stage.ViewProj);				
+		}                     
     }   
     #endif
-	output.Tex = lerp(lerp(patch[0].Tex, patch[1].Tex, uvwCoord.x), lerp(patch[3].Tex, patch[2].Tex, uvwCoord.x), uvwCoord.y);	
+    double2 innerPos = getInnerPos(InstData[id].x, InstData[id].y, lerp(patch[0].xydd.x, patch[2].xydd.x, uvwCoord.x), lerp(patch[0].xydd.y, patch[2].xydd.y, uvwCoord.y), InstData[id].level, InstData[id].density);
+        double lon		= innerPos.x;
+        double lat		= innerPos.y;  
+    float4 Tex = output.Tex = lerp(lerp(patch[0].Tex, patch[1].Tex, uvwCoord.x), lerp(patch[3].Tex, patch[2].Tex, uvwCoord.x), uvwCoord.y);	
 	output.Normal	=	lerp(lerp(patch[0].Normal, patch[1].Normal, uvwCoord.x), lerp(patch[3].Normal, patch[2].Normal, uvwCoord.x), uvwCoord.y);	
 	output.CapFade  =   lerp(lerp(patch[0].CapFade, patch[1].CapFade, uvwCoord.x), lerp(patch[3].CapFade, patch[2].CapFade, uvwCoord.x), uvwCoord.y);
-    output.Index = patch[0].Index;
+    float2 Index = output.Index = patch[0].Index;
+    float4 heightData = (Index.y > 0) ? 
+            Atlas.SampleLevel(Sampler, float3(Tex.xy, Index.y), 0) : 
+            float4(0.5f, 0, 0, 0);
+    float height = ((heightData.r * 256 * 256 + heightData.g * 256 + heightData.b) - 32768) * 0.001;
+    double3 cPos	= SphericalToDecart(double2(lon, lat), 6378.137 + height);
+
+    double3 normPos = cPos*0.000156785594;
+    float3	normal	= normalize(float3(normPos));
+    
+    
+    double3 cameraPos =  double3(asdouble(Stage.CameraX[0], Stage.CameraX[1]), asdouble(Stage.CameraY[0], Stage.CameraY[1]), asdouble(Stage.CameraZ[0], Stage.CameraZ[1]));
+    double posX = cPos.x - cameraPos.x;
+    double posY = cPos.y - cameraPos.y;
+    double posZ = cPos.z - cameraPos.z;
+    output.Position = mul(float4(posX, posY, posZ, 1), Stage.ViewProj);		
+    output.Color = heightData.r;
+    
+	
 	// output.lon = 0;
 	// output.lat = 0;
 	//output.Color = float4(normal, 1);
@@ -273,6 +282,8 @@ VS_OUTPUT DSMain(PATCH_OUTPUT input, float2 uvwCoord : SV_DomainLocation, const 
 ////////////////////////// Draw map tiles and polygons
 float4 PSMain ( VS_OUTPUT input ) : SV_Target
 {
+    //return input.Color;
+    
     //return float4(1, 1, 1, 1);
 	float3 waterColor = float3(0, 0, 0), snowColor = float3(0, 0, 0);
 	switch(Stage.SourceData.y) {
@@ -299,7 +310,7 @@ float4 PSMain ( VS_OUTPUT input ) : SV_Target
 		default:
 		break;
 	}		
-	float4 color	= input.Index > 0 ? DiffuseMap.Sample(Sampler, float3(input.Tex.xy, input.Index)) : FrameMap.Sample(Sampler, input.Tex.xy);
+	float4 color	= (input.Index.x > 0) ? Atlas.Sample(Sampler, float3(input.Tex.xy, input.Index.x)) : FrameMap.Sample(Sampler, input.Tex.xy);
 	float3 ret		= color.rgb;	
 	if (input.CapFade < 0 ) {
 		ret = lerp(ret, snowColor, -input.CapFade);

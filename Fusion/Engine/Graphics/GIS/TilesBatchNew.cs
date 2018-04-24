@@ -3,14 +3,15 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Forms;
 using Fusion.Core;
 using Fusion.Core.Mathematics;
 using Fusion.Drivers.Graphics;
 using Fusion.Engine.Common;
 using Fusion.Engine.Graphics.GIS.DataSystem.MapSources;
 using Fusion.Engine.Graphics.GIS.GlobeMath;
-using Fusion.Engine.Input;
 using SharpDX.Direct3D;
+using Keys = Fusion.Engine.Input.Keys;
 
 namespace Fusion.Engine.Graphics.GIS
 {
@@ -80,7 +81,9 @@ namespace Fusion.Engine.Graphics.GIS
 
         public override void Update(GameTime gameTime)
         {
-            CurrentMapSource.Update(gameTime);            
+
+            CurrentMapSource.Update(gameTime);
+            //CurrentHeightmapSource.Update(gameTime);
 
             DetermineTilesNew();           
         }
@@ -92,27 +95,6 @@ namespace Fusion.Engine.Graphics.GIS
             //      var camPos = new DBoundingBox(localCameraPos, localCameraPos + DVector3.One);
             //Gis.Debug.DrawSphere(100, Color.Red, DMatrix.Translation(localCameraPos));
 
-            var dev = Game.GraphicsDevice;
-
-            dev.VertexShaderConstants[0] = constBuffer;
-            dev.HullShaderConstants[0] = constBuffer;
-            dev.DomainShaderConstants[0] = constBuffer;
-            dev.PixelShaderConstants[0] = constBuffer;
-            dev.PixelShaderSamplers[0] = SamplerState.AnisotropicClamp;
-            dev.PixelShaderResources[0] = TileContainer.Atlas;
-            dev.PixelShaderResources[1] = frame;
-
-
-            TileFlags flags = Game.Keyboard.IsKeyDown(Keys.M) /*&& Game.Keyboard.IsKeyDown(Keys.LeftAlt)*/ ? TileFlags.SHOW_FRAMES : 0;
-
-            flags |= FixWater ? TileFlags.FIX_WATER : 0;
-            flags |= yandexMercator ? TileFlags.YANDEX : 0;
-            if (!Game.Keyboard.IsKeyDown(Keys.T))
-            {
-                flags |= TileFlags.TESSELLATE;
-            }           
-
-            dev.PipelineState = Game.Keyboard.IsKeyDown(Keys.M)/* && Game.Keyboard.IsKeyDown(Keys.LeftAlt)*/ ? factoryWire[(int)flags] : factory[(int)flags];
             //dev.PipelineState = factory[0];
             lock (tilesLock)
             {
@@ -122,7 +104,7 @@ namespace Fusion.Engine.Graphics.GIS
                     Console.WriteLine("maximal number of tiles to render reached: " + maxTilesToRender);
                 }
 
-                PixHelper.BeginEvent(new SharpDX.Mathematics.Interop.RawColorBGRA(255, 0, 0, 255), "Draw Tiles");
+                
                 var instData = new List<InstStruct>();
                 int i = 0;
                 foreach (var globeTile in tilesToRender)
@@ -130,7 +112,12 @@ namespace Fusion.Engine.Graphics.GIS
                     var tile = TileContainer.AddTile(
                         CurrentMapSource.GetTile(globeTile.Value.X, globeTile.Value.Y, globeTile.Value.Z),
                         globeTile.Key);
+                    var heightTile = HeightmapContainer.AddTile(
+                        CurrentHeightmapSource.GetTile(globeTile.Value.X, globeTile.Value.Y, globeTile.Value.Z),
+                        globeTile.Key);
                     if (tile < 0) tile = 0;
+                    if (heightTile < 0) heightTile = 0;
+
                     instData.Add(new InstStruct()
                     {
                         x = (uint) globeTile.Value.X,
@@ -138,18 +125,40 @@ namespace Fusion.Engine.Graphics.GIS
                         level = (uint) globeTile.Value.Z,
                         density = (uint) tileDensity,
                         texIndex = (uint) tile,
+                        heightmapIndex = (uint) heightTile,
                     });
                     TileContainer.RemoveTile(globeTile.Key);
+                    HeightmapContainer.RemoveTile(globeTile.Key);
                     i++;
                     //dev.PixelShaderResources[0] = tex;
                 }
                 instData.Sort((s1, s2) => (s1.x == s2.x) ? s1.y.CompareTo(s2.y) : s1.x.CompareTo(s2.x));
                 var id = instData;
-                    //.Where(a =>
-                    //DVector3.Dot(
-                    //    DVector3.Normalize(GeoHelper.SphericalToCartesian(
-                    //        (CurrentMapSource.Projection.TileToWorldPos(a.x + 0.5f, a.y + 0.5f, (int) a.level)))),
-                    //    DVector3.Normalize(camera.CameraPosition)) > -0.1f).ToList();
+
+                PixHelper.BeginEvent(new SharpDX.Mathematics.Interop.RawColorBGRA(255, 0, 0, 255), "Draw Tiles");
+                var dev = Game.GraphicsDevice;
+
+                dev.VertexShaderConstants[0] = constBuffer;
+                dev.HullShaderConstants[0] = constBuffer;
+                dev.DomainShaderConstants[0] = constBuffer;
+                dev.PixelShaderConstants[0] = constBuffer;
+                dev.DomainShaderSamplers[0] = SamplerState.AnisotropicClamp;
+                dev.PixelShaderSamplers[0] = SamplerState.AnisotropicClamp;
+                dev.PixelShaderResources[0] = TileContainer.Atlas;
+                dev.DomainShaderResources[0] = HeightmapContainer.Atlas;
+                dev.PixelShaderResources[1] = frame;
+
+
+                TileFlags flags = Game.Keyboard.IsKeyDown(Keys.M) /*&& Game.Keyboard.IsKeyDown(Keys.LeftAlt)*/ ? TileFlags.SHOW_FRAMES : 0;
+
+                flags |= FixWater ? TileFlags.FIX_WATER : 0;
+                flags |= yandexMercator ? TileFlags.YANDEX : 0;
+                if (!Game.Keyboard.IsKeyDown(Keys.T))
+                {
+                    flags |= TileFlags.TESSELLATE;
+                }
+
+                dev.PipelineState = Game.Keyboard.IsKeyDown(Keys.M)/* && Game.Keyboard.IsKeyDown(Keys.LeftAlt)*/ ? factoryWire[(int)flags] : factory[(int)flags];
                 if (instData.Count > 0)
                 {
                     instDataGpu.SetData(id.ToArray(), 0, Math.Min(id.Count, tilesLimit));
@@ -173,6 +182,7 @@ namespace Fusion.Engine.Graphics.GIS
             public uint level;
             public uint density;
             public uint texIndex;
+            public uint heightmapIndex;
             public Vector3 dummy;
         }
 

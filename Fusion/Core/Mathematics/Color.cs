@@ -695,6 +695,26 @@ namespace Fusion.Core.Mathematics
         }
 
         /// <summary>
+        /// Converts the color from a packed ABGR integer.
+        /// </summary>
+        /// <param name="color">A packed integer containing all four color components in ABGR order</param>
+        /// <returns>A color.</returns>
+        public static Color FromARGB(int color)
+        {
+            return new Color((byte)(color >> 16), (byte)(color >> 8), (byte)color, (byte)(color >> 24));
+        }
+
+        /// <summary>
+        /// Converts the color from a packed ABGR integer.
+        /// </summary>
+        /// <param name="color">A packed integer containing all four color components in ABGR order</param>
+        /// <returns>A color.</returns>
+        public static Color FromARGB(uint color)
+        {
+            return FromARGB(unchecked((int)color));
+        }
+
+        /// <summary>
         /// Converts the color from a packed BGRA integer.
         /// </summary>
         /// <param name="color">A packed integer containing all four color components in RGBA order</param>

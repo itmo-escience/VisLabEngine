@@ -155,6 +155,15 @@ namespace Fusion.Drivers.Graphics
             }
         }
 
+        public void SetFromResource(ShaderResource from, int sliceIndex)
+        {
+            lock (device.DeviceContext)
+            {
+                device.DeviceContext.CopySubresourceRegion(from.SRV.Resource, 0, null, tex2D, sliceIndex * mipCount);
+                device.DeviceContext.GenerateMips(SRV);
+            }
+        }
+
         /// <summary>
         /// Sets 2D texture data, specifying a mipmap level, source rectangle, start index, and number of elements.
         /// </summary>
