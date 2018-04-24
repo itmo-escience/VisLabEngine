@@ -105,10 +105,11 @@ namespace FusionUI.UI.Elements
             {
                 Cells.Add(new List<Cell>());
             }
-            var sizeText = this.FontHolder[ApplicationInterface.uiScale].MeasureString(value);            
+            var sizeText = Cells[i][j].FontHolder[ApplicationInterface.uiScale].MeasureString(value);            
             Cells[i][j].Text = value;
 
-            if (Cells[i][j].Width < sizeText.Width + defaultOffsetX * 2 * ApplicationInterface.ScaleMod)
+            if (Cells[i][j].Width < sizeText.Width + defaultOffsetX * 2 * ApplicationInterface.ScaleMod &&
+                value != "")
             {
                 ResizeTable(i, j, (sizeText.Width - Cells[i][j].Width) / ApplicationInterface.ScaleMod + defaultOffsetX * 2, 0);
             }

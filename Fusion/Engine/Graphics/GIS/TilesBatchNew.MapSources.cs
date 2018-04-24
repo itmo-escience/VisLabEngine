@@ -37,9 +37,9 @@ namespace Fusion.Engine.Graphics.GIS
 		}
 
 		public BaseMapSource CurrentMapSource { get; internal set; }
+        public BaseMapSource CurrentHeightmapSource { get; internal set; }
 
-
-		protected void RegisterMapSources()
+        protected void RegisterMapSources()
 		{
 			MapSources.Add(new OpenStreetMap(Game)		);
 			MapSources.Add(new GoogleMap(Game)			);
@@ -57,6 +57,8 @@ namespace Fusion.Engine.Graphics.GIS
 			MapSources.Add(new LightMap(Game)			);
 		}
 
+        }
+
 	    public MapSource CurrentMapSourecEnum;
 
         private bool yandexMercator => CurrentMapSource.Projection is MercatorProjectionYandex;
@@ -66,11 +68,12 @@ namespace Fusion.Engine.Graphics.GIS
 			var oldProj = CurrentMapSource.Projection;
 
 			CurrentMapSource = MapSources[(int)map];
-	        CurrentMapSourecEnum = map;            	        
+	        CurrentMapSourecEnum = map;            
 
-   //         if (!oldProj.Equals(CurrentMapSource.Projection)) {
-			//	updateTiles = true;
-			//}
+
+            //         if (!oldProj.Equals(CurrentMapSource.Projection)) {
+            //	updateTiles = true;
+            //}
 
             tileContainer?.Clear();
 	        lastNodes = new HashSet<NodeInfo>();

@@ -353,7 +353,6 @@ namespace Fusion.Drivers.Graphics {
                     // Copy the data to the array :
                     SharpDX.DataStream stream;
                     var databox = d3dContext.MapSubresource(stagingTex, 0, D3D.MapMode.Read, D3D.MapFlags.None, out stream);
-
                     // Some drivers may add pitch to rows.
                     // We need to copy each row separatly and skip trailing zeros.
                     var currentIndex	=	startIndex;
