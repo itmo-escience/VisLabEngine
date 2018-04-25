@@ -220,14 +220,14 @@ namespace Fusion.Engine.Graphics.GIS
 			double		angleStep	= Math.PI*2/density;
 			
 			for (int i = 0; i < density; i++) {
-				var point0X = radius * Math.Cos(angleStep * i);
-				var point0Y = radius * Math.Sin(angleStep * i);
+				var point0X = radius * Math.Sin(angleStep * i);
+				var point0Y = radius * Math.Cos(angleStep * i);
 
-				var point1X = radius * Math.Cos(angleStep * (i+1));
-				var point1Y = radius * Math.Sin(angleStep * (i+1));
+				var point1X = radius * Math.Sin(angleStep * (i+1));
+				var point1Y = radius * Math.Cos(angleStep * (i+1));
 
-				var p0 = DVector3.TransformCoordinate(new DVector3(point0X, point0Y, 0), transform);
-				var p1 = DVector3.TransformCoordinate(new DVector3(point1X, point1Y, 0), transform);
+				var p0 = DVector3.TransformCoordinate(new DVector3(point0X, 0, point0Y), transform);
+				var p1 = DVector3.TransformCoordinate(new DVector3(point1X, 0, point1Y), transform);
 
 				DrawLine(p0, p1, color);
 			}
