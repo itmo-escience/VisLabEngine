@@ -5,7 +5,7 @@
         <FusionOutputFiles Include="$(OutDir)*.dll;$(OutDir)*.exe;$(OutDir)*.pdb;"/>
         <ThirdPartyFiles Include="$(ProjectDir)..\SDKs\FbxSdk\lib\x64\$(ConfigurationName)\libfbxsdk.dll"/>
         <ToolBoxFiles Include="$(ProjectDir)..\Tools\*.com;$(ProjectDir)..\Tools\*.exe;$(ProjectDir)..\Tools\*.dll;"/>
-        <ContentFiles Include="$(ProjectDir)..\FusionContent\*.*"/>
+        <ContentFiles Include="$(ProjectDir)..\FusionContent\**\*.*"/>
     </ItemGroup>
 	
 	<PropertyGroup>
@@ -21,7 +21,7 @@
 		<Copy SourceFiles="@(FusionOutputFiles)" DestinationFolder="$(FusionBinaryTargetFolder)" SkipUnchangedFiles="false"/>
 		<Copy SourceFiles="@(ThirdPartyFiles)" DestinationFolder="$(FusionBinaryTargetFolder)" SkipUnchangedFiles="false"/>
 		<Copy SourceFiles="@(ToolBoxFiles)" DestinationFolder="$(FusionToolsFolder)" SkipUnchangedFiles="false"/>
-		<Copy SourceFiles="@(ContentFiles)" DestinationFolder="$(FusionContentTargetFolder)" SkipUnchangedFiles="false"/>
+		<Copy SourceFiles="@(ContentFiles)" DestinationFiles="@(ContentFiles->'$(SolutionDir)FusionEngine/FusionContent/%(RecursiveDir)%(Filename)%(Extension)')" SkipUnchangedFiles="false"/>
 		<Message Text="echo Done." Importance="high"/>
 	</Target>
 	
