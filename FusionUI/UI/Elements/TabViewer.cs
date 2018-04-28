@@ -64,7 +64,7 @@ namespace FusionUI.UI.Elements
             }
             float WidthTapLabel = Math.Max(this.WidthTapLabel,
                 UIConfig.FontSubtitle[ApplicationInterface.uiScale].MeasureStringF(name).Width / ScaleMultiplier + 2 * UIConfig.UnitTabTextOffsetX);
-            var xPosition =  listTab.Count * WidthTapLabel;
+            var xPosition =  listTab.Sum(a => a.Value.Label.UnitWidth + 2 * UIConfig.UnitTabTextOffsetX);
             if (addTabButton != null)
             {
                 xPosition = addTabButton.UnitX;

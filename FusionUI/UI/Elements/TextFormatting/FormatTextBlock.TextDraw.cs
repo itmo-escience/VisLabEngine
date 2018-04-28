@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Net;
 using Fusion;
@@ -260,13 +261,33 @@ namespace FusionUI.UI.Elements.TextFormatting
                                         try
                                         {
 
-                                            var client = new WebClient();
-                                            client.Headers.Add("user-agent",
-                                                "Mozilla/5.0 (Windows NT 6.1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/41.0.2228.0 Safari/537.36");
-                                            byte[] data = client.DownloadData(tag.Param);
+                                            if (tag.Param.Contains(":\\") && char.IsLetter(tag.Param[0]))
+                                            {
+                                                t.DiskWRQueue.Post(t1 =>
+                                                {
+                                                    if (!File.Exists(tag.Param))
+                                                    {
+                                                        using (var stream = File.OpenRead(tag.Param))
+                                                        {
+                                                            Texture Image = new UserTexture(Game.Instance.RenderSystem, stream, false);                                                            
+                                                            ImageCache.Add(tag.Param, Image);
+                                                        }
+                                                    }                                                   
+                                                }, null);
 
-                                            Texture Image = new UserTexture(Game.Instance.RenderSystem, data, false);
-                                            ImageCache.Add(tag.Param, Image);
+                                            }
+                                            else
+                                            {
+
+                                                var client = new WebClient();
+                                                client.Headers.Add("user-agent",
+                                                    "Mozilla/5.0 (Windows NT 6.1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/41.0.2228.0 Safari/537.36");
+                                                byte[] data = client.DownloadData(tag.Param);
+
+                                                Texture Image = new UserTexture(Game.Instance.RenderSystem, data,
+                                                    false);
+                                                ImageCache.Add(tag.Param, Image);
+                                            }
                                         }
                                         catch (Exception e)
                                         {
