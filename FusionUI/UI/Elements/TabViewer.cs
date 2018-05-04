@@ -17,8 +17,8 @@ namespace FusionUI.UI.Elements
         protected Color ActiveColor = Color.Zero;
         protected Color PassiveColor = Color.Zero;
 
-        protected Color ActiveColorText = Color.White;
-        protected Color PassiveColorText = new Color(1, 1, 1, 0.5f);
+        protected Color ActiveColorText = UIConfig.ActiveTextColor;
+        protected Color PassiveColorText = UIConfig.InactiveTextColor;
 
         protected Color BorderColorActive = UIConfig.ActiveColor;
 

@@ -23,7 +23,7 @@ namespace FusionUI.UI.Elements
         public int columns;
 
         public int CellBorder = 0;
-        public Color CellBorderColor = Color.White;
+        public Color CellBorderColor = UIConfig.BorderColor;
 
         public Action<Vector2> OnResize;
 

@@ -290,7 +290,7 @@ namespace FusionUI.UI.Elements.DropDown
                     row.Ghost = true;
                 }
                 else {
-                    row.ForeColor = Color.White;
+                    row.ForeColor = UIConfig.ActiveTextColor;
                     row.Ghost = false;
                 }
             }

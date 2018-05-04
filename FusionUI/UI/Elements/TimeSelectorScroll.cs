@@ -149,7 +149,7 @@ namespace FusionUI.UI.Elements
                 var row = rows[values[i]];
                 if (Offset == i)
                 {
-                    row.ForeColor = Color.White;
+                    row.ForeColor = UIConfig.ActiveTextColor;
                 }
                 else
                 {

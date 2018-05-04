@@ -133,7 +133,7 @@ namespace FusionUI.UI.Elements
             var yLabel = 0;
             timeLabelTime = new ScalableFrame(ui, LordOfTime.UnitX + LordOfTime.UnitWidth/2 - UIConfig.UnitTimelineLabelWidth/2, yLabel > 0 ? yLabel : 1.5f, UIConfig.UnitTimelineLabelWidth, font.CapHeight / ScaleMultiplier, "Time", Color.Zero)
             {
-                ForeColor = Color.White,
+                ForeColor = UIConfig.ActiveTextColor,
 //                Border = 1,
 //                BorderColor = new Color(110, 110, 110),
                 TextAlignment = Alignment.MiddleCenter,
@@ -165,13 +165,13 @@ namespace FusionUI.UI.Elements
 
 
             var thinknessLine = UIConfig.UnitTimelineTickness;
-            lineLineBeforeLord = new ScalableFrame(ui, 0, this.UnitHeight/2 - thinknessLine/2, LordOfTime.UnitX + emptySizeImage / ScaleMultiplier, thinknessLine, "", new Color(0, 120, 215, 205))
+            lineLineBeforeLord = new ScalableFrame(ui, 0, this.UnitHeight/2 - thinknessLine/2, LordOfTime.UnitX + emptySizeImage / ScaleMultiplier, thinknessLine, "", UIConfig.TimeLineColor1)
             {
                 //Anchor = FrameAnchor.Bottom | FrameAnchor.Left | FrameAnchor.Right,
                 Ghost = true
             };
 
-            lineLineAfterLord = new ScalableFrame(ui, LordOfTime.UnitX + LordOfTime.UnitWidth - emptySizeImage, this.UnitHeight/2 - thinknessLine/2, this.UnitWidth - LordOfTime.UnitX - LordOfTime.UnitWidth + emptySizeImage / ScaleMultiplier, thinknessLine, "", new Color(255, 255, 255, 205))
+            lineLineAfterLord = new ScalableFrame(ui, LordOfTime.UnitX + LordOfTime.UnitWidth - emptySizeImage, this.UnitHeight/2 - thinknessLine/2, this.UnitWidth - LordOfTime.UnitX - LordOfTime.UnitWidth + emptySizeImage / ScaleMultiplier, thinknessLine, "", UIConfig.TimeLineColor2)
             {
                 //Anchor = FrameAnchor.Bottom | FrameAnchor.Left | FrameAnchor.Right,
                 Ghost = true

@@ -105,7 +105,7 @@ namespace FusionUI.UI
                 currentEventArgs.IsAltClick = args.Key == Keys.RightButton;                
                 currentEventArgs.ActionType = ControlActionArgs.ClickActionType.ActionUp;
                 if (base.Ghost || !Active) return;
-                var rootFrame = ApplicationInterface.Instance.rootFrame;
+                var rootFrame = ApplicationInterface.Instance.RootFrame;
                 var hoveredFrame = MainFrame.GetHoveredFrame(rootFrame, (Point)currentEventArgs.Position);
                 if (MainFrame.IsChildOf(rootFrame, hoveredFrame, this) && Selected)
                 {
@@ -357,7 +357,38 @@ namespace FusionUI.UI
             ActiveImageColor = Color.White,
             InactiveImageColor = UIConfig.InactiveTextColor;       
 
-        public Texture ActiveImage, InactiveImage;        
+        public Texture ActiveImage, InactiveImage;
+
+        override public Color BackColor
+        {
+            get => base.BackColor;
+            set
+            {
+                base.BackColor = value;
+                if (Active) ActiveBackColor = value;
+                else InactiveBackColor = value;
+            }
+        }
+
+        override public Color BorderColor {
+            get => base.BorderColor;
+            set
+            {
+                base.BorderColor = value;
+                if (Active) ActiveBorderColor = value;
+                else InactiveBorderColor = value;
+            }
+        }
+
+        override public Color ForeColor {
+            get => base.ForeColor;
+            set
+            {
+                base.ForeColor = value;
+                if (Active) ActiveForeColor = value;
+                else InactiveForeColor = value;
+            }
+        }
 
         public virtual void UpdateColor(bool active)
         {

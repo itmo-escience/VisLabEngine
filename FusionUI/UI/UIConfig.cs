@@ -122,6 +122,12 @@ namespace FusionUI.UI
         public static Color NodeColor = new Color(0, 0, 0, 190);
         public static Color BackColorLayer = new Color(255, 255, 255, 30);
 
+        public static Color TimeLineColor1 = new Color(0, 120, 215, 205);
+        public static Color TimeLineColor2 = new Color(255, 255, 255, 205);
+
+        public static Color TimeLineIconColor = new Color(255, 255, 255, 255);
+
+
         public static float UnitCheckboxLabelHeight = 6;
         public static float UnitCheckboxWidth = 12;
         public static float UnitSwitcherWidth = 11;

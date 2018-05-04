@@ -191,7 +191,8 @@ namespace FusionUI.UI
                 TextAlignment = Alignment.MiddleCenter,
                 Ghost = !IsVisible,
                 Visible = IsVisible,
-                Text = currentStep
+                Text = currentStep,
+                ImageColor = UIConfig.TimeLineIconColor,
             };
             this.Add(button);
             return button;
@@ -216,7 +217,8 @@ namespace FusionUI.UI
                 TextAlignment = Alignment.MiddleCenter,
                 Ghost = !IsVisible,
                 Visible = IsVisible,
-                Text = currentStep,               
+                Text = currentStep,
+                ImageColor = UIConfig.TimeLineIconColor,
             };
             this.Add(button);
             return button;

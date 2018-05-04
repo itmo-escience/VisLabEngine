@@ -16,6 +16,7 @@ namespace FusionUI.UI.Factories
                 UIConfig.UnitFilterWindowElementHeight, okText, UIConfig.ButtonColor, UIConfig.ActiveColor, 200, confirmAction)
             {
                 TextAlignment = Alignment.MiddleCenter,
+                ForeColor = UIConfig.ActiveTextColor,
             };
             cancelButton = new Button(ui,
                 holder.UnitWidth / 2 + distance/2,
@@ -23,6 +24,7 @@ namespace FusionUI.UI.Factories
                 UIConfig.UnitFilterWindowElementHeight, cancelText, UIConfig.ButtonColor, UIConfig.ActiveColor, 200, cancelAction)
             {
                 TextAlignment = Alignment.MiddleCenter,
+                ForeColor = UIConfig.ActiveTextColor,
             };
 
             holder.Item1 = OkButton;
@@ -42,6 +44,7 @@ namespace FusionUI.UI.Factories
                 UIConfig.UnitFilterWindowElementHeight, button1Text, UIConfig.ButtonColor, UIConfig.ActiveColor, 200, button1Action)
             {
                 TextAlignment = Alignment.MiddleCenter,
+                ForeColor = UIConfig.ActiveTextColor,
             };
             button2 = new Button(ui,
                 OffsetX + bw + distance,
@@ -49,6 +52,7 @@ namespace FusionUI.UI.Factories
                 UIConfig.UnitFilterWindowElementHeight, button2Text, UIConfig.ButtonColor, UIConfig.ActiveColor, 200, button2Action)
             {
                 TextAlignment = Alignment.MiddleCenter,
+                ForeColor = UIConfig.ActiveTextColor,
             };
             button3 = new Button(ui,
                 OffsetX + 2 * bw + 2 * distance,
@@ -56,6 +60,7 @@ namespace FusionUI.UI.Factories
                 UIConfig.UnitFilterWindowElementHeight, button3Text, UIConfig.ButtonColor, UIConfig.ActiveColor, 200, button3Action)
             {
                 TextAlignment = Alignment.MiddleCenter,
+                ForeColor = UIConfig.ActiveTextColor,
             };
 
             holder.Item1 = button1;
@@ -79,6 +84,7 @@ namespace FusionUI.UI.Factories
                 UIConfig.UnitFilterWindowElementHeight, label, UIConfig.ButtonColor, UIConfig.ActiveColor, 200, action)
             {
                 TextAlignment = Alignment.MiddleCenter,
+                ForeColor = UIConfig.ActiveTextColor,
             };
 
             holder.Item = button;
@@ -98,6 +104,7 @@ namespace FusionUI.UI.Factories
                 UIConfig.UnitFilterWindowElementHeight, label, UIConfig.ButtonColor, UIConfig.ActiveColor, 200, action)
             {
                 TextAlignment = Alignment.MiddleCenter,
+                ForeColor = UIConfig.ActiveTextColor,
             };
 
             holder.Item = button;

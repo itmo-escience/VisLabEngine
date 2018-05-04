@@ -36,6 +36,7 @@ namespace FusionUI.UI.Factories
                     Border = 1,
                     TextAlignment = Alignment.MiddleLeft,
                     UnitTextOffsetX = UIConfig.UnitTabTextOffsetX,
+                    ForeColor = UIConfig.ActiveTextColor,
                 };
                 button.ButtonAction += b =>
                 {

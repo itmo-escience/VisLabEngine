@@ -104,7 +104,7 @@ namespace FusionUI.UI
             if (!(ExpandedPicture == null || CollapsedPicture == null))
                 sb.Draw(IsExpand ? ExpandedPicture : CollapsedPicture,
                     new Rectangle(xButton, yButton, (int) (UnitSizeExpandButton * ScaleMultiplier),
-                        (int) (UnitSizeExpandButton * ScaleMultiplier)), Color.White, clipRectIndex);            
+                        (int) (UnitSizeExpandButton * ScaleMultiplier)), UIConfig.ActiveTextColor, clipRectIndex);            
 
         }        
 

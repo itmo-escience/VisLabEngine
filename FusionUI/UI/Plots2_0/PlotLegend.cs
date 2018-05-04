@@ -146,7 +146,7 @@ namespace FusionUI.UI.Plots2_0
                 //}
                 //else
                 //{
-                Font.DrawString(spriteLayer, s, textX, textY, Color.White, ClipRectId);
+                Font.DrawString(spriteLayer, s, textX, textY, UIConfig.ActiveTextColor, ClipRectId);
                 //}
 
                 i++;

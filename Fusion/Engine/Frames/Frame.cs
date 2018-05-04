@@ -70,36 +70,36 @@ namespace Fusion.Engine.Frames {
 		/// </summary>
 		public	ClippingMode	 ClippingMode	{ get; set; } = ClippingMode.ClipByFrame;
 
-		/// <summary>
-		/// Overall color that used as multiplier 
-		/// for all children elements
-		/// </summary>
-		public	Color		OverallColor		{ get; set; }
+        /// <summary>
+        /// Overall color that used as multiplier 
+        /// for all children elements
+        /// </summary>
+        public virtual Color		OverallColor		{ get; set; }
 
-		/// <summary>
-		/// Background color
-		/// </summary>
-		public	Color		BackColor			{ get; set; }
+        /// <summary>
+        /// Background color
+        /// </summary>
+        public virtual Color		BackColor			{ get; set; }
 
-		/// <summary>
-		/// Background color
-		/// </summary>
-		public	Color		BorderColor			{ get; set; }
+        /// <summary>
+        /// Background color
+        /// </summary>
+        public virtual Color		BorderColor			{ get; set; }
 
-		/// <summary>
-		/// Foreground (e.g. text) color
-		/// </summary>
-		public	Color		ForeColor			{ get; set; }
+        /// <summary>
+        /// Foreground (e.g. text) color
+        /// </summary>
+        public virtual Color		ForeColor			{ get; set; }
 
-		/// <summary>
-		/// Text shadow color
-		/// </summary>
-		public	Color		ShadowColor			{ get; set; }
+        /// <summary>
+        /// Text shadow color
+        /// </summary>
+        public virtual Color		ShadowColor			{ get; set; }
 
-		/// <summary>
-		/// Shadow offset
-		/// </summary>
-		public	Vector2		ShadowOffset		{ get; set; }
+        /// <summary>
+        /// Shadow offset
+        /// </summary>
+        public virtual Vector2		ShadowOffset		{ get; set; }
 
 
 		/// <summary>

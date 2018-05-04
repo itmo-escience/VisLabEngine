@@ -56,7 +56,7 @@ namespace FusionUI.UI
                     UIConfig.UnitSettingsPanelHeightDropDown, buttonName, Color.Zero)
                 {
                     Image = ui.Game.Content.Load<Fusion.Engine.Graphics.DiscTexture>("ui-new/fv-icons_ensembles"),
-                    ForeColor = Color.White,
+                    ForeColor = UIConfig.ActiveTextColor,
                 };
                 Add(Button);
                 bool clicked = false;
@@ -83,7 +83,7 @@ namespace FusionUI.UI
                 UIConfig.UnitSettingsPanelHeightDropDown, "", UIConfig.ActiveColor, UIConfig.InactiveColor)
             {
                 Image = ui.Game.Content.Load<Fusion.Engine.Graphics.DiscTexture>(image),
-                ForeColor = Color.White,
+                ForeColor = UIConfig.ActiveTextColor,
             };
             Button.ButtonAction += b => {
                 action();

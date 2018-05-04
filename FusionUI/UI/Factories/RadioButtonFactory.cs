@@ -31,6 +31,7 @@ namespace FusionUI.UI.Factories
                 TextAlignment = Alignment.BaselineLeft,
                 UnitTextOffsetY = 5,
                 FontHolder = UIConfig.FontBody,
+                ForeColor = UIConfig.ActiveTextColor,
             };
             holder.Add(holder.Check);
             holder.Add(holder.Label);
@@ -54,6 +55,7 @@ namespace FusionUI.UI.Factories
                     TextAlignment = Alignment.BaselineLeft,
                     UnitTextOffsetY = 4,
                     FontHolder = UIConfig.FontBody,
+                    ForeColor = UIConfig.ActiveTextColor,
                 };
                 holder.Add(labelFrame);
             }

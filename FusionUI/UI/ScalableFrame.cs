@@ -130,7 +130,7 @@ namespace FusionUI.UI
             }
             catch (MissingManifestResourceException e)
             {
-                if (!string.IsNullOrWhiteSpace(DefaultText) && !double.TryParse(DefaultText, out var n)) Log.Warning("Missing translation for string \"{0}\"", DefaultText);
+                //if (!string.IsNullOrWhiteSpace(DefaultText) && !double.TryParse(DefaultText, out var n)) Log.Warning("Missing translation for string \"{0}\"", DefaultText);
                 text = DefaultText;
                 TryLoadResource = false;
             }
@@ -287,7 +287,7 @@ namespace FusionUI.UI
             UnitY = y;
             UnitWidth = w;
             UnitHeight = h;
-
+            ForeColor = UIConfig.ActiveTextColor;
             ApplicationInterface.Instance.onScaleUpdate += UpdateScale;
         }
 

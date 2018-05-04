@@ -15,7 +15,7 @@ namespace FusionUI.UI
 
         protected override void DrawFrame(GameTime gameTime, SpriteLayer sb, int clipRectIndex)
         {
-            Font.DrawString(sb, Text, this.GlobalRectangle.X, this.GlobalRectangle.Y, Color.White, 0, 0, false, IsFlip);
+            Font.DrawString(sb, Text, this.GlobalRectangle.X, this.GlobalRectangle.Y, UIConfig.ActiveTextColor, 0, 0, false, IsFlip);
         }
     }
 }

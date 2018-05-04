@@ -47,7 +47,7 @@ namespace FusionUI.UI.Elements
                 _currentValue = RoundValues ? (float)Math.Round(value) : value;                
                 OnChange?.Invoke(value);
             }
-        }        
+        }                     
 
         public int SliderWidth => (int)(UnitSliderWidth * ScaleMultiplier);
         public float UnitWidthControlElement = 4, UnitHeightControlElement = 11, UnitSliderWidth = 0.5f;
@@ -209,8 +209,8 @@ namespace FusionUI.UI.Elements
                 w = GlobalRectangle.Width - this.PaddingLeft - this.PaddingRight - 2 * widthControlElement;
                 h = SliderWidth;
                 vw = (int)(w * ((CurrentValue - MinValue) / (MaxValue - MinValue)));
-                sb.Draw(whiteTex, new Rectangle(x, y, w, h), /*IsHovered ? HoverColor :*/ backColorForSlider);
-                sb.Draw(whiteTex, new Rectangle(x, y, vw, h),/* IsHovered ?*/ HoverForeColor /*: ForeColor*/);
+                sb.Draw(whiteTex, new Rectangle(x, y, w, h), /*IsHovered ? HoverColor :*/ backColorForSlider, clipRectIndex);
+                sb.Draw(whiteTex, new Rectangle(x, y, vw, h),/* IsHovered ?*/ HoverForeColor /*: ForeColor*/, clipRectIndex);
 
                 if (PresetValues != null)
                 {
@@ -224,7 +224,7 @@ namespace FusionUI.UI.Elements
 
                 if (Image != null)
                 {
-                    sb.Draw(Image, new Rectangle(x + vw - widthControlElement / 2, y - heightControlElement / 2, widthControlElement, heightControlElement), HoverForeColor);
+                    sb.Draw(Image, new Rectangle(x + vw - widthControlElement / 2, y - heightControlElement / 2, widthControlElement, heightControlElement), HoverForeColor, clipRectIndex);
                 }
 
                 
@@ -236,8 +236,8 @@ namespace FusionUI.UI.Elements
                 w = SliderWidth;
                 h = GlobalRectangle.Height - this.PaddingTop - this.PaddingBottom - 2 * widthControlElement;
                 vw = (int)(h * ((CurrentValue - MinValue) / (MaxValue - MinValue)));
-                sb.Draw(whiteTex, new Rectangle(x, y, w, h), /*IsHovered ? HoverColor :*/ backColorForSlider);
-                sb.Draw(whiteTex, new Rectangle(x, y, w, vw),/* IsHovered ?*/ HoverForeColor /*: ForeColor*/);
+                sb.Draw(whiteTex, new Rectangle(x, y, w, h), /*IsHovered ? HoverColor :*/ backColorForSlider, clipRectIndex);
+                sb.Draw(whiteTex, new Rectangle(x, y, w, vw),/* IsHovered ?*/ HoverForeColor /*: ForeColor*/, clipRectIndex);
                 if (Image != null)
                 {
                     sb.DrawFreeUV(Image,
@@ -250,7 +250,7 @@ namespace FusionUI.UI.Elements
                         new Vector2(0, 0),
                         new Vector2(0, 1),
                         new Vector2(1, 0),
-                        new Vector2(1, 1)
+                        new Vector2(1, 1), clipRectIndex
                     );
                 }
             }

@@ -240,7 +240,7 @@ namespace FusionUI.UI.Plots2_0
             //UnitWidth = UIConfig.UnitPlotScaleWidth;
             //UnitHeight = Plot.UnitHeight;
 
-            var color = Plot.ActiveScale == this || Plot.ActiveScale == null ? Color.White : ForeColor;
+            var color = Plot.ActiveScale == this || Plot.ActiveScale == null ? UIConfig.ActiveTextColor : ForeColor;
             
             //sb.Draw(whiteTex, new RectangleF(Plot.GlobalRectangle.Left + offset + (int)(r.Height / 2) - r.Height, Plot.GlobalRectangle.Bottom + UIConfig.UnitPlotNumbersHeight + UIConfig.UnitPlotVerticalOffset, r.Height, r.Width), Color.Green);
             if ((Settings & ScaleParams.NotDisplayName) == 0)
@@ -311,7 +311,7 @@ namespace FusionUI.UI.Plots2_0
             {
                 Font.DrawString(sb, XLabel, Plot.GlobalRectangle.Center.X - r.Width / 2,
                     Plot.GlobalRectangle.Bottom - zeroH + (Index + 1) * UIConfig.UnitPlotScaleHeight * ScaleMultiplier,
-                    Color.White, clipRectIndex);
+                    UIConfig.ActiveTextColor, clipRectIndex);
             }
 
             if (StepX < float.Epsilon || (MaxX - MinX) / StepX > 100) return;

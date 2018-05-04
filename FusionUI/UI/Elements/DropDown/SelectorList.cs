@@ -59,7 +59,7 @@ namespace FusionUI.UI.Elements.DropDown
                     {
                         if (SelectedList.Contains(valueRow.Value))
                         {
-                            valueRow.ForeColor = Color.White;
+                            valueRow.ForeColor = UIConfig.ActiveTextColor;
                             valueRow.BackColor = Color.Zero;
                             SelectedList.Remove(valueRow.Value);
                             if ((Game.Keyboard.IsKeyDown(Keys.LeftShift) || Game.Keyboard.IsKeyDown(Keys.RightShift)) &&
@@ -68,7 +68,7 @@ namespace FusionUI.UI.Elements.DropDown
                                 for (int i = lastSelectIndex; i != index; i = index > lastSelectIndex ? ++i : --i)
                                 {
                                     var Row = rows[i];
-                                    Row.ForeColor = Color.White;
+                                    Row.ForeColor = UIConfig.ActiveTextColor;
                                     Row.BackColor = Color.Zero;
                                     SelectedList.Remove(Row.Value);
                                 }
@@ -99,7 +99,7 @@ namespace FusionUI.UI.Elements.DropDown
                     {
                         foreach (var Row in rows)
                         {
-                            Row.ForeColor = Color.White;
+                            Row.ForeColor = UIConfig.ActiveTextColor;
                             Row.BackColor = Color.Zero;
                             SelectedList.Remove(Row.Value);
                         }
