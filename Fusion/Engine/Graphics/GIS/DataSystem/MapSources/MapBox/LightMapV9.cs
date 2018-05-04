@@ -8,25 +8,25 @@ using Fusion.Engine.Common;
 
 namespace Fusion.Engine.Graphics.GIS.DataSystem.MapSources.MapBox
 {
-	public class LightMap : BaseMapBoxMap
+	public class LightMapV9 : BaseMapBoxMap
 	{
 		public override string Name {
-			get { return "LightMap"; }
+			get { return "LightMapV9"; }
 		}
 
 		public override string ShortName {
-			get { return "LM"; }
+			get { return "LMV9"; }
 		}
 
 		protected override string RefererUrl {
 			get { return "https://www.mapbox.com/"; }
 		}
 
-		public LightMap(Game game) : base(game)
+		public LightMapV9(Game game) : base(game)
 		{
 			TileSize = 256;
 			AcessToken = "pk.eyJ1Ijoia2FwYzNkIiwiYSI6ImNpbGpodG82czAwMmlubmtxamdsOHF0a3AifQ.xCbMUsy_a_0A9cd4GvjXKQ";
-			UrlFormat = "https://api.mapbox.com/styles/v1/kapc3d/cjgrxs3ql00112rqdtudkk2em/tiles/256/{0}/{1}/{2}?access_token={3}";
+			UrlFormat = "https://api.mapbox.com/styles/v1/mapbox/light-v9/tiles/256/{0}/{1}/{2}?access_token={3}";
 		}
 
 		public override string GenerateUrl(int x, int y, int zoom)

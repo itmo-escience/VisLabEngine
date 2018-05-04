@@ -263,6 +263,7 @@
     <Compile Include="Engine\Graphics\GIS\DataSystem\MapSources\MapBox\Dark.cs" />
     <Compile Include="Engine\Graphics\GIS\DataSystem\MapSources\MapBox\DarkV9.cs" />
     <Compile Include="Engine\Graphics\GIS\DataSystem\MapSources\MapBox\LightMap.cs" />
+    <Compile Include="Engine\Graphics\GIS\DataSystem\MapSources\MapBox\LightMapV9.cs" />
     <Compile Include="Engine\Graphics\GIS\DataSystem\MapSources\MapBox\MoiseevMap.cs" />
     <Compile Include="Engine\Graphics\GIS\DataSystem\MapSources\MapZenHeightmap\MapZenHeightmap.cs" />
     <Compile Include="Engine\Graphics\GIS\DebugGisLayer.cs" />
