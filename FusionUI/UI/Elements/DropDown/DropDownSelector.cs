@@ -12,7 +12,6 @@ namespace FusionUI.UI.Elements.DropDown
     {
         public List<string> Values;
         private string current;
-
         public string Current
         {
             get { return current; }
@@ -46,8 +45,9 @@ namespace FusionUI.UI.Elements.DropDown
 
 	    private EventHandler<MouseEventArgs> mouseScrollAction;
         public DropDownSelector(FrameProcessor ui, float x, float y, float w, float h, Color backColor, List<string> values,
-            Action<string> selectAction, Color borderColor, bool drawButton = true) : base(ui, x, y, w, h, "", backColor)
+            Action<string> selectAction, Color borderColor, bool drawButton = true, UIConfig.FontHolder? font = null) : base(ui, x, y, w, h, "", backColor)
         {
+            FontHolder = font ?? UIConfig.FontBase;
             BorderColor = borderColor;
             this.Values = values;
             init();
@@ -72,7 +72,8 @@ namespace FusionUI.UI.Elements.DropDown
             MainRow.Initialize(0, 0, UnitWidth, UIConfig.UnitSelectorHeight, Values.Any() ? Values[0] : "", Color.Zero);
             MainRow.TextAlignment = Alignment.MiddleLeft;
             MainRow.UnitTextOffsetX = 2;
-            MainRow.Name = $"mainRow";            
+            MainRow.Name = $"mainRow";
+            MainRow.FontHolder = FontHolder;
             this.Add(MainRow);
 
             ArrowButton = new ScalableFrame(ui, UnitWidth - UIConfig.UnitSelectorArrowButtonWidth, 0, UIConfig.UnitSelectorArrowButtonWidth, UIConfig.UnitSelectorHeight, "", Color.Zero)
@@ -242,6 +243,7 @@ namespace FusionUI.UI.Elements.DropDown
             valueRow.Name = $"row_{index}";
             valueRow.Visible = false;
             valueRow.Tooltip = Values[index];
+            valueRow.FontHolder = FontHolder;
 
             valueRow.ActionClick += (ControlActionArgs args, ref bool flag) =>
             {

@@ -48,7 +48,8 @@ namespace FusionUI.UI.Plots2_0
 
         public double StepY, StepX;
         public float SuggestedStepX = 20, SuggestedStepY = 10;
-        
+        public Color CaptionsColor = UIConfig.ActiveTextColor;
+        public Color LineColor = UIConfig.ActiveTextColor;
 
         public ScaleParams Settings;
 
@@ -233,14 +234,14 @@ namespace FusionUI.UI.Plots2_0
             int offset = (int)(Index / 2 * (UIConfig.UnitPlotScaleWidth * ScaleMultiplier * (left ? -1 : 1)) + (left ? 0 : Plot.Width));
 
             sb.Draw (whiteTex, new RectangleF (Plot.GlobalRectangle.Left + offset, Plot.GlobalRectangle.Top, UIConfig.UnitPlotScaleLineWidth * ScaleMultiplier, Plot.GlobalRectangle.Height + UIConfig.UnitPlotNumbersHeight * ScaleMultiplier),
-                    UIConfig.PlotScaleColor, clipRectIndex);
+                    LineColor, clipRectIndex);
 
             UnitX = Plot.UnitX + offset / ScaleMultiplier - (left ? UIConfig.UnitPlotScaleWidth : 0);
             UnitY = Plot.UnitY;
             //UnitWidth = UIConfig.UnitPlotScaleWidth;
             //UnitHeight = Plot.UnitHeight;
 
-            var color = Plot.ActiveScale == this || Plot.ActiveScale == null ? UIConfig.ActiveTextColor : ForeColor;
+            var color = Plot.ActiveScale == this || Plot.ActiveScale == null ? CaptionsColor : ForeColor;
             
             //sb.Draw(whiteTex, new RectangleF(Plot.GlobalRectangle.Left + offset + (int)(r.Height / 2) - r.Height, Plot.GlobalRectangle.Bottom + UIConfig.UnitPlotNumbersHeight + UIConfig.UnitPlotVerticalOffset, r.Height, r.Width), Color.Green);
             if ((Settings & ScaleParams.NotDisplayName) == 0)
@@ -311,7 +312,7 @@ namespace FusionUI.UI.Plots2_0
             {
                 Font.DrawString(sb, XLabel, Plot.GlobalRectangle.Center.X - r.Width / 2,
                     Plot.GlobalRectangle.Bottom - zeroH + (Index + 1) * UIConfig.UnitPlotScaleHeight * ScaleMultiplier,
-                    UIConfig.ActiveTextColor, clipRectIndex);
+                    CaptionsColor, clipRectIndex);
             }
 
             if (StepX < float.Epsilon || (MaxX - MinX) / StepX > 100) return;
@@ -319,12 +320,12 @@ namespace FusionUI.UI.Plots2_0
                 var s = xFunc.Invoke(pos) ?? "";
                 var b = Font.MeasureStringF(s);
                 float w =  (float)((pos - MinX)/(MaxX - MinX)*Plot.GlobalRectangle.Width - b.Width/2);
-                if (w > b.Width/2 && w <= Plot.GlobalRectangle.Width - b.Width / 2) {
+                if (w > b.Width/2 && w < Plot.GlobalRectangle.Width - b.Width / 2) {
                     Font.DrawString (sb, s, Plot.GlobalRectangle.Left + w, Plot.GlobalRectangle.Bottom + Index * UIConfig.UnitPlotScaleHeight * ScaleMultiplier + b.Height - ((float)zeroH/ Plot.GlobalRectangle.Height > 0.9 ? 0 : zeroH),
-                        Color.White, clipRectIndex);
+                        CaptionsColor, clipRectIndex);
                     if ((Settings & ScaleParams.DrawMeasure) != 0)
                     {
-                        sb.Draw(whiteTex, Plot.GlobalRectangle.Left + w + b.Width / 2 - 1, Plot.GlobalRectangle.Bottom - zeroH + Index * UIConfig.UnitPlotScaleHeight * ScaleMultiplier - 8, 1, 12, Color.White, clipRectIndex);
+                        sb.Draw(whiteTex, Plot.GlobalRectangle.Left + w + b.Width / 2 - 1, Plot.GlobalRectangle.Bottom - zeroH + Index * UIConfig.UnitPlotScaleHeight * ScaleMultiplier - 8, 1, 12, CaptionsColor, clipRectIndex);
                     }
                 }
             }

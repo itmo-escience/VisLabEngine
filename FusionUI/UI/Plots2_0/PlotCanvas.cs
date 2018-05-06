@@ -488,7 +488,7 @@ namespace FusionUI.UI.Plots2_0
                     var rect = Font.MeasureString(s);
 
                     Font.DrawString(sb, s, nextScreen.X - rect.Width / 2, nextScreen.Y - (next.Y > 0 ? 4 : 4 - rect.Height),
-                        /*pd.ColorsByDepth[depth]*/Color.White, clipRectIndex);
+                        /*pd.ColorsByDepth[depth]*/UIConfig.ActiveTextColor, clipRectIndex);
 
                     if (nextRect.X > 1) break;
                 }

@@ -21,7 +21,7 @@ namespace FusionUI.UI
         public Color HolderColor { get { return holder.BackColor; } set { holder.BackColor = value; } }
         public Color HatColor { get { return HatPanel.BackColor; } set { HatPanel.BackColor = value; } }
         public Color BasementColor { get { return BasementPanel.BackColor; } set { BasementPanel.BackColor = value; } }
-
+        public Bool FixedSize;
         public ScalableFrame HatPanel, BasementPanel;
 
         public override float UnitPaddingLeft { get { return holder.UnitPaddingLeft; } set { base.UnitPaddingLeft = 0;
@@ -39,18 +39,23 @@ namespace FusionUI.UI
 
         protected virtual void HolderOnResize(object sender, ResizeEventArgs args)
         {
-            BasementPanel.UnitY = holder.UnitY + holder.UnitHeight;
-            holder.UpdateLayout();
+            if (!FixedSize)
+            {
+                BasementPanel.UnitY = holder.UnitY + holder.UnitHeight;
+
+                holder.UpdateLayout();
+            }
         }
 
         public Action ActionCross;
 
         public Window(FrameProcessor ui, float x, float y, float w, float h, string text, Color backColor,
-            bool drawHat = true, bool drawCross = true, bool drawHelp = false, string helpText = "")
+            bool drawHat = true, bool drawCross = true, bool drawHelp = false, string helpText = "", bool fixedSize = false)
             : base(ui, x, y, w, h, text, backColor)
         {
+            FixedSize = fixedSize;
             ((Frame) this).Ghost = false;            
-            AutoHeight = true;
+            AutoHeight = !FixedSize;
             ForeColor = Color.Zero;
             Name = text;
             if (drawHat)

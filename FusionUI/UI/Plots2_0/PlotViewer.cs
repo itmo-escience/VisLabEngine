@@ -46,6 +46,52 @@ namespace FusionUI.UI.Plots2_0
         protected List<double> predefinedTimeSteps = new List<double>() {1.0/1440, 1.0 /288, 1.0/144, 1.0/48, 1.0/24, 1.0/12, 1.0/4, 1.0/2, 1, 2, 5, 10, 30, 60, 180, 365, 365*2, 365*5, 365*10};
 
         public ScaleParams ScaleSettings;
+        private UIConfig.FontHolder scaleFont = UIConfig.FontBody;
+
+        public UIConfig.FontHolder ScaleFont
+        {
+            get { return scaleFont; }
+            set
+            {
+                scaleFont = value;
+                Dirty = true;
+            }
+        }
+
+        private float scaleStepX = 20;
+        private float scaleStepY = 10;
+
+        public float ScaleStepX
+        {
+            get => scaleStepX;
+            set
+            {
+                scaleStepX = value;
+                Dirty = true;
+            }
+        }
+
+        public float ScaleStepY
+        {
+            get => scaleStepY;
+            set
+            {
+                scaleStepY = value;
+                Dirty = true;
+            }
+        }
+
+        private Color scaleFontColor = UIConfig.ActiveTextColor;
+
+        public Color ScaleFontColor
+        {
+            get => scaleFontColor;
+            set
+            {
+                scaleFontColor = value;
+                Dirty = true;
+            }
+        }
 
         public virtual void GenerateScales()
         {
@@ -69,11 +115,17 @@ namespace FusionUI.UI.Plots2_0
                         YLabel = name,
                         XLabel = "Time",
                         ZOrder =  1000,
-                        FontHolder = UIConfig.FontBody,
+                        FontHolder = scaleFont,
                         BoldFontHolder = UIConfig.FontSubtitleAlt,
-                        ForeColor = UIConfig.InactiveTextColor,
-
-                    };
+                        ForeColor = UIConfig.InactiveTextColor,    
+                        SuggestedStepX = scaleStepX,
+                        SuggestedStepY = scaleStepY,
+                        CaptionsColor = scaleFontColor,
+    };
+                    if (variable.Value.Depths.Count == 1)
+                    {
+                        scales[name].LineColor = variable.Value.Data.Values.First().Values.First().ColorsByDepth.First().Value;
+                    }
                     if (IsTime) scales[name].PredefinedStepsX = predefinedTimeSteps;
                 }
                 var scale = scales[name];
