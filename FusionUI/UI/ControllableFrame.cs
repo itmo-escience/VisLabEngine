@@ -105,7 +105,7 @@ namespace FusionUI.UI
                 currentEventArgs.IsAltClick = args.Key == Keys.RightButton;                
                 currentEventArgs.ActionType = ControlActionArgs.ClickActionType.ActionUp;
                 if (base.Ghost || !Active) return;
-                var rootFrame = ApplicationInterface.Instance.RootFrame;
+                var rootFrame = ApplicationInterface.Instance.rootFrame;
                 var hoveredFrame = MainFrame.GetHoveredFrame(rootFrame, (Point)currentEventArgs.Position);
                 if (MainFrame.IsChildOf(rootFrame, hoveredFrame, this) && Selected)
                 {
