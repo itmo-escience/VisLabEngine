@@ -17,8 +17,12 @@ namespace FusionUI.UI
 
         public override void UpdateAnchors(int oldW, int oldH, int newW, int newH)
         {
-            base.UpdateAnchors(oldW, oldH, newW, newH);
-            //HeightLimit += (newH - oldH) / ScaleMultiplier;
+            if (newH != oldH)
+            {
+                HeightLimit += (newH - oldH) / ScaleMultiplier;
+            }
+            base.UpdateAnchors(oldW, oldH, newW, newH);     
+            holder.UpdateAnchors(oldW, oldH, newW, newH);
         }
 
         public float ScrollSize = 2;
@@ -119,8 +123,8 @@ namespace FusionUI.UI
             if (AllowShrink)
             {
                 scrollHolder.UnitHeight = Math.Min(HeightLimit, holder.UnitHeight);
-            }
-            UnitHeight = (HatPanel?.UnitHeight ?? 0) + (scrollHolder.UnitHeight) + (BasementPanel?.UnitHeight ?? 0);            
+                UnitHeight = (HatPanel?.UnitHeight ?? 0) + (scrollHolder.UnitHeight) + (BasementPanel?.UnitHeight ?? 0);
+            }                        
             holder.UnitY = MathUtil.Clamp(holder.UnitY, Math.Min(MaxHeight - RealHeight, 0), 0);
         }
 

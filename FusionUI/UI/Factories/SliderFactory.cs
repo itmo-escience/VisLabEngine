@@ -127,7 +127,9 @@ namespace FusionUI.UI.Factories
         {
             var sizeLabel = UIConfig.FontBody[2].MeasureString(ScalableFrame.TryGetText(label));
 
-            ScalableFrame holder = new ScalableFrame(ui, parent.UnitPaddingLeft, 0, parent.UnitWidth - parent.UnitPaddingLeft - parent.UnitPaddingRight, sizeLabel.Height / ApplicationInterface.gridUnitDefault + height + OffsetY, "", Color.Zero);
+            ScalableFrame holder = new ScalableFrame(ui, parent.UnitPaddingLeft, 0, parent.UnitWidth - parent.UnitPaddingLeft - parent.UnitPaddingRight, sizeLabel.Height / ApplicationInterface.gridUnitDefault + height + OffsetY, "", Color.Zero)
+            {
+            };
             
 
             ScalableFrame labelFrame = new ScalableFrame(ui, OffsetX, OffsetY, holder.UnitWidth, (sizeLabel.Height) /ApplicationInterface.gridUnitDefault, label, Color.Zero)
@@ -137,7 +139,7 @@ namespace FusionUI.UI.Factories
                 FontHolder = UIConfig.FontBody,            
             };
 
-            slider = new Slider(ui, OffsetX - 2, labelFrame.UnitHeight + OffsetY, width, height, "", Color.Zero)
+            slider = new Slider(ui, OffsetX, labelFrame.UnitHeight + OffsetY, holder.UnitWidth, height, "", Color.Zero)
             {
                 backColorForSlider = ColorConstant.BackColorForSlider,
                 ForeColor = ColorConstant.ForeColor,
@@ -150,7 +152,7 @@ namespace FusionUI.UI.Factories
                 UnitWidthControlElement = 4,
                 UnitHeightControlElement = UIConfig.UnitSliderObjectHeight,
                 Image = ui.Game.Content.Load<DiscTexture>(imageSlider ?? @"UI-new\fv-icons_slider"),
-                IsVertical = IsVertical
+                IsVertical = IsVertical,
             };
 
             if (showValue)

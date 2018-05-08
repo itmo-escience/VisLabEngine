@@ -111,6 +111,7 @@ namespace FusionUI.UI
         public static Color InactiveColor = new Color(0, 0, 0, 155);
         public static Color ActiveTextColor = new Color(255, 255, 255, 255);
         public static Color InactiveTextColor = new Color(255, 255, 255, 150);
+        public static Color HighlightTextColor = new Color(255, 255, 255, 255);
         public static Color HatColor = new Color(0, 0, 0, 255);
         public static Color SettingsColor = new Color(30, 30, 30, 255);
         public static Color ButtonColor = new Color(255, 255, 255, 50);

@@ -547,7 +547,7 @@ namespace Fusion.Engine.Common {
 
 		bool isActiveLastFrame = true;
 
-
+	    public Color BackColor = Color.Zero;
 		/// <summary>
 		/// 
 		/// </summary>
@@ -609,7 +609,7 @@ namespace Fusion.Engine.Common {
 
 					GraphicsDevice.RestoreBackbuffer();
 
-					GraphicsDevice.ClearBackbuffer(Color.Zero);
+					GraphicsDevice.ClearBackbuffer(BackColor);
 
 					this.Draw( gameTimeInternal, eye );
 				}

@@ -11,8 +11,18 @@ namespace FusionUI.UI.Elements
         public bool IsFixedY = false;
         public bool IsDrag = false;
         public Vector2? PrevPosition = null;
+        /// <summary>
+        /// Deprecated
+        /// </summary>
         public Action<float, float> actionForMove;
+        /// <summary>
+        /// Deprecated
+        /// </summary>
         public Action<float, float> actionClickUp;
+
+        public Action<float, float> actionForMoveRelative;
+        public Action<float, float> actionClickUpRelative
+            ;
 
         public int extendedSize = 0;
              
@@ -40,6 +50,8 @@ namespace FusionUI.UI.Elements
         {
             PrevPosition = null;
             actionClickUp?.Invoke(this.GlobalRectangle.X, this.GlobalRectangle.Y);
+            actionClickUpRelative?.Invoke(GetRelativeX(),
+                GetRelativeY());
 //            actionForMove?.Invoke(this.GlobalRectangle.X, this.GlobalRectangle.Y);
             flag |= true;
         }
@@ -48,14 +60,64 @@ namespace FusionUI.UI.Elements
         {
             IsDrag = false;
             PrevPosition = null;            
-        }
+        }        
 
         void Scroll_MouseMove(ControlActionArgs args, ref bool flag)
         {
             Log.Message($"{args.Position}");
             ChangeSliderPosition(args.Position);
             actionForMove?.Invoke(this.GlobalRectangle.X, this.GlobalRectangle.Y);
+            actionForMoveRelative?.Invoke(GetRelativeX(),
+                GetRelativeY());
             flag |= true;
+        }
+
+        public void SetFromRelative(float x, float y)
+        {
+            SetFromRelativeX(x);
+            SetFromRelativeY(y);
+        }
+
+        public void SetFromRelativeX(float x)
+        {
+            var parent = this.parent.GetPaddedRectangle();
+            X = (int)(this.Parent.PaddingLeft - extendedSize / 2 + x * (parent.Width - extendedSize));            
+            UpdatePosition();
+        }
+
+        public void SetFromRelativeY(float y)
+        {
+            var parent = this.parent.GetPaddedRectangle();            
+            Y = (int)(0 + y * parent.Height);
+            UpdatePosition();
+        }
+
+        public float GetRelativeX()
+        {
+            return MathUtil.Clamp((float)(X + extendedSize/2 - this.parent.PaddingLeft) /
+                   (this.parent.GetPaddedRectangle().Width - extendedSize), 0, 1);
+        }
+
+        public float GetRelativeY()
+        {
+            return MathUtil.Clamp((float)(this.GlobalRectangle.Y + this.parent.GetPaddedRectangle().Y) /
+                   (this.parent.GetPaddedRectangle().Width - extendedSize), 0, 1);
+        }
+
+        public Vector2 GetRelative()
+        {
+            return new Vector2(GetRelativeX(), GetRelativeY());
+        }
+
+        public void UpdatePosition()
+        {
+            actionClickUp?.Invoke(this.GlobalRectangle.X, this.GlobalRectangle.Y);
+            actionClickUpRelative?.Invoke(GetRelativeX(),
+                GetRelativeY());
+            actionForMove?.Invoke(this.GlobalRectangle.X, this.GlobalRectangle.Y);
+            actionForMoveRelative?.Invoke(GetRelativeX(),
+                GetRelativeY());
+
         }
 
         void ChangeSliderPosition(Vector2 p)
@@ -71,24 +133,24 @@ namespace FusionUI.UI.Elements
             {
                 PrevPosition = p;
             }
-            var parent = this.Parent.GlobalRectangle;
+            var parent = this.Parent.GetPaddedRectangle(true);
             var scrollRectangle = this.GlobalRectangle;
             if (!IsFixedX)
             {                
-                var newX = X + (int)p.X - (int)PrevPosition.Value.X;
+                var newX = X + (int)p.X - (int)PrevPosition.Value.X - this.Parent.PaddingLeft;
 //                Log.Message($"{newX};{this.X}");
-                this.X = MathUtil.Clamp(newX, 0 - extendedSize, parent.Width - scrollRectangle.Width + extendedSize);
+                this.X = this.Parent.PaddingLeft + MathUtil.Clamp(newX, 0 - extendedSize, parent.Width - scrollRectangle.Width + extendedSize);
             }
             //&& parent.X < scrollRectangle.X + (int)p.X - (int)PrevPosition.Value.X && parent.Width + parent.X > scrollRectangle.Width + scrollRectangle.X + (int)p.X - (int)PrevPosition.Value.X)
                 //this.X += (int)p.X - (int)PrevPosition.Value.X;
             if (!IsFixedY)
             {
-                var newY = Y + (int)p.Y - (int)PrevPosition.Value.Y;
-                this.Y = MathUtil.Clamp(newY, 0, parent.Height - scrollRectangle.Height);
+                var newY = Y + (int)p.Y - (int)PrevPosition.Value.Y - this.Parent.PaddingTop;
+                this.Y = this.Parent.PaddingTop + MathUtil.Clamp(newY, 0, parent.Height - scrollRectangle.Height);
             }
 //            this.X = Math.Min(this.Width, this.X);
             //&& parent.Y < scrollRectangle.Y + (int)p.Y - (int)PrevPosition.Value.Y && parent.Height + parent.Y > scrollRectangle.Height + scrollRectangle.Y + (int)p.Y - (int)PrevPosition.Value.Y)
-            //this.Y += (int)p.Y - (int)PrevPosition.Value.Y;
+            //this.Y += (int)p.Y - (int)PrevPosition.Value.Y;            
             PrevPosition = p;
         }
 
