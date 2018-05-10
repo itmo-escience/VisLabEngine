@@ -228,7 +228,7 @@ float4 PSMain ( VS_OUTPUT input ) : SV_Target
 			#ifdef USE_CONST_COLOR
 				return float4(ret, color.a) * HeatStage.Data;
 			#else
-				return float4(ret, color.a);
+				return float4(ret, color.a * input.Color.a);
 			#endif
 		#endif
 	#endif

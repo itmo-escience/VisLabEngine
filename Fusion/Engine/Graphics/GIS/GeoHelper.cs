@@ -12,6 +12,24 @@ namespace Fusion.Engine.Graphics.GIS
 		public static readonly double EarthRadius = 6378.137;
 		public static readonly double EarthOneDegreeLengthOnEquatorMeters = 111152.8928;
 
+
+
+		public static DVector2 LonLatDegToWebMercatorMet(double lon, double lat)
+		{
+			var x = lon * 20037508.34 / 180;
+			var y = Math.Log(Math.Tan((90 + lat) * Math.PI / 360)) / (Math.PI / 180);
+			y = y * 20037508.34 / 180;
+			return new DVector2(x, y);
+		}
+
+		public static DVector2 WebMercatorMet2LonLatDeg(double x, double y)
+		{
+			var lon = x * 180 / 20037508.34;
+			var lat = Math.Atan(Math.Exp(y * Math.PI / 20037508.34)) * 360 / Math.PI - 90;
+			return new DVector2(lon, lat);
+		}
+
+
 		public static bool LineIntersection(DVector3 lineOrigin, DVector3 lineEnd, double radius, out DVector3[] intersectionPoints)
 		{
 			intersectionPoints = new DVector3[0];
