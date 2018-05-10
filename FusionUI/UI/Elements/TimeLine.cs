@@ -64,7 +64,8 @@ namespace FusionUI.UI.Elements
         {
             this.emptySizeImage = emptyWidth;
             this.textureLord = lordTexture;
-            Init(ui);
+            UnitHPadding = UIConfig.UnitTimelineOffsetX;    
+            Init(ui);            
         }
 
         public void initTimeValue(AbstractTimeManager timeManager)
@@ -78,38 +79,35 @@ namespace FusionUI.UI.Elements
         {
             if (isInited)
             {
-                LordOfTime.UnitX = (float) (TimeToXPositon(CurrentTime) - LordOfTime.Image.Width / 2 / ScaleMultiplier);
-                //                stripLine.UnitX = LordOfTime.UnitX;
-
+                //LordOfTime.UnitX = (float) (TimeToXPositon(CurrentTime) - LordOfTime.Image.Width / 2 / ScaleMultiplier);
+                ////                stripLine.UnitX = LordOfTime.UnitX;
+                LordOfTime.SetFromRelativeX(TimeToXPositon(CurrentTime));
                 UpdatedTimeElement();
             }    
         }
 
         public float TimeToXPositon(DateTime time)
         {
-            return this.UnitWidth * (float)((time - TimeManager.StartTime).TotalSeconds / (TimeManager.EndTime - TimeManager.StartTime).TotalSeconds);
+            return (float)((time - TimeManager.StartTime).TotalSeconds / (TimeManager.EndTime - TimeManager.StartTime).TotalSeconds);
+        }
+
+        public float TimeToXPositonTL(DateTime time)
+        {
+            return UnitPaddingLeft + (UnitWidth - UnitPaddingLeft - UnitPaddingRight) * TimeToXPositon(time);
         }
 
         private void UpdatedTimeElement()
         {
             timeLabelTime.UnitX = LordOfTime.UnitX + LordOfTime.UnitWidth / 2 - UIConfig.UnitTimelineLabelWidth / 2;
             timeLabelDate.UnitX = LordOfTime.UnitX + LordOfTime.UnitWidth / 2 - UIConfig.UnitTimelineLabelWidth / 2;
-            lineLineBeforeLord.UnitWidth = LordOfTime.UnitX + emptySizeImage;
+            lineLineBeforeLord.UnitWidth = LordOfTime.UnitX + emptySizeImage - UnitPaddingLeft;
             lineLineAfterLord.UnitX = LordOfTime.UnitX + LordOfTime.UnitWidth - emptySizeImage;
-            lineLineAfterLord.UnitWidth = this.UnitWidth - lineLineAfterLord.UnitX;
-        }
-
-        public DateTime ChangePostionLord(float x)
-        {
-            LordOfTime.UnitX = x + LordOfTime.UnitWidth / 2;
-            //            stripLine.UnitX = LordOfTime.UnitX;
-            UpdatedTimeElement();
-            return XPositionToDateTime(x);
-        }
+            lineLineAfterLord.UnitWidth = this.UnitWidth - lineLineAfterLord.UnitX - UnitPaddingRight;         
+        }        
 
         public DateTime XPositionToDateTime(float x)
         {
-            var valueSecond = (x * (TimeManager.EndTime - TimeManager.StartTime).TotalSeconds / UnitWidth);
+            var valueSecond =  (TimeManager.EndTime - TimeManager.StartTime).TotalSeconds * x;            
             var date = TimeManager.StartTime.AddSeconds(valueSecond);
             return date;
         }
@@ -125,7 +123,7 @@ namespace FusionUI.UI.Elements
             {
                 IsFixedY = true,
                 Image = textureLord,
-                ImageColor = new Color(0, 120, 215, 205),
+                ImageColor = UIConfig.TimeLineColor1,
                 ImageMode = FrameImageMode.Centered,                
             };
 
@@ -133,11 +131,11 @@ namespace FusionUI.UI.Elements
             var yLabel = 0;
             timeLabelTime = new ScalableFrame(ui, LordOfTime.UnitX + LordOfTime.UnitWidth/2 - UIConfig.UnitTimelineLabelWidth/2, yLabel > 0 ? yLabel : 1.5f, UIConfig.UnitTimelineLabelWidth, font.CapHeight / ScaleMultiplier, "Time", Color.Zero)
             {
-                ForeColor = UIConfig.ActiveTextColor,
+                ForeColor = UIConfig.TimeLineColor1,
 //                Border = 1,
 //                BorderColor = new Color(110, 110, 110),
                 TextAlignment = Alignment.MiddleCenter,
-                FontHolder = UIConfig.FontCaption,
+                FontHolder = UIConfig.FontCaption,                
                 Ghost = true
             };
 
@@ -146,7 +144,7 @@ namespace FusionUI.UI.Elements
             {
                 //                Border = 1,
                 //                BorderColor = new Color(110, 110, 110),
-                ForeColor = new Color(255, 255, 255, 205),
+                ForeColor = UIConfig.TimeLineColor1,
                 TextAlignment = Alignment.MiddleCenter,
                 FontHolder = UIConfig.FontCaption,
                 Ghost = true
@@ -165,28 +163,34 @@ namespace FusionUI.UI.Elements
 
 
             var thinknessLine = UIConfig.UnitTimelineTickness;
-            lineLineBeforeLord = new ScalableFrame(ui, 0, this.UnitHeight/2 - thinknessLine/2, LordOfTime.UnitX + emptySizeImage / ScaleMultiplier, thinknessLine, "", UIConfig.TimeLineColor1)
+            lineLineBeforeLord = new ScalableFrame(ui, UnitPaddingLeft , this.UnitHeight/2 - thinknessLine/2, LordOfTime.UnitX + emptySizeImage / ScaleMultiplier, thinknessLine, "", UIConfig.TimeLineColor1)
             {
                 //Anchor = FrameAnchor.Bottom | FrameAnchor.Left | FrameAnchor.Right,
                 Ghost = true
             };
 
-            lineLineAfterLord = new ScalableFrame(ui, LordOfTime.UnitX + LordOfTime.UnitWidth - emptySizeImage, this.UnitHeight/2 - thinknessLine/2, this.UnitWidth - LordOfTime.UnitX - LordOfTime.UnitWidth + emptySizeImage / ScaleMultiplier, thinknessLine, "", UIConfig.TimeLineColor2)
+            lineLineAfterLord = new ScalableFrame(ui, LordOfTime.UnitX + LordOfTime.UnitWidth - emptySizeImage, this.UnitHeight/2 - thinknessLine/2, this.UnitWidth - LordOfTime.UnitX - LordOfTime.UnitWidth + emptySizeImage / ScaleMultiplier - UnitPaddingRight, thinknessLine, "", UIConfig.TimeLineColor2)
             {
                 //Anchor = FrameAnchor.Bottom | FrameAnchor.Left | FrameAnchor.Right,
                 Ghost = true
             };
 
             LordOfTime.SuppressActions = true;
-            LordOfTime.ActionDrag += (ControlActionArgs args, ref bool flag) => {
-                var positionX = Math.Min(args.X, GlobalRectangle.X + GlobalRectangle.Width);
-                positionX = Math.Max(positionX, GlobalRectangle.X + emptySizeImage);
+            //LordOfTime.ActionDrag += (ControlActionArgs args, ref bool flag) => {
+            //    var positionX = Math.Min(LordOfTime.GlobalRectangle.X, GlobalRectangle.X + GlobalRectangle.Width);
+            //    positionX = Math.Max(positionX, GlobalRectangle.X + emptySizeImage);
 
-                //                Console.WriteLine(args.X + " -> " + (GlobalRectangle.X + GlobalRectangle.Width));
-                if (TimeManager!=null && (IsUpdateWithMove | TimeManager.UpdateOnDrag))
-                    TimeManager.CurrentTime = XPositionToDateTime((positionX - GlobalRectangle.X - emptySizeImage) / ScaleMultiplier);
+            //    //                Console.WriteLine(args.X + " -> " + (GlobalRectangle.X + GlobalRectangle.Width));
+            //    if (TimeManager!=null && (IsUpdateWithMove | TimeManager.UpdateOnDrag))
+            //        TimeManager.CurrentTime = XPositionToDateTime((positionX - GlobalRectangle.X - emptySizeImage) / ScaleMultiplier);
+            //    UpdatedTimeElement();
+            //    flag = true;
+            //};
+            LordOfTime.actionForMoveRelative += (x, y) =>
+            {
+                if (TimeManager != null && (IsUpdateWithMove | TimeManager.UpdateOnDrag))
+                    TimeManager.CurrentTime = XPositionToDateTime(x);
                 UpdatedTimeElement();
-                flag = true;
             };
 
             this.Add(lineLineBeforeLord);

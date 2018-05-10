@@ -10,6 +10,7 @@ namespace FusionUI.UI.Elements
     {
 
         public Color ActiveColor, InactiveColor;
+        public Color ActiveFColor, InactiveFColor;
         public Texture ActiveImage, PassiveImage;
         public Action UpdateAction;
         public Action<bool> ButtonAction;
@@ -22,6 +23,8 @@ namespace FusionUI.UI.Elements
         {
             ActiveColor = activeColor;
             InactiveColor = inactiveColor;
+            ActiveFColor = ForeColor;
+            InactiveFColor = ForeColor;
             ActiveImage = activeImage;
             PassiveImage = passiveImage;
             initToggableButton(active, timeTransition);
@@ -39,12 +42,16 @@ namespace FusionUI.UI.Elements
                 {
                     if (!args.IsClick) return;
                     this.BackColor = ActiveColor;
+                    this.ForeColor = ActiveFColor;
+                    this.ImageColor = ActiveFColor;
                     flag = true;
                 };
 
                 this.ActionOut += (ControlActionArgs args, ref bool flag) =>
                 {
                     this.BackColor = InactiveColor;
+                    this.ForeColor = InactiveFColor;
+                    this.ImageColor = InactiveFColor;
                 };
 
                 this.ActionDrag += (ControlActionArgs args, ref bool flag) => flag = true;
@@ -52,6 +59,8 @@ namespace FusionUI.UI.Elements
                 this.ActionUp += (ControlActionArgs args, ref bool flag) =>
                 {
                     this.BackColor = InactiveColor;
+                    this.ForeColor = InactiveFColor;
+                    this.ImageColor = InactiveFColor;
                     flag = true;
                 };
             }
@@ -63,7 +72,11 @@ namespace FusionUI.UI.Elements
                 if (transitionTime != 0)
                 {                    
                     this.BackColor = ActiveColor;
+                    this.ForeColor = ActiveFColor;
+                    this.ImageColor = ActiveFColor;
                     this.RunTransition("BackColor", InactiveColor, 0, transitionTime);
+                    this.RunTransition("ForeColor", InactiveFColor, 0, transitionTime);
+                    this.RunTransition("ImageColor", InactiveFColor, 0, transitionTime);
                 }
             };
             ToggleOnOff(!toggleState);            
@@ -72,6 +85,8 @@ namespace FusionUI.UI.Elements
         public void ToggleOn(bool invoke = true)
         {
             this.BackColor = ActiveColor;
+            this.ForeColor = ActiveFColor;
+            this.ImageColor = ActiveFColor;
             toggleState = true;
             if (ActiveImage != null) this.Image = ActiveImage;
             if (invoke)
@@ -84,6 +99,8 @@ namespace FusionUI.UI.Elements
         public void ToggleOff(bool invoke = true)
         {
             this.BackColor = InactiveColor;
+            this.ForeColor = InactiveFColor;
+            this.ImageColor = InactiveFColor;
             toggleState = false;
             if (PassiveImage != null) this.Image = PassiveImage;
             if (invoke)
@@ -104,10 +121,12 @@ namespace FusionUI.UI.Elements
             }
         }
 
-        public Button(FrameProcessor ui, float x, float y, float w, float h, string text, Color mainColor, Color transitionColor, int transitionTime, Action action = null) : base(ui, x, y, w, h, text, mainColor)
+        public Button(FrameProcessor ui, float x, float y, float w, float h, string text, Color mainColor, Color transitionColor, int transitionTime, Action action = null, Color? activeFColor = null, Color? inActiveFColor = null) : base(ui, x, y, w, h, text, mainColor)
         {
             ActiveColor = transitionColor;
             InactiveColor = mainColor;
+            ActiveFColor = activeFColor ?? ActiveFColor;
+            InactiveFColor = inActiveFColor ?? InactiveFColor;
             initClickableButton(transitionTime);
             if (action != null) ButtonAction += b => action();
             ImageMode = FrameImageMode.Fitted;
@@ -119,12 +138,16 @@ namespace FusionUI.UI.Elements
             {
                 if (!args.IsClick) return;
                 this.BackColor = ActiveColor;
+                this.ForeColor = ActiveFColor;
+                this.ImageColor = ActiveFColor;
                 flag = true;
             };
 
             this.ActionOut += (ControlActionArgs args, ref bool flag) =>
             {
                 this.BackColor = InactiveColor;
+                this.ForeColor = InactiveFColor;
+                this.ImageColor = InactiveFColor;
             };
 
             this.ActionDrag += (ControlActionArgs args, ref bool flag) => flag = true;
@@ -132,6 +155,8 @@ namespace FusionUI.UI.Elements
             this.ActionUp += (ControlActionArgs args, ref bool flag) =>
             {
                 this.BackColor = InactiveColor;
+                this.ForeColor = InactiveFColor;
+                this.ImageColor = InactiveFColor;
                 flag = true;
             };
 
@@ -139,10 +164,14 @@ namespace FusionUI.UI.Elements
             {
                  if (!args.IsClick) return;
                 this.BackColor = ActiveColor;
+                this.ForeColor = ActiveFColor;
+                this.ImageColor = ActiveFColor;
                 this.RunTransition("BackColor", InactiveColor, 0, transitionTime);                
                 ButtonAction?.Invoke(true);
             };
             this.BackColor = InactiveColor;
+            this.ForeColor = InactiveFColor;
+            this.ImageColor = InactiveFColor;
         }
 
         protected override void Update(GameTime gameTime)

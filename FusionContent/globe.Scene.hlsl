@@ -203,7 +203,7 @@ float4 PSMain ( VS_OUTPUT input ) : SV_Target
 		float time2 = lerp(BuildingsBuffer[input.ID].DestroyingTime.x, BuildingsBuffer[input.ID].DestroyingTime.y, 1 - input.Tex1.y);
 		color = float4(input.Color.rgb, 1);				
 		clip(SceneStage.Time - time1);
-		clip(time2 - SceneStage.Time);
+		clip(time2 - SceneStage.Time);		
 	#endif
 	
 	#ifdef XRAY
@@ -214,6 +214,9 @@ float4 PSMain ( VS_OUTPUT input ) : SV_Target
 		
 		return frsn*float4(color.rgb, color.a);
 	#else
+		#ifdef UV_TRANSPARENCY
+			return color;
+		#endif
 		if (BuildingsBuffer[input.ID].RenderType == 1) {
 			float3 ndir	= normalize(-input.WPos);
 		

@@ -167,7 +167,7 @@ namespace Fusion.Engine.Graphics.GIS
                         {
                             if (node.zoom == 0 || ((cameraPos - nodePos).Length() <
                                                    GetOptimalDistanceForLevel(node.zoom + 1)
-                                                   && IsTileInFrustum(node.x, node.y, node.zoom, frustum) &&
+                                                   && //IsTileInFrustum(node.x, node.y, node.zoom, frustum) &&
                                                    node.IsInit()))
                             {
                                 if (node.IsChildrenInit())
@@ -261,7 +261,7 @@ namespace Fusion.Engine.Graphics.GIS
             var p4 = GetCartesianCoord(x1, y1);
 
             var sphere = DBoundingSphere.FromPoints(new[] {p1, p2, p3, p4});
-
+            sphere.Radius *= 3f;
             var res = frustum.Contains(sphere) != ContainmentType.Disjoint;
 
             //if (Game.Keyboard.IsKeyDown(Keys.R))

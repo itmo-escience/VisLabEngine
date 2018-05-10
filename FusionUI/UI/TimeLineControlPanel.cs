@@ -106,18 +106,20 @@ namespace FusionUI.UI
         private void Init()
         {
             var lordTexture = ui.Game.Content.Load<DiscTexture>("ui/timeline/fv-icons_timeline-slider.png");
-            timeLine = new TimeLine(ui, UIConfig.UnitTimelineOffsetX, 0, this.UnitWidth - 2*UIConfig.UnitTimelineOffsetX,
+            timeLine = new TimeLine(ui, 0, 0, this.UnitWidth,
                 UIConfig.UnitTimelineHeight, "", Color.Zero, lordTexture, 4);
             this.Add(timeLine);
             timeLine.ActionClick += (ControlActionArgs args, ref bool flag) =>
             {
                 if (!args.IsClick) return;
                 if (timeManager != null)
-                timeManager.CurrentTime = timeLine.XPositionToDateTime((args.X - timeLine.GlobalRectangle.X - timeLine.emptySizeImage) / ScaleMultiplier);                
+                timeLine.LordOfTime.X = args.X - (timeLine.LordOfTime.Width) / 2 - timeLine.GetBorderedRectangle().X;
+                timeLine.LordOfTime.UpdatePosition();
+                //timeManager.CurrentTime = timeLine.XPositionToDateTime(timeLine.LordOfTime.GetRelative().X);                
             };
             timeLine.LordOfTime.ActionLost += (ControlActionArgs args, ref bool flag) =>
             {
-                var date = timeLine.XPositionToDateTime((timeLine.LordOfTime.GlobalRectangle.X - timeLine.GlobalRectangle.X  + timeLine.LordOfTime.Image.Width / 2) / ScaleMultiplier);
+                var date = timeLine.XPositionToDateTime(timeLine.LordOfTime.GetRelativeX());
                 if (timeManager != null)
                     timeManager.CurrentTime = date;
             };
@@ -193,6 +195,8 @@ namespace FusionUI.UI
                 Visible = IsVisible,
                 Text = currentStep,
                 ImageColor = UIConfig.TimeLineIconColor,
+                ActiveFColor = UIConfig.HighlightTextColor,
+                InactiveFColor = Color.Black,
             };
             this.Add(button);
             return button;
@@ -219,6 +223,8 @@ namespace FusionUI.UI
                 Visible = IsVisible,
                 Text = currentStep,
                 ImageColor = UIConfig.TimeLineIconColor,
+                ActiveFColor = UIConfig.HighlightTextColor,
+                InactiveFColor = Color.Black,
             };
             this.Add(button);
             return button;
