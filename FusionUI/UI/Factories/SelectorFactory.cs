@@ -38,7 +38,7 @@ namespace FusionUI.UI.Factories
             {
                 TextAlignment = Alignment.MiddleLeft,
             };            
-            selector = new DropDownSelector<TR>(ui, OffsetX, OffsetY + (label != "" ? labelFrame.UnitHeight : 0), holder.UnitWidth - OffsetX * 2, UIConfig.UnitFilterWindowElementHeight, UIConfig.InactiveColor, elements, selectAction, UIConfig.BorderColor, font:font)
+            selector = new DropDownSelector<TR>(ui, OffsetX, OffsetY + (label != "" ? labelFrame.UnitHeight : 0), holder.UnitWidth - OffsetX, UIConfig.UnitFilterWindowElementHeight, UIConfig.InactiveColor, elements, selectAction, UIConfig.BorderColor, font:font)
             {
                 Border = 2,
                 BorderColor = UIConfig.BorderColor,

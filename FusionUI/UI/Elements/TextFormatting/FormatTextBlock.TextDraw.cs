@@ -51,7 +51,7 @@ namespace FusionUI.UI.Elements.TextFormatting
                 var wsw = 0;
                 var textWidth = 0;
                 var xOffset = 0;
-                if (String.IsNullOrWhiteSpace(Words.Last()) && Words.Last() != "\n") Words = Words.Take(Words.Count - 1).ToList();
+                if (Words.Any() && String.IsNullOrWhiteSpace(Words.Last()) && Words.Last() != "\n") Words = Words.Take(Words.Count - 1).ToList();
                 string alignment = tagStack.LastByType(Tag.TagType.Alignment)?.Param.ToLower() ?? block.DefaultAlignment;
                 textWidth = 0;
                 var height = 0;
@@ -413,8 +413,11 @@ namespace FusionUI.UI.Elements.TextFormatting
                 currentString.Prepare();
             }
             lastString = Text;
-            this.Height = strings.Sum(a => a.Rect.Height) + 15;
+            TextHeight = strings.Sum(a => a.Rect.Height) + 15;
+            this.Height = Math.Max(TextHeight, MinHeight);
         }
+
+        private int TextHeight = 0;
 
         private Color GetColor(TagStack stack)
         {
@@ -463,13 +466,15 @@ namespace FusionUI.UI.Elements.TextFormatting
         private bool IsUnderline(TagStack stack)
         {
             return stack.LastByType(Tag.TagType.Underline) != null;
-        }
+        }        
 
         protected override void DrawFrame(GameTime gameTime, SpriteLayer sb, int clipRectIndex)
         {
             splitByString();
             float th = 0;
-            var textOffset = IsShortText ?  (BaseHeight - strings.TakeWhile(a => (th += a.Rect.Height) < BaseHeight).Sum(a => a.Rect.Height)) * 0.5f: 0f;
+            var textOffset = IsShortText ?  (BaseHeight - strings.TakeWhile(a => (th += a.Rect.Height) < BaseHeight).Sum(a => a.Rect.Height)) * 0.5f: 
+                TextAlignment == Alignment.MiddleLeft || TextAlignment == Alignment.MiddleCenter || TextAlignment == Alignment.MiddleRight ? (Height - TextHeight)/2  :
+                TextAlignment == Alignment.BottomLeft || TextAlignment == Alignment.BottomCenter || TextAlignment == Alignment.BottomRight ? Height - TextHeight : 0f;
 
             var rect = GlobalRectangle;
             Frame frame = this.parent;

@@ -8,6 +8,7 @@ using Fusion.Engine.Common;
 using Fusion.Engine.Frames;
 using Fusion.Engine.Graphics;
 using FusionUI.UI.Elements;
+using FusionUI.UI.Elements.TextFormatting;
 
 namespace FusionUI.UI.Factories
 {
@@ -24,28 +25,30 @@ namespace FusionUI.UI.Factories
                 parent.UnitWidth - parent.UnitPaddingLeft - parent.UnitPaddingRight,
                 UIConfig.UnitSettingsLabelHeight + OffsetY, "", Color.Zero);
 
-            ScalableFrame label = new ScalableFrame(ui, OffsetX, 0, holder.UnitWidth - valueBlockWidth - 2 * OffsetX,
-                UIConfig.UnitSettingsLabelHeight, text1, backColor ?? Color.Zero)
+            FormatTextBlock label = new FormatTextBlock(ui, OffsetX, 0, holder.UnitWidth - valueBlockWidth - 3 * OffsetX,
+                UIConfig.UnitSettingsLabelHeight, text1, backColor ?? Color.Zero, font, 0)
             {
                 FontHolder = font,
                 ForeColor = textColor ?? UIConfig.ActiveTextColor,
                 TextAlignment = Alignment.MiddleLeft,
             };
-            ScalableFrame label2 = new ScalableFrame(ui, OffsetX, 0, holder.UnitWidth - valueBlockWidth - 2 * OffsetX,
-                UIConfig.UnitSettingsLabelHeight, text2, backColor ?? Color.Zero)
+            FormatTextBlock label2 = new FormatTextBlock(ui, OffsetX, 0, holder.UnitWidth - valueBlockWidth - 3 * OffsetX,
+                UIConfig.UnitSettingsLabelHeight, text2, backColor ?? Color.Zero, font, 0)
             {
                 FontHolder = font,
                 TextAlignment = Alignment.MiddleRight,
+                DefaultAlignment = "right",
                 UnitTextOffsetX = -OffsetX,
-                ForeColor = Color.Gray,
+                ForeColor = Color.Gray,                
             };
-            ScalableFrame valueLabel = new ScalableFrame(ui, holder.UnitWidth - valueBlockWidth - OffsetX, 0,
+            FormatTextBlock valueLabel = new FormatTextBlock(ui, holder.UnitWidth - valueBlockWidth - OffsetX, 0,
                 valueBlockWidth,
-                UIConfig.UnitSettingsLabelHeight, value, color)
+                UIConfig.UnitSettingsLabelHeight, value, color, font, 0)
             {
                 FontHolder = font,
                 //ForeColor = textColor ?? UIConfig.ActiveTextColor,
                 TextAlignment = Alignment.MiddleCenter,
+                DefaultAlignment = "center",
             };
             holder.Item = valueLabel;
 
@@ -53,7 +56,12 @@ namespace FusionUI.UI.Factories
             holder.Add(label2);
 
             holder.Add(valueLabel);
-
+            holder.Height = holder.Children.Max(a => a.Height);
+            foreach (var holderChild in holder.Children)
+            {
+                holderChild.Height = holder.Height;
+                if (holderChild is RichTextBlock) ((RichTextBlock) holderChild).MinHeight = holder.Height;
+            }
             return holder;
 
 
@@ -71,20 +79,21 @@ namespace FusionUI.UI.Factories
                 blockHeight + OffsetY, "", Color.Zero);
 
 
-            float m = fixSizes ? holder.UnitWidth / (vals.Sum(a => a.Item2) + (vals.Count - 1) * InnerOffset) : 1;
+            float m = fixSizes ? (holder.UnitWidth - holder.UnitPaddingRight - holder.UnitPaddingLeft) / (vals.Sum(a => a.Item2) + (vals.Count - 1) * InnerOffset) : 1;
             float w = 0;
             for (int i = 0; i < vals.Count; i++)
             {
                 if (i == 2 && useOldStyle)
                 {
-                    
-                    ScalableFrame label = new ScalableFrame(ui, OffsetX + w, 0,
+
+                    FormatTextBlock label = new FormatTextBlock(ui, OffsetX + w, 0,
                         vals[i].Item2 * m,
-                        blockHeight, vals[i].Item1, Color.Zero)
+                        blockHeight, vals[i].Item1, Color.Zero, font, 0)
                     {
                         FontHolder = font,
                         ForeColor = UIConfig.InactiveTextColor,
                         TextAlignment = i == 0 ? Alignment.MiddleLeft : Alignment.MiddleCenter,
+                        DefaultAlignment = i == 0 ? "left" : "center"
                     };                    
                     holder.Add(label);
                     if (i == 2) holder.Item1 = label;
@@ -92,20 +101,29 @@ namespace FusionUI.UI.Factories
                 }
                 else
                 {
-                    ScalableFrame label = new ScalableFrame(ui, OffsetX + w, 0,
+                    FormatTextBlock label = new FormatTextBlock(ui, OffsetX + w, 0,
                         vals[i].Item2 * m,
-                        blockHeight, vals[i].Item1, (i > 1 && backColor != null) ? backColor.Value : Color.Zero)
+                        blockHeight, vals[i].Item1, (i > 1 && backColor != null) ? backColor.Value : Color.Zero, font, 0)
                     {
                         FontHolder = font,
                         ForeColor = textColor ?? UIConfig.ActiveTextColor,
                         TextAlignment = i == 0? Alignment.MiddleLeft : Alignment.MiddleCenter,
+                        DefaultAlignment = i == 0 ? "left" : "center"
+
                     };
                     holder.Add(label);
                     if (i == 2) holder.Item1 = label;
                     if (i == 3) holder.Item2 = label;
                 }
                 w += vals[i].Item2 * m + InnerOffset;
-            }                                               
+            }
+
+            holder.Height = holder.Children.Max(a => a.Height);
+            foreach (var holderChild in holder.Children)
+            {
+                holderChild.Height = holder.Height;
+                if (holderChild is RichTextBlock) ((RichTextBlock)holderChild).MinHeight = holder.Height;
+            }
             return holder;
 
 
@@ -192,8 +210,62 @@ namespace FusionUI.UI.Factories
                     ImageColor = Color.Black,
                 };
                 holder.Add(crossButton);
+                holder.Item = crossButton;
             }
 
+            return holder;
+
+
+        }
+
+        public static UIContainer<ScalableFrame, ScalableFrame> CaptionHolder(FrameProcessor ui, float OffsetX,
+            float OffsetY, ScalableFrame parent, String text, string buttonImage, Color? textColor = null,
+            UIConfig.FontHolder? UsedFont = null, bool cross = true, Action crossAction = null, Action ButtonAction = null)
+        {
+            var color = textColor ?? UIConfig.ActiveTextColor;
+            var font = UsedFont ?? UIConfig.FontHeader;
+            UIContainer<ScalableFrame, ScalableFrame> holder = new UIContainer<ScalableFrame, ScalableFrame>(ui, parent.UnitPaddingLeft, 0,
+                parent.UnitWidth - parent.UnitPaddingLeft - parent.UnitPaddingRight,
+                17, "", Color.Zero);
+
+            ScalableFrame label = new ScalableFrame(ui, OffsetX, 0, holder.UnitWidth,
+                holder.UnitHeight, text, Color.Zero)
+            {
+                FontHolder = font,
+                ForeColor = textColor ?? UIConfig.ActiveTextColor,
+                TextAlignment = Alignment.BaselineLeft,
+                UnitTextOffsetY = 11,
+            };
+
+
+            holder.Add(label);
+
+
+            if (cross)
+            {
+                var crossButton = new Button(ui, holder.UnitWidth - 17, 0, 17, 17, "", Color.Zero, UIConfig.ActiveColor,
+                    200, crossAction)
+                {
+                    Image = ui.Game.Content.Load<DiscTexture>(@"UI-new\southpark_cross_big"),
+                    ImageColor = Color.Black,
+                    ActiveFColor = Color.White,
+                    InactiveFColor = Color.Black,
+                };
+                holder.Add(crossButton);
+                holder.Item2 = crossButton;
+            }
+
+            var actionButton = new Button(ui, holder.UnitWidth - 17 - (cross ? 20 : 0), 0, 17, 17, "", Color.Zero, UIConfig.ActiveColor,
+                200, ButtonAction)
+            {
+                Image = ui.Game.Content.Load<DiscTexture>(buttonImage),
+                ImageColor = Color.Black,
+                ActiveFColor = Color.White,
+                InactiveFColor = Color.Black,
+            };
+            holder.Add(actionButton);
+
+            holder.Item1 = actionButton;
             return holder;
 
 

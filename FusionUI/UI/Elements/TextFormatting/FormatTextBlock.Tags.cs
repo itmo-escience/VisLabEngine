@@ -96,6 +96,8 @@ namespace FusionUI.UI.Elements.TextFormatting
             ItalicFont = font;
             BoldFont = font;
             BoldItalicFont = font;
+
+            init();
         }
 
         public static class ValidationControls
@@ -326,7 +328,7 @@ namespace FusionUI.UI.Elements.TextFormatting
         public override void init()
         {
             BaseHeight = this.Height;
-
+            UpdateGlobalRect(0, 0);
             splitByString();
             var textOffset = strings.Sum(a => a.Rect.Height);
             //foreach (var str in strForDraw)
@@ -335,12 +337,12 @@ namespace FusionUI.UI.Elements.TextFormatting
             //}
             //this.Height = textOffset + this.Font.CapHeight;
 
-            this.Height = Math.Max(this.Height, this.MinHeight);
-            if (IsShortText)
-            {
-                this.Height = BaseHeight;
-            }
-            this.Height = !IsShortText ? textOffset : BaseHeight;
+            //this.Height = Math.Max(this.Height, this.MinHeight);
+            //if (IsShortText)
+            //{
+            //    this.Height = BaseHeight;
+            //}
+            //this.Height = !IsShortText ? textOffset : BaseHeight;
 
         }
     }
