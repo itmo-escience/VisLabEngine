@@ -113,7 +113,7 @@ namespace FusionUI.UI
             {
                 if (!args.IsClick) return;
                 if (timeManager != null)
-                timeLine.LordOfTime.X = args.X - (timeLine.LordOfTime.Width) / 2 - timeLine.GetBorderedRectangle().X;
+                timeLine.LordOfTime.XVal = args.X - (float)(timeLine.LordOfTime.Width) / 2 - timeLine.GetBorderedRectangle().X;
                 timeLine.LordOfTime.UpdatePosition();
                 //timeManager.CurrentTime = timeLine.XPositionToDateTime(timeLine.LordOfTime.GetRelative().X);                
             };

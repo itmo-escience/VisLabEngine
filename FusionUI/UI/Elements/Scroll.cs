@@ -78,30 +78,34 @@ namespace FusionUI.UI.Elements
             SetFromRelativeY(y);
         }
 
+        public float XVal, YVal;
+
         public void SetFromRelativeX(float x)
         {
-            var parent = this.parent.GetPaddedRectangle();
-            X = (int)(this.Parent.PaddingLeft - extendedSize / 2 + x * (parent.Width - extendedSize));            
+            XVal = (this.Parent.PaddingLeft - extendedSize / 2 +
+                    x * (this.parent.GetPaddedRectangle().Width - extendedSize));
+            X = (int)XVal;            
             UpdatePosition();
         }
 
         public void SetFromRelativeY(float y)
         {
-            var parent = this.parent.GetPaddedRectangle();            
-            Y = (int)(0 + y * parent.Height);
+            var parent = this.parent.GetPaddedRectangle();
+            YVal = (0 + y * parent.Height);
+            Y = (int)YVal;
             UpdatePosition();
         }
 
         public float GetRelativeX()
         {
-            return MathUtil.Clamp((float)(X + extendedSize/2 - this.parent.PaddingLeft) /
+            return MathUtil.Clamp((float)(XVal + extendedSize/2 - this.parent.PaddingLeft) /
                    (this.parent.GetPaddedRectangle().Width - extendedSize), 0, 1);
         }
 
         public float GetRelativeY()
         {
-            return MathUtil.Clamp((float)(this.GlobalRectangle.Y + this.parent.GetPaddedRectangle().Y) /
-                   (this.parent.GetPaddedRectangle().Width - extendedSize), 0, 1);
+            return MathUtil.Clamp((float)(YVal + this.parent.PaddingTop) /
+                   (this.parent.GetPaddedRectangle().Height - extendedSize), 0, 1);
         }
 
         public Vector2 GetRelative()
@@ -137,16 +141,19 @@ namespace FusionUI.UI.Elements
             var scrollRectangle = this.GlobalRectangle;
             if (!IsFixedX)
             {                
-                var newX = X + (int)p.X - (int)PrevPosition.Value.X - this.Parent.PaddingLeft;
+                var newX = XVal + (int)p.X - (int)PrevPosition.Value.X - this.Parent.PaddingLeft;
 //                Log.Message($"{newX};{this.X}");
-                this.X = this.Parent.PaddingLeft + MathUtil.Clamp(newX, 0 - extendedSize, parent.Width - scrollRectangle.Width + extendedSize);
+                XVal = this.Parent.PaddingLeft + MathUtil.Clamp(newX, 0 - extendedSize, parent.Width - scrollRectangle.Width + extendedSize);
+                this.X = (int) XVal;
             }
             //&& parent.X < scrollRectangle.X + (int)p.X - (int)PrevPosition.Value.X && parent.Width + parent.X > scrollRectangle.Width + scrollRectangle.X + (int)p.X - (int)PrevPosition.Value.X)
                 //this.X += (int)p.X - (int)PrevPosition.Value.X;
             if (!IsFixedY)
             {
-                var newY = Y + (int)p.Y - (int)PrevPosition.Value.Y - this.Parent.PaddingTop;
-                this.Y = this.Parent.PaddingTop + MathUtil.Clamp(newY, 0, parent.Height - scrollRectangle.Height);
+                var newY = YVal + (int)p.Y - (int)PrevPosition.Value.Y - this.Parent.PaddingTop;
+                
+                YVal = this.Parent.PaddingTop + MathUtil.Clamp(newY, 0, parent.Height - scrollRectangle.Height);
+                this.Y = (int)YVal;
             }
 //            this.X = Math.Min(this.Width, this.X);
             //&& parent.Y < scrollRectangle.Y + (int)p.Y - (int)PrevPosition.Value.Y && parent.Height + parent.Y > scrollRectangle.Height + scrollRectangle.Y + (int)p.Y - (int)PrevPosition.Value.Y)
