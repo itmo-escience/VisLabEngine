@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using Fusion.Core.Mathematics;
 using Fusion.Engine.Graphics.GIS;
 using Fusion.Engine.Graphics.GIS.GlobeMath;
@@ -134,6 +135,15 @@ namespace FusionUI.UI.Plots2_0
                 Right = data.Max(a => a.X),
                 Bottom = data.Max(a => a.Y),
             };
+            if (StartFromZeroX)
+            {
+                ld.Left = Math.Min(ld.Left, 0);
+            }
+
+            if (StartFromZeroY)
+            {
+                ld.Top = Math.Min(ld.Top, 0);
+            }
             if (IsBarChart)
             {
                 ld.Left -= 1;
@@ -303,6 +313,7 @@ namespace FusionUI.UI.Plots2_0
             }
         }
 
+        public bool StartFromZeroX, StartFromZeroY;
         public RectangleD Limits
         {
             get
@@ -493,6 +504,42 @@ namespace FusionUI.UI.Plots2_0
                 });
                 return set;
             });
+
+        public bool StartFromZeroX
+        {
+            set
+            {
+                foreach (var dataValue in Data.Values)
+                {
+                    foreach (var dataValueValue in dataValue.Values)
+                    {
+                        if (dataValueValue.StartFromZeroX != value)
+                        {
+                            dataValueValue.StartFromZeroX = value;
+                            dataValueValue.UpdateLimits();
+                        }
+                    }
+                }
+            }   
+        }
+
+        public bool StartFromZeroY
+        {
+            set
+            {
+                foreach (var dataValue in Data.Values)
+                {
+                    foreach (var dataValueValue in dataValue.Values)
+                    {
+                        if (dataValueValue.StartFromZeroY != value)
+                        {
+                            dataValueValue.StartFromZeroY = value;
+                            dataValueValue.UpdateLimits();
+                        }
+                    }
+                }
+            }
+        }
 
         public RectangleD ActiveLimits
         {

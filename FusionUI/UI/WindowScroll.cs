@@ -21,8 +21,24 @@ namespace FusionUI.UI
             {
                 HeightLimit += (newH - oldH) / ScaleMultiplier;
             }
-            base.UpdateAnchors(oldW, oldH, newW, newH);     
-            holder.UpdateAnchors(oldW, oldH, newW, newH);
+            base.UpdateAnchors(oldW, oldH, newW, newH);   
+            UpdateResize();
+            //holder.UpdateAnchors(oldW, oldH, newW, newH);
+        }
+
+        public override void UpdateResize (bool UpdateChildren = true)
+        {            
+            base.UpdateResize(UpdateChildren);
+            bool fr = firstResize;
+            var ow = oldW;
+            var oh = oldH;
+            AutoResize(true);
+            if (oldW != Width || oldH != Height ) {                
+                if (!fr && UpdateChildren)
+                {
+                    holder.UpdateAnchors(ow, oh, Width, Height);
+                }                                                
+            }
         }
 
         public float ScrollSize = 2;

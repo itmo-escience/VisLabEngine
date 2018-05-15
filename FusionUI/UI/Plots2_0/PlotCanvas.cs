@@ -235,7 +235,7 @@ namespace FusionUI.UI.Plots2_0
             if (!SingleScale)
             {
                 foreach (var pv in DataContainer.Data.Values)
-                {
+                {                    
                     if (!pv.IsPresent || pv.ActiveDepths.Count == 0) continue;
                     {
                         var l = pv.ActiveLimits;
@@ -445,9 +445,9 @@ namespace FusionUI.UI.Plots2_0
             var pcNew = PointCount / ScaleRect.Width;            
             foreach (var depth in pd.ActiveDepths)
             {
-                var points = pd[(int)pcNew, depth];
-                float BarWidth = Width / points.Count * 0.7f;
+                var points = pd[(int)pcNew, depth];                
                 var limits = pd.Variable.LimitsAligned;
+                float BarWidth = 0.7f * Width / (float)limits.Width;
                 var pointsX = points.ConvertAll(a => a.X);
                 var leftLim = limits.Left + ScaleRect.Left * limits.Width;
                 var left = pointsX.BinarySearch(leftLim);
@@ -484,7 +484,8 @@ namespace FusionUI.UI.Plots2_0
                         zeroScreen.Y - nextScreen.Y, pd.ColorsByDepth[depth], clipRectIndex);
                     //hintPoints.Add(new Tuple<Vector2, string, double, PlotData>(
                         //new Vector2(nextScreen.X - BarWidth / 2, nextScreen.Y), $"{next.Y}", depth, pd));
-                    var s = $"{next.Y:0}";
+
+                    var s = next.Y.ToString($"F{(int)Math.Max(0, 2 - (Math.Log(Math.Abs(1 + next.Y), 10)))}");//$"{next.Y:()}";
                     var rect = Font.MeasureString(s);
 
                     Font.DrawString(sb, s, nextScreen.X - rect.Width / 2, nextScreen.Y - (next.Y > 0 ? 4 : 4 - rect.Height),

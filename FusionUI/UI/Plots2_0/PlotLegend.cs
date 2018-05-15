@@ -54,9 +54,9 @@ namespace FusionUI.UI.Plots2_0
                     delta = 0;
                     flag = false;
                 }
-                if (delta < ElementHeight * ScaleMultiplier * (3 - rowCount - 1))
+                if (delta < ElementHeight * ScaleMultiplier * (MaxRowCount - rowCount - 1))
                 {
-                    delta = ElementHeight * ScaleMultiplier * (3 - rowCount - 1);
+                    delta = ElementHeight * ScaleMultiplier * (MaxRowCount - rowCount - 1);
                     flag = false;
                 }                
                 args.MoveDelta.Y = args.MoveDelta.Y - (delta - oldDelta);
@@ -69,33 +69,33 @@ namespace FusionUI.UI.Plots2_0
                 {
                     delta = 0;                    
                 }
-                if (delta < ElementHeight * ScaleMultiplier * (3 - rowCount - 1))
+                if (delta < ElementHeight * ScaleMultiplier * (MaxRowCount - rowCount - 1))
                 {
-                    delta = ElementHeight * ScaleMultiplier * (3 - rowCount - 1);
+                    delta = ElementHeight * ScaleMultiplier * (MaxRowCount - rowCount - 1);
                 }
             };
         }
 
-        protected List<Tuple<Color, String>> currentPlots;
+        protected List<Tuple<Color, String, bool>> currentPlots;
 
         public Func<string, string> textFunc;
 
         protected virtual void DeterminePlots()
         {
-            currentPlots = new List<Tuple<Color, string>>();
+            currentPlots = new List<Tuple<Color, string, bool>>();
             foreach (var variable in PlotData.Data)
             {
-                if (!variable.Value.IsPresent) continue;
+                if (!variable.Value.IsPresent) continue;                
                 foreach (var data in variable.Value.Data)
                 {
                     if (!data.Value.Any(a => a.Value.IsPresent)) continue;
                     foreach (var kv in data.Value)
-                    {
+                    {                        
                         foreach (var depth in kv.Value.ActiveDepths)
                         {
                             if (kv.Value.ColorsByDepth.ContainsKey(depth))
-                                currentPlots.Add(new Tuple<Color, string>(kv.Value.ColorsByDepth[depth],
-                                    $"({data.Key.Index}){kv.Key} at {depth:0.##} {variable.Value.CatUnits}"));
+                                currentPlots.Add(new Tuple<Color, string, bool>(kv.Value.ColorsByDepth[depth],
+                                    $"({data.Key.Index}){kv.Key}{(kv.Value.ActiveDepths.Count > 1 ? " at {depth:0.##}" : "")} {variable.Value.CatUnits}", kv.Value.IsBarChart));
                         }
                     }
                 }
@@ -104,12 +104,13 @@ namespace FusionUI.UI.Plots2_0
 
         private float delta = 0;
         private int elementCount = 0, rowCount = 0;
+        public int MaxRowCount = 3;
         protected override void DrawFrame(GameTime gameTime, SpriteLayer spriteLayer, int clipRectIndex)
         {
-            delta = MathUtil.Clamp(delta, ElementHeight * ScaleMultiplier * (3 - rowCount - 1), 0);
+            delta = MathUtil.Clamp(delta, ElementHeight * ScaleMultiplier * (MaxRowCount - rowCount - 1), 0);
             base.DrawFrame(gameTime, spriteLayer, clipRectIndex);            
             var delta1 = delta + ElementHeight / 2 * ScaleMultiplier;
-            if (rowCount <= 3) delta1 = 0;
+            if (rowCount <= MaxRowCount) delta1 = 0;
             DeterminePlots();
 
             var whiteTex = this.Game.RenderSystem.WhiteTexture;
@@ -133,9 +134,11 @@ namespace FusionUI.UI.Plots2_0
                 var clipRect = RectangleF.Intersect(new RectangleF(left, top + delta1, width, height), this.GlobalRectangle);
                 spriteLayer.SetClipRectangle(ClipRectId, (Rectangle)clipRect, Color.White);
                 float lineX = left;
-                float lineY = top + (ElementHeight / 2 - UnitLineWidth / 2) * ScaleMultiplier + delta1;
+
+                var w = !colorData.Item3 ? UnitLineWidth : ElementHeight - UnitLineWidth;
+                float lineY = top + (ElementHeight / 2 - w / 2) * ScaleMultiplier + delta1;
                 spriteLayer.Draw(whiteTex, lineX, lineY, UnitLineLength * ScaleMultiplier,
-                    UnitLineWidth * ScaleMultiplier, colorData.Item1, ClipRectId);
+                    w * ScaleMultiplier, colorData.Item1, ClipRectId);
 
                 float textX = left + (UnitLineLength + MinXOffset) * ScaleMultiplier;
                 float textY = (float)Math.Floor(top + height / 2 + sRect.Height / 2 + delta1);
@@ -166,14 +169,14 @@ namespace FusionUI.UI.Plots2_0
             //}
             elementCount = i;
             rowCount = (int) Math.Ceiling((float) (elementCount) / hCount);
-            UnitHeight = ElementHeight * Math.Min(3, rowCount);
+            UnitHeight = ElementHeight * Math.Min(MaxRowCount, rowCount);
 
-            if (rowCount > 3)
+            if (rowCount > MaxRowCount)
             {
                 //Draw scroll line
-                float d = 3.0f / rowCount;
+                float d = (float)MaxRowCount / rowCount;
 
-                float deltaMul = rowCount > 3 ? delta1 / (ElementHeight * (3 - rowCount - 1)) : 1;
+                float deltaMul = rowCount > MaxRowCount ? delta1 / (ElementHeight * (MaxRowCount - rowCount - 1)) : 1;
                 spriteLayer.Draw(whiteTex, GlobalRectangle.Right - UIConfig.ScrollBarWidth * ScaleMultiplier,
                     GlobalRectangle.Top, UIConfig.ScrollBarWidth * ScaleMultiplier, Height, UIConfig.ButtonColor,
                     clipRectIndex);

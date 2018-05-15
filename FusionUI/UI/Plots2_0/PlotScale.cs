@@ -26,6 +26,7 @@ namespace FusionUI.UI.Plots2_0
         NoActiveCheckX = 512,
         NoActiveCheckY = 1024,
         NotDisplayName = 2048,
+        NotWriteNumbersX = 4096,
     }
 
     public class PlotScale : ScalableFrame
@@ -76,7 +77,7 @@ namespace FusionUI.UI.Plots2_0
                 var MinX = (float)Limits.Left;
                 var MaxX = (float)Limits.Right;
                 if (MaxX - MinX < float.Epsilon) return;
-                leftValue = (Settings & ScaleParams.StartFromZeroX) != 0 ? 0 : MinX;
+                leftValue = MinX;//(Settings & ScaleParams.StartFromZeroX) != 0 ? 0 : MinX;
                 float dist = MaxX - leftValue;
                 double st = Math.Abs(dist / (Plot.UnitWidth / SuggestedStepX));
                 if (st < float.Epsilon) return;
@@ -124,7 +125,7 @@ namespace FusionUI.UI.Plots2_0
                 var MinY = (float)Limits.Top;
                 var MaxY = (float)Limits.Bottom;
                 if (MaxY - MinY < float.Epsilon) return;
-                bottomValue = (Settings & ScaleParams.StartFromZeroY) != 0 ? 0 : MinY;
+                bottomValue = MinY;// (Settings & ScaleParams.StartFromZeroY) != 0 ? 0 : MinY;
                 float dist = MaxY - bottomValue;
                 double st = Math.Abs(dist / (Plot.UnitHeight / SuggestedStepY));
                 if ((Settings & ScaleParams.UseFixedStepY) == 0)
@@ -203,9 +204,14 @@ namespace FusionUI.UI.Plots2_0
             {
                 if (PlotData.Count > 0)
                 {
+                    PlotData[0].StartFromZeroX = (Settings & ScaleParams.StartFromZeroX) != 0;
+                    PlotData[0].StartFromZeroY = (Settings & ScaleParams.StartFromZeroY) != 0;
                     var lim = PlotData[0].LimitsAligned;
+
                     for (int i = 1; i < PlotData.Count; i++)
                     {
+                        PlotData[i].StartFromZeroX = (Settings & ScaleParams.StartFromZeroX) != 0;
+                        PlotData[i].StartFromZeroY = (Settings & ScaleParams.StartFromZeroY) != 0;
                         lim = RectangleD.Union(lim, PlotData[i].Limits);
                     }
                     return new RectangleD()
@@ -320,7 +326,7 @@ namespace FusionUI.UI.Plots2_0
                 var s = xFunc.Invoke(pos) ?? "";
                 var b = Font.MeasureStringF(s);
                 float w =  (float)((pos - MinX)/(MaxX - MinX)*Plot.GlobalRectangle.Width - b.Width/2);
-                if (w > b.Width/2 && w < Plot.GlobalRectangle.Width - b.Width / 2) {
+                if (w > b.Width/2 && w < Plot.GlobalRectangle.Width - b.Width / 2 && (Settings & ScaleParams.NotWriteNumbersX) == 0) {
                     Font.DrawString (sb, s, Plot.GlobalRectangle.Left + w, Plot.GlobalRectangle.Bottom + Index * UIConfig.UnitPlotScaleHeight * ScaleMultiplier + b.Height - ((float)zeroH/ Plot.GlobalRectangle.Height > 0.9 ? 0 : zeroH),
                         CaptionsColor, clipRectIndex);
                     if ((Settings & ScaleParams.DrawMeasure) != 0)

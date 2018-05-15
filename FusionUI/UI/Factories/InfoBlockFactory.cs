@@ -69,14 +69,14 @@ namespace FusionUI.UI.Factories
 
         public static UIContainer<ScalableFrame, ScalableFrame> InfoBlockHolder5(FrameProcessor ui, float OffsetX,
             float OffsetY, ScalableFrame parent,
-            List<Tuple<string, float>> vals, float InnerOffset = 3, float blockHeight = 9, bool useOldStyle = false, bool fixSizes = false, Color? backColor = null,
+            List<Tuple<string, float>> vals, float InnerOffset = 1, float blockHeight = 9, bool useOldStyle = false, bool fixSizes = false, Color? backColor = null,
             Color? textColor = null, Color? valueBackColor = null, UIConfig.FontHolder? UsedFont = null)
         {
             var color = valueBackColor ?? UIConfig.PopupColor;
             var font = UsedFont ?? UIConfig.FontBase;
             UIContainer<ScalableFrame, ScalableFrame> holder = new UIContainer<ScalableFrame, ScalableFrame>(ui, parent.UnitPaddingLeft, 0,
                 parent.UnitWidth - parent.UnitPaddingLeft - parent.UnitPaddingRight,
-                blockHeight + OffsetY, "", Color.Zero);
+                blockHeight + 2 * OffsetY, "", Color.Zero);
 
 
             float m = fixSizes ? (holder.UnitWidth - holder.UnitPaddingRight - holder.UnitPaddingLeft) / (vals.Sum(a => a.Item2) + (vals.Count - 1) * InnerOffset) : 1;
@@ -86,7 +86,7 @@ namespace FusionUI.UI.Factories
                 if (i == 2 && useOldStyle)
                 {
 
-                    FormatTextBlock label = new FormatTextBlock(ui, OffsetX + w, 0,
+                    FormatTextBlock label = new FormatTextBlock(ui, OffsetX + w, OffsetY,
                         vals[i].Item2 * m,
                         blockHeight, vals[i].Item1, Color.Zero, font, 0)
                     {
@@ -118,11 +118,11 @@ namespace FusionUI.UI.Factories
                 w += vals[i].Item2 * m + InnerOffset;
             }
 
-            holder.Height = holder.Children.Max(a => a.Height);
+            holder.Height = holder.Children.Max(a => a.Height) + (int)(OffsetY * 2 * ApplicationInterface.ScaleMod);
             foreach (var holderChild in holder.Children)
             {
-                holderChild.Height = holder.Height;
-                if (holderChild is RichTextBlock) ((RichTextBlock)holderChild).MinHeight = holder.Height;
+                holderChild.Height = holder.Height - (int)(OffsetY * 2 * ApplicationInterface.ScaleMod);
+                if (holderChild is RichTextBlock) ((RichTextBlock)holderChild).MinHeight = holder.Height - (int)(OffsetY * 2 * ApplicationInterface.ScaleMod);
             }
             return holder;
 

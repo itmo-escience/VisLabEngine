@@ -14,7 +14,8 @@ namespace FusionUI.UI.Plots2_0
         public List<PlotScale> Scales = new List<PlotScale>();
 
         public PlotLegend Legend;
-                
+
+        public bool ShowScaleX = true, ShowScaleY = true;
 
         public PlotViewer(FrameProcessor ui, float x, float y, float w, float h, Color backColor,
             AbstractTimeManager tm, PlotCanvas plot = null) : base(ui, x, y, w, h, "", backColor)
@@ -45,7 +46,7 @@ namespace FusionUI.UI.Plots2_0
         public bool IsTime;
         protected List<double> predefinedTimeSteps = new List<double>() {1.0/1440, 1.0 /288, 1.0/144, 1.0/48, 1.0/24, 1.0/12, 1.0/4, 1.0/2, 1, 2, 5, 10, 30, 60, 180, 365, 365*2, 365*5, 365*10};
 
-        public ScaleParams ScaleSettings;
+        public ScaleParams ScaleSettings = ScaleParams.DrawMeasure;
         private UIConfig.FontHolder scaleFont = UIConfig.FontBody;
 
         public UIConfig.FontHolder ScaleFont
@@ -104,13 +105,18 @@ namespace FusionUI.UI.Plots2_0
             var scales = new Dictionary<string, PlotScale>();
             foreach (var variable in Plot.DataContainer.Data) {
 	            var name = variable.Value.Name;
+                if (!(first && ShowScaleX || ShowScaleY)) break;
                 if (!scales.ContainsKey(name))
                 {
                     scales[name] = new PlotScale(ui, Plot)
                     {
-                        Settings = ScaleParams.DrawScaleY | ScaleParams.UseFixedStepY | ScaleParams.DrawMeasure | (first
+                        Settings = (ShowScaleY 
+                                       ? ScaleParams.DrawScaleY | ScaleParams.UseFixedStepY 
+                                       : 0) | 
+                                   (first && ShowScaleX
                                        ? ScaleParams.DrawScaleX | ScaleParams.UseFixedStepX | ScaleParams.NoActiveCheckX
-                                       : 0) | ScaleSettings,
+                                       : 0) | 
+                                   ScaleSettings,
                         Dirty = true,
                         YLabel = name,
                         XLabel = "Time",
@@ -179,17 +185,25 @@ namespace FusionUI.UI.Plots2_0
             {
                 if (scale.Visible = scale.PlotData.Any(d => d.IsPresent))
                 {
-                    scale.Index = i++;
+                    if (ShowScaleY) scale.Index = i++;
                     if (first)
                     {
-                        scale.Settings = ScaleParams.DrawScaleY | ScaleParams.UseFixedStepY | ScaleParams.DrawMeasure |
-                                         (ScaleParams.DrawScaleX | ScaleParams.UseFixedStepX |
-                                          ScaleParams.NoActiveCheckX) | ScaleSettings;
+                        scale.Settings = (ShowScaleY
+                                             ? ScaleParams.DrawScaleY | ScaleParams.UseFixedStepY
+                                             : 0) |
+                                         (ShowScaleX
+                                             ? ScaleParams.DrawScaleX | ScaleParams.UseFixedStepX |
+                                               ScaleParams.NoActiveCheckX
+                                             : 0) |
+                                         ScaleSettings;
                         first = false;
                     }
                     else
                     {
-                        scale.Settings = ScaleParams.DrawScaleY | ScaleParams.UseFixedStepY | ScaleParams.DrawMeasure | ScaleSettings;
+                        scale.Settings = (ShowScaleY
+                                             ? ScaleParams.DrawScaleY | ScaleParams.UseFixedStepY
+                                             : 0) |
+                                         ScaleSettings;
                     }
                 }   
                 scale.UpdateScaleSteps();             
