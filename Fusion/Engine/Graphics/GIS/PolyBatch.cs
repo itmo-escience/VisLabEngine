@@ -76,6 +76,9 @@ namespace Fusion.Engine.Graphics.GIS
 		public Gis.GeoPoint[] PointsCpu { get; protected set; }
 		public int[] IndecesCpu			{ get; protected set; }
 
+		public int IndecesToDrawCount = 0;
+
+
 		protected PolyGisLayer(Game engine) : base(engine) { }
 
 
@@ -118,6 +121,9 @@ namespace Fusion.Engine.Graphics.GIS
 
 			PointsCpu	= points;
 			IndecesCpu	= indeces;
+
+			IndecesToDrawCount = indeces.Length;
+
 
 			cb			= new ConstantBuffer(Game.GraphicsDevice, typeof(ConstData));
 		    if (!reInit)
@@ -193,7 +199,7 @@ namespace Fusion.Engine.Graphics.GIS
 			Game.GraphicsDevice.PixelShaderSamplers[1] = SamplerState.AnisotropicClamp;
 
 			Game.GraphicsDevice.SetupVertexInput(currentBuffer, indexBuffer);
-			Game.GraphicsDevice.DrawIndexed(indexBuffer.Capacity, 0, 0);
+			Game.GraphicsDevice.DrawIndexed(IndecesToDrawCount, 0, 0);
 
 			//game.GraphicsDevice.ResetStates();
 		}
