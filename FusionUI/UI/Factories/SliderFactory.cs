@@ -259,7 +259,7 @@ namespace FusionUI.UI.Factories
             };
 
             slider = new Slider(ui, OffsetX - 2 + labelWidth, OffsetY,
-                width - labelWidth - (showValue ? valueWidth : 0), height, "", Color.Zero)
+                holder.UnitWidth - labelWidth - (showValue ? valueWidth : 0), height, "", Color.Zero)
             {
                 backColorForSlider = ColorConstant.BackColorForSlider,
                 ForeColor = ColorConstant.ForeColor,

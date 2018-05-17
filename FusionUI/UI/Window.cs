@@ -47,12 +47,14 @@ namespace FusionUI.UI
             }
         }
 
+        public readonly bool DrawHat;
         public Action ActionCross;
 
         public Window(FrameProcessor ui, float x, float y, float w, float h, string text, Color backColor,
             bool drawHat = true, bool drawCross = true, bool drawHelp = false, string helpText = "", bool fixedSize = false)
             : base(ui, x, y, w, h, text, backColor)
         {
+            DrawHat = drawHat;
             FixedSize = fixedSize;
             ((Frame) this).Ghost = false;            
             AutoHeight = !FixedSize;
@@ -98,16 +100,16 @@ namespace FusionUI.UI
                     HatPanel.Add(help);
                 }
 
-                ((Frame) this).Add(HatPanel);
+                base.Add(HatPanel);
             }
             holder = new LayoutFrame(ui, 0, drawHat ? UIConfig.UnitHatHeight : 0, (int)UnitWidth, 0, Color.Zero)
             {
                 AutoHeight = true,
                 Anchor = FrameAnchor.All,
             };
-            ((Frame)this).Add(holder);
+            base.Add(holder);
             BasementPanel = new ScalableFrame(ui, 0, (int)(holder.UnitY + holder.UnitHeight), (int)UnitWidth, 0, "", UIConfig.SettingsColor);
-            ((Frame)this).Add(BasementPanel);
+            base.Add(BasementPanel);
 
             holder.Resize += HolderOnResize;
             UpdateResize();
@@ -116,9 +118,14 @@ namespace FusionUI.UI
 
         public IEnumerable<Frame> Children { get { return holder.Children; } }
 
-        public void Add(Frame frame)
+        public override void Add(Frame frame)
         {
             holder.Add(frame);            
+        }
+
+        public void AddBase(Frame frame)
+        {
+            base.Add(frame);
         }
 
         public void Remove(Frame frame)
@@ -126,6 +133,10 @@ namespace FusionUI.UI
             holder.Remove(frame);
         }
 
+        public override void Clear(Frame frame)
+        {
+            holder.Clear(frame);
+        }
 
 	    public void HideWindow()
 	    {

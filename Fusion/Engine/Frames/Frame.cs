@@ -412,7 +412,7 @@ namespace Fusion.Engine.Frames {
 		/// Adds frame
 		/// </summary>
 		/// <param name="frame"></param>
-		public void Add ( Frame frame )
+		public virtual void Add ( Frame frame )
 		{
 			if ( !children.Contains(frame) ) {
 				children.Add( frame );

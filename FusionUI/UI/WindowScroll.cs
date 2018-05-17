@@ -13,6 +13,44 @@ namespace FusionUI.UI
             //Log.Message("LoL");
         }
 
+        private float unitPaddingTop, unitPaddingBottom, unitPaddingLeft, unitPaddingRight;
+        public override float UnitPaddingLeft
+        {
+            get { return unitPaddingLeft; }
+            set
+            {
+                unitPaddingLeft = value;
+                UpdatePadding();
+            }
+        }
+        public override float UnitPaddingRight
+        {
+            get { return unitPaddingRight; }
+            set
+            {
+                unitPaddingRight = value;
+                UpdatePadding();
+            }
+        }
+        public override float UnitPaddingTop
+        {
+            get { return unitPaddingTop; }
+            set
+            {
+               unitPaddingTop = value;
+                UpdatePadding();
+            }
+        }
+        public override float UnitPaddingBottom
+        {
+            get { return unitPaddingBottom; }
+            set
+            {
+                unitPaddingBottom = value;
+                UpdatePadding();
+            }
+        }
+
         public float HeightLimit;
 
         public override void UpdateAnchors(int oldW, int oldH, int newW, int newH)
@@ -41,6 +79,15 @@ namespace FusionUI.UI
             }
         }
 
+        public void UpdatePadding()
+        {
+            scrollHolder.UnitY = DrawHat ? UIConfig.UnitHatHeight : 0 + UnitPaddingTop;
+            scrollHolder.UnitX = UnitPaddingLeft;
+            scrollHolder.UnitWidth = UnitWidth - UnitPaddingLeft - UnitPaddingRight;
+            scrollHolder.UnitHeight = HeightLimit - UnitPaddingTop - UnitPaddingBottom;
+            holder.UnitWidth = scrollHolder.UnitWidth;
+        }
+
         public float ScrollSize = 2;
 
         public bool AllowShrink = true;
@@ -56,20 +103,20 @@ namespace FusionUI.UI
             UnitHeight = h;            
             UpdateResize();
             SuppressActions = true;
-            HeightLimit = h - (HatPanel?.UnitHeight ?? 0) - (BasementPanel?.UnitHeight ?? 0) - UnitPaddingTop - UnitPaddingBottom;
-            scrollHolder = new ScalableFrame(ui, holder.UnitX, holder.UnitY, holder.UnitWidth, HeightLimit, "", Color.Zero)
+            HeightLimit = h - (HatPanel?.UnitHeight ?? 0) - (BasementPanel?.UnitHeight ?? 0) ;
+            scrollHolder = new ScalableFrame(ui, holder.UnitX, holder.UnitY, holder.UnitWidth, HeightLimit - UnitPaddingTop - UnitPaddingBottom, "", Color.Zero)
             {   
                 //Border = 1,
                 //BorderColor = Color.Violet,
                 Anchor = FrameAnchor.Left | FrameAnchor.Right | FrameAnchor.Top,
-            };
+            };            
             if (BasementPanel != null)
             {
                 BasementPanel.UnitY = h - BasementPanel.UnitHeight;
             }
             if (HatPanel != null) HatPanel.Border = 1;
-            ((Frame)this).Remove(holder);
-            ((Frame)this).Add(scrollHolder);
+            base.Remove(holder);
+            AddBase(scrollHolder);
             scrollHolder.Add(holder);
             holder.UnitY = 0;
             holder.UnitWidth = Math.Max(this.UnitWidth, this.UnitWidth - ScrollSize + holder.UnitPaddingRight);
@@ -152,12 +199,13 @@ namespace FusionUI.UI
             var whiteTex = this.Game.RenderSystem.WhiteTexture;
             if (RealHeight > MaxHeight)
             {
-                var Rectangle = new RectangleF(scrollHolder.GlobalRectangle.Left, scrollHolder.GlobalRectangle.Top,
-                    scrollHolder.GlobalRectangle.Width,
+                var Rectangle = new RectangleF(GlobalRectangle.Left, scrollHolder.GlobalRectangle.Top,
+                    GlobalRectangle.Width,
                     scrollHolder.GlobalRectangle.Height);
+
                 var relativeSize = MaxHeight / RealHeight;
                 var relativePos = (1 - relativeSize) * (-ScrollDelta / (RealHeight - MaxHeight));
-                spriteLayer.Draw(whiteTex, Rectangle.Right - ScrollSize * ScaleMultiplier, Rectangle.Top + relativePos * Rectangle.Height, ScrollSize * ScaleMultiplier, relativeSize * Rectangle.Height, UIConfig.ActiveColor);
+                spriteLayer.Draw(whiteTex, Rectangle.Right - (ScrollSize * ScaleMultiplier), Rectangle.Top + relativePos * Rectangle.Height, ScrollSize * ScaleMultiplier, relativeSize * Rectangle.Height, UIConfig.ActiveColor);
                 //spriteLayer.Draw(whiteTex, Rectangle.Left, Rectangle.Top, Rectangle.Width, Rectangle.Height, Color.Green);
             }
         }

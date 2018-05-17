@@ -44,10 +44,15 @@ namespace FusionUI.UI.Elements
             get { return _currentValue; }
             set
             {
-                _currentValue = RoundValues ? (float)Math.Round(value) : value;                
+                _currentValue = MathUtil.Clamp((RoundValues ? (float)Math.Round(value) : value), MinValue, MaxValue);                
                 OnChange?.Invoke(value);
             }
-        }                     
+        }
+
+        public void SetValueImplicit(float value)
+        {
+            _currentValue = MathUtil.Clamp(RoundValues ? (float)Math.Round(value) : value, MinValue, MaxValue);
+        }
 
         public int SliderWidth => (int)(UnitSliderWidth * ScaleMultiplier);
         public float UnitWidthControlElement = 4, UnitHeightControlElement = 11, UnitSliderWidth = 0.5f;

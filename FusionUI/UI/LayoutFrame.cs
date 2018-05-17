@@ -72,11 +72,10 @@ namespace FusionUI.UI
             }
         }
 
-        public new Frame Add(Frame frame)
+        public override void Add(Frame frame)
         {
             if (frame is ScalableFrame)
-                Add((ScalableFrame) frame);
-            return frame;
+                Add((ScalableFrame) frame);            
         }
 
         public new void Remove(Frame frame)
@@ -128,6 +127,14 @@ namespace FusionUI.UI
             nodes.Remove(frame);
             UpdateResize();
             UpdateLayout();
+        }
+
+        public override void Clear(Frame frame)
+        {
+            base.Clear(frame);
+            nodes.Clear();
+            Height = 0;
+            UpdateLayout();            
         }
 
         public float UnitSeparateOffset = 0;
