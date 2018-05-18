@@ -328,9 +328,10 @@ namespace FusionUI.UI.Elements.TextFormatting
         public override void init()
         {
             BaseHeight = this.Height;
-            UpdateGlobalRect(0, 0);
+            //UpdateGlobalRect(0, 0);
             splitByString();
             var textOffset = strings.Sum(a => a.Rect.Height);
+            //UpdateGlobalRect(0, 0);
             //foreach (var str in strForDraw)
             //{
             //    textOffset += this.Font.CapHeight + OffsetLine;

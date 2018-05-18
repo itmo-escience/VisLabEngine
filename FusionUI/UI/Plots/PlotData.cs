@@ -307,6 +307,9 @@ namespace FusionUI.UI.Plots
                 color = new Color(indexcolors[next++] * 256);
             }
             color.A = 255;
+            color.R = (byte)(256 - color.R);
+            color.G = (byte)(256 - color.G);
+            color.B = (byte)(256 - color.B);
             return color;
             //return new Color(
             //    new Vector3(random.NextFloat(0.25f, 1), random.NextFloat(0.25f, 1), random.NextFloat(0.25f, 1)), 1);
