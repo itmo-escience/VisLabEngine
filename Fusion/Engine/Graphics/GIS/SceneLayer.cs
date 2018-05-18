@@ -640,7 +640,7 @@ namespace Fusion.Engine.Graphics.GIS
             {                
                 if (info.NodeName == buildingName)
                 {
-                    Console.WriteLine(info.NodeName);
+                    //Console.WriteLine(info.NodeName);
 
                     selectedList.Add(new SelectedItem
                     {

@@ -32,6 +32,7 @@ namespace Fusion.Engine.Graphics.GIS
 			FillTrafficBuffer = 1 << 0,
 			DrawTraffic = 1 << 1,
 			XRAY = 1 << 2,
+			ALPHA_BLEND = 1 << 3,
 		}
 
 
@@ -74,6 +75,8 @@ namespace Fusion.Engine.Graphics.GIS
 		ConstantBuffer EachFrameCB;
 		ConstantBuffer ParticlesCB;
 
+		public TrafficFlags Flags = 0;
+
 		public int DrawCount = 0;
 
 		public float Time { set { EachFrame.TimeXXX.X = value; } }
@@ -85,7 +88,7 @@ namespace Fusion.Engine.Graphics.GIS
 			var flags = (TrafficFlags)flag;
 
 			ps.VertexInputElements	= flags.HasFlag(TrafficFlags.DrawTraffic) ? VertexInputElement.FromStructure<VertexColorTextureTBNRigid>() : null;
-			ps.BlendState			= BlendState.Additive;
+			ps.BlendState			= flags.HasFlag(TrafficFlags.ALPHA_BLEND) ? BlendState.AlphaBlend : BlendState.Additive;
 			ps.DepthStencilState	= DepthStencilState.Readonly;
 			ps.RasterizerState		= RasterizerState.CullCCW;
 
@@ -173,7 +176,7 @@ namespace Fusion.Engine.Graphics.GIS
 			DrawCount = Particles.GetStructureCount();
 
 
-			Game.GraphicsDevice.PipelineState = factory[(int)(TrafficFlags.DrawTraffic)];
+			Game.GraphicsDevice.PipelineState = factory[(int)(TrafficFlags.DrawTraffic | Flags)];
 			Game.GraphicsDevice.VertexShaderConstants[0] = constBuffer;
 			Game.GraphicsDevice.VertexShaderConstants[1] = EachFrameCB;
 			//Game.GraphicsDevice.GeometryShaderConstants[0]	= constBuffer;

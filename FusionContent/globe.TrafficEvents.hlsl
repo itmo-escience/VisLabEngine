@@ -75,7 +75,7 @@ cbuffer CBEachStage		: register(b2) { ParticlesData ParticlesCB;	}
 
 #if 0
 $ubershader FillTrafficBuffer
-$ubershader DrawTraffic +XRAY
+$ubershader DrawTraffic +XRAY +ALPHA_BLEND
 #endif
 
 
