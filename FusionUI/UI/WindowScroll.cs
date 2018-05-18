@@ -115,7 +115,7 @@ namespace FusionUI.UI
                 BasementPanel.UnitY = h - BasementPanel.UnitHeight;
             }
             if (HatPanel != null) HatPanel.Border = 1;
-            base.Remove(holder);
+            RemoveBase(holder);
             AddBase(scrollHolder);
             scrollHolder.Add(holder);
             holder.UnitY = 0;

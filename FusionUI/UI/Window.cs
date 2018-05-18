@@ -133,6 +133,12 @@ namespace FusionUI.UI
             holder.Remove(frame);
         }
 
+        public void RemoveBase(Frame frame)
+        {
+            base.Remove(frame);
+        }
+
+
         public override void Clear(Frame frame)
         {
             holder.Clear(frame);

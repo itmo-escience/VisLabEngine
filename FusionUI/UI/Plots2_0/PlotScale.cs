@@ -61,11 +61,11 @@ namespace FusionUI.UI.Plots2_0
 
             ActionClick += (ControlActionArgs args, ref bool flag) =>
             {
-                if (args.IsClick)
-                {
-                    if (Plot.ActiveScale == this) Plot.ActiveScale = null;
-                    else Plot.ActiveScale = this;
-                }
+                //if (args.IsClick)
+                //{
+                //    if (Plot.ActiveScale == this) Plot.ActiveScale = null;
+                //    else Plot.ActiveScale = this;
+                //}
             };
         }
 
