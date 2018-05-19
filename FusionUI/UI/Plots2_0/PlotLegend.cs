@@ -95,11 +95,11 @@ namespace FusionUI.UI.Plots2_0
                         {
                             if (kv.Value.ColorsByDepth.ContainsKey(depth))
                                 currentPlots.Add(new Tuple<Color, string, bool>(kv.Value.ColorsByDepth[depth],
-                                    $"({data.Key.Index}){kv.Key}{(kv.Value.ActiveDepths.Count > 1 ? " at {depth:0.##}" : "")} {variable.Value.CatUnits}", kv.Value.IsBarChart));
+                                    $"{kv.Key}{(kv.Value.ActiveDepths.Count > 1 ? " at {depth:0.##}" : "")} {variable.Value.CatUnits}", kv.Value.IsBarChart));
                         }
                     }
                 }
-            }            
+            }         
         }
 
         private float delta = 0;
@@ -117,13 +117,13 @@ namespace FusionUI.UI.Plots2_0
             var rect = GetBorderedRectangle();
             int hCount = Math.Max(1, Math.Min((int)Math.Floor((UnitWidth + MinXOffset) / (ElementWidth + MinXOffset)), currentPlots.Count));
             int i = 0;
-            if (IsNewFrame(gameTime)) ClipRectId = 800;
+            if (IsNewFrame(gameTime)) ClipRectId = 1200;
             int selected = -1;
             string selectedString = "";
             foreach (var colorData in currentPlots)
             {
                 ClipRectId++;
-                if (ClipRectId > 1256) break; // too much elements
+                if (ClipRectId > 2048) break; // too much elements
                 string s = colorData.Item2;
 
                 var sRect = Font.MeasureStringF(s);

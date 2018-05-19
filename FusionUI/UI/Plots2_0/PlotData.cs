@@ -149,8 +149,8 @@ namespace FusionUI.UI.Plots2_0
                 ld.Left -= 1;
                 ld.Width += 1;
                 var h = ld.Height;
-                if (ld.Top < 0) ld.Top -=  h * 0.05f;
-                if (ld.Bottom > 0) ld.Bottom += h * 0.05f;
+                ld.Top -=  h * 0.1f;
+                ld.Bottom += h * 0.1f;
             }
             ld.Width = Math.Max(ld.Width, float.Epsilon);
             ld.Height = Math.Max(ld.Height, float.Epsilon);
@@ -434,6 +434,9 @@ namespace FusionUI.UI.Plots2_0
         public bool IsActive = true;
         public bool IsPresent => IsActive && Data.Any(a => a.Value.Any(b => b.Value.IsPresent));
         public Func<double, double, string> xFunction = (v, w) => v.ToString("0.###"), yFunction = (v, w) => v.ToString("0.###");
+
+        public Func<double, double, string> bcFunction = (v, w) =>
+            v.ToString($"F{(int) Math.Max(0, 3 - Math.Floor(Math.Log(Math.Max(1, v), 10)))}");
         public virtual void OnDraw() { }
         public String Name, NiceName;
 

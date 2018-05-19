@@ -45,8 +45,9 @@ namespace FusionUI.UI.Elements.DropDown
 
 	    private EventHandler<MouseEventArgs> mouseScrollAction;
         public DropDownSelector(FrameProcessor ui, float x, float y, float w, float h, Color backColor, List<string> values,
-            Action<string> selectAction, Color borderColor, bool drawButton = true, UIConfig.FontHolder? font = null) : base(ui, x, y, w, h, "", backColor)
+            Action<string> selectAction, Color borderColor, bool drawButton = true, UIConfig.FontHolder? font = null, Color? dropColor = null) : base(ui, x, y, w, h, "", backColor)
         {
+            DropColor = dropColor ?? DropColor;
             FontHolder = font ?? UIConfig.FontBase;
             BorderColor = borderColor;
             this.Values = values;
@@ -135,6 +136,8 @@ namespace FusionUI.UI.Elements.DropDown
             }
         }
 
+        public Color DropColor = UIConfig.PopupColor;
+
         void initList()
         {
             if (SelectorHolder != null) {
@@ -152,7 +155,7 @@ namespace FusionUI.UI.Elements.DropDown
             };
             ApplicationInterface.Instance.rootFrame.Add(FullScreenHolder);
 
-            SelectorHolder = new ScalableFrame(ui, -BorderLeft / ScaleMultiplier, -BorderTop / ScaleMultiplier, UnitWidth + BorderLeft + BorderRight, 0, "", UIConfig.PopupColor)
+            SelectorHolder = new ScalableFrame(ui, -BorderLeft / ScaleMultiplier, -BorderTop / ScaleMultiplier, UnitWidth + BorderLeft + BorderRight, 0, "", DropColor)
             {
                 Border = 1,
                 BorderColor = BorderColor,

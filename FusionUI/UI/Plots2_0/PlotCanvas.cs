@@ -139,6 +139,13 @@ namespace FusionUI.UI.Plots2_0
             }
 
             hintPoints = new List<Tuple<Vector2, string, double, PlotData>>();
+            int nBarCharts = DataContainer.Data.Values.Sum(pv =>
+                pv.IsActive
+                    ? pv.Data.Values.Sum(pd => 
+                        pd.Sum(a => 
+                            a.Value.IsPresent && a.Value.IsBarChart ? 1 : 0))
+                    : 0);
+            int plotIndex = 0;
             foreach (var pv in DataContainer.Data.Values)
             {
                 if (pv.IsActive)
@@ -152,7 +159,8 @@ namespace FusionUI.UI.Plots2_0
                             {
                                 if (kv.Value.IsBarChart)
                                 {
-                                    DrawBarChart(sb, kv.Value, clipRectIndex);
+                                    DrawBarChart(sb, kv.Value, clipRectIndex, plotIndex, nBarCharts);
+                                    plotIndex++;
                                 }
                                 else
                                 {
@@ -296,7 +304,7 @@ namespace FusionUI.UI.Plots2_0
                 {
                     var l = pv.Limits;
                     pv.LimitsAligned = l;
-                    if (r != null && l.Top * l.Bottom < 0)
+                    if (r != null /*&& l.Top * l.Bottom < 0*/)
                     {
                         pv.LimitsAligned.Top = l.Height * r.Value.Top;
                         pv.LimitsAligned.Bottom = l.Height * r.Value.Bottom;
@@ -435,7 +443,7 @@ namespace FusionUI.UI.Plots2_0
             }                        
         }
 
-        public virtual void DrawBarChart(SpriteLayer sb, PlotData pd, int clipRectIndex)
+        public virtual void DrawBarChart(SpriteLayer sb, PlotData pd, int clipRectIndex, int plotIndex, int nBarCharts)
         {
             //var whiteTex = this.Game.RenderSystem.WhiteTexture;
             if (!pd.IsLoaded || !pd.IsPresent) return;
@@ -447,7 +455,10 @@ namespace FusionUI.UI.Plots2_0
             {
                 var points = pd[(int)pcNew, depth];                
                 var limits = pd.Variable.LimitsAligned;
-                float BarWidth = 0.7f * Width / (float)limits.Width;
+                float BarWidth = (0.7f - 0.1f * (nBarCharts - 1)) * Width / (float)limits.Width / nBarCharts;
+
+                float offset = (nBarCharts - plotIndex - 1.5f) * Width / (float) limits.Width / nBarCharts;
+
                 var pointsX = points.ConvertAll(a => a.X);
                 var leftLim = limits.Left + ScaleRect.Left * limits.Width;
                 var left = pointsX.BinarySearch(leftLim);
@@ -479,16 +490,20 @@ namespace FusionUI.UI.Plots2_0
                         DataContainer.RepairColors();
                         Log.Warning("Colors not yet initialized");
                     }
-
-                    sb.Draw(whiteTex, nextScreen.X - BarWidth / 2, nextScreen.Y, BarWidth,
+                    
+                    sb.Draw(whiteTex, nextScreen.X + offset - BarWidth / 2, nextScreen.Y, BarWidth,
                         zeroScreen.Y - nextScreen.Y, pd.ColorsByDepth[depth], clipRectIndex);
                     //hintPoints.Add(new Tuple<Vector2, string, double, PlotData>(
                         //new Vector2(nextScreen.X - BarWidth / 2, nextScreen.Y), $"{next.Y}", depth, pd));
 
-                    var s = next.Y.ToString($"F{(int)Math.Max(0, 2 - (Math.Log(Math.Abs(1 + next.Y), 10)))}");//$"{next.Y:()}";
+                    var s = pd.Variable.bcFunction(next.Y, limits.Height);//.ToString($"F{(int)Math.Max(0, 3 - Math.Floor(Math.Log(Math.Max(1, next.Y), 10)))}");//$"{next.Y:()}";
                     var rect = Font.MeasureString(s);
+                    if (nextScreen.Y - (next.Y > 0 ? 4 : 4 - rect.Height) < GlobalRectangle.Y + rect.Height)
+                    {
+                        nextScreen.Y = GlobalRectangle.Y + rect.Height + (next.Y > 0 ? 4 : 4 - rect.Height);
+                    }                    
 
-                    Font.DrawString(sb, s, nextScreen.X - rect.Width / 2, nextScreen.Y - (next.Y > 0 ? 4 : 4 - rect.Height),
+                        Font.DrawString(sb, s, nextScreen.X + offset - rect.Width / 2, nextScreen.Y - (next.Y > 0 ? 4 : 4 - rect.Height),
                         /*pd.ColorsByDepth[depth]*/UIConfig.ActiveTextColor, clipRectIndex);
 
                     if (nextRect.X > 1) break;
