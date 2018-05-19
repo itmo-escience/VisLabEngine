@@ -98,6 +98,7 @@ namespace FusionUI.UI.Elements.TextFormatting
             BoldItalicFont = font;
 
             init();
+            Resize += (sender, args) => init();
         }
 
         public static class ValidationControls
@@ -326,7 +327,7 @@ namespace FusionUI.UI.Elements.TextFormatting
         //}
 
         public override void init()
-        {
+        {            
             BaseHeight = this.Height;
             //UpdateGlobalRect(0, 0);
             splitByString();

@@ -65,7 +65,11 @@ namespace FusionUI.UI
         }
 
         public override void UpdateResize (bool UpdateChildren = true)
-        {            
+        {
+            if (!AllowShrink)
+            {
+                Height = oldH;
+            }
             base.UpdateResize(UpdateChildren);
             bool fr = firstResize;
             var ow = oldW;

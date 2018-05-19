@@ -250,12 +250,12 @@ namespace FusionUI.UI.Factories
 
 
             ScalableFrame labelFrame = new FormatTextBlock(ui, OffsetX, OffsetY, labelWidth,
-                height, label, Color.Zero, labelFontHolder, 0)
+                height, label, Color.Zero, labelFontHolder, 0, minHeight:height)
             {
                 TextAlignment = labelAlignment,
                 //UnitTextOffsetY = 4,
                 FontHolder = labelFontHolder,
-                IsShortText = true,                
+                IsShortText = false,                
             };
 
             slider = new Slider(ui, OffsetX - 2 + labelWidth, OffsetY,
