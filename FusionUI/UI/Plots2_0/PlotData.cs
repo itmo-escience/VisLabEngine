@@ -144,14 +144,14 @@ namespace FusionUI.UI.Plots2_0
             {
                 ld.Top = Math.Min(ld.Top, 0);
             }
-            if (IsBarChart)
-            {
+            //if (IsBarChart)
+            //{
                 ld.Left -= 1;
                 ld.Width += 1;
                 var h = ld.Height;
                 ld.Top -=  h * 0.1f;
                 ld.Bottom += h * 0.1f;
-            }
+            //}
             ld.Width = Math.Max(ld.Width, float.Epsilon);
             ld.Height = Math.Max(ld.Height, float.Epsilon);
             LimitsByDepth[depth] = ld;            

@@ -457,7 +457,7 @@ namespace FusionUI.UI.Plots2_0
                 var limits = pd.Variable.LimitsAligned;
                 float BarWidth = (0.7f - 0.1f * (nBarCharts - 1)) * Width / (float)limits.Width / nBarCharts;
 
-                float offset = (nBarCharts - plotIndex - 1.5f) * Width / (float) limits.Width / nBarCharts;
+                float offset = nBarCharts > 1 ? (nBarCharts - plotIndex - 1.5f) * Width / (float) limits.Width / nBarCharts : 0;
 
                 var pointsX = points.ConvertAll(a => a.X);
                 var leftLim = limits.Left + ScaleRect.Left * limits.Width;

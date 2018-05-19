@@ -260,6 +260,15 @@ namespace FusionUI.UI.Plots2_0
                     useBaseLine: false, flip: true);
             }
 
+            if (Measure != "")
+            {
+                var r = Font.MeasureStringF(this.Measure);
+                Font.DrawString(sb, this.Measure, Plot.GlobalRectangle.Left + offset - (int)(r.Width) * (left ? 0 : 1) + (left ? -8 : 8),
+                    Plot.GlobalRectangle.Top, color,
+                    0,
+                    useBaseLine: false);
+            }
+
             var MaxY = (float)Limits.Bottom;
             var MinY = (float)Limits.Top;
             if (StepY < float.Epsilon || (MaxY - MinY) / StepY > 100) return;

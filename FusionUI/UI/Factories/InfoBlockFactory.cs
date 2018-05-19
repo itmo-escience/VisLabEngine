@@ -32,7 +32,7 @@ namespace FusionUI.UI.Factories
                 ForeColor = textColor ?? UIConfig.ActiveTextColor,
                 TextAlignment = Alignment.MiddleLeft,
             };
-            FormatTextBlock label2 = new FormatTextBlock(ui, OffsetX + 3 + label.UnitWidth, 0, holder.UnitWidth - valueBlockWidth * 2 - 3 * OffsetX,
+            FormatTextBlock label2 = new FormatTextBlock(ui, OffsetX + label.UnitWidth, 0, valueBlockWidth,
                 UIConfig.UnitSettingsLabelHeight, text2, backColor ?? Color.Zero, font, 0)
             {
                 FontHolder = font,
