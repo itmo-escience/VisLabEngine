@@ -275,6 +275,7 @@ namespace FusionUI.UI
 
         public ScalableFrame(FrameProcessor ui) : base(ui)
         {
+            ForeColor = UIConfig.ActiveTextColor;
         }
 
         public ScalableFrame(FrameProcessor ui, float x, float y, float w, float h, string text, Color backColor)

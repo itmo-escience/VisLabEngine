@@ -118,7 +118,7 @@ namespace FusionUI.UI.Plots2_0
                                        : 0) | 
                                    ScaleSettings,
                         Dirty = true,
-                        YLabel = name,
+                        YLabel = name + variable.Value.Units + name != "" ? "," : "" + variable.Value.Units,
                         XLabel = "Time",
                         ZOrder =  1000,
                         FontHolder = scaleFont,

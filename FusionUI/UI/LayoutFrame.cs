@@ -202,18 +202,17 @@ namespace FusionUI.UI
 
         public override void UpdateResize(bool updateChildren = true)
         {
-
             if (Width != oldW || Height != oldH)
             {
                 UpdateLayout();
                 oldW = Width;
                 oldH = Height;
+                base.UpdateResize();
             }
             else if (ControlChildrenSize)
             {
                 UpdateLayout();
-            }
-            base.UpdateResize();
+            }            
         }
     }
 }

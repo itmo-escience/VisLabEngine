@@ -25,14 +25,14 @@ namespace FusionUI.UI.Factories
                 parent.UnitWidth - parent.UnitPaddingLeft - parent.UnitPaddingRight,
                 UIConfig.UnitSettingsLabelHeight + OffsetY, "", Color.Zero);
 
-            FormatTextBlock label = new FormatTextBlock(ui, OffsetX, 0, holder.UnitWidth - valueBlockWidth - 3 * OffsetX,
+            FormatTextBlock label = new FormatTextBlock(ui, OffsetX, 0, holder.UnitWidth - valueBlockWidth * (text2 == "" ? 1 : 2) - 3 * OffsetX,
                 UIConfig.UnitSettingsLabelHeight, text1, backColor ?? Color.Zero, font, 0)
             {
                 FontHolder = font,
                 ForeColor = textColor ?? UIConfig.ActiveTextColor,
                 TextAlignment = Alignment.MiddleLeft,
             };
-            FormatTextBlock label2 = new FormatTextBlock(ui, OffsetX, 0, holder.UnitWidth - valueBlockWidth - 3 * OffsetX,
+            FormatTextBlock label2 = new FormatTextBlock(ui, OffsetX + 3 + label.UnitWidth, 0, holder.UnitWidth - valueBlockWidth * 2 - 3 * OffsetX,
                 UIConfig.UnitSettingsLabelHeight, text2, backColor ?? Color.Zero, font, 0)
             {
                 FontHolder = font,
@@ -243,7 +243,7 @@ namespace FusionUI.UI.Factories
 
             if (cross)
             {
-                var crossButton = new Button(ui, holder.UnitWidth - 17, 0, 17, 17, "", Color.Zero, UIConfig.ActiveColor,
+                var crossButton = new Button(ui, holder.UnitWidth - 17 - OffsetX, 0, 17, 17, "", Color.Zero, UIConfig.ActiveColor,
                     200, crossAction)
                 {
                     Image = ui.Game.Content.Load<DiscTexture>(@"UI-new\southpark_cross_big"),
@@ -255,7 +255,7 @@ namespace FusionUI.UI.Factories
                 holder.Item2 = crossButton;
             }
 
-            var actionButton = new Button(ui, holder.UnitWidth - 17 - (cross ? 20 : 0), 0, 17, 17, "", Color.Zero, UIConfig.ActiveColor,
+            var actionButton = new Button(ui, holder.UnitWidth - 17 - OffsetX - (cross ? 20 : 0), 0, 17, 17, "", Color.Zero, UIConfig.ActiveColor,
                 200, ButtonAction)
             {
                 Image = ui.Game.Content.Load<DiscTexture>(buttonImage),
