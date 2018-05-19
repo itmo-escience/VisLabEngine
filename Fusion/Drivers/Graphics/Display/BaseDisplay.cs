@@ -224,7 +224,7 @@ namespace Fusion.Drivers.Graphics.Display {
 			if (fullscr) {
 				window.FormBorderStyle	=	FormBorderStyle.None;
 				window.WindowState		=	FormWindowState.Maximized;
-				window.TopMost			=	true;
+				window.TopMost			=	false;
 			} else {
 				window.FormBorderStyle	=	FormBorderStyle.Sizable;
 				window.WindowState		=	FormWindowState.Normal;

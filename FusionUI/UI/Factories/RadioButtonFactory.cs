@@ -2,6 +2,7 @@
 using Fusion.Engine.Frames;
 using Fusion.Engine.Graphics;
 using FusionUI.UI.Elements;
+using FusionUI.UI.Elements.TextFormatting;
 
 namespace FusionUI.UI.Factories
 {
@@ -50,11 +51,10 @@ namespace FusionUI.UI.Factories
             {
                 group.UnitY += UIConfig.UnitRadioButtonGroupCaptionHeight;
                 holder.UnitHeight += UIConfig.UnitRadioButtonGroupCaptionHeight;
-                ScalableFrame labelFrame = new ScalableFrame(ui, OffsetX, OffsetY, holder.UnitWidth - OffsetX, UIConfig.UnitRadioButtonGroupCaptionHeight, label, Color.Zero)
+                FormatTextBlock labelFrame = new FormatTextBlock(ui, OffsetX, OffsetY, holder.UnitWidth - OffsetX, UIConfig.UnitRadioButtonGroupCaptionHeight, label, Color.Zero, UIConfig.FontBody, 0)
                 {
                     TextAlignment = Alignment.BaselineLeft,
                     UnitTextOffsetY = 4,
-                    FontHolder = UIConfig.FontBody,
                     ForeColor = UIConfig.ActiveTextColor,
                 };
                 holder.Add(labelFrame);
