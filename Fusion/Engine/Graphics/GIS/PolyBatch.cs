@@ -77,7 +77,7 @@ namespace Fusion.Engine.Graphics.GIS
 		public int[] IndecesCpu			{ get; protected set; }
 
 		public int IndecesToDrawCount = 0;
-
+		public int FirstIndex = 0;
 
 		protected PolyGisLayer(Game engine) : base(engine) { }
 
@@ -199,7 +199,7 @@ namespace Fusion.Engine.Graphics.GIS
 			Game.GraphicsDevice.PixelShaderSamplers[1] = SamplerState.AnisotropicClamp;
 
 			Game.GraphicsDevice.SetupVertexInput(currentBuffer, indexBuffer);
-			Game.GraphicsDevice.DrawIndexed(IndecesToDrawCount, 0, 0);
+			Game.GraphicsDevice.DrawIndexed(IndecesToDrawCount, FirstIndex, 0);
 
 			//game.GraphicsDevice.ResetStates();
 		}
