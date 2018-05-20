@@ -503,7 +503,7 @@ namespace FusionUI.UI.Plots2_0
                         nextScreen.Y = GlobalRectangle.Y + rect.Height + (next.Y > 0 ? 4 : 4 - rect.Height);
                     }                    
 
-                        Font.DrawString(sb, s, nextScreen.X + offset - rect.Width / 2, nextScreen.Y - (next.Y > 0 ? 4 : 4 - rect.Height),
+                        Font.DrawString(sb, s, nextScreen.X + offset - rect.Width / 2, Math.Min(nextScreen.Y, zeroScreen.Y) - ((next.Y > 0.0f) ? 4 : 4),
                         /*pd.ColorsByDepth[depth]*/UIConfig.ActiveTextColor, clipRectIndex);
 
                     if (nextRect.X > 1) break;

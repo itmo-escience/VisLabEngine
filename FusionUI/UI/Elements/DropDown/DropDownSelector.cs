@@ -34,6 +34,21 @@ namespace FusionUI.UI.Elements.DropDown
                 }
             }
         }
+
+        public override Color ForeColor
+        {
+            get => base.ForeColor;
+            set
+            {
+                base.ForeColor = value;
+                foreach (var rowsValue in rows.Values)
+                {
+                    rowsValue.ForeColor = value;
+                }
+                if (MainRow != null) MainRow.ForeColor = value;
+            }
+        }
+
         public Action<string> OnClicked;
 		private Action<string> updateValue;
 		public bool IsOpen = false;
@@ -72,6 +87,7 @@ namespace FusionUI.UI.Elements.DropDown
             MainRow = new TR();
             MainRow.Initialize(0, 0, UnitWidth, UIConfig.UnitSelectorHeight, Values.Any() ? Values[0] : "", Color.Zero);
             MainRow.TextAlignment = Alignment.MiddleLeft;
+            MainRow.ForeColor = ForeColor;
             MainRow.UnitTextOffsetX = 2;
             MainRow.Name = $"mainRow";
             MainRow.FontHolder = FontHolder;
@@ -247,6 +263,7 @@ namespace FusionUI.UI.Elements.DropDown
             valueRow.Visible = false;
             valueRow.Tooltip = Values[index];
             valueRow.FontHolder = FontHolder;
+            valueRow.ForeColor = ForeColor;
 
             valueRow.ActionClick += (ControlActionArgs args, ref bool flag) =>
             {
@@ -295,7 +312,7 @@ namespace FusionUI.UI.Elements.DropDown
                     row.Ghost = true;
                 }
                 else {
-                    row.ForeColor = UIConfig.ActiveTextColor;
+                    row.ForeColor = ForeColor;
                     row.Ghost = false;
                 }
             }

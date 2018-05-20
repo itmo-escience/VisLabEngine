@@ -336,7 +336,7 @@ namespace FusionUI.UI.Plots2_0
                 var b = Font.MeasureStringF(s);
                 float w =  (float)((pos - MinX)/(MaxX - MinX)*Plot.GlobalRectangle.Width - b.Width/2);
                 if (w > b.Width/2 && w < Plot.GlobalRectangle.Width - b.Width / 2 && (Settings & ScaleParams.NotWriteNumbersX) == 0) {
-                    Font.DrawString (sb, s, Plot.GlobalRectangle.Left + w, Plot.GlobalRectangle.Bottom + Index * UIConfig.UnitPlotScaleHeight * ScaleMultiplier + b.Height - ((float)zeroH/ Plot.GlobalRectangle.Height > 0.9 ? 0 : zeroH),
+                    Font.DrawString (sb, s, Plot.GlobalRectangle.Left + w, Plot.GlobalRectangle.Bottom + Index * UIConfig.UnitPlotScaleHeight * ScaleMultiplier + Font.LineHeight - ((float)zeroH/ Plot.GlobalRectangle.Height > 0.9 ? 0 : zeroH),
                         CaptionsColor, clipRectIndex);
                     if ((Settings & ScaleParams.DrawMeasure) != 0)
                     {
