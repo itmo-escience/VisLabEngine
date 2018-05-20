@@ -12,7 +12,7 @@ namespace FusionUI.UI.Factories
     {
         public static UIContainer<Slider> SliderVerticalHolder(FrameProcessor ui, float OffsetX, float OffsetY,
             ScalableFrame parent, string label,
-            Action<float> changeAction, float min, float max, float initValue, out Slider slider, bool minMaxSelector = false, string imageSlider = null, bool IsVertical=false)
+            Action<float> changeAction, float min, float max, float initValue, out Slider slider, bool minMaxSelector = false, string imageSlider = null, bool IsVertical=false, bool percent = false)
         {
             UIContainer<Slider> holder = new UIContainer<Slider>(ui, parent.UnitPaddingLeft, 0, parent.UnitWidth - parent.UnitPaddingLeft - parent.UnitPaddingRight, UIConfig.UnitSliderLabelHeight + UIConfig.UnitSliderObjectHeight + OffsetY, "", Color.Zero)
             {                
@@ -26,7 +26,7 @@ namespace FusionUI.UI.Factories
             };
 
             ScalableFrame valueFrame = new ScalableFrame(ui, OffsetX, OffsetY, holder.UnitWidth - 2 * OffsetX,
-                UIConfig.UnitCheckboxLabelHeight, $"{initValue:0.##}", Color.Zero)
+                UIConfig.UnitCheckboxLabelHeight, percent ? $"{initValue * 100:0.##}%" : $"{initValue:0.##}", Color.Zero)
             {
                 TextAlignment = Alignment.BaselineRight,
                 UnitTextOffsetY = 4,
@@ -49,7 +49,15 @@ namespace FusionUI.UI.Factories
                 IsVertical           = IsVertical
             };
 
-            slider.OnChange += f => { valueFrame.Text = $"{f:0.##}"; };
+            //slider.OnChange += f => { valueFrame.Text = $"{f:0.##}"; };
+            if (percent)
+            {
+                slider.OnChange += f => { valueFrame.Text = $"{f * 100:0.##}%"; };
+            }
+            else
+            {
+                slider.OnChange += f => { valueFrame.Text = $"{f:0.##}"; };
+            }
             slider.OnChange += changeAction;
             holder.Item = slider;
             holder.Add(labelFrame);
@@ -123,7 +131,7 @@ namespace FusionUI.UI.Factories
             ScalableFrame parent, string label,
             Action<float> changeAction, float min, float max, float initValue, out Slider slider,
             bool minMaxSelector = false, string imageSlider = null,
-            bool IsVertical = false, bool showValue = true, Alignment labelAlignment = Alignment.MiddleCenter)
+            bool IsVertical = false, bool showValue = true, Alignment labelAlignment = Alignment.MiddleCenter, bool percent = false)
         {
             var sizeLabel = UIConfig.FontBody[2].MeasureString(ScalableFrame.TryGetText(label));
 
@@ -158,13 +166,21 @@ namespace FusionUI.UI.Factories
             if (showValue)
             {
                 ScalableFrame valueFrame = new ScalableFrame(ui, OffsetX, OffsetY, holder.UnitWidth - 2 * OffsetX,
-                    height, $"{initValue:0.##}", Color.Zero)
+                    height, percent ? $"{initValue * 100:0.##}%" : $"{initValue:0.##}", Color.Zero)
                 {
                     TextAlignment = Alignment.BaselineRight,
                     UnitTextOffsetY = 4,
                     FontHolder = UIConfig.FontBody,
                 };
-                slider.OnChange += f => { valueFrame.Text = $"{f:0.##}"; };
+                if (percent)
+                {
+                    slider.OnChange += f => { valueFrame.Text = $"{f * 100:0.##}%"; };
+                }
+                else
+                {
+                    slider.OnChange += f => { valueFrame.Text = $"{f:0.##}"; };
+                }
+
                 holder.Add(valueFrame);
             }
 
@@ -235,11 +251,14 @@ namespace FusionUI.UI.Factories
             return holder;
         }
 
-        public static ScalableFrame SliderHorizontalHolderNew(FrameProcessor ui, float OffsetX, float OffsetY, float width, float height,
+        public static ScalableFrame SliderHorizontalHolderNew(FrameProcessor ui, float OffsetX, float OffsetY,
+            float width, float height,
             ScalableFrame parent, string label, float labelWidth,
             Action<float> changeAction, float min, float max, float initValue, out Slider slider,
             bool minMaxSelector = false, string imageSlider = null,
-            bool IsVertical = false, bool showValue = true, float valueWidth = 0, Alignment labelAlignment = Alignment.MiddleCenter, Alignment valueAlignment = Alignment.MiddleCenter, UIConfig.FontHolder? labelFont = null, UIConfig.FontHolder? valueFont = null)
+            bool IsVertical = false, bool showValue = true, float valueWidth = 0,
+            Alignment labelAlignment = Alignment.MiddleCenter, Alignment valueAlignment = Alignment.MiddleCenter,
+            UIConfig.FontHolder? labelFont = null, UIConfig.FontHolder? valueFont = null, bool percent = false)
         {
             var sizeLabel = UIConfig.FontBody[2].MeasureString(ScalableFrame.TryGetText(label));
             var labelFontHolder = labelFont ?? UIConfig.FontBody;
@@ -250,12 +269,12 @@ namespace FusionUI.UI.Factories
 
 
             ScalableFrame labelFrame = new FormatTextBlock(ui, OffsetX, OffsetY, labelWidth,
-                height, label, Color.Zero, labelFontHolder, 0, minHeight:height)
+                height, label, Color.Zero, labelFontHolder, 0, minHeight: height)
             {
                 TextAlignment = labelAlignment,
                 //UnitTextOffsetY = 4,
                 FontHolder = labelFontHolder,
-                IsShortText = false,                
+                IsShortText = false,
             };
 
             slider = new Slider(ui, OffsetX - 2 + labelWidth, OffsetY,
@@ -278,12 +297,20 @@ namespace FusionUI.UI.Factories
             if (showValue)
             {
                 ScalableFrame valueFrame = new ScalableFrame(ui, holder.UnitWidth - valueWidth, OffsetY, valueWidth,
-                    height, $"{initValue:0.##}", Color.Zero)
+                    height, percent ? $"{initValue * 100:0.##}%" : $"{initValue:0.##}", Color.Zero)
                 {
-                    TextAlignment = valueAlignment,                    
+                    TextAlignment = valueAlignment,
                     FontHolder = valueFontHolder,
                 };
-                slider.OnChange += f => { valueFrame.Text = $"{f:0.##}"; };
+                if (percent)
+                {
+                    slider.OnChange += f => { valueFrame.Text = $"{f * 100:0.##}%"; };
+                }
+                else
+                {
+                    slider.OnChange += f => { valueFrame.Text = $"{f:0.##}"; };
+                }
+                //slider.OnChange += f => { valueFrame.Text = $"{f:0.##}"; };
                 holder.Add(valueFrame);
             }
 
@@ -304,7 +331,7 @@ namespace FusionUI.UI.Factories
                     BorderColor = UIConfig.BorderColor,
                     BorderActive = UIConfig.ActiveColor,
                     HoverColor = Color.White,
-                    PaddingLeft = (int)(2 * ApplicationInterface.ScaleMod),
+                    PaddingLeft = (int) (2 * ApplicationInterface.ScaleMod),
                     //PaddingBottom = (int) (2*AppInterface.ScaleMod),
                     TextAlignment = Alignment.MiddleLeft
                 };
@@ -320,7 +347,7 @@ namespace FusionUI.UI.Factories
                     BorderColor = UIConfig.BorderColor,
                     BorderActive = UIConfig.ActiveColor,
                     HoverColor = Color.White,
-                    PaddingLeft = (int)(2 * ApplicationInterface.ScaleMod),
+                    PaddingLeft = (int) (2 * ApplicationInterface.ScaleMod),
                     //PaddingBottom = (int)(2 * AppInterface.ScaleMod),
                     TextAlignment = Alignment.MiddleLeft
                 };

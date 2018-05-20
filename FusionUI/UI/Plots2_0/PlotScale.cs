@@ -263,7 +263,7 @@ namespace FusionUI.UI.Plots2_0
             if (Measure != "")
             {
                 var r = Font.MeasureStringF(this.Measure);
-                Font.DrawString(sb, this.Measure, Plot.GlobalRectangle.Left + offset - (int)(r.Width) * (left ? 0 : 1) + (left ? -8 : 8),
+                Font.DrawString(sb, this.Measure, Plot.GlobalRectangle.Left + offset - (int)(r.Width) * (left ? 0 : 1) + (left ? 8 : -8),
                     Plot.GlobalRectangle.Top, color,
                     0,
                     useBaseLine: false);

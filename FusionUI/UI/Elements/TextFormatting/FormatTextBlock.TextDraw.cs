@@ -539,7 +539,7 @@ namespace FusionUI.UI.Elements.TextFormatting
                             if (alignment.Equals("right", StringComparison.OrdinalIgnoreCase))
                             {
                                 this.Font.DrawString(sb, str.Words[0] + "...",
-                                    this.GlobalRectangle.X + this.Width - r.Width,
+                                    this.GlobalRectangle.X + this.Width - r.Width - PaddingRight,
                                     this.GlobalRectangle.Y + textOffset,
                                     ForeColor, 0, 0, false);
                             }
@@ -576,7 +576,7 @@ namespace FusionUI.UI.Elements.TextFormatting
 
                     if (alignment == "right")
                     {
-                        xOffset = (int) (Width - textWidth);
+                        xOffset = (int) (Width - textWidth - PaddingRight);
                     }
 
                     if (alignment == "center")
