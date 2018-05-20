@@ -39,10 +39,12 @@ namespace FusionUI.UI.Factories
             return holder;
         }
 
-        public static UIContainer<RadioButtonGroup> RadioButtonGroupHolder(FrameProcessor ui, float OffsetX, float OffsetY, ScalableFrame parent, string label, out RadioButtonGroup group, float unitHeightHolder = 0)
+        public static UIContainer<RadioButtonGroup> RadioButtonGroupHolder(FrameProcessor ui, float OffsetX, float OffsetY, ScalableFrame parent, string label, out RadioButtonGroup group, float unitHeightHolder = 0, UIConfig.FontHolder? font = null)
         {
+            var Font = font ?? UIConfig.FontBody;
             UIContainer<RadioButtonGroup> holder = new UIContainer<RadioButtonGroup>(ui, parent.UnitPaddingLeft, 0, parent.UnitWidth - parent.UnitPaddingLeft - parent.UnitPaddingRight, unitHeightHolder + OffsetY, "", Color.Zero)
             {
+                
             };
             group = new RadioButtonGroup(ui, OffsetX, OffsetY,
                 holder.UnitWidth - OffsetX, 0, Color.Zero);
@@ -56,6 +58,7 @@ namespace FusionUI.UI.Factories
                     TextAlignment = Alignment.BaselineLeft,
                     UnitTextOffsetY = 4,
                     ForeColor = UIConfig.ActiveTextColor,
+                    FontHolder = Font,
                 };
                 holder.Add(labelFrame);
             }
