@@ -14,18 +14,18 @@ namespace FusionUI.UI.Factories
 {
     public class InfoBlockFactory
     {
-        public static UIContainer<ScalableFrame> InfoBlockHolder(FrameProcessor ui, float OffsetX,
+        public static UIContainer<ScalableFrame, ScalableFrame> InfoBlockHolder(FrameProcessor ui, float OffsetX,
             float OffsetY, ScalableFrame parent, float valueBlockWidth = 16,
             string text1 = "Text1", string text2 = "Text2", string value = "0.00", Color? backColor = null,
             Color? textColor = null, Color? valueBackColor = null, UIConfig.FontHolder? UsedFont = null)
         {
             var color = valueBackColor ?? UIConfig.PopupColor;
             var font = UsedFont ?? UIConfig.FontBase;
-            UIContainer<ScalableFrame> holder = new UIContainer<ScalableFrame>(ui, parent.UnitPaddingLeft, 0,
+            UIContainer<ScalableFrame, ScalableFrame> holder = new UIContainer<ScalableFrame, ScalableFrame>(ui, parent.UnitPaddingLeft, 0,
                 parent.UnitWidth - parent.UnitPaddingLeft - parent.UnitPaddingRight,
                 UIConfig.UnitSettingsLabelHeight + OffsetY, "", Color.Zero);
 
-            FormatTextBlock label = new FormatTextBlock(ui, OffsetX, 0, holder.UnitWidth - valueBlockWidth * (text2 == "" ? 1 : 2) - 3 * OffsetX,
+            FormatTextBlock label = new FormatTextBlock(ui, OffsetX, 0, holder.UnitWidth - (valueBlockWidth + OffsetX) * (text2 == "" ? 1 : 2) -  OffsetX,
                 UIConfig.UnitSettingsLabelHeight, text1, backColor ?? Color.Zero, font, 0)
             {
                 FontHolder = font,
@@ -39,7 +39,8 @@ namespace FusionUI.UI.Factories
                 TextAlignment = Alignment.MiddleRight,
                 DefaultAlignment = "right",
                 UnitTextOffsetX = -OffsetX,
-                ForeColor = Color.Gray,                
+                ForeColor = Color.Gray,
+                UnitHPadding = 2,
             };
             FormatTextBlock valueLabel = new FormatTextBlock(ui, holder.UnitWidth - valueBlockWidth - OffsetX, 0,
                 valueBlockWidth,
@@ -50,8 +51,8 @@ namespace FusionUI.UI.Factories
                 TextAlignment = Alignment.MiddleCenter,
                 DefaultAlignment = "center",
             };
-            holder.Item = valueLabel;
-
+            holder.Item1 = valueLabel;
+            holder.Item2 = label2;
             holder.Add(label);
             holder.Add(label2);
 

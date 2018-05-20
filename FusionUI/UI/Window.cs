@@ -18,6 +18,12 @@ namespace FusionUI.UI
 
         protected LayoutFrame holder;
 
+        public float UnitSeparateOffset
+        {
+            get => holder.UnitSeparateOffset;
+            set { holder.UnitSeparateOffset = value; }
+        }
+
         public Color HolderColor { get { return holder.BackColor; } set { holder.BackColor = value; } }
         public Color HatColor { get { return HatPanel.BackColor; } set { HatPanel.BackColor = value; } }
         public Color BasementColor { get { return BasementPanel.BackColor; } set { BasementPanel.BackColor = value; } }

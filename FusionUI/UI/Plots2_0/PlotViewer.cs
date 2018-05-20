@@ -22,7 +22,7 @@ namespace FusionUI.UI.Plots2_0
         {
             if (plot == null)
                 Plot = new PlotCanvas(ui, 0, 0, 100, 100, Color.Zero)
-                {                    
+                {                  
                 };
 
             else Plot = plot;
@@ -171,7 +171,7 @@ namespace FusionUI.UI.Plots2_0
             Legend.UnitWidth = Plot.UnitWidth - UIConfig.UnitPlotScaleWidth;
             Legend.UnitY = UnitHeight - Legend.UnitHeight - UnitPaddingBottom;
             Plot.UnitY = this.UnitPaddingTop;
-            Plot.UnitHeight = Legend.UnitY - this.UnitPaddingTop - UIConfig.UnitPlotScaleHeight - UIConfig.UnitPlotLegendOffset;
+            Plot.UnitHeight = Legend.UnitY - UIConfig.UnitPlotScaleHeight - UIConfig.UnitPlotLegendOffset;
         }
 
         public virtual Size2F MinSize => new Size2F(UIConfig.PlotWindowMinPlotWidth + UnitPaddingLeft + UnitPaddingRight + UIConfig.UnitPlotScaleWidth * LegendsNum,
