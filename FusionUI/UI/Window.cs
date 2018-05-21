@@ -46,11 +46,12 @@ namespace FusionUI.UI
         protected virtual void HolderOnResize(object sender, ResizeEventArgs args)
         {
             if (!FixedSize)
-            {
-                BasementPanel.UnitY = holder.UnitY + holder.UnitHeight;
+            {    
 
-                holder.UpdateLayout();
+                
             }
+            BasementPanel.UnitY = holder.UnitY + holder.UnitHeight;
+            holder.UpdateLayout();
         }
 
         public readonly bool DrawHat;

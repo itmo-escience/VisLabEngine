@@ -127,24 +127,24 @@ namespace FusionUI.UI.Factories
             return holder;
         }
 
-        public static ScalableFrame SliderVerticalHolderNew(FrameProcessor ui, float OffsetX, float OffsetY, float width, float height,
+        public static UIContainer<Slider> SliderVerticalHolderNew(FrameProcessor ui, float OffsetX, float OffsetY, float width, float height,
             ScalableFrame parent, string label,
             Action<float> changeAction, float min, float max, float initValue, out Slider slider,
             bool minMaxSelector = false, string imageSlider = null,
-            bool IsVertical = false, bool showValue = true, Alignment labelAlignment = Alignment.MiddleCenter, bool percent = false)
+            bool IsVertical = false, bool showValue = true, Alignment labelAlignment = Alignment.MiddleCenter, bool percent = false, Color? labelBackColor = null)
         {
-            var sizeLabel = UIConfig.FontBody[2].MeasureString(ScalableFrame.TryGetText(label));
+            var sizeLabel = UIConfig.FontBody[1].MeasureString(ScalableFrame.TryGetText(label));
 
-            ScalableFrame holder = new ScalableFrame(ui, parent.UnitPaddingLeft, 0, parent.UnitWidth - parent.UnitPaddingLeft - parent.UnitPaddingRight, sizeLabel.Height / ApplicationInterface.gridUnitDefault + height + OffsetY, "", Color.Zero)
+            UIContainer<Slider> holder = new UIContainer<Slider>(ui, parent.UnitPaddingLeft, 0, parent.UnitWidth - parent.UnitPaddingLeft - parent.UnitPaddingRight, sizeLabel.Height / ApplicationInterface.gridUnitDefault + height + OffsetY, "", Color.Zero)
             {
             };
             
 
-            ScalableFrame labelFrame = new ScalableFrame(ui, OffsetX, OffsetY, holder.UnitWidth, (sizeLabel.Height) /ApplicationInterface.gridUnitDefault, label, Color.Zero)
+            ScalableFrame labelFrame = new ScalableFrame(ui, OffsetX, OffsetY, holder.UnitWidth, (sizeLabel.Height) /ApplicationInterface.gridUnitDefault, label, labelBackColor ?? Color.Zero)
             {
                 TextAlignment = labelAlignment,
                 //UnitTextOffsetY = 4,
-                FontHolder = UIConfig.FontBody,            
+                FontHolder = UIConfig.FontBody,                                    
             };
 
             slider = new Slider(ui, OffsetX, labelFrame.UnitHeight + OffsetY, holder.UnitWidth, height, "", Color.Zero)
@@ -187,7 +187,7 @@ namespace FusionUI.UI.Factories
             slider.OnChange += changeAction;
             holder.Add(labelFrame);
             holder.Add(slider);
-
+            holder.Item = slider;
 
             if (minMaxSelector)
             {

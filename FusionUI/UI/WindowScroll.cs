@@ -68,7 +68,7 @@ namespace FusionUI.UI
         {
             if (!AllowShrink)
             {
-                Height = oldH;
+                Height = Math.Max(Height, oldH);
             }
             base.UpdateResize(UpdateChildren);
             bool fr = firstResize;
