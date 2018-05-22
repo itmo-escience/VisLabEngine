@@ -2,6 +2,7 @@
 using Fusion.Core.Mathematics;
 using Fusion.Engine.Frames;
 using Fusion.Engine.Graphics;
+using FusionUI.UI.Elements.TextFormatting;
 
 namespace FusionUI.UI.Factories
 {
@@ -71,8 +72,8 @@ namespace FusionUI.UI.Factories
                 Name = label
             };
 
-            ScalableFrame cbLabel = new ScalableFrame(ui, OffsetX + UnitCheckboxWidth + UIConfig.UnitCheckboxValueOffset, OffsetY,
-                holder.Width - UnitCheckboxWidth + UIConfig.UnitCheckboxValueOffset - OffsetX, height - 2 * OffsetY, label, Color.Zero)
+            FormatTextBlock cbLabel = new FormatTextBlock(ui, OffsetX + UnitCheckboxWidth + UIConfig.UnitCheckboxValueOffset, OffsetY,
+                holder.Width - UnitCheckboxWidth + UIConfig.UnitCheckboxValueOffset - OffsetX, height - 2 * OffsetY, label, Color.Zero, UIConfig.FontBody, 0)
             {
                 TextAlignment = Alignment.MiddleLeft,                
                 FontHolder = UIConfig.FontBody,
