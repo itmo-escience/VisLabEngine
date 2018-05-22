@@ -158,13 +158,14 @@ namespace FusionUI.UI.Elements.TextFormatting
             string currentWord = "";
             SpriteFont currentFont = GetFont(tagStack);
             Tag lastTag;
+            float Width = this.Width - PaddingLeft - PaddingRight;
             //string align = DefaultAlignment;            
             for (int i = 0; i < Text.Length; i++)
             {
                 if (Text[i] == '[')
                 {
                     width += currentFont.MeasureString(currentWord + " ").Width;
-                    if (width > this.Width - 10)
+                    if (width > Width - 10)
                     {
                         strings.Add(currentString);
                         width = 0;
@@ -353,7 +354,7 @@ namespace FusionUI.UI.Elements.TextFormatting
                 {
                     currentFont = GetFont(tagStack);
                     width += currentFont.MeasureString(currentWord + " ").Width;
-                    if (width > this.Width - 10)
+                    if (width > Width - 10)
                     {
                         strings.Add(currentString);
                         width = currentFont.MeasureString(currentWord + " ").Width;
@@ -382,7 +383,7 @@ namespace FusionUI.UI.Elements.TextFormatting
                 {
                     currentFont = GetFont(tagStack);
                     width += currentFont.MeasureString(currentWord + " ").Width;
-                    if (width > this.Width - 10)
+                    if (width > Width - 10)
                     {
                         strings.Add(currentString);
                         width = currentFont.MeasureString(currentWord + " ").Width;
@@ -407,7 +408,7 @@ namespace FusionUI.UI.Elements.TextFormatting
             {
                 currentFont = GetFont(tagStack);
                 width += currentFont.MeasureString(currentWord + " ").Width;
-                if (width > this.Width - 10)
+                if (width > Width - 10)
                 {
                     strings.Add(currentString);
                     width = currentFont.MeasureString(currentWord + " ").Width;
@@ -490,7 +491,7 @@ namespace FusionUI.UI.Elements.TextFormatting
             float th = 0;
             var textOffset = IsShortText ?  (BaseHeight - strings.TakeWhile(a => (th += a.Rect.Height) < BaseHeight).Sum(a => a.Rect.Height)) * 0.5f: 
                 TextAlignment == Alignment.MiddleLeft || TextAlignment == Alignment.MiddleCenter || TextAlignment == Alignment.MiddleRight ? (Height - TextHeight)/2  :
-                TextAlignment == Alignment.BottomLeft || TextAlignment == Alignment.BottomCenter || TextAlignment == Alignment.BottomRight ? Height - TextHeight : 0f;
+                TextAlignment == Alignment.BottomLeft || TextAlignment == Alignment.BottomCenter || TextAlignment == Alignment.BottomRight ? Height - TextHeight : PaddingTop;
             DefaultAlignment = TextAlignment == Alignment.MiddleLeft || TextAlignment == Alignment.BottomLeft ||
                                TextAlignment == Alignment.TopLeft ? "left" :
                 TextAlignment == Alignment.MiddleRight || TextAlignment == Alignment.BottomRight ||
@@ -543,14 +544,14 @@ namespace FusionUI.UI.Elements.TextFormatting
                             if (alignment.Equals("right", StringComparison.OrdinalIgnoreCase))
                             {
                                 this.Font.DrawString(sb, str.Words[0] + "...",
-                                    this.GlobalRectangle.X + this.Width - r.Width - PaddingRight,
+                                    this.GlobalRectangle.X + Width - r.Width - PaddingRight,
                                     this.GlobalRectangle.Y + textOffset,
                                     ForeColor, 0, 0, false);
                             }
                             else if (alignment.Equals("center", StringComparison.OrdinalIgnoreCase))
                             {
                                 this.Font.DrawString(sb, str.Words[0] + "...",
-                                    this.GlobalRectangle.X + this.Width / 2 - r.Width / 2,
+                                    this.GlobalRectangle.X + Width / 2 - r.Width / 2,
                                     this.GlobalRectangle.Y + textOffset,
                                     ForeColor, 0, 0, false);
                             }
@@ -587,7 +588,8 @@ namespace FusionUI.UI.Elements.TextFormatting
                     {
                         xOffset = (int) (Width - textWidth) / 2;
                     }
-                    
+
+                    xOffset += PaddingLeft;
                     foreach (var word in str.Words)
                     {
                         if (Tag.IsTag(word))
@@ -607,7 +609,7 @@ namespace FusionUI.UI.Elements.TextFormatting
                                     if (ImageCache.ContainsKey(tag.Param))
                                     {
                                         var Image = ImageCache[tag.Param];
-                                        var w = this.Width;
+                                        var w = Width;
                                         var h = w * Image.Height / Image.Width;
                                         sb.Draw(Image, GlobalRectangle.Left, GlobalRectangle.Top + textOffset, w, h, Color.White, clipRectIndex);
                                         this.Height += h - str.Rect.Height;

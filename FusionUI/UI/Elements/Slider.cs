@@ -17,6 +17,7 @@ namespace FusionUI.UI.Elements
         public float MaxValue = 1;
 
         public bool IsVertical = false;
+        public bool DrawPreset = true;
 
         public Action<float> OnChange;
 
@@ -94,7 +95,7 @@ namespace FusionUI.UI.Elements
             ActionOut += outAction;
             ActionLost += outAction;
             ActionUp += outAction;
-
+            ActionClick += outAction;                       
             // hovered
 
             //Game.Touch.Manipulate += args =>
@@ -217,7 +218,7 @@ namespace FusionUI.UI.Elements
                 sb.Draw(whiteTex, new Rectangle(x, y, w, h), /*IsHovered ? HoverColor :*/ backColorForSlider, clipRectIndex);
                 sb.Draw(whiteTex, new Rectangle(x, y, vw, h),/* IsHovered ?*/ HoverForeColor /*: ForeColor*/, clipRectIndex);
 
-                if (PresetValues != null)
+                if (PresetValues != null && DrawPreset)
                 {
                     for (int i = 0; i < PresetValues.Count; i++)
                     {                 

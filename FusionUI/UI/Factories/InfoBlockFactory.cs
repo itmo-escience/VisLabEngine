@@ -17,9 +17,10 @@ namespace FusionUI.UI.Factories
         public static UIContainer<ScalableFrame, ScalableFrame> InfoBlockHolder(FrameProcessor ui, float OffsetX,
             float OffsetY, ScalableFrame parent, float valueBlockWidth = 16,
             string text1 = "Text1", string text2 = "Text2", string value = "0.00", Color? backColor = null,
-            Color? textColor = null, Color? valueBackColor = null, UIConfig.FontHolder? UsedFont = null)
+            Color? textColor = null, Color? valueBackColor = null, UIConfig.FontHolder? UsedFont = null, Color? highlightTextColor = null)
         {
             var color = valueBackColor ?? UIConfig.PopupColor;
+            var HighlightTextColor = highlightTextColor ?? UIConfig.HighlightTextColor;
             var font = UsedFont ?? UIConfig.FontBase;
             UIContainer<ScalableFrame, ScalableFrame> holder = new UIContainer<ScalableFrame, ScalableFrame>(ui, parent.UnitPaddingLeft, 0,
                 parent.UnitWidth - parent.UnitPaddingLeft - parent.UnitPaddingRight,
@@ -46,6 +47,7 @@ namespace FusionUI.UI.Factories
                 valueBlockWidth,
                 UIConfig.UnitSettingsLabelHeight, value, color, font, 0)
             {
+                ForeColor = HighlightTextColor,
                 FontHolder = font,
                 //ForeColor = textColor ?? UIConfig.ActiveTextColor,
                 TextAlignment = Alignment.MiddleCenter,
@@ -71,8 +73,9 @@ namespace FusionUI.UI.Factories
         public static UIContainer<ScalableFrame, ScalableFrame> InfoBlockHolder5(FrameProcessor ui, float OffsetX,
             float OffsetY, ScalableFrame parent,
             List<Tuple<string, float>> vals, float InnerOffset = 1, float blockHeight = 9, bool useOldStyle = false, bool fixSizes = false, Color? backColor = null,
-            Color? textColor = null, Color? valueBackColor = null, UIConfig.FontHolder? UsedFont = null)
+            Color? textColor = null, Color? valueBackColor = null, UIConfig.FontHolder? UsedFont = null, Color? highlightTextColor = null)
         {
+            var HighlightTextColor = highlightTextColor ?? UIConfig.HighlightTextColor;
             var color = valueBackColor ?? UIConfig.PopupColor;
             var font = UsedFont ?? UIConfig.FontBase;
             UIContainer<ScalableFrame, ScalableFrame> holder = new UIContainer<ScalableFrame, ScalableFrame>(ui, parent.UnitPaddingLeft, 0,
@@ -107,7 +110,7 @@ namespace FusionUI.UI.Factories
                         blockHeight, vals[i].Item1, (i > 1 && backColor != null) ? backColor.Value : Color.Zero, font, 0)
                     {
                         FontHolder = font,
-                        ForeColor = textColor ?? UIConfig.ActiveTextColor,
+                        ForeColor = (i > 1 && backColor != null) ? HighlightTextColor : textColor ?? UIConfig.ActiveTextColor,
                         TextAlignment = i == 0? Alignment.MiddleLeft : Alignment.MiddleCenter,
                         DefaultAlignment = i == 0 ? "left" : "center"
 
