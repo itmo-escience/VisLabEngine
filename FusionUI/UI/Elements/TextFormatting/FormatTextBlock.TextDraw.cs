@@ -491,6 +491,10 @@ namespace FusionUI.UI.Elements.TextFormatting
             var textOffset = IsShortText ?  (BaseHeight - strings.TakeWhile(a => (th += a.Rect.Height) < BaseHeight).Sum(a => a.Rect.Height)) * 0.5f: 
                 TextAlignment == Alignment.MiddleLeft || TextAlignment == Alignment.MiddleCenter || TextAlignment == Alignment.MiddleRight ? (Height - TextHeight)/2  :
                 TextAlignment == Alignment.BottomLeft || TextAlignment == Alignment.BottomCenter || TextAlignment == Alignment.BottomRight ? Height - TextHeight : 0f;
+            DefaultAlignment = TextAlignment == Alignment.MiddleLeft || TextAlignment == Alignment.BottomLeft ||
+                               TextAlignment == Alignment.TopLeft ? "left" :
+                TextAlignment == Alignment.MiddleRight || TextAlignment == Alignment.BottomRight ||
+                TextAlignment == Alignment.TopRight ? "right" : "center";
             var toOld = textOffset;
             var rect = GlobalRectangle;
             Frame frame = this.parent;

@@ -131,7 +131,7 @@ namespace FusionUI.UI.Factories
             ScalableFrame parent, string label,
             Action<float> changeAction, float min, float max, float initValue, out Slider slider,
             bool minMaxSelector = false, string imageSlider = null,
-            bool IsVertical = false, bool showValue = true, Alignment labelAlignment = Alignment.MiddleCenter, bool percent = false, Color? labelBackColor = null)
+            bool IsVertical = false, bool showValue = true, Alignment labelAlignment = Alignment.TopCenter, bool percent = false, Color? labelBackColor = null)
         {
             var sizeLabel = UIConfig.FontBody[1].MeasureString(ScalableFrame.TryGetText(label));
 
@@ -140,7 +140,7 @@ namespace FusionUI.UI.Factories
             };
             
 
-            ScalableFrame labelFrame = new ScalableFrame(ui, OffsetX, OffsetY, holder.UnitWidth, (sizeLabel.Height) /ApplicationInterface.gridUnitDefault, label, labelBackColor ?? Color.Zero)
+            ScalableFrame labelFrame = new FormatTextBlock(ui, OffsetX, OffsetY, holder.UnitWidth, (sizeLabel.Height) /ApplicationInterface.gridUnitDefault, label, labelBackColor ?? Color.Zero, UIConfig.FontBody, 0)
             {
                 TextAlignment = labelAlignment,
                 //UnitTextOffsetY = 4,
@@ -162,7 +162,7 @@ namespace FusionUI.UI.Factories
                 Image = ui.Game.Content.Load<DiscTexture>(imageSlider ?? @"UI-new\fv-icons_slider"),
                 IsVertical = IsVertical,
             };
-
+            holder.UnitHeight = labelFrame.UnitHeight + slider.UnitHeight;
             if (showValue)
             {
                 ScalableFrame valueFrame = new ScalableFrame(ui, OffsetX, OffsetY, holder.UnitWidth - 2 * OffsetX,
