@@ -90,7 +90,7 @@ namespace FusionUI.UI.Elements.TextFormatting
             }
         }
 
-        public FormatTextBlock(FrameProcessor ui, float x, float y, float w, float h, string text, Color backColor, UIConfig.FontHolder font, float offsetLine, float minHeight = 0, bool isShortText = false, int maxWidth = 0) : base(ui, x, y, w, h, text, backColor, font, offsetLine, minHeight, isShortText, maxWidth)
+        public FormatTextBlock(FrameProcessor ui, float x, float y, float w, float h, string text, Color backColor, UIConfig.FontHolder font, float offsetLine = 0, float minHeight = 0, bool isShortText = false, int maxWidth = 0) : base(ui, x, y, w, h, text, backColor, font, offsetLine, minHeight, isShortText, maxWidth)
         {
             BaseFont = font;
             ItalicFont = font;
