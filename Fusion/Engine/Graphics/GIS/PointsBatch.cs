@@ -22,6 +22,7 @@ namespace Fusion.Engine.Graphics.GIS
 			DOTS_WORLDSPACE		= 1 << 0,
 			DOTS_SCREENSPACE	= 1 << 1,
 			ROTATION_ANGLE		= 1 << 2,
+			DOTS_PROJSPACE		= 1 << 3,
 		}
 
 		public int Flags;
@@ -205,6 +206,10 @@ namespace Fusion.Engine.Graphics.GIS
 
 			if (!GeoHelper.LineIntersection(nearPoint, farPoint, GeoHelper.EarthRadius, out rayHitPoints)) return ret;
 
+
+			float mult = 1.0f;
+			if (((PointFlags)Flags).HasFlag(PointFlags.DOTS_PROJSPACE)) mult = 10.0f;
+
 			var rayLonLatRad			= GeoHelper.CartesianToSpherical(rayHitPoints[0]);
 			//var OneGradusLengthKmInv	= 1.0 / (Math.Cos(rayLonLatRad.Y)*GeoHelper.EarthOneDegreeLengthOnEquatorMeters/1000.0);
 
@@ -212,7 +217,7 @@ namespace Fusion.Engine.Graphics.GIS
 				int ind		= PointsDrawOffset + i;
 				var point	= PointsCpu[ind];
 
-				var size		= point.Tex0.Z * 0.5;
+				var size		= point.Tex0.Z * 0.5 * mult;
 				var pointLonLat = new DVector2(point.Lon, point.Lat);
 
 

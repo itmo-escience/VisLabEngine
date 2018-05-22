@@ -135,6 +135,7 @@ cbuffer CBColorsStage 	: register(b2) 	{	DotsColorsStruct DotsColors	;	}
 #if 0
 $ubershader DOTS_WORLDSPACE +ROTATION_ANGLE
 $ubershader DOTS_SCREENSPACE +ROTATION_ANGLE
+$ubershader DOTS_PROJSPACE +ROTATION_ANGLE
 #endif
 
 
@@ -236,6 +237,32 @@ void GSMain ( point VS_OUTPUT inputArray[1], inout TriangleStream<GS_OUTPUT> str
 	stream.Append( output );
 	
 	output.Position	= mul(float4(viewPos.x + halfWidth, viewPos.y - halfWidth, viewPos.z, 1), DotsData.Proj);
+	output.Tex		= float2(texRight, 1.0f);
+	stream.Append( output );
+#endif
+#ifdef DOTS_PROJSPACE
+	// Plane
+	float4 projPos = mul(float4(pos, 1), Stage.ViewProj);
+	
+	projPos /= projPos.w;
+	
+	output.Color	=	color;
+	output.Normal	=	input.Normal;
+	
+	
+	output.Position	= float4(projPos.x - halfWidth, projPos.y + halfWidth * 1.7777f, projPos.z, projPos.w);
+	output.Tex		= float2(texLeft, 0.0f);
+	stream.Append( output );
+	
+	output.Position	= float4(projPos.x + halfWidth, projPos.y + halfWidth * 1.7777f, projPos.z, projPos.w);
+	output.Tex		= float2(texRight, 0.0f);
+	stream.Append( output );
+	
+	output.Position	= float4(projPos.x - halfWidth, projPos.y - halfWidth * 1.7777f, projPos.z, projPos.w);
+	output.Tex		= float2(texLeft, 1.0f);
+	stream.Append( output );
+	
+	output.Position	= float4(projPos.x + halfWidth, projPos.y - halfWidth * 1.7777f, projPos.z, projPos.w);
 	output.Tex		= float2(texRight, 1.0f);
 	stream.Append( output );
 #endif
