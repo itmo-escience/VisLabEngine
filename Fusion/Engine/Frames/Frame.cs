@@ -517,7 +517,7 @@ namespace Fusion.Engine.Frames {
 		/// <param name="action"></param>
 		public void ForEachChildren ( Action<Frame> action ) 
 		{
-			children.ForEach( f => action(f) );
+			children.ToList().ForEach( f => action(f) );
 		}
 
 
@@ -939,7 +939,7 @@ namespace Fusion.Engine.Frames {
             {
                 Rectangle rect = new Rectangle(0, 0, 0, 0);
 
-                foreach (var frame in children)
+                foreach (var frame in children.ToList())
                 {
                     if (frame == this || frame.Visible==false) continue;                    
                     rect.Right = Math.Max(frame.X + frame.Width + PaddingRight, rect.Right);
