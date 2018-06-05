@@ -295,7 +295,7 @@ namespace Fusion.Engine.Graphics {
 
 				if (ch0 == '\n') {
 					y += fontInfo.lineHeight;
-					x =  xPos;
+					x =  flip ? yPos : xPos;
 				}
 
 				char ch1	= (i+1)<length ? text[i+1] : '\0';

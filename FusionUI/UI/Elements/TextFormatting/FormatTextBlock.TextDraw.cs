@@ -145,10 +145,13 @@ namespace FusionUI.UI.Elements.TextFormatting
 
         public Dictionary<string, Texture> ImageCache;
 
+        private int lastWidth = 0;
+
         protected override void splitByString()
         {
-            if (lastString == Text && strings != null || Text == null) return;
+            if (lastString == Text && strings != null && lastWidth == this.Width|| Text == null ) return;
             MaxLineWidth = 0;
+            lastWidth = this.Width;
             ImageCache = new Dictionary<string, Texture>();
             lastString = Text;
             float width = 0;

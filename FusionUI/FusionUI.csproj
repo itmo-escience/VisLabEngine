@@ -126,6 +126,7 @@
     <Compile Include="UI\FreeFrame.cs" />
     <Compile Include="UI\LayoutFrame.cs" />
     <Compile Include="UI\MainFrame.cs" />
+    <Compile Include="UI\Plots2_0\HeatCanvas.cs" />
     <Compile Include="UI\Plots2_0\PlotCanvas.cs" />
     <Compile Include="UI\Plots2_0\PlotData.cs" />
     <Compile Include="UI\Plots2_0\PlotLegend.cs" />

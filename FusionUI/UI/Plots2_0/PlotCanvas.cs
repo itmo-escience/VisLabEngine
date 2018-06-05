@@ -15,7 +15,7 @@ namespace FusionUI.UI.Plots2_0
     {
         public bool SingleScale;
 
-        public PlotScale ActiveScale = null;
+        public PlotScale ActiveScale = null;        
 
         public PlotCanvas(FrameProcessor ui, float x, float y, float w, float h, Color backColor) : base(ui, x, y, w, h,
             "", backColor)

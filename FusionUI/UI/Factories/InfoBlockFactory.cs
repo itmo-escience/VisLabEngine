@@ -178,9 +178,35 @@ namespace FusionUI.UI.Factories
             holder.Add(valueLabel2);
 
             return holder;
+        }
+
+        public static UIContainer<ScalableFrame> SmallCaptionHolder(FrameProcessor ui, float OffsetX,
+            float OffsetY, ScalableFrame parent, String text, Color? textColor = null,
+            UIConfig.FontHolder? UsedFont = null)
+        {
+            var color = textColor ?? UIConfig.ActiveTextColor;
+            var font = UsedFont ?? UIConfig.FontSubtitle;
+            UIContainer<ScalableFrame> holder = new UIContainer<ScalableFrame>(ui, parent.UnitPaddingLeft, 0,
+                parent.UnitWidth - parent.UnitPaddingLeft - parent.UnitPaddingRight,
+                17, "", Color.Zero);
+
+            ScalableFrame label = new ScalableFrame(ui, OffsetX, 0, holder.UnitWidth,
+                holder.UnitHeight, text, Color.Zero)
+            {
+                FontHolder = font,
+                ForeColor = textColor ?? UIConfig.ActiveTextColor,
+                TextAlignment = Alignment.BaselineLeft,
+                UnitTextOffsetY = 11,
+            };
+
+
+            holder.Add(label);            
+
+            return holder;
 
 
         }
+
 
         public static UIContainer<ScalableFrame> CaptionHolder(FrameProcessor ui, float OffsetX,
             float OffsetY, ScalableFrame parent, String text, Color? textColor = null,

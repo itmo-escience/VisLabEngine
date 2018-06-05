@@ -127,7 +127,9 @@ namespace FusionUI.UI.Plots2_0
 
         public void UpdateLimits(double depth)
         {
+            if (!Data.ContainsKey(depth)) return;            
             var data = Data[depth].Where(a => !(double.IsNaN(a.X) || double.IsNaN(a.Y))).ToList();
+            if (!data.Any()) return;
             var ld= new RectangleD() {
                 
                 Left = data.Min(a => a.X),
@@ -438,7 +440,7 @@ namespace FusionUI.UI.Plots2_0
         public Func<double, double, string> bcFunction = (v, w) =>
             v.ToString($"F{(int) Math.Max(0, 3 - Math.Floor(Math.Log(Math.Max(1, v), 10)))}");
         public virtual void OnDraw() { }
-        public String Name, NiceName;
+        public String Name = "", NiceName = "";
 
         public static RectangleD AggregateLimits(List<RectangleD> data)
         {

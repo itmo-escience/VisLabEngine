@@ -56,22 +56,12 @@ namespace FusionUI.UI.Factories
         public static UIContainer<Checkbox> CheckboxHorizontalHolder(FrameProcessor ui, float OffsetX, float OffsetY, float width, float height, ScalableFrame parent, string label,
             Action<bool> switchAction, bool active, out Checkbox checkbox, bool isSwitcher = true)
         {
-            UIContainer<Checkbox> holder = new UIContainer<Checkbox>(ui, parent.UnitPaddingLeft, 0, width + OffsetX, height + OffsetY, "", Color.Zero);
+            UIContainer<Checkbox> holder = new UIContainer<Checkbox>(ui, parent.UnitPaddingLeft, 0, width + OffsetX, height + OffsetY, "", Color.Zero)
+            {
+            };
             float UnitCheckboxWidth = isSwitcher ? UIConfig.UnitSwitcherWidth : UIConfig.UnitCheckboxWidth;
             float UnitCheckboxHeight = isSwitcher ? UIConfig.UnitSwitcherHeight : UIConfig.UnitCheckboxHeight;
-            checkbox = new Checkbox(ui, OffsetX, OffsetY, width - 2 * OffsetX, height - 2 * OffsetY, "", Color.Zero)
-            {
-                Checked = isSwitcher ? ui.Game.Content.Load<DiscTexture>(@"UI-new\fv-icons_switcher-on")  : ui.Game.Content.Load<DiscTexture>(@"UI-new\fv-icons_checkbox-big-on"),
-                None    = isSwitcher ? ui.Game.Content.Load<DiscTexture>(@"UI-new\fv-icons_switcher-off") : ui.Game.Content.Load<DiscTexture>(@"UI-new\fv-icons_checkbox-big-off"),
-                //UnitImageOffsetX = -(holder.UnitWidth - OffsetX * 2 - UIConfig.UnitCheckboxWidth) / 2,
-                //UnitImageOffsetY = holder.UnitHeight - UIConfig.UnitCheckboxHeight,
-                ImageMode = FrameImageMode.Fitted,
-                UnitVPadding = (height - 2 * OffsetY - UnitCheckboxHeight)/2,
-                UnitPaddingRight = width - 2 * OffsetX - UnitCheckboxWidth - UIConfig.UnitCheckboxValueOffset,
-                IsChecked = active,
-                Name = label
-            };
-
+            
             FormatTextBlock cbLabel = new FormatTextBlock(ui, OffsetX + UnitCheckboxWidth + UIConfig.UnitCheckboxValueOffset, OffsetY,
                 holder.Width - UnitCheckboxWidth + UIConfig.UnitCheckboxValueOffset - OffsetX, height - 2 * OffsetY, label, Color.Zero, UIConfig.FontBody, 0)
             {
@@ -79,7 +69,20 @@ namespace FusionUI.UI.Factories
                 FontHolder = UIConfig.FontBody,
                 ForeColor = UIConfig.ActiveTextColor,
             };
-            
+
+            checkbox = new Checkbox(ui, OffsetX, OffsetY, width - 2 * OffsetX, cbLabel.UnitHeight, "", Color.Zero)
+            {
+                Checked = isSwitcher ? ui.Game.Content.Load<DiscTexture>(@"UI-new\fv-icons_switcher-on") : ui.Game.Content.Load<DiscTexture>(@"UI-new\fv-icons_checkbox-big-on"),
+                None = isSwitcher ? ui.Game.Content.Load<DiscTexture>(@"UI-new\fv-icons_switcher-off") : ui.Game.Content.Load<DiscTexture>(@"UI-new\fv-icons_checkbox-big-off"),
+                //UnitImageOffsetX = -(holder.UnitWidth - OffsetX * 2 - UIConfig.UnitCheckboxWidth) / 2,
+                //UnitImageOffsetY = holder.UnitHeight - UIConfig.UnitCheckboxHeight,
+                ImageMode = FrameImageMode.Fitted,
+                UnitVPadding = (cbLabel.UnitHeight - UnitCheckboxHeight) / 2,
+                UnitPaddingRight = width - 2 * OffsetX - UnitCheckboxWidth - UIConfig.UnitCheckboxValueOffset,
+                IsChecked = active,
+                Name = label,
+            };
+            holder.UnitHeight = cbLabel.UnitHeight + 2 * OffsetY;
             checkbox.Changed += switchAction;
             holder.Add(checkbox);
             holder.Add(cbLabel);

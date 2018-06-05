@@ -227,6 +227,7 @@ namespace FusionUI.UI
             public string FontName;
 
             private int lastIndex;
+            public SpriteFont Current => currentFont??this[1];
             private SpriteFont currentFont;
             public SpriteFont this[float scale]
             {

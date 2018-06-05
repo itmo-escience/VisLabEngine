@@ -7,7 +7,14 @@ using Fusion.Engine.Frames;
 
 namespace FusionUI.UI.Plots2_0
 {
-    public class PlotViewer : FreeFrame
+    public class PlotViewer : PlotViewer<PlotCanvas>
+    {
+        public PlotViewer(FrameProcessor ui, float x, float y, float w, float h, Color backColor, AbstractTimeManager tm = null, PlotCanvas plot = null) : base(ui, x, y, w, h, backColor, tm, plot, null)
+        {
+        }
+    };
+
+    public class PlotViewer<TP> : FreeFrame where TP : PlotCanvas
     {
         public PlotCanvas Plot;        
 
@@ -17,15 +24,16 @@ namespace FusionUI.UI.Plots2_0
 
         public bool ShowScaleX = true, ShowScaleY = true;
 
+        public Func<FrameProcessor, PlotCanvas, PlotScale> scaleConstruct;        
         public PlotViewer(FrameProcessor ui, float x, float y, float w, float h, Color backColor,
-            AbstractTimeManager tm, PlotCanvas plot = null) : base(ui, x, y, w, h, "", backColor)
+            AbstractTimeManager tm = null, TP plot = null, Func<FrameProcessor, TP> plotConstruct = null, Func<FrameProcessor, PlotCanvas, PlotScale> scaleConstruct = null) : base(ui, x, y, w, h, "", backColor)
         {
             if (plot == null)
-                Plot = new PlotCanvas(ui, 0, 0, 100, 100, Color.Zero)
-                {                  
-                };
-
+                Plot = plotConstruct != null ? plotConstruct(ui) : new PlotCanvas(ui, 0, 0, 100, 100, Color.Zero);            
             else Plot = plot;
+
+            this.scaleConstruct = scaleConstruct ?? new Func<FrameProcessor, PlotCanvas, PlotScale>((ui1, pc) => new PlotScale(ui1, pc));
+
             this.Add(Plot);
             Plot.DataContainer = new PlotContainer();
             AddLegend();
@@ -93,48 +101,55 @@ namespace FusionUI.UI.Plots2_0
                 Dirty = true;
             }
         }
+        
 
         public virtual void GenerateScales()
         {
             foreach (var s in Scales)
             {
-                this.Remove(s);                                
+                this.Remove(s);
             }
+
             Scales.Clear();
             bool first = true;
             var scales = new Dictionary<string, PlotScale>();
-            foreach (var variable in Plot.DataContainer.Data) {
-	            var name = variable.Value.Name;
+            foreach (var variable in Plot.DataContainer.Data)
+            {
+                var name = variable.Value.Name;
                 if (!(first && ShowScaleX || ShowScaleY)) break;
                 if (!scales.ContainsKey(name))
                 {
-                    scales[name] = new PlotScale(ui, Plot)
-                    {
-                        Settings = (ShowScaleY 
-                                       ? ScaleParams.DrawScaleY | ScaleParams.UseFixedStepY 
-                                       : 0) | 
-                                   (first && ShowScaleX
-                                       ? ScaleParams.DrawScaleX | ScaleParams.UseFixedStepX | ScaleParams.NoActiveCheckX
-                                       : 0) | 
-                                   ScaleSettings,
-                        Dirty = true,
-                        YLabel = name,
-                        Measure = variable.Value.Units,
-                        XLabel = "Time",
-                        ZOrder =  1000,
-                        FontHolder = scaleFont,
-                        BoldFontHolder = UIConfig.FontSubtitleAlt,
-                        ForeColor = UIConfig.InactiveTextColor,    
-                        SuggestedStepX = scaleStepX,
-                        SuggestedStepY = scaleStepY,
-                        CaptionsColor = scaleFontColor,
-    };
+
+                    scales[name] = scaleConstruct(ui, Plot); //new PlotScale(ui, Plot)
+                    //{
+                    scales[name].Settings = (ShowScaleY
+                                                ? ScaleParams.DrawScaleY | ScaleParams.UseFixedStepY
+                                                : 0) |
+                                            (first && ShowScaleX
+                                                ? ScaleParams.DrawScaleX | ScaleParams.UseFixedStepX |
+                                                  ScaleParams.NoActiveCheckX
+                                                : 0) |
+                                            ScaleSettings;
+                    scales[name].Dirty = true;
+                    scales[name].YLabel = name;
+                    scales[name].Measure = variable.Value.Units;
+                    scales[name].XLabel = "Time";
+                    scales[name].ZOrder = 1000;
+                    scales[name].FontHolder = scaleFont;
+                    scales[name].BoldFontHolder = UIConfig.FontSubtitleAlt;
+                    scales[name].ForeColor = UIConfig.InactiveTextColor;
+                    scales[name].SuggestedStepX = scaleStepX;
+                    scales[name].SuggestedStepY = scaleStepY;
+                    scales[name].CaptionsColor = scaleFontColor;
                     if (variable.Value.Depths.Count == 1)
                     {
-                        scales[name].LineColor = variable.Value.Data.Values.First().Values.First().ColorsByDepth.First().Value;
+                        scales[name].LineColor = variable.Value.Data.Values.First().Values.First().ColorsByDepth.First()
+                            .Value;
                     }
+
                     if (IsTime) scales[name].PredefinedStepsX = predefinedTimeSteps;
                 }
+
                 var scale = scales[name];
                 scale.PlotData.Add(variable.Value);
                 if (!Scales.Select(a => a.YLabel).Contains(name))
