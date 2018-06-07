@@ -115,7 +115,7 @@ struct DataForDots {
 	float4x4	View;
 	float4x4	Proj;
 	float4		AtlasSizeImgSize;
-	float4		SizeMult;
+	float4		SizeMultTimeAlpha;
 };
 
 struct DotsColorsStruct {
@@ -133,7 +133,7 @@ cbuffer CBColorsStage 	: register(b2) 	{	DotsColorsStruct DotsColors	;	}
 
 
 #if 0
-$ubershader DOTS_WORLDSPACE +ROTATION_ANGLE
+$ubershader DOTS_WORLDSPACE +ROTATION_ANGLE +TIME
 $ubershader DOTS_SCREENSPACE +ROTATION_ANGLE
 $ubershader DOTS_PROJSPACE +ROTATION_ANGLE
 #endif
@@ -166,6 +166,11 @@ VS_OUTPUT VSMain ( VS_INPUT v )
 	float4x4 rotMatZ = float4x4( cos(-v.Tex0.w),sin(-v.Tex0.w),0,0, 	-sin(-v.Tex0.w),cos(-v.Tex0.w),0,0, 0,0,1,0, 0,0,0,1 );
 	xAxis = normalize(mul(float4(1, 0, 0, 0), rotMatZ).xyz);
 #endif
+
+#ifdef TIME
+	float timeAlpha = saturate((DotsData.SizeMultTimeAlpha.y - v.Tex1.y)/v.Tex1.z);
+	v.Color.a = v.Color.a * timeAlpha;
+#endif
 	
 	float4x4 rotMatY = float4x4( cos(angle), 0, -sin(angle), 0, 0,1,0,0, sin(angle),0,cos(angle),0, 0,0,0,1 );
 
@@ -185,37 +190,18 @@ void GSMain ( point VS_OUTPUT inputArray[1], inout TriangleStream<GS_OUTPUT> str
 	GS_OUTPUT	output;// = (GS_OUTPUT)0;
 	VS_OUTPUT	input	=	inputArray[0];
 
-	float halfWidth = (input.Tex.z * DotsData.SizeMult.x) / 2.0f;
-	
-	//float x = input.Position.x;
-	//float y = input.Position.y;
-	//float z = input.Position.z;
+	float halfWidth = (input.Tex.z * DotsData.SizeMultTimeAlpha.x) / 2.0f;
 
-	float3 pos = input.Position.xyz;
-	float3 xAxis = input.XAxis;
-	float3 zAxis = normalize(cross(xAxis,input.Normal)); 
+	float3 pos		= input.Position.xyz;
+	float3 xAxis 	= input.XAxis;
+	float3 zAxis 	= normalize(cross(xAxis,input.Normal)); 
 	xAxis = normalize(cross(zAxis,input.Normal));
 	
 	float texRight	= ((input.Tex.x+1) 	* DotsData.AtlasSizeImgSize.z)/DotsData.AtlasSizeImgSize.x;
 	float texLeft	= (input.Tex.x 		* DotsData.AtlasSizeImgSize.z)/DotsData.AtlasSizeImgSize.x;
 
 	float4	color	= input.Color;
-	//int		colorInd	= int(input.Tex.y);
-	//if(colorInd != 0) color = DotsColors.Colors[colorInd];
 
-	//float ang = dot(input.Normal, Stage.ViewDir.xyz);
-	//color.a = ang;
-	
-	//////
-	//if(input.Tex.x == 13) {
-	//	halfWidth = halfWidth*2.5f;
-	//	color = float4(0.9f,0.9f,0.1f,1.0f);
-	//}
-	//if(input.Tex.x == 14) {
-	//	halfWidth = halfWidth*1.7f;
-	//	color = float4(0.3f,0.3f,0.3f,1.0f);
-	//}
-	/////////////
 	
 #ifdef DOTS_SCREENSPACE
 	// Plane
@@ -296,7 +282,7 @@ float4 PSMain ( GS_OUTPUT input ) : SV_Target
 
 	color.rgb *= input.Color.rgb;
 
-	color.a *= input.Color.a;
+	color.a *= input.Color.a * DotsData.SizeMultTimeAlpha.z;
 
 	//color = float4(1.0f, 0.0f, 0.0f, 1.0f);
 	return color;
