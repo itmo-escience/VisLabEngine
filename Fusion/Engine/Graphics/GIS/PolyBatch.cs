@@ -289,8 +289,32 @@ namespace Fusion.Engine.Graphics.GIS
             Initialize(points.ToArray(), indeces.ToArray(), false, true);
 	    }
 
+	    public void MergeList(IEnumerable<PolyGisLayer> list)
+	    {
+	        var points = new List<Gis.GeoPoint>(PointsCpu);
+	        var indeces = new List<int>(IndecesCpu);
+            foreach (var second in list)
+	        {	            
+	            var c = points.Count;
+	            foreach (var p in second.PointsCpu)
+	            {
+	                points.Add(p);
+	            }
 
-		public static PolyGisLayer CreateFromContour(Game engine, DVector2[] lonLatRad, Color color, bool usePalette = true, List<DVector2[]> excludeRad = null, TriangulationAlgorithm method = TriangulationAlgorithm.Dwyer)
+	            foreach (var index in second.IndecesCpu)
+	            {
+	                indeces.Add(index + c);
+	            }
+	        }
+
+	        //PointsCpu = points.ToArray();
+	        //IndecesCpu = indeces.ToArray();
+	        Dispose();
+	        Initialize(points.ToArray(), indeces.ToArray(), false, true);
+	    }
+
+
+        public static PolyGisLayer CreateFromContour(Game engine, DVector2[] lonLatRad, Color color, bool usePalette = true, List<DVector2[]> excludeRad = null, TriangulationAlgorithm method = TriangulationAlgorithm.Dwyer)
 		{
 			var triangulator = new TriangleNet.Mesh();
 			triangulator.Behavior.Algorithm = method;		    
@@ -326,7 +350,7 @@ namespace Fusion.Engine.Graphics.GIS
             
 
 			if (triangulator.Vertices.Count != lonLatRad.Length) {
-				Log.Warning("Vertices count not match");
+				//Log.Warning("Vertices count not match");
 				//return null;
 			}
 
