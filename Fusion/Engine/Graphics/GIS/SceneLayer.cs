@@ -438,7 +438,7 @@ namespace Fusion.Engine.Graphics.GIS
                             Lat = lat,
                             Color = vert.Color0 * color,
                             Tex0 = new Vector4(norm.ToVector3(), 0),
-                            Tex1 = new Vector4(vert.TexCoord0, 0, (float)(worldPos.Z / 1000.0 + (bd.Dummy.X - bd.Dummy.Y < 0.0001 ? 0.0002 : -0.0002))),
+                            Tex1 = new Vector4(vert.TexCoord0, 0, (float)(worldPos.Z / 1000.0 + ((bd.Dummy.X - bd.Dummy.Y < 0.0001) ? 0.0002 : -0.0002))),
                             ID = (uint) buildingsIds[buildingName],
 
                         };
