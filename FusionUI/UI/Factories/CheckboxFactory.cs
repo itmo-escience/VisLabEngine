@@ -67,7 +67,7 @@ namespace FusionUI.UI.Factories
             {
                 TextAlignment = Alignment.MiddleLeft,                
                 FontHolder = UIConfig.FontBody,
-                ForeColor = UIConfig.ActiveTextColor,
+                ForeColor = UIConfig.ActiveTextColor
             };
 
             checkbox = new Checkbox(ui, OffsetX, OffsetY, width - 2 * OffsetX, cbLabel.UnitHeight, "", Color.Zero)

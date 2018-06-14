@@ -101,7 +101,7 @@ namespace FusionUI.UI.Factories
             button = new Button(ui,
                 holder.UnitWidth / 2 - buttonWidth / 2,
                 OffsetY, buttonWidth,
-                UIConfig.UnitFilterWindowElementHeight, label, UIConfig.ButtonColor, UIConfig.ActiveColor, 200, action)
+                UIConfig.UnitFilterWindowElementHeight, label, UIConfig.ButtonColor, UIConfig.ActiveColor, 200, action, Color.White, Color.White)
             {
                 TextAlignment = Alignment.MiddleCenter,
                 ForeColor = UIConfig.ActiveTextColor,
@@ -109,6 +109,49 @@ namespace FusionUI.UI.Factories
 
             holder.Item = button;
             holder.Add(button);
+            return holder;
+        }
+
+        public static UIContainer<Button, RichTextBlock, RichTextBlock> СoordinatesButtonHolder(FrameProcessor ui,
+            float OffsetX, float OffsetY, ScalableFrame parent,
+            float distance, Action button1Action, out Button buttonXY, out RichTextBlock textBlockX,
+            out RichTextBlock textBlockY, string buttonText = "coordinates", string richTextX= "0",
+            string richTextY = "0")
+        {
+            UIContainer<Button, RichTextBlock, RichTextBlock> holder = new UIContainer<Button, RichTextBlock, RichTextBlock>(ui, parent.UnitPaddingLeft, 0, 
+                parent.UnitWidth - parent.UnitPaddingLeft - parent.UnitPaddingRight, 
+                UIConfig.UnitFilterWindowConfirmationButtonRowHeight + OffsetY, 
+                "", Color.Zero);
+            float bw = (holder.UnitWidth - 2 * OffsetX - distance * 2) / 3;
+            //buttonXY = new Button(ui,
+            //    OffsetX, OffsetY,
+            //    bw, UIConfig.UnitFilterWindowElementHeight,
+            //    buttonText, UIConfig.ButtonColor, UIConfig.ActiveColor, 10, button1Action, Color.White, Color.White)
+            //{
+            //    TextAlignment = Alignment.MiddleCenter,
+            //    ForeColor = Color.White,
+            //};
+            buttonXY = new Button(ui,
+                OffsetX, OffsetY,
+                bw, UIConfig.UnitFilterWindowElementHeight,
+                buttonText, UIConfig.ActiveColor, UIConfig.ButtonColor, null, null, null, false, 0)
+            {
+                TextAlignment = Alignment.MiddleCenter
+            };
+            textBlockX = new RichTextBlock(ui,
+                OffsetX + bw + distance, OffsetY, 
+                bw, UIConfig.UnitFilterWindowElementHeight,
+                richTextX, Color.Zero, UIConfig.FontBody, 10);
+            textBlockY = new RichTextBlock(ui,
+                OffsetX + 2 * bw + 2 * distance, OffsetY,
+                bw, UIConfig.UnitFilterWindowElementHeight,
+                richTextY, Color.Zero, UIConfig.FontBody, 10);
+            holder.Item1 = buttonXY;
+            holder.Item2 = textBlockX;
+            holder.Item3 = textBlockY;
+            holder.Add(buttonXY);
+            holder.Add(textBlockX);
+            holder.Add(textBlockY);
             return holder;
         }
 
