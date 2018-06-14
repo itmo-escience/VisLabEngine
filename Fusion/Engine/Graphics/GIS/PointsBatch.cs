@@ -23,6 +23,7 @@ namespace Fusion.Engine.Graphics.GIS
 			DOTS_SCREENSPACE	= 1 << 1,
 			ROTATION_ANGLE		= 1 << 2,
 			DOTS_PROJSPACE		= 1 << 3,
+			TIME				= 1 << 4,
 		}
 
 		public int Flags;
@@ -82,6 +83,8 @@ namespace Fusion.Engine.Graphics.GIS
 
 		public bool IsDynamic { get; protected set; }
 
+		public float Time { get; set; }
+		public float Alpha { get; set; } = 1.0f;
 
 
 		public PointsGisLayer(Game engine, int maxPointsCount, bool isDynamic = false, bool useSecondBuffer = false) : base(engine)
@@ -152,7 +155,7 @@ namespace Fusion.Engine.Graphics.GIS
 			dotsData.View				= curCamera.ViewMatrixFloat;
 			dotsData.Proj				= curCamera.ProjMatrixFloat;
 			dotsData.AtlasSizeImgSize	= new Vector4(TextureAtlas.Width, TextureAtlas.Height, ImageSizeInAtlas.X, ImageSizeInAtlas.Y);
-			dotsData.SizeMult			= new Vector4(SizeMultiplier);
+			dotsData.SizeMult			= new Vector4(SizeMultiplier, Time, Alpha, 0);
 
 
 			DotsBuffer.SetData(dotsData);
@@ -176,6 +179,7 @@ namespace Fusion.Engine.Graphics.GIS
 
 			dev.VertexShaderConstants[1]	= DotsBuffer;
 			dev.GeometryShaderConstants[1]	= DotsBuffer;
+			dev.PixelShaderConstants[1] = DotsBuffer;
 
 			dev.GeometryShaderConstants[2]	= ColorBuffer;
 
