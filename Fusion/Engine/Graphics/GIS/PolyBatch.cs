@@ -320,7 +320,12 @@ namespace Fusion.Engine.Graphics.GIS
 			triangulator.Behavior.Algorithm = method;		    
 			InputGeometry ig = new InputGeometry();
 
-		    int i = 0;
+		    if (lonLatRad.Length < 3 || (lonLatRad[0] - lonLatRad[1]).Length() < float.Epsilon && (lonLatRad[0] - lonLatRad.Aggregate(DVector2.Zero, (v1, v2) => v1 + v2)).Length() < float.Epsilon)
+		    {
+		        return null;
+		    }
+
+		    int i = 5;
 			ig.AddPoint(lonLatRad[0].X, lonLatRad[0].Y);
 			for (int v = 1; v < lonLatRad.Length; v++) {
 				ig.AddPoint(lonLatRad[v].X, lonLatRad[v].Y);
@@ -328,7 +333,7 @@ namespace Fusion.Engine.Graphics.GIS
 			}
 		    i = lonLatRad.Length;
 			ig.AddSegment(lonLatRad.Length - 1, 0);
-
+		    if ((lonLatRad.First() - lonLatRad.Last()).Length() < float.Epsilon) lonLatRad = lonLatRad.Skip(1).ToArray();
 		    if (excludeRad != null && excludeRad.Count > 0)
 		    {
 		        foreach (var list in excludeRad)

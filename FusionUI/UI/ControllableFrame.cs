@@ -393,17 +393,17 @@ namespace FusionUI.UI
         public virtual void UpdateColor(bool active)
         {
             if (this.Active && active) {
-                if (ActiveForeColor != null) ForeColor = ActiveForeColor.Value;
-                if (ActiveBackColor != null) BackColor = ActiveBackColor.Value;
-                if (ActiveBorderColor != null) BorderColor = ActiveBorderColor.Value;
-                if (ActiveImageColor != null) ImageColor = ActiveImageColor.Value;
-                if (ActiveImage != null) Image = ActiveImage;
+                if (ActiveForeColor != null) base.ForeColor = ActiveForeColor.Value;
+                if (ActiveBackColor != null) base.BackColor = ActiveBackColor.Value;
+                if (ActiveBorderColor != null) base.BorderColor = ActiveBorderColor.Value;
+                if (ActiveImageColor != null) base.ImageColor = ActiveImageColor.Value;
+                if (ActiveImage != null) base.Image = ActiveImage;
             } else {
-                if (InactiveForeColor != null) ForeColor = InactiveForeColor.Value;
-                if (InactiveBackColor != null) BackColor = InactiveBackColor.Value;
-                if (InactiveBorderColor != null) BorderColor = InactiveBorderColor.Value;
-                if (InactiveImageColor != null) ImageColor = InactiveImageColor.Value;
-                if (InactiveImage != null) Image = InactiveImage;
+                if (InactiveForeColor != null) base.ForeColor = InactiveForeColor.Value;
+                if (InactiveBackColor != null) base.BackColor = InactiveBackColor.Value;
+                if (InactiveBorderColor != null) base.BorderColor = InactiveBorderColor.Value;
+                if (InactiveImageColor != null) base.ImageColor = InactiveImageColor.Value;
+                if (InactiveImage != null) base.Image = InactiveImage;
             }
         }
 
