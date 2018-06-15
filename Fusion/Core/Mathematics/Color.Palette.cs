@@ -18,6 +18,8 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
+using System.Globalization;
+
 namespace Fusion.Core.Mathematics
 {
     /// <summary>
@@ -738,7 +740,7 @@ namespace Fusion.Core.Mathematics
         public static Color FromString(string s)
         {
             if (s.StartsWith("#"))
-                return Color.FromRgba(int.Parse(s.Substring(1)));
+                return Color.FromRgba(int.Parse(s.Substring(1), NumberStyles.AllowHexSpecifier));
             else
                 return Color.FromName(s);
         }

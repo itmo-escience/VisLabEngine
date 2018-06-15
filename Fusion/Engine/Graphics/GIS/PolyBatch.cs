@@ -325,74 +325,88 @@ namespace Fusion.Engine.Graphics.GIS
 		        return null;
 		    }
 
-		    int i = 5;
-			ig.AddPoint(lonLatRad[0].X, lonLatRad[0].Y);
-			for (int v = 1; v < lonLatRad.Length; v++) {
-				ig.AddPoint(lonLatRad[v].X, lonLatRad[v].Y);
-				ig.AddSegment(v-1, v);
-			}
-		    i = lonLatRad.Length;
-			ig.AddSegment(lonLatRad.Length - 1, 0);
-		    if ((lonLatRad.First() - lonLatRad.Last()).Length() < float.Epsilon) lonLatRad = lonLatRad.Skip(1).ToArray();
-		    if (excludeRad != null && excludeRad.Count > 0)
+		    try
 		    {
-		        foreach (var list in excludeRad)
+		        int i = 5;
+		        ig.AddPoint(lonLatRad[0].X, lonLatRad[0].Y);
+		        for (int v = 1; v < lonLatRad.Length; v++)
 		        {
-		            var m = list.ToList().Aggregate(DVector2.Zero, (a, b) => a + b/list.Length);
-		            ig.AddPoint(list[0].X, list[0].Y);
-                    for (int v = 1; v < list.Length; v++)
+		            ig.AddPoint(lonLatRad[v].X, lonLatRad[v].Y);
+		            ig.AddSegment(v - 1, v);
+		        }
+
+		        i = lonLatRad.Length;
+		        ig.AddSegment(lonLatRad.Length - 1, 0);
+		        if ((lonLatRad.First() - lonLatRad.Last()).Length() < float.Epsilon) lonLatRad = lonLatRad.Skip(1).ToArray();
+		        if (excludeRad != null && excludeRad.Count > 0)
+		        {
+		            foreach (var list in excludeRad)
 		            {
-		                ig.AddPoint(list[v].X, list[v].Y);
-                        ig.AddSegment(i + v - 1, i + v);
-                    }
-		            ig.AddSegment(i + list.Length - 1, i);
-                    ig.AddHole(m.X, m.Y);                    
-		            i += list.Length;
+		                var m = list.ToList().Aggregate(DVector2.Zero, (a, b) => a + b / list.Length);
+		                ig.AddPoint(list[0].X, list[0].Y);
+		                for (int v = 1; v < list.Length; v++)
+		                {
+		                    ig.AddPoint(list[v].X, list[v].Y);
+		                    ig.AddSegment(i + v - 1, i + v);
+		                }
+
+		                ig.AddSegment(i + list.Length - 1, i);
+		                ig.AddHole(m.X, m.Y);
+		                i += list.Length;
+		            }
+		        }
+
+		        triangulator.Triangulate(ig);
+
+
+		        if (triangulator.Vertices.Count != lonLatRad.Length)
+		        {
+		            //Log.Warning("Vertices count not match");
+		            //return null;
+		        }
+
+
+		        var points = new List<Gis.GeoPoint>();
+		        foreach (var pp in triangulator.Vertices)
+		        {
+		            points.Add(new Gis.GeoPoint
+		            {
+		                Lon = pp.X,
+		                Lat = pp.Y,
+		                Color = color
+		            });
+		        }
+
+
+		        var indeces = new List<int>();
+		        foreach (var tr in triangulator.Triangles)
+		        {
+		            indeces.Add(tr.P0);
+		            indeces.Add(tr.P1);
+		            indeces.Add(tr.P2);
+		        }
+
+		        if (usePalette)
+		        {
+		            return new PolyGisLayer(engine, points.ToArray(), indeces.ToArray(), false)
+		            {
+		                Flags = (int) (PolyFlags.NO_DEPTH | PolyFlags.DRAW_TEXTURED | PolyFlags.CULL_NONE |
+		                               PolyFlags.VERTEX_SHADER | PolyFlags.PIXEL_SHADER | PolyFlags.USE_PALETTE_COLOR)
+		            };
+		        }
+		        else
+		        {
+		            return new PolyGisLayer(engine, points.ToArray(), indeces.ToArray(), false)
+		            {
+		                Flags = (int) (PolyFlags.NO_DEPTH | PolyFlags.DRAW_COLORED | PolyFlags.CULL_NONE |
+		                               PolyFlags.VERTEX_SHADER | PolyFlags.PIXEL_SHADER | PolyFlags.USE_VERT_COLOR)
+		            };
 		        }
 		    }
-
-		    triangulator.Triangulate(ig);
-            
-
-			if (triangulator.Vertices.Count != lonLatRad.Length) {
-				//Log.Warning("Vertices count not match");
-				//return null;
-			}
-
-
-			var points = new List<Gis.GeoPoint>();
-			foreach (var pp in triangulator.Vertices) {
-				points.Add(new Gis.GeoPoint {
-					Lon		= pp.X,
-					Lat		= pp.Y,
-					Color	= color
-				});
-			}
-
-
-			var indeces = new List<int>();
-			foreach (var tr in triangulator.Triangles) {
-				indeces.Add(tr.P0);
-				indeces.Add(tr.P1);
-				indeces.Add(tr.P2);
-			}
-
-		    if (usePalette)
+		    catch (Exception e)
 		    {
-		        return new PolyGisLayer(engine, points.ToArray(), indeces.ToArray(), false)
-		        {
-		            Flags = (int) (PolyFlags.NO_DEPTH | PolyFlags.DRAW_TEXTURED | PolyFlags.CULL_NONE |
-		                           PolyFlags.VERTEX_SHADER | PolyFlags.PIXEL_SHADER | PolyFlags.USE_PALETTE_COLOR)
-		        };
+		        return null;
 		    }
-		    else
-		    {
-		        return new PolyGisLayer(engine, points.ToArray(), indeces.ToArray(), false)
-		        {
-		            Flags = (int)(PolyFlags.NO_DEPTH | PolyFlags.DRAW_COLORED | PolyFlags.CULL_NONE |
-		                          PolyFlags.VERTEX_SHADER | PolyFlags.PIXEL_SHADER | PolyFlags.USE_VERT_COLOR)
-		        };
-            }		
 		}
 
 
