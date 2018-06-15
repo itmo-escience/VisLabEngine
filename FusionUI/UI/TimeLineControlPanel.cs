@@ -196,7 +196,7 @@ namespace FusionUI.UI
                 Text = currentStep,
                 ImageColor = UIConfig.TimeLineIconColor,
                 ActiveFColor = UIConfig.HighlightTextColor,
-                InactiveFColor = Color.Black,
+                InactiveFColor = UIConfig.HighlightTextColor,
             };
             this.Add(button);
             return button;
@@ -215,7 +215,7 @@ namespace FusionUI.UI
 
         private Button createToggleableButton(float x, float y, string activeTexture = null, string inactiveTexture = null, bool IsVisible = true, string currentStep = "", bool active = false, int transitionTime = 0)
         {            
-            var button = new Button(ui, x, y, sizeButton, sizeButton, "", UIConfig.ActiveColor, Color.Zero, activeTexture != null ? ui.Game.Content.Load<DiscTexture>(activeTexture) : null, inactiveTexture != null ? ui.Game.Content.Load<DiscTexture>(inactiveTexture) : null, null, active, transitionTime)
+            var button = new Button(ui, x, y, sizeButton, sizeButton, "", UIConfig.ActiveColor, UIConfig.InactiveColor, activeTexture != null ? ui.Game.Content.Load<DiscTexture>(activeTexture) : null, inactiveTexture != null ? ui.Game.Content.Load<DiscTexture>(inactiveTexture) : null, null, active, transitionTime)
             {
                 //                Border = 1,
                 TextAlignment = Alignment.MiddleCenter,
@@ -224,7 +224,7 @@ namespace FusionUI.UI
                 Text = currentStep,
                 ImageColor = UIConfig.TimeLineIconColor,
                 ActiveFColor = UIConfig.HighlightTextColor,
-                InactiveFColor = Color.Black,
+                InactiveFColor = UIConfig.HighlightTextColor,
             };
             this.Add(button);
             return button;
