@@ -12,7 +12,9 @@ namespace FusionUI
             Stop
         }
 
-        public TimeState State = TimeState.Stop;
+		public string Name = "";
+
+        public TimeState State { get; protected set; } = TimeState.Stop;
 
         public DateTime CurrentTime;
         public TimeSpan TimeStep = TimeSpan.FromMinutes(60);
