@@ -83,7 +83,7 @@ namespace FusionUI.UI.Elements
         public void SetFromRelativeX(float x)
         {
             XVal = (this.Parent.PaddingLeft - extendedSize / 2 +
-                    x * (this.parent.GetPaddedRectangle().Width - extendedSize));
+                    x * (this.parent.GetPaddedRectangle().Width - extendedSize - Width));
             X = (int)XVal;            
             UpdatePosition();
         }
@@ -99,7 +99,7 @@ namespace FusionUI.UI.Elements
         public float GetRelativeX()
         {
             return MathUtil.Clamp((float)(XVal + extendedSize/2 - this.parent.PaddingLeft) /
-                   (this.parent.GetPaddedRectangle().Width - extendedSize), 0, 1);
+                   (this.parent.GetPaddedRectangle().Width - extendedSize - Width), 0, 1);
         }
 
         public float GetRelativeY()

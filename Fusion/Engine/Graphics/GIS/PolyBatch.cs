@@ -314,7 +314,7 @@ namespace Fusion.Engine.Graphics.GIS
 	    }
 
 
-        public static PolyGisLayer CreateFromContour(Game engine, DVector2[] lonLatRad, Color color, bool usePalette = true, List<DVector2[]> excludeRad = null, TriangulationAlgorithm method = TriangulationAlgorithm.Dwyer)
+        public static PolyGisLayer CreateFromContour(Game engine, DVector2[] lonLatRad, Color color, bool usePalette = true, List<DVector2[]> excludeRad = null, TriangulationAlgorithm method = TriangulationAlgorithm.Dwyer, bool holesCCW = false)
 		{
 			var triangulator = new TriangleNet.Mesh();
 			triangulator.Behavior.Algorithm = method;		    
@@ -342,8 +342,19 @@ namespace Fusion.Engine.Graphics.GIS
 		        {
 		            foreach (var list in excludeRad)
 		            {
-		                var m = list.ToList().Aggregate(DVector2.Zero, (a, b) => a + b / list.Length);
-		                ig.AddPoint(list[0].X, list[0].Y);
+		                //var m = list.ToList().Aggregate(DVector2.Zero, (a, b) => a + b / list.Length);
+		                var p1 = list[0];
+		                var p2 = p1;
+		                for (int pi = 1; (p2 - p1).Length() < float.Epsilon; pi++)
+		                {
+		                    p2 = list[pi];
+		                }
+
+		                var m1 = new DVector3(p1 + p2, 0) / 2 - 0.001 * DVector3.Cross(new DVector3(p2 - p1, 0), DVector3.ForwardLH);
+		                var m2 = new DVector3(p1 + p2, 0) / 2 + 0.001 * DVector3.Cross(new DVector3(p2 - p1, 0), DVector3.ForwardLH);
+		                var m = holesCCW ? m2 : m1;//GeoHelper.IsPointInPolygon(list, (DVector2) m1) ? m1 : m2;
+                        //if (!GeoHelper.IsPointInPolygon(list, (DVector2)m)) Log.Warning("mistake point selected");
+                        ig.AddPoint(list[0].X, list[0].Y);
 		                for (int v = 1; v < list.Length; v++)
 		                {
 		                    ig.AddPoint(list[v].X, list[v].Y);
