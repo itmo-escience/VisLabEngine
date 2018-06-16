@@ -193,7 +193,10 @@ namespace Fusion.Engine.Graphics.GIS
 		        Game.GraphicsDevice.PixelShaderConstants[1] = cb;
             }
 
-			Game.GraphicsDevice.VertexShaderConstants[0] = constBuffer;
+		    cb.SetData (constData);
+            Game.GraphicsDevice.PixelShaderConstants[1] = cb;
+
+            Game.GraphicsDevice.VertexShaderConstants[0] = constBuffer;
 
 			Game.GraphicsDevice.PixelShaderSamplers[0] = Sampler;
 			Game.GraphicsDevice.PixelShaderSamplers[1] = SamplerState.AnisotropicClamp;
