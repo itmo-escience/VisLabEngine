@@ -260,6 +260,7 @@
     <Compile Include="Engine\Graphics\GIS\Concurrent\MessageQueue.MessageInfo.cs" />
     <Compile Include="Engine\Graphics\GIS\DataSystem\MapSources\BingMaps\BaseBingMapsSource.cs" />
     <Compile Include="Engine\Graphics\GIS\DataSystem\MapSources\BingMaps\BingMapSatellite.cs" />
+    <Compile Include="Engine\Graphics\GIS\DataSystem\MapSources\Cartocdn\CartoCdnMap.cs" />
     <Compile Include="Engine\Graphics\GIS\DataSystem\MapSources\MapBox\Dark.cs" />
     <Compile Include="Engine\Graphics\GIS\DataSystem\MapSources\MapBox\DarkV9.cs" />
     <Compile Include="Engine\Graphics\GIS\DataSystem\MapSources\MapBox\LightMap.cs" />
