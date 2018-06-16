@@ -11,6 +11,7 @@ using Fusion.Engine.Graphics.GIS.DataSystem.MapSources.MapBox;
 using Fusion.Engine.Graphics.GIS.DataSystem.MapSources.OpenStreetMaps;
 using Fusion.Engine.Graphics.GIS.DataSystem.MapSources.Projections;
 using Fusion.Engine.Graphics.GIS.DataSystem.MapSources.YandexMaps;
+using Fusion.Engine.Graphics.GIS.DataSystem.MapSources.Cartocdn;
 
 namespace Fusion.Engine.Graphics.GIS
 {
@@ -34,6 +35,7 @@ namespace Fusion.Engine.Graphics.GIS
 			MoiseevMap			= 11,
 			DarkV9				= 12,
 			LightMap			= 13,
+			CartoCdnMap			= 14,
 		}
 
 		public BaseMapSource CurrentMapSource { get; internal set; }
@@ -55,6 +57,7 @@ namespace Fusion.Engine.Graphics.GIS
 			MapSources.Add(new MoiseevMap(Game)			);
 			MapSources.Add(new DarkV9(Game)				);
 			MapSources.Add(new LightMap(Game)			);
+			MapSources.Add(new CartoCdnMap(Game)		);
         }
 
 	    public MapSource CurrentMapSourecEnum;
