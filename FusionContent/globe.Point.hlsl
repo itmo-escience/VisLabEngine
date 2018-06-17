@@ -133,7 +133,7 @@ cbuffer CBColorsStage 	: register(b2) 	{	DotsColorsStruct DotsColors	;	}
 
 
 #if 0
-$ubershader DOTS_WORLDSPACE +ROTATION_ANGLE +TIME
+$ubershader DOTS_WORLDSPACE +ROTATION_ANGLE +TIME|LIFETIME
 $ubershader DOTS_SCREENSPACE +ROTATION_ANGLE
 $ubershader DOTS_PROJSPACE +ROTATION_ANGLE
 #endif
@@ -169,6 +169,12 @@ VS_OUTPUT VSMain ( VS_INPUT v )
 
 #ifdef TIME
 	float timeAlpha = saturate((DotsData.SizeMultTimeAlpha.y - v.Tex1.y)/v.Tex1.z);
+	v.Color.a = v.Color.a * timeAlpha;
+#endif
+
+#ifdef LIFETIME
+	float timeAlpha = 0.0f; 
+	if(DotsData.SizeMultTimeAlpha.y >= v.Tex1.y && DotsData.SizeMultTimeAlpha.y <= v.Tex1.z) timeAlpha = 1.0f;
 	v.Color.a = v.Color.a * timeAlpha;
 #endif
 	

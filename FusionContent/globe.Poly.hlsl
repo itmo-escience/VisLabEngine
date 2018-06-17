@@ -117,6 +117,7 @@ SamplerState	PointSampler	: register(s1);
 #if 0
 $ubershader PIXEL_SHADER VERTEX_SHADER DRAW_HEAT +NO_DEPTH +CULL_NONE
 $ubershader PIXEL_SHADER VERTEX_SHADER DRAW_COLORED +USE_NORMAL +USE_CONST_COLOR +USE_VERT_COLOR +NO_DEPTH +CULL_NONE
+$ubershader PIXEL_SHADER VERTEX_SHADER DRAW_COLORED USE_VERT_COLOR NO_DEPTH CULL_NONE LIFETIME
 $ubershader PIXEL_SHADER VERTEX_SHADER DRAW_TEXTURED +USE_NORMAL +USE_CONST_COLOR
 $ubershader PIXEL_SHADER VERTEX_SHADER XRAY
 $ubershader PIXEL_SHADER VERTEX_SHADER DRAW_TEXTURED NO_DEPTH CULL_NONE USE_PALETTE_COLOR
@@ -150,6 +151,14 @@ VS_OUTPUT VSMain ( VS_INPUT v )
 	double posZ = cPos.z - cameraPos.z;
 
 	float4 wPos = float4(posX, posY, posZ, 1.0f);
+	
+	
+#ifdef LIFETIME
+	float timeAlpha = 0.0f; 
+	if(HeatStage.Data.z >= v.Tex1.y && HeatStage.Data.z <= v.Tex1.z) timeAlpha = 1.0f;
+	v.Color.a = v.Color.a * timeAlpha;
+#endif
+	
 	
 	output.Position	=	mul(wPos, Stage.ViewProj);
 	output.Color	=	v.Color;

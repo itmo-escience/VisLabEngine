@@ -24,6 +24,7 @@ namespace Fusion.Engine.Graphics.GIS
 			ROTATION_ANGLE		= 1 << 2,
 			DOTS_PROJSPACE		= 1 << 3,
 			TIME				= 1 << 4,
+			LIFETIME			= 1 << 5,
 		}
 
 		public int Flags;
