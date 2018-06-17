@@ -184,6 +184,16 @@ namespace FusionUI.UI
             };
         }
 
+        public void SetScroll(float value)
+        {
+            var relativeSize = MaxHeight / RealHeight;  
+            if (relativeSize >= 1 || float.IsNaN(relativeSize)) return;            
+            float rp = value;
+            var p = rp / (1 - relativeSize) * (RealHeight - MaxHeight);            
+            holder.UnitY = -p;
+            holder.UnitY = MathUtil.Clamp (holder.UnitY, Math.Min (MaxHeight - RealHeight, 0), 0);
+        }
+
         protected override void Update(GameTime gameTime)
         {
             base.Update(gameTime);
