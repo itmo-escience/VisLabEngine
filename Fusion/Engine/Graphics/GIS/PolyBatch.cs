@@ -1040,154 +1040,96 @@ namespace Fusion.Engine.Graphics.GIS
 				return;
 			}
 
-			int indexVertex = 0;
-			for (int i = 0; i < lineRad.Length; i++) {
-				var pP = i != 0 ? lineRad[i - 1] : lineRad[lineRad.Length - 2];
+			for (int i = 0; i < lineRad.Length - 1; i++) {
 				var p0 = lineRad[i];
-				var p1 = i != lineRad.Length - 1 ? lineRad[i + 1] : lineRad[1];
+				var p1 = lineRad[i + 1];
 
-				var cPosP = GeoHelper.SphericalToCartesian(pP);
 				var cPos0 = GeoHelper.SphericalToCartesian(p0);
 				var cPos1 = GeoHelper.SphericalToCartesian(p1);
 
 				var normal = DVector3.Normalize(cPos0);
 
-				var forwardDir = DVector3.Normalize(cPos1 - cPos0);
+				var dir = cPos1 - cPos0;
+				var sideVec = DVector3.Normalize(DVector3.Cross(normal, dir));
 
-				var sideForwardVec = DVector3.Normalize(DVector3.Cross(normal, forwardDir));
-
-				var prevDir = DVector3.Normalize(cPos0 - cPosP);
-				var sidePrevVec = DVector3.Normalize(DVector3.Cross(normal, prevDir));
-
-				var angleDot = DVector3.Dot(forwardDir, prevDir);
-
-				if (MathUtil.RadiansToDegrees((float)Math.Acos(angleDot)) > 150) {
-					var leftOffset = sidePrevVec * width;
-					var rightOffset = sideForwardVec * width;
-					var centerOffest = DVector3.Normalize(sideForwardVec + sidePrevVec) * width;
-
-					var finalPosLeft1	= cPos0 - leftOffset;
-					var finalPosRight1	= cPos0 - rightOffset;
-					var finalPosCenter	= cPos0 - centerOffest;
-					var finalPos		= cPos0;
-
-					var lonLatRight1	= GeoHelper.CartesianToSpherical(finalPosRight1);
-					var lonLatLeft1		= GeoHelper.CartesianToSpherical(finalPosLeft1);
-					var lotLatCenter	= GeoHelper.CartesianToSpherical(finalPosCenter);
-					var lotLatFinal		= GeoHelper.CartesianToSpherical(finalPos);
-
-					var p0Ind = vertices.Count;
+				var sideOffset = sideVec * width * 0.5;
 
 
-					vertices.Add(new Gis.GeoPoint
-					{
-						Lon = lotLatFinal.X,
-						Lat = lotLatFinal.Y,
-						Color = color,
-						Tex0 = Vector4.Zero,
-					});
+				// Plane
+				var finalPosRight = cPos0 + sideOffset;
+				var finalPosLeft = cPos0 - sideOffset;
 
-					vertices.Add(new Gis.GeoPoint
-					{
-						Lon = lonLatLeft1.X,
-						Lat = lonLatLeft1.Y,
-						Color = color,
-						Tex0 = Vector4.Zero,
-					});
+				var lonLatRight = GeoHelper.CartesianToSpherical(finalPosRight);
+				var lonLatLeft = GeoHelper.CartesianToSpherical(finalPosLeft);
 
-					vertices.Add(new Gis.GeoPoint
-					{
-						Lon = lotLatCenter.X,
-						Lat = lotLatCenter.Y,
-						Color = color,
-						Tex0 = Vector4.Zero,
-					});
-
-					vertices.Add(new Gis.GeoPoint
-					{
-						Lon = lonLatRight1.X,
-						Lat = lonLatRight1.Y,
-						Color = color,
-						Tex0 = Vector4.Zero,
-					});
-
-
-					var p1Ind = p0Ind + 1;
-					var p2Ind = p0Ind + 2;
-					var p3Ind = p0Ind + 3;
-					var p4Ind = p0Ind + 4;
-					var p5Ind = p0Ind + 5;
-					if (i != lineRad.Length - 1)
-					{
-						indeces.Add(p0Ind);
-						indeces.Add(p1Ind);
-						indeces.Add(p2Ind);
-
-						indeces.Add(p0Ind);
-						indeces.Add(p2Ind);
-						indeces.Add(p3Ind);
-
-						indeces.Add(p0Ind);
-						indeces.Add(p3Ind);
-						indeces.Add(p4Ind);
-
-						indeces.Add(p3Ind);
-						indeces.Add(p4Ind);
-						indeces.Add(p5Ind);
-					}
-				}
-				else
+				vertices.Add(new Gis.GeoPoint
 				{
-					var sideVec = sideForwardVec + sidePrevVec;
+					Lon = lonLatRight.X,
+					Lat = lonLatRight.Y,
+					Color = color,
+					Tex0 = new Vector4(0.0f, 0.0f, 0.0f, 0.0f),
+					Tex1 = parameters
+				});
 
-					var fx = DVector3.Dot(sideForwardVec, sideVec);
+				vertices.Add(new Gis.GeoPoint
+				{
+					Lon = lonLatLeft.X,
+					Lat = lonLatLeft.Y,
+					Color = color,
+					Tex0 = new Vector4(0.0f, 0.0f, 0.0f, 0.0f),
+					Tex1 = parameters
+				});
 
-					if (fx < 0.00001) fx = 1.0f;
+				indeces.Add(i * 2);
+				indeces.Add(i * 2 + 1);
+				indeces.Add((i + 1) * 2);
 
-					sideVec = sideVec / fx;
+				indeces.Add(i * 2 + 1);
+				indeces.Add((i + 1) * 2 + 1);
+				indeces.Add((i + 1) * 2);
 
-					var sideOffset = sideVec * width;
+			}
 
-					// Plane
-					var finalPosRight = cPos0; // + sideOffset;
-					var finalPosLeft = cPos0 - sideOffset;
+			{
+				var p0 = lineRad[lineRad.Length - 1];
+				var p1 = lineRad[lineRad.Length - 2];
 
-					var lonLatRight = GeoHelper.CartesianToSpherical(finalPosRight);
-					var lonLatLeft = GeoHelper.CartesianToSpherical(finalPosLeft);
+				var cPos0 = GeoHelper.SphericalToCartesian(p0);
+				var cPos1 = GeoHelper.SphericalToCartesian(p1);
+
+				var normal = DVector3.Normalize(cPos0);
+
+				var dir = cPos0 - cPos1;
+				var sideVec = DVector3.Normalize(DVector3.Cross(normal, dir));
+
+				var sideOffset = sideVec * width * 0.5;
 
 
-					var p0Ind = vertices.Count;
-					vertices.Add(new Gis.GeoPoint
-					{
-						Lon = lonLatRight.X,
-						Lat = lonLatRight.Y,
-						Color = color,
-						Tex0 = Vector4.Zero,
-					});
+				// Plane
+				var finalPosRight = cPos0 + sideOffset;
+				var finalPosLeft = cPos0 - sideOffset;
 
-					vertices.Add(new Gis.GeoPoint
-					{
-						Lon = lonLatLeft.X,
-						Lat = lonLatLeft.Y,
-						Color = color,
-						Tex0 = Vector4.Zero,
-					});
+				var lonLatRight = GeoHelper.CartesianToSpherical(finalPosRight);
+				var lonLatLeft = GeoHelper.CartesianToSpherical(finalPosLeft);
 
-					var p1Ind = p0Ind + 1;
-					var p2Ind = p0Ind + 2;
-					var p3Ind = p0Ind + 3;
 
-					if (i != lineRad.Length - 1)
-					{
-						indeces.Add(p0Ind);
-						indeces.Add(p1Ind);
-						indeces.Add(p2Ind);
+				vertices.Add(new Gis.GeoPoint
+				{
+					Lon = lonLatRight.X,
+					Lat = lonLatRight.Y,
+					Color = color,
+					Tex0 = new Vector4(0, 0.0f, 0.0f, 0.0f),
+					Tex1 = parameters
+				});
 
-						indeces.Add(p1Ind);
-						indeces.Add(p3Ind);
-						indeces.Add(p2Ind);
-					}
-				}
+				vertices.Add(new Gis.GeoPoint
+				{
+					Lon = lonLatLeft.X,
+					Lat = lonLatLeft.Y,
+					Color = color,
+					Tex0 = new Vector4(0, 1.0f, 0.0f, 0.0f),
+					Tex1 = parameters
+				});
 			}
 		}
 
@@ -1206,12 +1148,6 @@ namespace Fusion.Engine.Graphics.GIS
 
 			ig.AddSegment(lonLatRad.Length - 1, 0);
 			triangulator.Triangulate(ig);
-
-
-			//if (triangulator.Vertices.Count != lonLatRad.Length) {
-			//	//Log.Warning("Vertices count not match");
-			//	//return null;
-			//}
 
 
 			points = new List<Gis.GeoPoint>();
