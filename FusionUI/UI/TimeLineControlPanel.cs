@@ -249,9 +249,9 @@ namespace FusionUI.UI
             base.Update(gameTime);
             if (timeManager != null) timeLine.CurrentTime = timeManager.CurrentTime;
             if(timeLine.timeLabelTime!=null && timeManager!=null)
-                timeLine.timeLabelTime.Text = String.Format("{0:D2}:{1:D2}", timeManager.CurrentTime.Hour, timeManager.CurrentTime.Minute);
+                timeLine.timeLabelTime.Text = timeManager.TimeFunc?.Invoke() ?? String.Format("{0:D2}:{1:D2}", timeManager.CurrentTime.Hour, timeManager.CurrentTime.Minute);
             if (timeLine.timeLabelDate != null && timeManager != null)
-                timeLine.timeLabelDate.Text = String.Format("{0:dd.MM.yyyy}", timeManager.CurrentTime.Date);
+                timeLine.timeLabelDate.Text = timeManager.DateFunc?.Invoke() ?? String.Format("{0:dd.MM.yyyy}", timeManager.CurrentTime.Date);
             if (ShowStartAndEndDate)
             {
                 if (timeManager != null)

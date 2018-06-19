@@ -25,7 +25,8 @@ namespace FusionUI
         public bool IsAutoRewind { set; get; } = true;
 
         private bool resetTimes = false;
-        
+
+        public Func<string> TimeFunc = null, DateFunc = null;
 
         public bool UpdateLayers = true;
 
