@@ -803,6 +803,191 @@ namespace Fusion.Engine.Graphics.GIS
             }
         }
 
+        public static PolyGisLayer CreatePolyFromLineThree(DVector2[] lineRad, double width, bool usePalette = true, Color? color = null)
+        {
+            if (lineRad.Length == 0)
+            {
+                return null;
+            }
+
+            if (color == null) color = Color.White;
+
+            List<Gis.GeoPoint> vertices = new List<Gis.GeoPoint>();
+            List<int> indeces = new List<int>();
+
+            int indexVertex = 0;
+            for (int i = 0; i < lineRad.Length; i++)
+            {
+
+                var pP = i != 0 ? lineRad[i - 1] : lineRad[lineRad.Length - 2];
+                var p0 = lineRad[i];
+                var p1 = i != lineRad.Length - 1 ? lineRad[i + 1] : lineRad[1];
+
+                var cPosP = GeoHelper.SphericalToCartesian(pP);
+                var cPos0 = GeoHelper.SphericalToCartesian(p0);
+                var cPos1 = GeoHelper.SphericalToCartesian(p1);
+
+                var normal = DVector3.Normalize(cPos0);
+
+                var forwardDir = DVector3.Normalize(cPos1 - cPos0);
+
+                var sideForwardVec = DVector3.Normalize(DVector3.Cross(normal, forwardDir));
+
+                var prevDir = DVector3.Normalize(cPos0 - cPosP);
+                var sidePrevVec = DVector3.Normalize(DVector3.Cross(normal, prevDir));
+
+                var angleDot = DVector3.Dot(forwardDir, prevDir);
+
+                if ((MathUtil.RadiansToDegrees((float)Math.Acos(angleDot)) > 150) || (indexVertex == 0) || (i == lineRad.Length - 1))
+                {
+                    var leftOffset = sidePrevVec * width;
+                    var rightOffset = sideForwardVec * width;
+                    var centerOffest = DVector3.Normalize(sideForwardVec + sidePrevVec) * width;
+
+                    var finalPosLeft1 = cPos0 - leftOffset / 2;
+                    var finalPosRight1 = cPos0 - rightOffset / 2;
+                    var finalPosCenter = cPos0 - centerOffest / 2;
+                    var finalPos = cPos0 + centerOffest / 2;
+
+                    var lonLatRight1 = GeoHelper.CartesianToSpherical(finalPosRight1);
+                    var lonLatLeft1 = GeoHelper.CartesianToSpherical(finalPosLeft1);
+                    var lotLatCenter = GeoHelper.CartesianToSpherical(finalPosCenter);
+                    var lotLatFinal = GeoHelper.CartesianToSpherical(finalPos);
+
+                    var p0Ind = vertices.Count;
+
+
+                    vertices.Add(new Gis.GeoPoint
+                    {
+                        Lon = lotLatFinal.X,
+                        Lat = lotLatFinal.Y,
+                        Color = color.Value,
+                        Tex0 = Vector4.Zero,
+                    });
+
+                    vertices.Add(new Gis.GeoPoint
+                    {
+                        Lon = lonLatLeft1.X,
+                        Lat = lonLatLeft1.Y,
+                        Color = color.Value,
+                        Tex0 = Vector4.Zero,
+                    });
+
+                    vertices.Add(new Gis.GeoPoint
+                    {
+                        Lon = lotLatCenter.X,
+                        Lat = lotLatCenter.Y,
+                        Color = color.Value,
+                        Tex0 = Vector4.Zero,
+                    });
+
+                    vertices.Add(new Gis.GeoPoint
+                    {
+                        Lon = lonLatRight1.X,
+                        Lat = lonLatRight1.Y,
+                        Color = color.Value,
+                        Tex0 = Vector4.Zero,
+                    });
+
+
+                    var p1Ind = p0Ind + 1;
+                    var p2Ind = p0Ind + 2;
+                    var p3Ind = p0Ind + 3;
+                    var p4Ind = p0Ind + 4;
+                    var p5Ind = p0Ind + 5;
+                    if (i != lineRad.Length - 1)
+                    {
+                        indeces.Add(p0Ind);
+                        indeces.Add(p1Ind);
+                        indeces.Add(p2Ind);
+
+                        indeces.Add(p0Ind);
+                        indeces.Add(p2Ind);
+                        indeces.Add(p3Ind);
+
+                        indeces.Add(p0Ind);
+                        indeces.Add(p3Ind);
+                        indeces.Add(p4Ind);
+
+                        indeces.Add(p3Ind);
+                        indeces.Add(p4Ind);
+                        indeces.Add(p5Ind);
+                    }
+                }
+                else
+                {
+                    var sideVec = sideForwardVec + sidePrevVec;
+
+                    var fx = DVector3.Dot(sideForwardVec, sideVec);
+
+                    if (fx < 0.00001) fx = 1.0f;
+
+                    sideVec = sideVec / fx;
+
+                    var sideOffset = sideVec * width;
+
+                    // Plane
+                    var finalPosRight = cPos0 + sideOffset / 2;
+                    var finalPosLeft = cPos0 - sideOffset / 2;
+
+                    var lonLatRight = GeoHelper.CartesianToSpherical(finalPosRight);
+                    var lonLatLeft = GeoHelper.CartesianToSpherical(finalPosLeft);
+
+
+                    var p0Ind = vertices.Count;
+                    vertices.Add(new Gis.GeoPoint
+                    {
+                        Lon = lonLatRight.X,
+                        Lat = lonLatRight.Y,
+                        Color = color.Value,
+                        Tex0 = Vector4.Zero,
+                    });
+
+                    vertices.Add(new Gis.GeoPoint
+                    {
+                        Lon = lonLatLeft.X,
+                        Lat = lonLatLeft.Y,
+                        Color = color.Value,
+                        Tex0 = Vector4.Zero,
+                    });
+
+                    var p1Ind = p0Ind + 1;
+                    var p2Ind = p0Ind + 2;
+                    var p3Ind = p0Ind + 3;
+
+                    if (i != lineRad.Length - 1)
+                    {
+                        indeces.Add(p0Ind);
+                        indeces.Add(p1Ind);
+                        indeces.Add(p2Ind);
+
+                        indeces.Add(p1Ind);
+                        indeces.Add(p3Ind);
+                        indeces.Add(p2Ind);
+                    }
+                }
+            }
+
+            if (usePalette)
+            {
+                return new PolyGisLayer(Game.Instance, vertices.ToArray(), indeces.ToArray(), false)
+                {
+                    Flags = (int)(PolyFlags.NO_DEPTH | PolyFlags.DRAW_TEXTURED | PolyFlags.CULL_NONE |
+                                   PolyFlags.VERTEX_SHADER | PolyFlags.PIXEL_SHADER | PolyFlags.USE_PALETTE_COLOR),
+                    Sampler = SamplerState.AnisotropicWrap
+                };
+            }
+            else
+            {
+                return new PolyGisLayer(Game.Instance, vertices.ToArray(), indeces.ToArray(), false)
+                {
+                    Flags = (int)(PolyFlags.NO_DEPTH | PolyFlags.DRAW_COLORED | PolyFlags.CULL_NONE |
+                                  PolyFlags.VERTEX_SHADER | PolyFlags.PIXEL_SHADER | PolyFlags.USE_VERT_COLOR),
+                    Sampler = SamplerState.AnisotropicWrap
+                };
+            }
+        }
+
         public static PolyGisLayer CreateFromUtmFbxModel(Game engine, string fileName)
 		{
 			var scene = engine.Content.Load<Scene>(fileName);
