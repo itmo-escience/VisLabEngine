@@ -6,6 +6,7 @@ sprites/*.tga
 
 [BinaryDirectories]
 ..\..\..\..\..\Tools
+..\..\..\..\..\FusionEngine\x64\Release
 
 [ContentDirectories]
 ..\..\..\..\..\FusionContent
