@@ -988,7 +988,7 @@ namespace Fusion.Engine.Graphics.GIS
             }
         }
 
-        public static PolyGisLayer CreateFromUtmFbxModel(Game engine, string fileName)
+        public static PolyGisLayer CreateFromUtmFbxModel(Game engine, string fileName, float heightMult = 1.0f)
 		{
 			var scene = engine.Content.Load<Scene>(fileName);
 
@@ -1057,14 +1057,14 @@ namespace Fusion.Engine.Graphics.GIS
 					lon = DMathUtil.DegreesToRadians(lon) + 0.0000068;
 					lat = DMathUtil.DegreesToRadians(lat) + 0.0000113;
 
-					cartPoints.Add(DVector3.TransformCoordinate(GeoHelper.SphericalToCartesian(new DVector2(lon, lat), GeoHelper.EarthRadius + worldPos.Y / 1000.0), worldBasisInvert).ToVector3());
+					cartPoints.Add(DVector3.TransformCoordinate(GeoHelper.SphericalToCartesian(new DVector2(lon, lat), GeoHelper.EarthRadius + heightMult * worldPos.Y / 1000.0), worldBasisInvert).ToVector3());
 
 					var point = new Gis.GeoPoint {
 						Lon		= lon,
 						Lat		= lat,
 						Color	= vert.Color0,
 						Tex0	= new Vector4(norm.ToVector3(), 0),
-						Tex1	= new Vector4(0,0,0, (float)(worldPos.Y/1000.0))
+						Tex1	= new Vector4(0,0,0, (float)(heightMult * worldPos.Y/1000.0))
 					};
 					//point.Color.Alpha = 0.5f;
 					points.Add(point);
