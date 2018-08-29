@@ -394,7 +394,17 @@ void Native::Fbx::FbxLoader::HandleMesh( Fusion::Engine::Graphics::Scene ^scene,
 		}
 
 	} else {
-		throw gcnew Exception( string::Format( "Mesh does not contain material mapping" ) );
+		Fusion::Engine::Graphics::MaterialRef	^mtrl = gcnew Fusion::Engine::Graphics::MaterialRef();
+		scene->Materials->Add(mtrl);
+		int ind = mtrlMap->Count;
+		mtrlMap[ind] = scene->Materials->Count - 1;
+
+		for (int i = 0; i < lPolygonCount; i++) {
+			int i0 = nodeMesh->Triangles[i].Index0;
+			int i1 = nodeMesh->Triangles[i].Index1;
+			int i2 = nodeMesh->Triangles[i].Index2;
+			nodeMesh->Triangles[i] = Fusion::Engine::Graphics::MeshTriangle(i0, i1, i2, ind);
+		}
 	}
 }
 
