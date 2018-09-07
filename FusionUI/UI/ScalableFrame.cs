@@ -114,7 +114,9 @@ namespace FusionUI.UI
                 return ApplicationInterface.Instance.LangManager.GetString(DefaultText,
                     ApplicationInterface.Instance.CurrentCulture).Replace("\\n", "\n").Replace("\\t", "\t");
             }
-            catch (MissingManifestResourceException e)
+
+            catch (Exception e)
+
             {
                 return DefaultText;
             }
@@ -128,7 +130,7 @@ namespace FusionUI.UI
                 text = TryLoadResource && ApplicationInterface.Instance.LangManager != null ? ApplicationInterface.Instance.LangManager.GetString(DefaultText,
                     ApplicationInterface.Instance.CurrentCulture).Replace("\\n", "\n").Replace("\\t", "\t") : DefaultText;
             }
-            catch (MissingManifestResourceException e)
+            catch (Exception e)
             {
                 //if (!string.IsNullOrWhiteSpace(DefaultText) && !double.TryParse(DefaultText, out var n)) Log.Warning("Missing translation for string \"{0}\"", DefaultText);
                 text = DefaultText;

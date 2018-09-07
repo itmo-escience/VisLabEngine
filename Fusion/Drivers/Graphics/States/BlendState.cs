@@ -25,11 +25,12 @@ namespace Fusion.Drivers.Graphics {
 		public	int				MultiSampleMask	{ get; set; }
 		public	Color4			BlendFactor		{ get; set; }
 
-
+        
 		public static  BlendState	Opaque			 { get; private set; }
 		public static  BlendState	NoWrite			 { get; private set; }
 		public static  BlendState	AlphaBlend		 { get; private set; }
-		public static  BlendState	AlphaBlendPremul { get; private set; }
+	    public static BlendState AlphaBlendKeepDstAlpha { get; private set; }
+        public static  BlendState	AlphaBlendPremul { get; private set; }
 		public static  BlendState	AlphaMaskWrite	 { get; private set; }
 		public static  BlendState	Additive		 { get; private set; }
 		public static  BlendState	Screen			 { get; private set; }
@@ -43,8 +44,9 @@ namespace Fusion.Drivers.Graphics {
 		{
 			Opaque				=	Create();
 			NoWrite				=	Create( ColorChannels.None ); 
-			AlphaBlend			=	Create( ColorChannels.All,	Blend.SrcAlpha,		Blend.InvSrcAlpha	);
-			AlphaBlendPremul	=	Create( ColorChannels.All,	Blend.One,			Blend.InvSrcAlpha	);						
+			AlphaBlend			=	Create( ColorChannels.All,	Blend.SrcAlpha,	Blend.InvSrcAlpha );
+		    AlphaBlendKeepDstAlpha = Create( ColorChannels.All, Blend.SrcAlpha, Blend.InvSrcAlpha, Blend.Zero, Blend.One);
+            AlphaBlendPremul	=	Create( ColorChannels.All,	Blend.One,			Blend.InvSrcAlpha	);						
 			AlphaMaskWrite		=	Create( ColorChannels.Alpha );
 			AlphaOnly			=	Create( ColorChannels.Alpha );
 			Additive			=	Create( ColorChannels.All,	Blend.One,			Blend.One,			Blend.One, Blend.One );	

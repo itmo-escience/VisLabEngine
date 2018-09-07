@@ -91,7 +91,7 @@ namespace FusionUI.UI.Plots2_0
         private bool isLoaded = false;
 
         public bool IsBarChart = false;
-
+        public bool FixLimits = true;
         public bool IsLoaded
         {
             get { return isLoaded; }
@@ -146,14 +146,14 @@ namespace FusionUI.UI.Plots2_0
             {
                 ld.Top = Math.Min(ld.Top, 0);
             }
-            //if (IsBarChart)
-            //{
+            if (FixLimits)
+            {
                 ld.Left -= 1;
                 ld.Width += 1;
                 var h = ld.Height;
                 ld.Top -=  h * 0.1f;
                 ld.Bottom += h * 0.1f;
-            //}
+            }
             ld.Width = Math.Max(ld.Width, float.Epsilon);
             ld.Height = Math.Max(ld.Height, float.Epsilon);
             LimitsByDepth[depth] = ld;            
@@ -345,12 +345,14 @@ namespace FusionUI.UI.Plots2_0
                     var rect = ans.Value;
                     rect.Width = Math.Max(rect.Width, float.Epsilon);
                     rect.Height = Math.Max(rect.Height, float.Epsilon);
-                    //if (IsBarChart)
-                    //{
+                    if (IsBarChart)
+                    {
                     //    rect.Left -= 1;
                     //    rect.Width += 2;
-                    //    rect.Height *= 1.1f;
-                    //}
+                        var h = rect.Height;
+                        if (rect.Bottom > 0) rect.Bottom += h * 0.1f;
+                        if (rect.Top < 0) rect.Top -= h * 0.1f;
+                    }
                     return rect;
                 }
                 return RectangleD.Empty;                

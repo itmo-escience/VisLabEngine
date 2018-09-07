@@ -160,7 +160,7 @@ namespace FusionUI.UI.Factories
                 UnitWidthControlElement = 4,
                 UnitHeightControlElement = UIConfig.UnitSliderObjectHeight,
                 Image = ui.Game.Content.Load<DiscTexture>(imageSlider ?? @"UI-new\fv-icons_slider"),
-                IsVertical = IsVertical,
+                IsVertical = IsVertical,                
             };
             holder.UnitHeight = labelFrame.UnitHeight + slider.UnitHeight;
             if (showValue)

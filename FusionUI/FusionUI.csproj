@@ -80,6 +80,9 @@
     <Compile Include="UI\Elements\DropDown\DropDownSelectorTextureRow.cs" />
     <Compile Include="UI\Elements\DropDown\SelectorList.cs" />
     <Compile Include="UI\Elements\Editbox.cs" />
+    <Compile Include="UI\Elements\GraphRenderTargetGraph.cs" />
+    <Compile Include="UI\Elements\GisRenderTargtDraw.cs" />
+    <Compile Include="UI\Elements\RenderTargetDraw.cs" />
     <Compile Include="UI\Elements\TextFormatting\FormatTextBlock.Tags.cs" />
     <Compile Include="UI\Elements\Label.cs" />
     <Compile Include="UI\Elements\Legenda\ILegend.cs" />
@@ -127,12 +130,14 @@
     <Compile Include="UI\LayoutFrame.cs" />
     <Compile Include="UI\MainFrame.cs" />
     <Compile Include="UI\Plots2_0\HeatCanvas.cs" />
+    <Compile Include="UI\Plots2_0\ViolinCanvas.cs" />
     <Compile Include="UI\Plots2_0\PlotCanvas.cs" />
     <Compile Include="UI\Plots2_0\PlotData.cs" />
     <Compile Include="UI\Plots2_0\PlotLegend.cs" />
     <Compile Include="UI\Plots2_0\PlotScale.cs" />
     <Compile Include="UI\Plots2_0\PlotTree.cs" />
     <Compile Include="UI\Plots2_0\PlotViewer.cs" />
+    <Compile Include="UI\Plots2_0\ViolinScale.cs" />
     <Compile Include="UI\Plots\Plot.cs" />
     <Compile Include="UI\Plots\PlotData.cs" />
     <Compile Include="UI\Plots\PlotLegend.cs" />

@@ -30,6 +30,57 @@ namespace FusionUI.UI.Plots2_0
         NotWriteNumbersX = 4096,
     }
 
+    public class CatScale : PlotScale
+    {
+        public CatScale(FrameProcessor ui, PlotCanvas plotWindow) : base(ui, plotWindow)
+        {
+        }
+
+        public override double StepX => 1;        
+
+        protected override float offsetX => 0.5f;
+        protected override float offsetY => 0.0f;
+
+        public override RectangleD Limits
+        {
+            get
+            {
+                var pds = PlotData.Where(a => a != null).ToList();
+                if (pds.Count() == 0) return RectangleD.Empty;                
+                var lim = new RectangleD()
+                {
+                    Left = pds[0].ActiveDepths.Any() ? pds[0].ActiveDepths.Min() : 0,
+                    Right = pds[0].ActiveDepths.Any() ? pds[0].ActiveDepths.Max() : 1,
+                    Top = pds[0].Limits.Left,
+                    Bottom = pds[0].Limits.Right,
+                };
+                for (int i = 1; i < pds.Count(); i++)
+                {
+                    lim = RectangleD.Union(lim, new RectangleD()
+                    {
+                        Left = pds[i].ActiveDepths.Any() ? pds[i].Depths.Min() : 0,
+                        Right = pds[1].ActiveDepths.Any() ? pds[i].Depths.Max() : 1,
+                        Top = pds[i].Limits.Left,
+                        Bottom = pds[i].Limits.Right,
+                    });
+                }
+
+                lim.Left = Math.Ceiling(lim.Left);
+                lim.Right = Math.Ceiling(lim.Right) + 1;
+                var h = lim.Height;
+                //lim.Bottom += lim.Height * 0.125;
+                //lim.Top += lim.Height * 0.125;
+                return new RectangleD()
+                {
+                    Left = DMathUtil.Lerp(lim.Left, lim.Right, Plot.ScaleRect.Left),
+                    Right = DMathUtil.Lerp(lim.Left, lim.Right, Plot.ScaleRect.Right),
+                    Top = DMathUtil.Lerp(lim.Bottom, lim.Top, Plot.ScaleRect.Bottom),
+                    Bottom = DMathUtil.Lerp(lim.Bottom, lim.Top, Plot.ScaleRect.Top),
+                };
+            }
+        }
+    }
+
     public class HeatScale : PlotScale
     {
         public HeatScale(FrameProcessor ui, PlotCanvas plotWindow) : base(ui, plotWindow)
@@ -140,7 +191,7 @@ namespace FusionUI.UI.Plots2_0
                     return;
                 }
                 int ind = PredefinedStepsX.BinarySearch(st);
-                if (ind <= 0)
+                if (ind < 0)
                 {
                     ind = ~ind;
                     if (ind == 0)
@@ -165,7 +216,7 @@ namespace FusionUI.UI.Plots2_0
                 }
                 else
                 {
-                    StepX = PredefinedStepsX[ind - 1]; // IMPOSIBURU!
+                    StepX = PredefinedStepsX[ind]; // IMPOSIBURU!
                 }
             }
         }
@@ -187,7 +238,7 @@ namespace FusionUI.UI.Plots2_0
                     return;
                 }
                 int ind = predefinedStepsY.BinarySearch(st);
-                if (ind <= 0)
+                if (ind < 0)
                 {
                     if (ind != 0) ind = ~ind;
                     if (ind == 0)
@@ -212,7 +263,7 @@ namespace FusionUI.UI.Plots2_0
                 }
                 else
                 {
-                    StepY = predefinedStepsY[ind - 1]; // IMPOSIBURU!
+                    StepY = predefinedStepsY[ind]; // IMPOSIBURU!
                 }
                 //bottomValue = (float) (Math.Floor(bottomValue / StepY) * StepY);
                 //topValue = (float) (bottomValue + Math.Ceiling((MaxY - bottomValue) / StepY) * StepY);
@@ -247,12 +298,14 @@ namespace FusionUI.UI.Plots2_0
             Y = -parent.GlobalRectangle.Y;
             Width = ui.RootFrame.GlobalRectangle.Width;
             Height = ui.RootFrame.GlobalRectangle.Height;
+            if ((Settings & ScaleParams.DrawScaleX) != 0)
+            {
+                DrawHorizontal(gameTime, sb, clipRectIndex);
+            }
             if ((Settings & ScaleParams.DrawScaleY) != 0) {
                 DrawVertical (gameTime, sb, clipRectIndex);
             }
-            if ((Settings & ScaleParams.DrawScaleX) != 0) {
-                DrawHorizontal (gameTime, sb, clipRectIndex);
-            }
+
         }
 
         protected virtual float offsetX => 0;

@@ -58,7 +58,7 @@ namespace Fusion.Engine.Graphics.Graph {
 		/// Returns normalized random vector with X=0
 		/// </summary>
 		/// <returns></returns>
-		public Vector3 RadialRandomVector()
+		public static Vector3 RadialRandomVector()
 		{
 			Vector2 r;
 			do

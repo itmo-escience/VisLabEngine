@@ -36,6 +36,7 @@ namespace Fusion.Engine.Graphics.Graph
 
         //Node texture
         Texture2D	texture;
+        Texture2D linkTexture;
         Ubershader	shader;
 
 
@@ -70,9 +71,9 @@ namespace Fusion.Engine.Graphics.Graph
         enum Flags
         {
             // for geometry shader:
-            POINT	= 0x1 << 5,
-            LINE	= 0x1 << 6,
-            DRAW	= 0x1 << 7,
+            POINT	= 0x1 << 1,
+            LINE	= 0x1 << 2,
+            DRAW	= 0x1 << 3,
         }
 
 
@@ -118,7 +119,8 @@ namespace Fusion.Engine.Graphics.Graph
         /// </summary>
         public void Initialize()
         {
-            texture	= Game.Content.Load<Texture2D>("Graph/node");            
+            texture	= Game.Content.Load<Texture2D>("Graph/node");
+            linkTexture = Game.Content.Load<Texture2D>("Graph/arrow");
             shader = Game.Content.Load<Ubershader>(ShaderPath);
 			factory	= new StateFactory( shader, typeof(Flags), (ps,i) => Enum( ps, (Flags)i ) );
 
@@ -159,20 +161,26 @@ namespace Fusion.Engine.Graphics.Graph
 		{
 			ps.Primitive			=	Primitive.PointList; //принимает точки
 			ps.RasterizerState		=	RasterizerState.CullNone; //без разницы по или против часовой стрелки
-			if (flag.HasFlag(Flags.LINE)) {
-				ps.BlendState = BlendState.AlphaBlend; //режим смешивания
-				ps.DepthStencilState = DepthStencilState.Readonly;
-			}
-			if (flag.HasFlag(Flags.POINT)) {
-				ps.BlendState = BlendState.Opaque;
-				ps.DepthStencilState = DepthStencilState.Default;
-			}	
-		}
+
+            //if (flag.HasFlag(Flags.LINE))
+            //{
+                ps.BlendState = BlendState.AlphaBlendKeepDstAlpha; //режим смешивания
+                ps.DepthStencilState = DepthStencilState.Readonly;
+                Log.Message("LINE");
+            //}
+            //if (flag.HasFlag(Flags.POINT))
+            //{
+            //    ps.BlendState = BlendState.Opaque;
+            //    ps.DepthStencilState = DepthStencilState.Default;
+            //    Log.Message("Point");
+            //}
+        }
 
         public void Pause()
         {
 	        State = State == State.RUN ? State.PAUSE : State.RUN;
         }
+
 
 		//добавляем сразу все вершины
 	    public void AddMaxParticles()
@@ -205,7 +213,7 @@ namespace Fusion.Engine.Graphics.Graph
 		        ParticlesCpu[i].LinksPtr	= linksCounter;
 		        ParticlesCpu[i].LinksCount	= linkPtrLists[i].Count;
 
-		        ParticlesCpu[i].Mass = linkPtrLists[i].Count == 0 ? 15 : linkPtrLists[i].Count;
+		        //ParticlesCpu[i].Mass = linkPtrLists[i].Count == 0 ? 15 : linkPtrLists[i].Count;
 
 				Array.Copy(linkPtrLists[i].ToArray(), 0, linksPtrsCpu, linksCounter, linkPtrLists[i].Count);
 		        linksCounter += linkPtrLists[i].Count;
@@ -256,9 +264,9 @@ namespace Fusion.Engine.Graphics.Graph
         /// <param name="disposing"></param>
         public void Dispose()
         {
-			ParamsCb.Dispose();
-			ParticlesGpu.Dispose();
-			LinksGpu.Dispose();
+			ParamsCb?.Dispose();
+			ParticlesGpu?.Dispose();
+			LinksGpu?.Dispose();
         }
 
 
@@ -390,23 +398,29 @@ namespace Fusion.Engine.Graphics.Graph
             //
 			device.SetCSRWBuffer(0, null);
 
-			// draw lines: --------------------------------------------------------------------------
-			//рисуем сначала линии
-			//линии и вершины по сути одно и тоже (прямоугольник)
-			device.PipelineState = factory[(int)Flags.DRAW | (int)Flags.LINE];
+
+			
 			device.GeometryShaderResources[1] = ParticlesGpu;
 			device.GeometryShaderResources[3] = LinksGpu;
 	        device.PixelShaderSamplers[0]	= SamplerState.LinearWrap;
 	        device.PixelShaderResources[0]	= texture;
+            device.PixelShaderResources[2] = linkTexture;
 
-			device.Draw(LinksCpu.Length, 0);
-
+            // draw lines: --------------------------------------------------------------------------
+            //рисуем сначала линии
+            //линии и вершины по сути одно и тоже (прямоугольник)
+            device.PipelineState = factory[(int)Flags.DRAW | (int)Flags.LINE];
+            device.Draw(LinksCpu.Length, 0);
 
             // draw points: ------------------------------------------------------------------------
-			//а теперь вершины
+            //а теперь вершины
             device.PipelineState = factory[(int)Flags.DRAW | (int)Flags.POINT];
-	
             device.Draw(ParticlesCpu.Length, 0);
+
+           
+
+
+
         }
     }
 }

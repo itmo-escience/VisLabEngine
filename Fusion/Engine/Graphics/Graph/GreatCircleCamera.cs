@@ -41,22 +41,32 @@ namespace Fusion.Engine.Graphics.Graph
 			FreeCamFov = 70.0f;
 			FreeCamZNear = 0.1f;
 			FreeCamZFar = 60000;
+
+		    Game.Instance.RenderSystem.DisplayBoundsChanged += (sender, args) =>
+		    {
+		        if (CameraToScreen)
+		        {
+		            Height = Game.Instance.RenderSystem.DisplayBounds.Height;
+		            Width = Game.Instance.RenderSystem.DisplayBounds.Width;
+                }		       
+		    };
 		}
 
-
-		public void Update(GameTime gameTime)
+	    public float CameraSpeed = 10;	    
+        public float Height = Game.Instance.RenderSystem.DisplayBounds.Height;
+	    public float Width = Game.Instance.RenderSystem.DisplayBounds.Width;
+	    public bool CameraToScreen = true;
+        public void Update(GameTime gameTime)
 		{
-			CenterOfOrbit = Vector3.Lerp(CenterOfOrbit, TargetCenterOfOrbit, gameTime.ElapsedSec);
+			CenterOfOrbit = Vector3.Lerp(CenterOfOrbit, TargetCenterOfOrbit, gameTime.ElapsedSec * CameraSpeed);
 
 			var pos = new Vector3(Altitude, 0, 0);
 			var newUp = Vector3.Transform(up, quat);
 			pos = Vector3.Transform(pos, quat);
 
-			var cameraLocation = CenterOfOrbit + pos;
-			float height = Game.Instance.RenderSystem.DisplayBounds.Height;
-			float width = Game.Instance.RenderSystem.DisplayBounds.Width;
+			var cameraLocation = CenterOfOrbit + pos;			
 
-			SetupCameraFov(cameraLocation, CenterOfOrbit, newUp, FreeCamFov, FreeCamZNear, FreeCamZFar, 1.0f, 1.0f, (float) width / height);		
+			SetupCameraFov(cameraLocation, CenterOfOrbit, newUp, FreeCamFov, FreeCamZNear, FreeCamZFar, 1.0f, 1.0f, (float) Width / Height);		
 		}
 
 
@@ -77,7 +87,7 @@ namespace Fusion.Engine.Graphics.Graph
 
 		public void MoveCamera(Vector2 mouseOffset)
 		{
-			TargetCenterOfOrbit  += new Vector3(0, -mouseOffset.X, mouseOffset.Y);
+			TargetCenterOfOrbit  += new Vector3(0, -mouseOffset.X, mouseOffset.Y) * Altitude / 10000;
 		}
 
 	}

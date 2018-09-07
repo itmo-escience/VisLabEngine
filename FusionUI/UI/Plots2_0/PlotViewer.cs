@@ -143,6 +143,7 @@ namespace FusionUI.UI.Plots2_0
                     scales[name].CaptionsColor = scaleFontColor;
                     if (variable.Value.Depths.Count == 1)
                     {
+                        Plot.DataContainer.RepairColors();
                         scales[name].LineColor = variable.Value.Data.Values.First().Values.First().ColorsByDepth.First()
                             .Value;
                     }

@@ -138,7 +138,7 @@ namespace FusionUI.UI.Plots
                     return;
                 }
                 int ind = predefinedSteps.BinarySearch(st);
-                if (ind <= 0)
+                if (ind < 0)
                 {
                     if (ind != 0) ind = ~ind;
                     if (ind == 0)
@@ -163,7 +163,7 @@ namespace FusionUI.UI.Plots
                 }
                 else
                 {
-                    stepY = predefinedSteps[ind - 1]; // IMPOSIBURU!
+                    stepY = predefinedSteps[ind]; // IMPOSIBURU!
                 }
                 bottomValue = (float) (Math.Floor(bottomValue / stepY) * stepY);
                 topValue = (float) (bottomValue + Math.Ceiling((MaxY - bottomValue) / stepY) * stepY);
@@ -199,7 +199,7 @@ namespace FusionUI.UI.Plots
                             stepX = predefinedSteps[ind];
                     }
                 } else {
-                    stepX = predefinedSteps[ind-1]; // IMPOSIBURU!
+                    stepX = predefinedSteps[ind]; // IMPOSIBURU!
                 }
                 leftValue = (float)(Math.Floor (leftValue / stepX) * stepX);
                 rightValue = (float)(leftValue + Math.Ceiling ((MaxX - leftValue) / stepX) * stepX);

@@ -149,6 +149,7 @@ namespace FusionUI.UI
         public override void Clear(Frame frame)
         {
             holder.Clear(frame);
+            base.Clear(frame);
         }
 
 	    public void HideWindow()

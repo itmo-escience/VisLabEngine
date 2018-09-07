@@ -57,7 +57,7 @@ namespace Fusion.Engine.Graphics {
 		/// <param name="width"></param>
 		/// <param name="height"></param>
 		/// <param name="format"></param>
-		internal TargetTexture ( RenderTarget2D renderTarget )
+		public TargetTexture ( RenderTarget2D renderTarget )
 		{
 			createdFromRT	=	true;
 
