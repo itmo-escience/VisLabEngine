@@ -74,6 +74,7 @@
     <Compile Include="UI\Elements\Button.cs" />
     <Compile Include="UI\Elements\Checkbox.cs" />
     <Compile Include="UI\Elements\ConfirmWindow.cs" />
+    <Compile Include="UI\Elements\ConnectorArrow.cs" />
     <Compile Include="UI\Elements\DropDown\DropDownSelector.cs" />
     <Compile Include="UI\Elements\DropDown\DropDownSelectorRow.cs" />
     <Compile Include="UI\Elements\DropDown\DropDownSelectorTextRow.cs" />

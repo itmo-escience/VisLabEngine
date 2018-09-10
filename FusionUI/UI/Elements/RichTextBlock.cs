@@ -189,7 +189,7 @@ namespace FusionUI.UI
                     ForeColor, clipRectIndex, 0, false);
                 textOffset += this.Font.LineHeight + OffsetLine;
             }
-            this.Height = !IsShortText ? textOffset : BaseHeight;
+            this.Height = Math.Max(!IsShortText ? textOffset : BaseHeight, MinHeight);
         }
     }
 }
