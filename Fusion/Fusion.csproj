@@ -196,6 +196,7 @@
     <Compile Include="Drivers\Graphics\Collections\ConstantBufferCollection.cs" />
     <Compile Include="Drivers\Graphics\Collections\SamplerStateCollection.cs" />
     <Compile Include="Drivers\Graphics\Collections\ShaderResourceCollection.cs" />
+    <Compile Include="Drivers\Graphics\Display\WpfDisplay.cs" />
     <Compile Include="Drivers\Graphics\GraphicsResource.cs" />
     <Compile Include="Drivers\Graphics\Pix.cs" />
     <Compile Include="Drivers\Graphics\Resources\FormattedBuffer.cs" />

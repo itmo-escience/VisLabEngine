@@ -248,10 +248,6 @@ namespace Fusion.Engine.Common {
 		/// <summary>
 		/// 
 		/// </summary>
-		/// <param name="p"></param>
-		/// <param name="sv"></param>
-		/// <param name="cl"></param>
-		/// <param name="gi"></param>
 		public void Run ()
 		{
 			InitInternal();

@@ -97,6 +97,9 @@ namespace Fusion.Engine.Graphics {
 		}
 
 
+		public Viewport? GlobeViewport { set; get; }
+
+
 		internal DepthStencil2D GlobeDepthStencil;
 
 
@@ -153,12 +156,14 @@ namespace Fusion.Engine.Graphics {
 				rs.Device.Clear( targetSurface, ClearColor );
 			}
 
-			var viewport	=	new Viewport( 0,0, targetSurface.Width, targetSurface.Height );
+			var viewport = GlobeViewport ?? new Viewport( 0,0, targetSurface.Width, targetSurface.Height );
 
 
 			if (GisLayers.Any() || GraphLayers.Any()) {
 				SetTargets(targetSurface);
-				
+
+				Game.GraphicsDevice.SetViewport(viewport);
+
 				//	Render GIS stuff :
 				RenderGIS(gameTime, stereoEye, viewport, targetSurface);
 				// Render Graph stuff :
