@@ -12,7 +12,7 @@ using ContainmentType = Fusion.Engine.Graphics.GIS.GlobeMath.ContainmentType;
 
 namespace Fusion.Engine.Graphics.GIS
 {
-    partial class TilesBatchNew
+    partial class TilesAtlasLayer
     {
         int lowestLod = 9;
         int minLod = 3;
@@ -75,7 +75,7 @@ namespace Fusion.Engine.Graphics.GIS
                 return tile.IsLoaded;
             }
 
-            public HashSet<NodeInfo> RequestSplit(TilesBatchNew tileSystem)
+            public HashSet<NodeInfo> RequestSplit(TilesAtlasLayer tileSystem)
             {
                 var ret = new HashSet<NodeInfo>();
                 if (tlChild == null) ret.Add(tlChild = new NodeInfo()

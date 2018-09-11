@@ -328,7 +328,7 @@
     <Compile Include="Engine\Graphics\Sprites\SpriteDrawer.cs" />
     <Compile Include="Engine\Graphics\Sprites\SpriteLayerCollection.cs" />
     <Compile Include="Engine\Graphics\SurfaceFlags.cs" />
-    <Compile Include="Engine\Graphics\GIS\TilesBatchNew.cs" />
+    <Compile Include="Engine\Graphics\GIS\TilesAtlasLayer.cs" />
     <Compile Include="Engine\Graphics\Utils\DebugLayer.cs" />
     <Compile Include="Engine\Graphics\Utils\DebugRender.cs" />
     <Compile Include="Engine\Graphics\Utils\DebugRenderConfig.cs" />

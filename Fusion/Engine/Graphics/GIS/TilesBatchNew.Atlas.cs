@@ -11,7 +11,7 @@ using Fusion.Engine.Graphics.GIS.DataSystem.MapSources;
 
 namespace Fusion.Engine.Graphics.GIS
 {
-    partial class TilesBatchNew
+    partial class TilesAtlasLayer
     {
 
         #region TileAtlas

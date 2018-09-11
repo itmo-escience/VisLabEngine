@@ -15,7 +15,7 @@ using Keys = Fusion.Engine.Input.Keys;
 
 namespace Fusion.Engine.Graphics.GIS
 {
-    public partial class TilesBatchNew : Gis.GisLayer
+    public partial class TilesAtlasLayer : Gis.GisLayer
     {        
         Ubershader shader;
         StateFactory factory;
@@ -51,7 +51,7 @@ namespace Fusion.Engine.Graphics.GIS
 
         private int tilesLimit => TileAtlasContainer.MaxTiles;
 
-        public TilesBatchNew(Game engine, GlobeCamera camera) : base(engine)
+        public TilesAtlasLayer(Game engine, GlobeCamera camera) : base(engine)
         {
             RegisterMapSources();
             maxTilesToRender = 0;
@@ -112,9 +112,9 @@ namespace Fusion.Engine.Graphics.GIS
                     var tile = TileContainer.AddTile(
                         CurrentMapSource.GetTile(globeTile.Value.X, globeTile.Value.Y, globeTile.Value.Z),
                         globeTile.Key);
-                    var heightTile = HeightmapContainer.AddTile(
+                    var heightTile = CurrentHeightmapSource != null ? HeightmapContainer.AddTile(
                         CurrentHeightmapSource.GetTile(globeTile.Value.X, globeTile.Value.Y, globeTile.Value.Z),
-                        globeTile.Key);
+                        globeTile.Key) : -1;
                     if (tile < 0) tile = 0;
                     if (heightTile < 0) heightTile = 0;
 

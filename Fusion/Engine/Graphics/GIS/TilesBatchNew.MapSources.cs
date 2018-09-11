@@ -15,7 +15,7 @@ using Fusion.Engine.Graphics.GIS.DataSystem.MapSources.Cartocdn;
 
 namespace Fusion.Engine.Graphics.GIS
 {
-    partial class TilesBatchNew
+    partial class TilesAtlasLayer
     {
 		public static List<BaseMapSource> MapSources = new List<BaseMapSource>();
 

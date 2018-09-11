@@ -87,6 +87,9 @@ namespace FusionUI.UI
                     {
                         Image = ui.Game.Content.Load<DiscTexture>(@"UI-new\fv-icons_close-window"),
                         ImageMode = FrameImageMode.Cropped,
+                        ActiveImageColor = Color.White,
+                        InactiveImageColor = Color.White,
+                        ImageColor = Color.White,
                     };
                     HatPanel.Add(cross);
                 }
