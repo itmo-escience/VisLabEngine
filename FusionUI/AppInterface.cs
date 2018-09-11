@@ -43,11 +43,13 @@ namespace FusionUI
 
         protected SpriteLayer     uiLayer;
         protected RenderWorld     masterView;
-        public RenderLayer      ViewLayer;
         protected DiscTexture     debugFont;
         protected SpriteFont      textFont;
 
-        [Config]
+		public RenderLayer ViewLayer;
+
+
+		[Config]
         public static int gridUnitDefault = 4;
 
         [Config]
