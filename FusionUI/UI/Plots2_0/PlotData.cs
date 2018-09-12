@@ -127,7 +127,7 @@ namespace FusionUI.UI.Plots2_0
 
         public void UpdateLimits(double depth)
         {
-            if (!Data.ContainsKey(depth)) return;            
+            if (!Data.ContainsKey(depth)) { LimitsByDepth[depth] = new RectangleD(0, 0, 0, 0); return;}            
             var data = Data[depth].Where(a => !(double.IsNaN(a.X) || double.IsNaN(a.Y))).ToList();
             if (!data.Any()) return;
             var ld= new RectangleD() {

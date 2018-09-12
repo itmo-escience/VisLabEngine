@@ -13,7 +13,7 @@ namespace FusionUI.UI.Factories
 
             OkButton = new Button(ui, OffsetX,
                 OffsetY, holder.UnitWidth / 2 - OffsetX - distance/2,
-                UIConfig.UnitFilterWindowElementHeight, okText, UIConfig.ButtonColor, UIConfig.ActiveColor, 200, confirmAction)
+                UIConfig.UnitFilterWindowElementHeight, okText, UIConfig.ButtonColor, UIConfig.ActiveColor, 200, confirmAction, UIConfig.ActiveTextColor, UIConfig.ActiveTextColor)
             {
                 TextAlignment = Alignment.MiddleCenter,
                 ForeColor = UIConfig.ActiveTextColor,
@@ -21,7 +21,7 @@ namespace FusionUI.UI.Factories
             cancelButton = new Button(ui,
                 holder.UnitWidth / 2 + distance/2,
                 OffsetY, holder.UnitWidth / 2 - OffsetX - distance/2,
-                UIConfig.UnitFilterWindowElementHeight, cancelText, UIConfig.ButtonColor, UIConfig.ActiveColor, 200, cancelAction)
+                UIConfig.UnitFilterWindowElementHeight, cancelText, UIConfig.ButtonColor, UIConfig.ActiveColor, 200, cancelAction, UIConfig.ActiveTextColor, UIConfig.ActiveTextColor)
             {
                 TextAlignment = Alignment.MiddleCenter,
                 ForeColor = UIConfig.ActiveTextColor,
@@ -81,10 +81,11 @@ namespace FusionUI.UI.Factories
             button = new Button(ui,
                 holder.UnitWidth - OffsetX - buttonWidth,
                 OffsetY, buttonWidth,
-                UIConfig.UnitFilterWindowElementHeight, label, UIConfig.ButtonColor, UIConfig.ActiveColor, 200, action)
+                UIConfig.UnitFilterWindowElementHeight, label, UIConfig.ButtonColor, UIConfig.ActiveColor, 200, action, UIConfig.ActiveTextColor, UIConfig.ActiveTextColor)
             {
                 TextAlignment = Alignment.MiddleCenter,
                 ForeColor = UIConfig.ActiveTextColor,
+                
             };
 
             holder.Item = button;
@@ -101,7 +102,7 @@ namespace FusionUI.UI.Factories
             button = new Button(ui,
                 holder.UnitWidth / 2 - buttonWidth / 2,
                 OffsetY, buttonWidth,
-                UIConfig.UnitFilterWindowElementHeight, label, UIConfig.ButtonColor, UIConfig.ActiveColor, 200, action, Color.White, Color.White)
+                UIConfig.UnitFilterWindowElementHeight, label, UIConfig.ButtonColor, UIConfig.ActiveColor, 200, action, UIConfig.ActiveTextColor, UIConfig.ActiveTextColor)
             {
                 TextAlignment = Alignment.MiddleCenter,
                 ForeColor = UIConfig.ActiveTextColor,
