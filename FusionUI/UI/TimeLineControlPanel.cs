@@ -22,6 +22,7 @@ namespace FusionUI.UI
                 timeManager = value;
                 buttonLoop.ToggleOnOff(!timeManager.IsAutoRewind, true);
                 buttonPlay.ToggleOnOff(timeManager.State == AbstractTimeManager.TimeState.Stop);
+                timeLine.TimeManager = timeManager;
             }
         }
 
