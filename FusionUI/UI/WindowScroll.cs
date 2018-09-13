@@ -123,7 +123,7 @@ namespace FusionUI.UI
             AddBase(scrollHolder);
             scrollHolder.Add(holder);
             holder.UnitY = 0;
-            holder.UnitWidth = Math.Max(this.UnitWidth, this.UnitWidth - ScrollSize + holder.UnitPaddingRight);
+            holder.UnitWidth = this.UnitWidth - ScrollSize + holder.UnitPaddingRight;
             holder.ZOrder = -100;
             holder.ActionDrag += (ControlActionArgs args, ref bool flag) =>
             {
