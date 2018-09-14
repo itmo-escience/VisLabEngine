@@ -99,7 +99,7 @@ namespace Fusion.Core.Content {
 		/// </summary>
 		/// <param name="path"></param>
 		/// <returns></returns>
-		string GetRealAssetFileName ( string assetPath )
+		public string GetRealAssetFileName ( string assetPath )
 		{
 			if ( string.IsNullOrWhiteSpace(assetPath) ) {
 				throw new ArgumentException("Asset path can not be null, empty or whitespace.");

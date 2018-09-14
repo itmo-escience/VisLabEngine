@@ -11,25 +11,68 @@ using Fusion.Engine.Graphics;
 
 namespace FusionUI.UI.Elements
 {
+    public class ArrowController
+    {
+        private static ArrowController instance = null;
+
+        public static ArrowController Instance
+        {
+            get { return instance ?? (instance = new ArrowController()); }
+        }        
+
+        public Dictionary<ScalableFrame, List<ConnectorArrow>> ArrowsByFrame
+        {
+            get
+            {
+                return OutArrowsByFrame.Keys.Union(InArrowsByFrame.Keys)
+                    .ToDictionary(a => a, a => OutArrowsByFrame[a].Union(InArrowsByFrame[a]).ToList());
+            }
+        }
+
+        public Dictionary<ScalableFrame, List<ConnectorArrow>> OutArrowsByFrame = new Dictionary<ScalableFrame, List<ConnectorArrow>>();
+        public Dictionary<ScalableFrame, List<ConnectorArrow>> InArrowsByFrame = new Dictionary<ScalableFrame, List<ConnectorArrow>>();
+
+
+        public void AddArrow(ConnectorArrow arrow)
+        {            
+            if (!OutArrowsByFrame.ContainsKey(arrow.FromFrame)) OutArrowsByFrame.Add(arrow.FromFrame, new List<ConnectorArrow>());
+            OutArrowsByFrame[arrow.FromFrame].Add(arrow);
+            if (!InArrowsByFrame.ContainsKey(arrow.ToFrame)) InArrowsByFrame.Add(arrow.ToFrame, new List<ConnectorArrow>());
+            InArrowsByFrame[arrow.ToFrame].Add(arrow);            
+        }
+    }
+
     public class ConnectorArrow : ScalableFrame
     {
         public ScalableFrame FromFrame, ToFrame;
         public float ArrowWidth, ArrowPointerSize;
         public int ForceInDirection = 0, ForceOutDirection = 0;
+
         public bool IsStraight = false;
+
+        public bool IsAnimation = true;
+        public float AnimVelocityMult = 2f;
+        public float GlobalAnimvelocity = 50;
+        private float animProgress = 0;
+
         public ConnectorArrow(FrameProcessor ui, ScalableFrame from, ScalableFrame to, float width, float arrowSize) : base(ui)
         {
             FromFrame = from;
             ToFrame = to;
             ArrowWidth = width;
             ArrowPointerSize = arrowSize;
+
+            ArrowController.Instance.AddArrow(this);
         }
        
         protected override void Update(GameTime gameTime)
-        {                        
+        {
+            animProgress += gameTime.ElapsedSec * AnimVelocityMult;
+            animProgress = animProgress - (float)Math.Floor(animProgress);
             base.Update(gameTime);
         }
 
+        private int inDirection, outDirection;
         protected override void DrawFrame(GameTime gameTime, SpriteLayer spriteLayer, int clipRectIndex)
         {
             int xDir = FromFrame.GetBorderedRectangle().Center.X > ToFrame.GetBorderedRectangle().Center.X
@@ -44,7 +87,7 @@ namespace FusionUI.UI.Elements
                     : 0;
             xDir++;
             yDir++;
-            int inDirection = 0, outDirection = 0;
+            inDirection = 0; outDirection = 0;
             Vector2 start = new Vector2(), end = new Vector2();
             switch (xDir * 3 + yDir)
             {
@@ -99,17 +142,74 @@ namespace FusionUI.UI.Elements
             }
 
 
+            #region multipleArrows
+
+            var startArrows = ArrowController.Instance.OutArrowsByFrame[FromFrame]
+                .Where(a => a.outDirection == outDirection).ToList();
+            var endarrows = ArrowController.Instance.InArrowsByFrame[ToFrame].Where(a => a.inDirection == inDirection).ToList();
+            if (startArrows.Count() > 1)
+            {
+                if (outDirection % 2 == 1)
+                {
+                    start.Y = FromFrame.GlobalRectangle.Top + FromFrame.GlobalRectangle.Height /
+                              (startArrows.Count() + 1) * (startArrows.IndexOf(this) + 1);
+                }
+                else
+                {
+                    start.X = FromFrame.GlobalRectangle.Left + FromFrame.GlobalRectangle.Width /
+                              (startArrows.Count() + 1) * (startArrows.IndexOf(this) + 1);
+                }
+            }
+
+            if (endarrows.Count() > 1)
+            {
+                if (inDirection % 2 == 1)
+                {
+                    end.Y = ToFrame.GlobalRectangle.Top + ToFrame.GlobalRectangle.Height /
+                              (endarrows.Count() + 1) * (endarrows.IndexOf(this) + 1);
+                }
+                else
+                {
+                    end.X = ToFrame.GlobalRectangle.Left + ToFrame.GlobalRectangle.Width /
+                              (endarrows.Count() + 1) * (endarrows.IndexOf(this) + 1);
+                }
+            }
+
+            #endregion
+
 
 
             var whiteTex = Game.Content.Load<DiscTexture>("UI/beam");//this.Game.RenderSystem.WhiteTexture);
+            
             if ((inDirection + outDirection) % 2 == 1 && !IsStraight)
             {
                 Vector2 center = outDirection % 2 == 0 ? new Vector2(start.X, end.Y) : new Vector2(end.X, start.Y);
-                var l1 = center - start;
-                var l2 = end - center;
-                l1.Normalize(); l2.Normalize();                                
-                spriteLayer.DrawBeam(whiteTex, start + l1 * ArrowPointerSize / 2, center, BackColor, BackColor, ArrowWidth);
-                spriteLayer.DrawBeam(whiteTex, center, end - l2 * ArrowPointerSize / 2, BackColor, BackColor, ArrowWidth);
+                var d1 = center - start;
+                var d2 = end - center;
+                float l1 = d1.Length(), l2 = d2.Length();
+                d1.Normalize(); d2.Normalize();
+                spriteLayer.DrawBeam(whiteTex, start + d1 * ArrowPointerSize / 2, center, BackColor, BackColor, ArrowWidth);
+                spriteLayer.DrawBeam(whiteTex, center, end - d2 * ArrowPointerSize / 2, BackColor, BackColor, ArrowWidth);
+                if (IsAnimation)
+                {
+                    float length = l1 + l2;
+                    var circleTex = Game.Content.Load<DiscTexture>("UI/icons_lord-of-time-without-wand");
+                    for (int i = 0; i < (int) (length / GlobalAnimvelocity) + 1; i++)
+                    {
+                        float l = GlobalAnimvelocity * (i + animProgress);
+                        if (l > length - ArrowPointerSize || l < ArrowPointerSize) continue;
+                        if (l > l1)
+                        {
+                            var p = center + d2 * (l-l1);
+                            spriteLayer.Draw(circleTex, p.X - ArrowPointerSize / 2, p.Y - ArrowPointerSize / 2, ArrowPointerSize, ArrowPointerSize, BackColor);
+                        }
+                        else
+                        {
+                            var p = start + d1 * l;
+                            spriteLayer.Draw(circleTex, p.X - ArrowPointerSize/2, p.Y - ArrowPointerSize/2, ArrowPointerSize, ArrowPointerSize, BackColor);
+                        }
+                    }
+                }                             
             }
             else if (inDirection == outDirection && !IsStraight)
             {
@@ -132,12 +232,40 @@ namespace FusionUI.UI.Elements
                         center2 = new Vector2(end.X, (start.Y + end.Y) / 2 - 4 * ArrowPointerSize);
                         break;
                 }
-                var l1 = center1 - start;
-                var l2 = end - center2;
-                l1.Normalize(); l2.Normalize();                                
-                spriteLayer.DrawBeam(whiteTex, start + l1 * ArrowPointerSize / 2, center1, BackColor, BackColor, ArrowWidth);
+                var d1 = center1 - start;
+                var d2 = center2 - center1;
+                var d3 = end - center2;
+                float l1 = d1.Length(), l2 = d2.Length(), l3 = d3.Length();
+                d1.Normalize(); d2.Normalize(); d3.Normalize();
+
+                if (IsAnimation)
+                {
+                    float length = l1 + l2 + l3;
+                    var circleTex = Game.Content.Load<DiscTexture>("UI/icons_lord-of-time-without-wand");
+                    for (int i = 0; i < (int)(length / GlobalAnimvelocity) + 1; i++)
+                    {
+                        float l = GlobalAnimvelocity * (i + animProgress);
+                        if (l > length - ArrowPointerSize || l < ArrowPointerSize) continue;
+                        if (l > l1 + l2)
+                        {
+                            var p = center2 + d3 * (l - l1 - l2);
+                            spriteLayer.Draw(circleTex, p.X - ArrowPointerSize / 2, p.Y - ArrowPointerSize / 2, ArrowPointerSize, ArrowPointerSize, BackColor);
+                        }
+                        else if (l > l1)
+                        {
+                            var p = center1 + d2 * (l - l1);
+                            spriteLayer.Draw(circleTex, p.X - ArrowPointerSize / 2, p.Y - ArrowPointerSize / 2, ArrowPointerSize, ArrowPointerSize, BackColor);
+                        }
+                        else
+                        {
+                            var p = start + d1 * l;
+                            spriteLayer.Draw(circleTex, p.X - ArrowPointerSize / 2, p.Y - ArrowPointerSize / 2, ArrowPointerSize, ArrowPointerSize, BackColor);
+                        }
+                    }
+                }
+                spriteLayer.DrawBeam(whiteTex, start + d1 * ArrowPointerSize / 2, center1, BackColor, BackColor, ArrowWidth);
                 spriteLayer.DrawBeam(whiteTex, center1, center2, BackColor, BackColor, ArrowWidth);
-                spriteLayer.DrawBeam(whiteTex, center2, end - l2 * ArrowPointerSize / 2, BackColor, BackColor, ArrowWidth);
+                spriteLayer.DrawBeam(whiteTex, center2, end - d3 * ArrowPointerSize / 2, BackColor, BackColor, ArrowWidth);
             }
             else if (!IsStraight)
             {
@@ -162,22 +290,61 @@ namespace FusionUI.UI.Elements
                         center2 = new Vector2(end.X, (start.Y + end.Y) / 2);
                         break;
                 }
+                                
+                var d1 = center1 - start;
+                var d2 = center2 - center1;
+                var d3 = end - center2;
+                float l1 = d1.Length(), l2 = d2.Length(), l3 = d3.Length();
+                d1.Normalize(); d2.Normalize(); d3.Normalize();
 
-                var l1 = center1 - start;
-                var l2 = end - center2;
-                l1.Normalize();l2.Normalize();
-                
-                
-                spriteLayer.DrawBeam(whiteTex, start + l1 * ArrowPointerSize / 2, center1, BackColor, BackColor, ArrowWidth);
+                if (IsAnimation)
+                {
+                    float length = l1 + l2 + l3;
+                    var circleTex = Game.Content.Load<DiscTexture>("UI/icons_lord-of-time-without-wand");
+                    for (int i = 0; i < (int)(length / GlobalAnimvelocity) + 1; i++)
+                    {
+                        float l = GlobalAnimvelocity * (i + animProgress);
+                        if (l > length - ArrowPointerSize || l < ArrowPointerSize) continue;
+                        if (l > l1 + l2)
+                        {
+                            var p = center2 + d3 * (l - l1 - l2);
+                            spriteLayer.Draw(circleTex, p.X - ArrowPointerSize / 2, p.Y - ArrowPointerSize / 2, ArrowPointerSize, ArrowPointerSize, BackColor);
+                        }
+                        else if (l > l1)
+                        {
+                            var p = center1 + d2 * (l - l1);
+                            spriteLayer.Draw(circleTex, p.X - ArrowPointerSize / 2, p.Y - ArrowPointerSize / 2, ArrowPointerSize, ArrowPointerSize, BackColor);
+                        }
+                        else
+                        {
+                            var p = start + d1 * l;
+                            spriteLayer.Draw(circleTex, p.X - ArrowPointerSize / 2, p.Y - ArrowPointerSize / 2, ArrowPointerSize, ArrowPointerSize, BackColor);
+                        }
+                    }
+                }
+
+                spriteLayer.DrawBeam(whiteTex, start + d1 * ArrowPointerSize / 2, center1, BackColor, BackColor, ArrowWidth);
                 spriteLayer.DrawBeam(whiteTex, center1, center2, BackColor, BackColor, ArrowWidth);
-                spriteLayer.DrawBeam(whiteTex, center2, end - l2 * ArrowPointerSize / 2, BackColor, BackColor, ArrowWidth);
+                spriteLayer.DrawBeam(whiteTex, center2, end - d3 * ArrowPointerSize / 2, BackColor, BackColor, ArrowWidth);
             }
             else
             {
-                var l = end - start;
-                l.Normalize();
-                
-                spriteLayer.DrawBeam(whiteTex, start + l * ArrowPointerSize / 2, end - l * ArrowPointerSize / 2, BackColor, BackColor, ArrowWidth);
+                var d = end - start;
+                var length = d.Length();
+                d.Normalize();                
+                if (IsAnimation)
+                {
+                    
+                    var circleTex = Game.Content.Load<DiscTexture>("UI/icons_lord-of-time-without-wand");
+                    for (int i = 0; i < (int)(length / GlobalAnimvelocity) + 1; i++)
+                    {
+                        float l = GlobalAnimvelocity * (i + animProgress);
+                        if (l > length - ArrowPointerSize || l < ArrowPointerSize) continue;
+                        var p = start + d * l;
+                        spriteLayer.Draw(circleTex, p.X - ArrowPointerSize / 2, p.Y - ArrowPointerSize / 2, ArrowPointerSize, ArrowPointerSize, BackColor);                        
+                    }
+                }
+                spriteLayer.DrawBeam(whiteTex, start + d * ArrowPointerSize / 2, end - d * ArrowPointerSize / 2, BackColor, BackColor, ArrowWidth);
             }
                         
 

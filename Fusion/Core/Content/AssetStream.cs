@@ -75,19 +75,18 @@ namespace Fusion.Core.Content {
 		/// </summary>
 		public override long Position {
 			get {
-				throw new NotSupportedException();
-			}
-			set {
-				throw new NotSupportedException();
-			}
+			    return zipStream.Position;
+            }
+			set { zipStream.Position = value; }
 		}
 
 
 		/// <summary>
 		/// Length is not supported.
 		/// </summary>
-		public override long Length	{
-			get { throw new NotSupportedException(); }
+		public override long Length
+		{
+		    get { return zipStream.Length; }
 		}
 
 
@@ -221,8 +220,9 @@ namespace Fusion.Core.Content {
 		/// <returns></returns>
 		public override long Seek ( long offset, SeekOrigin origin ) 
 		{
-			throw new NotSupportedException();
-		}
+			return zipStream.Seek(offset, origin);
+
+        }
 
 
 		/// <summary>
@@ -231,7 +231,7 @@ namespace Fusion.Core.Content {
 		/// <param name="value"></param>
 		public override void SetLength ( long value )
 		{
-			throw new NotSupportedException();
+            zipStream.SetLength(value);			
 		}
 
 
