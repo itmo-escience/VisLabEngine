@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using Fusion.Core.Mathematics;
 using Fusion.Engine.Common;
 using Fusion.Engine.Frames;
@@ -10,6 +11,10 @@ namespace FusionUI.UI
     public class RichTextBlock : ScalableFrame
     {
         public float UnitOffsetLine;
+
+        /// <summary>
+        /// Offset between lines
+        /// </summary>
         public int OffsetLine
         {
             get { return (int)(UnitOffsetLine * ScaleMultiplier); }
@@ -34,25 +39,29 @@ namespace FusionUI.UI
         }
 
         public int MaxWidth;
-
         public int MaxLineWidth;
 
         public bool EnableClip = false;
+        public override string Tooltip { get; set; } = "";
 
-        private string tooltip = "";
-        public override string Tooltip { get { return tooltip; } set { tooltip = value; } }
+        public RichTextBlock(
+            FrameProcessor ui, 
+            float x, float y, 
+            float w, float h, 
+            string text, Color backColor, UIConfig.FontHolder font, 
+            float offsetLine, float minHeight = 0, 
+            bool isShortText = false, int maxWidth = 200000 // Wider than any screen
+        ) : base(ui, x, y, w, h, text, backColor)
+        {            
+            IsShortText    = isShortText;
+            UnitOffsetLine = offsetLine;
+            FontHolder     = font;
+            MinUnitHeight  = minHeight;
 
-        public RichTextBlock(FrameProcessor ui, float x, float y, float w, float h, string text, Color backColor, UIConfig.FontHolder font, float offsetLine, float minHeight = 0, bool isShortText = false, int maxWidth = 0) : base(ui, x, y, w, h, text, backColor)
-        {
-            MaxWidth = maxWidth > Width ? maxWidth : Width;
-            this.IsShortText = isShortText;
-            this.UnitOffsetLine = offsetLine;
-            this.FontHolder = font;
-            this.MinUnitHeight = minHeight;
-            
+            MaxWidth = maxWidth;
         }
 
-        private bool isInit = false;
+        private bool _isInitialized = false;
 
         public new string Text
         {
@@ -60,136 +69,149 @@ namespace FusionUI.UI
             set
             {
                 base.Text = value;
-                isInit = false;
+                _isInitialized = false;
             }
         }
 
         public virtual void init()
         {
-            BaseHeight = this.Height;
+            BaseHeight = Height;
             
             splitByString();
-            var textOffset = strForDraw.Count * (this.Font.LineHeight + OffsetLine);
-            //foreach (var str in strForDraw)
-            //{
-            //    textOffset += this.Font.CapHeight + OffsetLine;
-            //}
-            this.Height = textOffset + this.Font.CapHeight;
 
-            this.Height = Math.Min(this.Height, this.MinHeight);
+            var textOffset = _linesToDraw.Count * (Font.LineHeight + OffsetLine);
+            Height = textOffset + Font.CapHeight;
+
+            Height = Math.Min(Height, MinHeight);
             if (IsShortText)
             {
-                this.Height = BaseHeight;
+                Height = BaseHeight;
             }
-            this.Height = !IsShortText ? textOffset : BaseHeight;
-        }
-
-        protected new List<Tuple<Rectangle, string>> strForDraw;
-        protected string lastString = "";
+            Height = !IsShortText ? textOffset : BaseHeight;
+        }              
 
         protected override void Update(GameTime gameTime)
         {
             base.Update(gameTime);
-            if (!isInit)
+            if (!_isInitialized)
             {
                 init();
-                isInit = true;
+                _isInitialized = true;
             }
         }
+
+        private struct TextLine
+        {
+            public int Width;
+            public string Text;
+        }
+        private List<TextLine> _linesToDraw;
+
+        /// <summary>
+        /// Last drawn line
+        /// </summary>
+        protected string LastText = "";
 
         protected virtual void splitByString()
         {
-            if (lastString == Text && strForDraw != null || Text==null) return;
-            MaxLineWidth = 0;
-            lastString = Text;
-            strForDraw = new List<Tuple<Rectangle, string>>();
-            var words = Text.Replace("\n", " \n ").Replace("#", " #").Split(' ');
-            bool haveMoreOneWord = false;
-            var currentStr = "";
-            var currentStrSize = 0;
-            var currentStrSizeRect = Rectangle.Empty;
-
-            foreach (var word in words)
+            if (Text == null)
+            //if (LastLine == Text && _linesToDraw != null || Text == null)
             {
+                // Nothing changed since last time or nothing to split
+                return;
+            }
+
+            LastText = Text;
+            _linesToDraw = new List<TextLine>();
+
+            var words = Text.Replace("\n", " \n ").Replace("#", " #").Split(' ');
+            var currentLine = "";
+            var currentLineWidth = 0;
+            var maxAvailableWidth = Math.Min(MaxWidth, Width);
+
+            var spaceWidth = FontHolder[ApplicationInterface.uiScale].MeasureString(" ").Width;
+            var remainingWords = new Queue<string>(words);
+
+            while(remainingWords.Count > 0)
+            {
+                var word = remainingWords.Peek();
+
+                // Forced line break found
                 if (word.Equals("\n"))
                 {
-                    strForDraw.Add(new Tuple<Rectangle, string>(currentStrSizeRect, currentStr));
-                    MaxLineWidth = currentStrSizeRect.Width > MaxLineWidth ? currentStrSizeRect.Width : MaxLineWidth;
-                    currentStrSize = 0;
-                    currentStr = "";
-                    currentStrSizeRect = Rectangle.Empty;
+                    _linesToDraw.Add(new TextLine { Text = currentLine, Width = currentLineWidth });                    
+
+                    currentLineWidth = 0;
+                    currentLine = "";
+
+                    // remove first of remaining words
+                    remainingWords.Dequeue();
                     continue;
                 }
 
-                var sizeText = this.FontHolder[ApplicationInterface.uiScale].MeasureString(word);
-                if (sizeText.Width + currentStrSize > MaxWidth)
+                var wordWidth = FontHolder[ApplicationInterface.uiScale].MeasureString(word).Width;
+                // There is enough space for this word or current word is longer than availableWidth
+                if (wordWidth + currentLineWidth <= maxAvailableWidth || currentLineWidth == 0 && wordWidth > maxAvailableWidth)
                 {
-                    if (!haveMoreOneWord)
-                    {
-                        strForDraw.Add(new Tuple<Rectangle, string>(sizeText, word));
-                        MaxLineWidth = sizeText.Width > MaxLineWidth ? sizeText.Width : MaxLineWidth;
-                        currentStrSize = 0;
-                        currentStr = "";
-                        currentStrSizeRect = Rectangle.Empty;
-                    }
-                    else
-                    {
-                        strForDraw.Add(new Tuple<Rectangle, string>(currentStrSizeRect, currentStr));
-                        MaxLineWidth = currentStrSizeRect.Width > MaxLineWidth ? currentStrSizeRect.Width : MaxLineWidth;
-                        currentStr = word + " ";
-                        currentStrSize = sizeText.Width;
-                        currentStrSizeRect = Rectangle.Empty;
-                        currentStrSizeRect.Width = currentStrSize;
-                    }
-                }
-                else
-                {
-                    haveMoreOneWord = true;
-                    currentStr += word + " ";
-                    currentStrSize += sizeText.Width + this.Font.SpaceWidth;
-                    currentStrSizeRect.Width = currentStrSize;
-                }
+                    currentLine += word + " ";
+                    currentLineWidth += wordWidth + spaceWidth;
 
+                    // remove first of remaining words
+                    remainingWords.Dequeue();
+                }
+                else // Need to start new line
+                {
+                    _linesToDraw.Add(new TextLine { Text = currentLine, Width = currentLineWidth });
+                    currentLine = "";
+                    currentLineWidth = 0;
+                }                
             }
-            strForDraw.Add(new Tuple<Rectangle, string>(currentStrSizeRect, currentStr));
-            MaxLineWidth = currentStrSizeRect.Width > MaxLineWidth ? currentStrSizeRect.Width : MaxLineWidth;
+            _linesToDraw.Add(new TextLine { Text = currentLine, Width = currentLineWidth });
+
+            MaxLineWidth = _linesToDraw.Max(l => l.Width);
+
             if (EnableClip)
             {
-                this.X += (Width - MaxLineWidth)/2;
-                this.Width = MaxLineWidth;
-                
+                X += (Width - MaxLineWidth)/2;
+                Width = MaxLineWidth;                
             }
-        }
-
-        protected virtual void DrawString(SpriteLayer spriteBatch, string text, float xPos, float yPos, Color color,
-            int frameIndex = 0, float tracking = 0, bool useBaseLine = true, bool flip = false)
-        {
-            this.Font.DrawString(spriteBatch, text, xPos, yPos,
-                color, frameIndex, tracking, useBaseLine, flip);
         }
 
         protected override void DrawFrame(GameTime gameTime, SpriteLayer sb, int clipRectIndex)
         {
             splitByString();
+
             var textOffset = 0;
-            foreach (var str in strForDraw)
+            foreach (var line in _linesToDraw)
             {
-                if (IsShortText && str.Item2.Replace(" ", "").Equals(""))
+                // Line with only spaces
+                if (IsShortText && line.Text.All(c => c == ' '))
                     continue;
-                if (IsShortText && textOffset > BaseHeight - OffsetLine * 2 - this.Font.CapHeight * 2)
+
+                if (IsShortText && textOffset > BaseHeight - OffsetLine * 2 - Font.CapHeight * 2)
                 {
-                    this.Font.DrawString(sb, str.Item2.Length > 3 ? str.Item2.Remove(str.Item2.Length - 3) + "..." : "...", this.GlobalRectangle.X, this.GlobalRectangle.Y + textOffset,
+                    // TODO: WTF is that
+                    Font.DrawString(sb, 
+                        line.Text.Length > 3 ? line.Text.Remove(line.Text.Length - 3) + "..." : "...", 
+                        GlobalRectangle.X, GlobalRectangle.Y + textOffset,
                         ForeColor, 0, 0, false);
                     break;
                 }
+
+                // TODO: WTF is that
                 var offsetX = TextAlignment == Alignment.MiddleCenter
-                    ? (this.GlobalRectangle.Width - str.Item1.Width) / 2
+                    ? (this.GlobalRectangle.Width - line.Width) / 2
                     : 0;
-                DrawString(sb, str.Item2, this.GlobalRectangle.X + offsetX, this.GlobalRectangle.Y + textOffset,
-                    ForeColor, clipRectIndex, 0, false);
-                textOffset += this.Font.LineHeight + OffsetLine;
+
+                Font.DrawString(sb, line.Text,
+                    GlobalRectangle.X + offsetX, GlobalRectangle.Y + textOffset,
+                    ForeColor, clipRectIndex, 
+                    0, false
+                );
+
+                textOffset += Font.LineHeight + OffsetLine;
             }
-            this.Height = Math.Max(!IsShortText ? textOffset : BaseHeight, MinHeight);
+            Height = Math.Max(!IsShortText ? textOffset : BaseHeight, MinHeight);
         }
     }
 }
