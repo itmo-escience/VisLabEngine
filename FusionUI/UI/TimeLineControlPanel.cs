@@ -23,6 +23,8 @@ namespace FusionUI.UI
                 buttonLoop.ToggleOnOff(!timeManager.IsAutoRewind, true);
                 buttonPlay.ToggleOnOff(timeManager.State == AbstractTimeManager.TimeState.Stop);
                 timeLine.TimeManager = timeManager;
+                updateStep();
+                initTimeLine();
             }
         }
 
@@ -163,13 +165,13 @@ namespace FusionUI.UI
 
         private void createControlButtons(float x, float y)
         {
-            downStepButton    = createClickableButton(x + 0 * sizeButton, y, @"UI\timeline\fv-icons_playback-slow");            
-            buttonStepBack    = createClickableButton(x + 1 * sizeButton, y, @"UI\timeline\fv-icons_playback-stp-bckw");
-            buttonPlay        = createToggleableButton(x + 2 * sizeButton, y, @"UI\timeline\fv-icons_playback-pause", @"UI\timeline\fv-icons_playback-play", true,"",false, 200);
-            buttonStepForward = createClickableButton(x + 3 * sizeButton, y, @"UI\timeline\fv-icons_playback-step-fwd");
-            upStepButton      = createClickableButton(x + 4 * sizeButton, y, @"UI\timeline\fv-icons_playback-fast");
-            stepValueLabel    = createLableFrame(x + 5 * sizeButton, y, listStepName[currentStep].Item2);
-            buttonLoop        = createToggleableButton(x + 6 * sizeButton, y, @"UI\timeline\fv-icons_playback-loop", @"UI\timeline\fv-icons_playback-loop");
+            downStepButton    =   createClickableButton(x + 0 * sizeButton, y, @"UI\timeline\fv-icons_playback-slow");            
+            buttonStepBack    =   createClickableButton(x + 1 * sizeButton, y, @"UI\timeline\fv-icons_playback-stp-bckw");
+            buttonPlay        =  createToggleableButton(x + 2 * sizeButton, y, @"UI\timeline\fv-icons_playback-pause", @"UI\timeline\fv-icons_playback-play", true,"",false, 200);
+            buttonStepForward =   createClickableButton(x + 3 * sizeButton, y, @"UI\timeline\fv-icons_playback-step-fwd");
+            upStepButton      =   createClickableButton(x + 4 * sizeButton, y, @"UI\timeline\fv-icons_playback-fast");
+            stepValueLabel    =        createLableFrame(x + 5 * sizeButton, y, listStepName[currentStep].Item2);
+            buttonLoop        =  createToggleableButton(x + 6 * sizeButton, y, @"UI\timeline\fv-icons_playback-loop", @"UI\timeline\fv-icons_playback-loop");
 
             buttonEnsembles   = createClickableButton(this.UnitWidth - UIConfig.UnitTimelineOffsetX - 2 * sizeButton, y, @"UI\timeline\fv-icons_ensembles");
             buttonMinimize    = createClickableButton(this.UnitWidth - UIConfig.UnitTimelineOffsetX - 1 * sizeButton, y, @"UI\timeline\fv-icons_timeline-minimize");
@@ -183,6 +185,18 @@ namespace FusionUI.UI
             buttonLoop.Tooltip = "Auto replay";
             buttonEnsembles.Tooltip = "Ensembles";
             buttonMinimize.Tooltip = "Minimize ui";
+            
+            this.Resize += (sender, args) =>
+            {
+                x = this.UnitWidth / 2 - sizeButton * 5 / 2;
+                downStepButton    .UnitX = x + 0 * sizeButton;
+                buttonStepBack    .UnitX = x + 1 * sizeButton;
+                buttonPlay        .UnitX = x + 2 * sizeButton;
+                buttonStepForward .UnitX = x + 3 * sizeButton;
+                upStepButton      .UnitX = x + 4 * sizeButton;
+                stepValueLabel    .UnitX = x + 5 * sizeButton;
+                buttonLoop        .UnitX = x + 6 * sizeButton;
+            };
         }
 
         private Button createClickableButton(float x, float y, string nameTexture, bool IsVisible = true, string currentStep="")
