@@ -149,11 +149,11 @@ namespace FusionUI.UI.Elements.TextFormatting
 
         protected override void splitByString()
         {
-            if (lastString == Text && strings != null && lastWidth == this.Width|| Text == null ) return;
+            if (LastText == Text && strings != null && lastWidth == this.Width|| Text == null ) return;
             MaxLineWidth = 0;
             lastWidth = this.Width;
             ImageCache = new Dictionary<string, Texture>();
-            lastString = Text;
+            LastText = Text;
             float width = 0;
             strings = new List<SingleString>();
             TagStack tagStack = new TagStack();
@@ -432,7 +432,7 @@ namespace FusionUI.UI.Elements.TextFormatting
                 strings.Add(currentString);
                 currentString.Prepare();
             }
-            lastString = Text;
+            LastText = Text;
             TextHeight = strings.Sum(a => a.Rect.Height) + 15;
             this.Height = Math.Max(TextHeight, MinHeight);
         }
