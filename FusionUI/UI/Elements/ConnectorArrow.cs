@@ -25,7 +25,7 @@ namespace FusionUI.UI.Elements
             get
             {
                 return OutArrowsByFrame.Keys.Union(InArrowsByFrame.Keys)
-                    .ToDictionary(a => a, a => OutArrowsByFrame[a].Union(InArrowsByFrame[a]).ToList());
+                    .ToDictionary(a => a, a => (OutArrowsByFrame.ContainsKey(a) ? OutArrowsByFrame[a] : new List<ConnectorArrow>()).Union(InArrowsByFrame.ContainsKey(a) ? InArrowsByFrame[a].ToList() : new List<ConnectorArrow>()).ToList());
             }
         }
 
@@ -50,7 +50,7 @@ namespace FusionUI.UI.Elements
 
         public bool IsStraight = false;
 
-        public bool IsAnimation = true;
+        public bool IsAnimation = false;
         public float AnimVelocityMult = 2f;
         public float GlobalAnimvelocity = 50;
         private float animProgress = 0;
