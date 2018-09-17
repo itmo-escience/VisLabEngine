@@ -10,7 +10,7 @@ namespace FusionUI.UI.Elements
     {
 
         public Color ActiveColor, InactiveColor;
-        public Color ActiveFColor, InactiveFColor;
+        public Color ActiveFColor = UIConfig.ActiveTextColor, InactiveFColor = UIConfig.ActiveTextColor;
         public Texture ActiveImage, PassiveImage;
         public Action UpdateAction;
         public Action<bool> ButtonAction;
@@ -127,6 +127,8 @@ namespace FusionUI.UI.Elements
             InactiveColor = mainColor;
             ActiveFColor = activeFColor ?? ActiveFColor;
             InactiveFColor = inActiveFColor ?? InactiveFColor;
+            ActiveImageColor = activeFColor ?? ActiveImageColor;
+            InactiveImageColor = inActiveFColor ?? InactiveImageColor;
             initClickableButton(transitionTime);
             if (action != null) ButtonAction += b => action();
             ImageMode = FrameImageMode.Fitted;
@@ -162,7 +164,7 @@ namespace FusionUI.UI.Elements
 
             this.ActionClick += (ControlActionArgs args, ref bool flag) =>
             {
-                 if (!args.IsClick) return;
+                if (!args.IsClick) return;
                 this.BackColor = ActiveColor;
                 this.ForeColor = ActiveFColor;
                 this.ImageColor = ActiveFColor;
