@@ -98,6 +98,7 @@ namespace FusionUI.UI.Plots2_0
             set { isLoaded = value; if (isLoaded) Approximate(30, false); }
         }
 
+        public Color BaseColor = Color.Pink;
         public Dictionary<double, Color> ColorsByDepth = new Dictionary<double, Color>();
 
         public virtual void UpdateColors(ColorConfig cc)
@@ -111,6 +112,7 @@ namespace FusionUI.UI.Plots2_0
 
         public virtual void RepairColors(ColorConfig cc)
         {
+            BaseColor = cc.NextColor();
             foreach (var k in Depths)
             {
                 if (!ColorsByDepth.ContainsKey(k)) ColorsByDepth[k] = cc.NextColor();                
@@ -455,6 +457,7 @@ namespace FusionUI.UI.Plots2_0
             });
         }
 
+        public RectangleD LimitsAnim;
         public RectangleD Limits
         {
             get

@@ -77,11 +77,11 @@ namespace FusionUI.UI
                 };
                 if (drawCross)
                 {
+                    ActionCross += () => this.Visible = false;
                     var cross = new Button(ui, UnitWidth - UIConfig.UnitHatCrossSize - UIConfig.UnitHatTextOffset, 0,
-                        UIConfig.UnitHatCrossSize, UIConfig.UnitHatHeight, "", Color.Zero, Color.Zero, 0,
+                        UIConfig.UnitHatCrossSize, UIConfig.UnitHatHeight, "", Color.Zero, UIConfig.ActiveColor, 0,
                         () =>
-                        {
-                            this.Visible = false;
+                        {                            
                             ActionCross?.Invoke();
                         })
                     {
