@@ -36,10 +36,13 @@ namespace FusionUI.UI.Elements
         public void AddArrow(ConnectorArrow arrow)
         {            
             if (!OutArrowsByFrame.ContainsKey(arrow.FromFrame)) OutArrowsByFrame.Add(arrow.FromFrame, new List<ConnectorArrow>());
+            if (!OutArrowsByFrame.ContainsKey(arrow.ToFrame)) OutArrowsByFrame.Add(arrow.ToFrame, new List<ConnectorArrow>());
             OutArrowsByFrame[arrow.FromFrame].Add(arrow);
             if (!InArrowsByFrame.ContainsKey(arrow.ToFrame)) InArrowsByFrame.Add(arrow.ToFrame, new List<ConnectorArrow>());
+            if (!InArrowsByFrame.ContainsKey(arrow.FromFrame)) InArrowsByFrame.Add(arrow.FromFrame, new List<ConnectorArrow>());
             InArrowsByFrame[arrow.ToFrame].Add(arrow);            
         }
+        
     }
 
     public class ConnectorArrow : ScalableFrame
@@ -54,6 +57,11 @@ namespace FusionUI.UI.Elements
         public float AnimVelocityMult = 2f;
         public float GlobalAnimvelocity = 50;
         private float animProgress = 0;
+
+
+        public static float ArrowSpread = 10;
+        private static int Index = 0;
+        private int myIndex = Index++;
 
         public ConnectorArrow(FrameProcessor ui, ScalableFrame from, ScalableFrame to, float width, float arrowSize) : base(ui)
         {
@@ -145,19 +153,25 @@ namespace FusionUI.UI.Elements
             #region multipleArrows
 
             var startArrows = ArrowController.Instance.OutArrowsByFrame[FromFrame]
-                .Where(a => a.outDirection == outDirection).ToList();
-            var endarrows = ArrowController.Instance.InArrowsByFrame[ToFrame].Where(a => a.inDirection == inDirection).ToList();
+                .Where(a => a.outDirection == outDirection)
+                .Concat(ArrowController.Instance
+                    .InArrowsByFrame[FromFrame]
+                    .Where(a => a.inDirection == outDirection)
+                    ).OrderBy(a => a.myIndex).ToList();
+
+            var endarrows = ArrowController.Instance.InArrowsByFrame[ToFrame].Where(a => a.inDirection == inDirection).Concat(ArrowController.Instance
+                .OutArrowsByFrame[ToFrame]
+                .Where(a => a.outDirection == inDirection)
+                ).OrderBy(a => a.myIndex).ToList();
             if (startArrows.Count() > 1)
             {
                 if (outDirection % 2 == 1)
                 {
-                    start.Y = FromFrame.GlobalRectangle.Top + FromFrame.GlobalRectangle.Height /
-                              (startArrows.Count() + 1) * (startArrows.IndexOf(this) + 1);
+                    start.Y = FromFrame.GlobalRectangle.Center.Y - ArrowSpread * ((float)(startArrows.Count - 1) / 2 - startArrows.IndexOf(this));
                 }
                 else
                 {
-                    start.X = FromFrame.GlobalRectangle.Left + FromFrame.GlobalRectangle.Width /
-                              (startArrows.Count() + 1) * (startArrows.IndexOf(this) + 1);
+                    start.X = FromFrame.GlobalRectangle.Center.X - ArrowSpread * ((float)(startArrows.Count - 1) / 2 - startArrows.IndexOf(this));
                 }
             }
 
@@ -165,13 +179,11 @@ namespace FusionUI.UI.Elements
             {
                 if (inDirection % 2 == 1)
                 {
-                    end.Y = ToFrame.GlobalRectangle.Top + ToFrame.GlobalRectangle.Height /
-                              (endarrows.Count() + 1) * (endarrows.IndexOf(this) + 1);
+                    end.Y = ToFrame.GlobalRectangle.Center.Y - ArrowSpread * ((float)(endarrows.Count - 1) / 2 - endarrows.IndexOf(this));
                 }
                 else
                 {
-                    end.X = ToFrame.GlobalRectangle.Left + ToFrame.GlobalRectangle.Width /
-                              (endarrows.Count() + 1) * (endarrows.IndexOf(this) + 1);
+                    end.X = ToFrame.GlobalRectangle.Center.X - ArrowSpread * ((float)(endarrows.Count - 1) / 2 - endarrows.IndexOf(this));
                 }
             }
 
