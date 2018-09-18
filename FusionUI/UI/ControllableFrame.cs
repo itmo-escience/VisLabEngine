@@ -631,5 +631,13 @@ namespace FusionUI.UI
             base.DrawFrame(gameTime, spriteLayer, clipRectIndex);
             if (Visible) ActionDraw?.Invoke(gameTime, spriteLayer, clipRectIndex);
         }
+
+        public Action OnAnchorsUpdate;
+
+        public override void UpdateAnchors(int oldW, int oldH, int newW, int newH)
+        {
+            base.UpdateAnchors(oldW, oldH, newW, newH);
+            OnAnchorsUpdate?.Invoke();
+        }
     }
 }
