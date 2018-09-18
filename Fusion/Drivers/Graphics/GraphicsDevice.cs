@@ -884,9 +884,21 @@ namespace Fusion.Drivers.Graphics {
 		/// <param name="h"></param>
 		public void SetViewport ( ViewportF viewport )
 		{
-			lock (deviceContext) {
+			//lock (deviceContext)
+			{
 				deviceContext.Rasterizer.SetViewport( SharpDXHelper.Convert( viewport ) );
 			}
+		}
+
+
+		public ViewportF GetViewport()
+		{
+			var viewports = deviceContext.Rasterizer.GetViewports<SharpDX.ViewportF>();
+
+			if(viewports.Any()) {
+				return new ViewportF(viewports[0].X, viewports[0].Y, viewports[0].Width, viewports[0].Height);
+			}
+			return new ViewportF();
 		}
 
 
