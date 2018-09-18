@@ -66,6 +66,17 @@ namespace Fusion.Engine.Graphics.GIS
 		}
 
 
+	    public void UpdateLodDistances()
+	    {
+	        lodDistances = new double[25];
+	        for (int i = 1; i < 25; i++)
+	        {
+	            var dist = GetOptimalDistanceForLevel(i - 1);
+	            lodDistances[i] = dist;
+	        }
+        }
+
+
 		private int t = 0;
 		public override void Update(GameTime gameTime)
 		{

@@ -1170,7 +1170,7 @@ namespace Fusion.Engine.Frames {
 		/// <param name="termValue"></param>
 		/// <param name="delay"></param>
 		/// <param name="period"></param>
-		public void RunTransition<T,I> ( string property, T targetValue, int delay, int period ) where I: IInterpolator<T>, new()
+		public void RunTransition<T,I> ( string property, T targetValue, int delay, int period, Action callback = null) where I: IInterpolator<T>, new()
 		{
 			var pi	=	GetType().GetProperty( property );
 			
@@ -1181,7 +1181,7 @@ namespace Fusion.Engine.Frames {
 			//	call ToList() to terminate LINQ evaluation :
 			var toCancel = transitions.Where( t => t.TagName == property ).ToList();
 
-			transitions.Add( new Transition<T,I>( this, pi, targetValue, delay, period, toCancel ){ TagName = property } );
+			transitions.Add( new Transition<T,I>( this, pi, targetValue, delay, period, toCancel, callback) { TagName = property } );
 		}
 
 
@@ -1193,9 +1193,9 @@ namespace Fusion.Engine.Frames {
 		/// <param name="targetValue"></param>
 		/// <param name="delay"></param>
 		/// <param name="period"></param>
-		public void RunTransition ( string property, Color targetValue, int delay, int period )
+		public void RunTransition ( string property, Color targetValue, int delay, int period, Action callback = null )
 		{
-			RunTransition<Color, ColorInterpolator>( property, targetValue, delay, period );
+			RunTransition<Color, ColorInterpolator>( property, targetValue, delay, period, callback );
 		}
 
 
@@ -1207,9 +1207,9 @@ namespace Fusion.Engine.Frames {
 		/// <param name="targetValue"></param>
 		/// <param name="delay"></param>
 		/// <param name="period"></param>
-		public void RunTransition ( string property, int targetValue, int delay, int period )
+		public void RunTransition ( string property, int targetValue, int delay, int period, Action callback = null)
 		{
-			RunTransition<int, IntInterpolator>( property, targetValue, delay, period );
+			RunTransition<int, IntInterpolator>( property, targetValue, delay, period, callback);
 		}
 
 	    /// <summary>
@@ -1219,9 +1219,9 @@ namespace Fusion.Engine.Frames {
 	    /// <param name="targetValue"></param>
 	    /// <param name="delay"></param>
 	    /// <param name="period"></param>
-	    public void RunTransition(string property, float targetValue, int delay, int period)
+	    public void RunTransition(string property, float targetValue, int delay, int period, Action callback = null)
 	    {
-	        RunTransition<float, FloatInterpolator>(property, targetValue, delay, period);
+	        RunTransition<float, FloatInterpolator>(property, targetValue, delay, period, callback);
 	    }
 
 
@@ -1234,8 +1234,12 @@ namespace Fusion.Engine.Frames {
 			foreach ( var t in transitions ) {
 				t.Update( gameTime );
 			}
-
-			transitions.RemoveAll( t => t.IsDone );
+		    var done = transitions.Where(t => t.IsDone);
+		    foreach (var t in done)
+		    {
+		        t.Callback?.Invoke();
+		    }
+            transitions.RemoveAll( t => t.IsDone );
 		}
 
 

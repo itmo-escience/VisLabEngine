@@ -18,7 +18,8 @@ namespace Fusion.Engine.Frames {
 		bool	IsActive { get; }
 		string	TagName { get; set; }
 		float	Timer { get; }
-	}
+	    Action Callback { get; set; }
+    }
 
 
 	public interface IInterpolator<T> {
@@ -117,6 +118,7 @@ namespace Fusion.Engine.Frames {
 		readonly T				targetValue;
 		readonly float			period;
 		readonly I				interpolator;
+        
 
 		T		originValue;
 		float	timer;
@@ -127,6 +129,8 @@ namespace Fusion.Engine.Frames {
 		public string TagName {
 			get; set;
 		}
+
+        public Action Callback { get; set; }
 
 
 		public bool IsDone {
@@ -159,7 +163,7 @@ namespace Fusion.Engine.Frames {
 		/// <param name="targetProperty"></param>
 		/// <param name="initValue"></param>
 		/// <param name="termValue"></param>
-		public Transition ( object targetObject, PropertyInfo targetProperty, T targetValue, float delay, float period, IEnumerable<ITransition> toCancel )
+		public Transition ( object targetObject, PropertyInfo targetProperty, T targetValue, float delay, float period, IEnumerable<ITransition> toCancel, Action callback = null )
 		{
 			this.targetObject	=	targetObject;
 			this.targetProperty	=	targetProperty;
@@ -167,7 +171,7 @@ namespace Fusion.Engine.Frames {
 			this.period			=	period;
 			this.interpolator	=	new I();
 			this.toCancel		=	toCancel;
-
+		    this.Callback       =   callback;
 			timer	=	-delay;
 		}
 
