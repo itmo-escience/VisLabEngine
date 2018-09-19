@@ -30,7 +30,8 @@ namespace Fusion.Engine.Graphics.GIS
 			OVERALL_COLOR = 1 << 6,
 			TEXTURED_LINE = 1 << 7,
 			PALETTE_COLOR = 1 << 8,
-		}
+		    GEO_LINES = 1 << 9,
+        }
 
 		public int Flags;
 		 
@@ -269,7 +270,7 @@ namespace Fusion.Engine.Graphics.GIS
 				for (int col = 0; col < xStepsCount; col++)
 				{
 					indeces.Add(col * yStepsCount + row);
-					indeces.Add((col) * yStepsCount + row + 1);
+					indeces.Add((col) * yStepsCount + row + 1); 
 				}
 			}
 
@@ -290,6 +291,6 @@ namespace Fusion.Engine.Graphics.GIS
 		public override List<Gis.SelectedItem> Select(DVector3 nearPoint, DVector3 farPoint)
 		{
 			return null;
-		}
+		} 
 	}
-}
+}  

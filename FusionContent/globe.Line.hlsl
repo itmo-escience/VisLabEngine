@@ -74,6 +74,11 @@ double3 SphericalToDecart(double2 pos, double r)
 
 	return res;
 }
+
+double dlerp(double a, double b, float t) 
+{
+	return a + (b - a) * double(t);
+}
 ////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
@@ -92,6 +97,9 @@ struct VS_OUTPUT {
 	float4 Tex			: TEXCOORD0		;
 	float3 Normal		: TEXCOORD1		;
 	float3 XAxis		: TEXCOORD2		;
+	uint2 lon				: TEXCOORD3	;
+	uint2 lat				: TEXCOORD4	;
+	float4	Tex1			: TEXCOORD5	;
 };
 
 
@@ -127,6 +135,7 @@ cbuffer LinesCBStage	: register(b1) 	{	LinesConstData	LinesStage;	}
 
 #if 0
 $ubershader DRAW_LINES +ADD_CAPS +PALETTE_COLOR
+$ubershader GEO_LINES +ADD_CAPS +PALETTE_COLOR
 $ubershader ARC_LINE
 $ubershader DRAW_SEGMENTED_LINES +TEXTURED_LINE +ADD_CAPS
 $ubershader THIN_LINE +OVERALL_COLOR
@@ -172,6 +181,11 @@ VS_OUTPUT VSMain ( VS_INPUT v )
 	
 	output.Color.a = output.Color.a * factor;
 #endif
+
+#ifdef GEO_LINES
+	output.lon = v.lon;
+	output.lat = v.lat;
+#endif
 	
 	return output;
 }
@@ -189,6 +203,15 @@ VS_OUTPUT VSMain ( VS_INPUT v )
 	#else
 		#define TotalVertex LineVertexCount
 	#endif
+#endif
+
+#ifdef GEO_LINES
+	#define TotalVertex (68)
+	// #ifdef ADD_CAPS
+		// #define TotalVertex (SegmentedLineVertexCount + 8)
+	// #else
+		// #define TotalVertex SegmentedLineVertexCount
+	// #endif
 #endif
 
 #ifdef DRAW_SEGMENTED_LINES
@@ -222,13 +245,17 @@ inout TriangleStream<GS_OUTPUT> stream
 {
 	GS_OUTPUT	output;// = (GS_OUTPUT)0;
 	VS_OUTPUT	p0	=	inputArray[0];
-	VS_OUTPUT	p1	=	inputArray[1];
+	VS_OUTPUT	p1	=	inputArray[1];	
 	
 #ifdef PALETTE_COLOR
 	// For roads graph load
 	p0.Color = PaletteMap.SampleLevel(Sampler, float2(p0.Tex.w, 0.5f), 0);
 	p1.Color = p0.Color;
 #endif
+	
+	#ifdef GEO_LINES
+	double3 cameraPos =  double3(asdouble(Stage.CameraX[0], Stage.CameraX[1]), asdouble(Stage.CameraY[0], Stage.CameraY[1]), asdouble(Stage.CameraZ[0], Stage.CameraZ[1]));
+	#endif
 	
 #ifdef THIN_LINE
 	output.Normal 	= float3(0,0,0);
@@ -264,6 +291,16 @@ inout TriangleStream<GS_OUTPUT> stream
 	float slicesCount = 5;
 #endif
 
+#ifdef GEO_LINES
+	double lon0		= asdouble(p0.lon.x, p0.lon.y);
+	double lat0		= asdouble(p0.lat.x, p0.lat.y);
+	
+	double lon1		= asdouble(p1.lon.x, p1.lon.y);
+	double lat1		= asdouble(p1.lat.x, p1.lat.y);
+	
+	float slicesCount = 10;//max(length(float2(float(lon1-lon0), float(lat1 - lat0))), 30);	
+#endif
+
 #ifdef ARC_LINE	
 	float slicesCount	= 30;
 	float radius 		= length(dis)/2.0f;
@@ -278,6 +315,30 @@ inout TriangleStream<GS_OUTPUT> stream
 	[unroll]
 	for(float i = 0; i < slicesCount; i = i + 1) {
 
+	#ifdef GEO_LINES
+		float f = i / (slicesCount-1);
+		
+		double lon = dlerp(lon0, lon1, f);
+		double lat = dlerp(lat0, lat1, f);
+		float h = lerp(p0.Tex1.x, p1.Tex1.x, f);
+		double3 cPos = SphericalToDecart(double2(lon, lat), 6378.137 + h);
+		
+		double3 normPos = cPos*0.000156785594;
+	
+		double posX = cPos.x - cameraPos.x;
+		double posY = cPos.y - cameraPos.y;
+		double posZ = cPos.z - cameraPos.z;
+		
+		float3 pos			= float3(posX, posY, posZ);
+		float3 sideOffset	= lerp(sideOffset0, sideOffset1, f);
+		float3 normal		= float3(normPos)
+		;//normalize(lerp(p0.Normal, p1.Normal, f));
+		
+		float texX = texMaxX*f;
+		
+		float height = h;
+		output.Color = lerp(p0.Color, p1.Color, f); 
+	#else
 		float f = i / (slicesCount-1);
 
 		float3 pos			= lerp(p0.Position.xyz, p1.Position.xyz, f);
@@ -287,18 +348,18 @@ inout TriangleStream<GS_OUTPUT> stream
 		float texX = texMaxX*f;
 		
 		float height = 0;
-#ifdef ARC_LINE
-		height = sin(PI * f) * radius;
-#endif
-		// Determine color
-		output.Color = lerp(p0.Color, p1.Color, f);
-		
-#ifdef 	FADING_LINE
-		if(i == slicesCount-1) {
-			output.Color.a = 0;
-		}
-#endif
-
+		#ifdef ARC_LINE
+			height = sin(PI * f) * radius;
+		#endif
+			// Determine color
+			output.Color = lerp(p0.Color, p1.Color, f);
+			
+		#ifdef 	FADING_LINE
+			if(i == slicesCount-1) {
+				output.Color.a = 0;
+			}
+		#endif
+	#endif
 		output.Normal = normal;
 		
 		output.Tex		= float2(texX, 0.0f);
