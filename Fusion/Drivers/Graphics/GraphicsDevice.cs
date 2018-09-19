@@ -889,6 +889,17 @@ namespace Fusion.Drivers.Graphics {
 			}
 		}
 
+	    public ViewportF GetViewport()
+	    {
+	        ViewportF[] viewports = new ViewportF[1];
+            lock (deviceContext)
+	        {	            
+	            deviceContext.Rasterizer.GetViewports(viewports);
+	        }
+
+	        return viewports[0];
+	    }
+
 
 
 		/// <summary>

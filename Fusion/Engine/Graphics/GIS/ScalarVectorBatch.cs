@@ -408,7 +408,8 @@ namespace Fusion.Engine.Graphics.GIS
 				DepthStencilSurface depth;
 				RenderTargetSurface[] surfaces;
 				Game.GraphicsDevice.GetTargets(out depth, out surfaces);
-
+			    var v = Game.GraphicsDevice.GetViewport();
+                Game.GraphicsDevice.
 				Game.GraphicsDevice.Clear(VelocityMap.Surface, Color4.Zero);
 				Game.GraphicsDevice.SetTargets(null, VelocityMap);
 
@@ -428,7 +429,7 @@ namespace Fusion.Engine.Graphics.GIS
 
 				// Restore previous targets
 				Game.GraphicsDevice.SetTargets(depth, surfaces);
-
+                Game.GraphicsDevice.SetViewport(v);
 				Game.GraphicsDevice.VertexShaderResources[5] = null;
 				Game.GraphicsDevice.VertexShaderResources[6] = null;
 				Game.GraphicsDevice.VertexShaderResources[7] = null;
