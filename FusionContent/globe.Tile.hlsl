@@ -120,6 +120,10 @@ float4 PSMain ( VS_OUTPUT input ) : SV_Target
 			waterColor = float3(181.0f/255.0f, 208.0f/255.0f, 208.0f/255.0f);
 			snowColor = float3(242.0f/255.0f, 239.0f/255.0f, 239.0f/255.0f);			
 		break;
+		case 5:
+			waterColor = float3(38.0f/255.0f,38.0f/255.0f, 38.0f/255.0f);
+			snowColor = float3(0.0f, 0.0f, 0.0f);			
+		break;
 		default:
 		break;
 	}		

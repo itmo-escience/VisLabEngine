@@ -231,8 +231,8 @@ namespace Fusion.Engine.Graphics.GIS
 			//		//	Lat = DMathUtil.DegreesToRadians(coords1.Y),
 			//		//	Color = color
 			//		//});
-			//	}
-			//}
+			//	} 
+			//} 
 
 			for (int col = 0; col < xStepsCount; col++) {
 				var xPoint = GeoHelper.RhumbDestinationPoint(lonLatLeftBottomCorner, 90, step * col);

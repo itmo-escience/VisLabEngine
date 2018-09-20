@@ -176,6 +176,10 @@ namespace Fusion.Engine.Graphics.GIS
                             case "OSM":
                                 constantData.Dummy.Y = 4;
                                 break;
+                            case "Dark": 
+                            case "CDN":
+                                constantData.Dummy.Y = 5;
+                                break; 
                         }
                     }
 

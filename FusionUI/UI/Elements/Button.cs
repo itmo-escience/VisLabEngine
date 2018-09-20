@@ -19,12 +19,12 @@ namespace FusionUI.UI.Elements
 
         public bool IsToggled => toggleState;
 
-        public Button(FrameProcessor ui, float x, float y, float w, float h, string text, Color activeColor, Color inactiveColor, Texture activeImage = null, Texture passiveImage = null, Action<bool> action = null, bool active = false, int timeTransition=0) : base(ui, x, y, w, h, text, inactiveColor)
+        public Button(FrameProcessor ui, float x, float y, float w, float h, string text, Color activeColor, Color inactiveColor, Texture activeImage = null, Texture passiveImage = null, Action<bool> action = null, bool active = false, int timeTransition=0, Color? activeFColor = null, Color? inactiveFColor = null) : base(ui, x, y, w, h, text, inactiveColor)
         {
             ActiveColor = activeColor;
             InactiveColor = inactiveColor;
-            ActiveFColor = ForeColor;
-            InactiveFColor = ForeColor;
+            ActiveFColor = activeFColor ?? ForeColor;
+            InactiveFColor = inactiveFColor ?? ForeColor;
             ActiveImage = activeImage;
             PassiveImage = passiveImage;
             initToggableButton(active, timeTransition);
