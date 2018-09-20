@@ -94,15 +94,15 @@ namespace Fusion.Engine.Graphics {
 		}
 
 
-		public static bool operator == (MeshVertex vertex1, MeshVertex vertex2)
-		{
-			return vertex1.Equals(vertex2);
-		}
+        public static bool operator ==(MeshVertex vertex1, MeshVertex vertex2)
+        {
+            return vertex1.Equals(vertex2);
+        }
 
 
-		public static bool operator != (MeshVertex vertex1, MeshVertex vertex2)
-		{
-			return ! (vertex1.Equals(vertex2));
-		}
-	}
+        public static bool operator !=(MeshVertex vertex1, MeshVertex vertex2)
+        {
+            return !(vertex1.Equals(vertex2));
+        }
+    }
 }

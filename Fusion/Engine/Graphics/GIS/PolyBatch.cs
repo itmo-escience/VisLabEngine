@@ -275,8 +275,8 @@ namespace Fusion.Engine.Graphics.GIS
 
 	    public void Merge(PolyGisLayer second)
 	    {
-	        var points = new List<Gis.GeoPoint>(PointsCpu);
-	        var indeces = new List<int>(IndecesCpu);
+	        var points = new List<Gis.GeoPoint>(PointsCpu ?? new Gis.GeoPoint[0]);
+	        var indeces = new List<int>(IndecesCpu ?? new int[0]);
 	        var c = points.Count;
 	        foreach (var p in second.PointsCpu) 
 	        {
@@ -527,6 +527,130 @@ namespace Fusion.Engine.Graphics.GIS
 			};
 		}
 
+        public static PolyGisLayer CreateRoadFromLineTwo(DVector2[] lineRad, double width, bool usePalette = true, Color? color = null)
+        {
+            if (lineRad.Length == 0)
+            {
+                return null;
+            }
+
+            if (color == null) color = Color.White;
+
+            float distMul = 4.0f;
+
+            List<Gis.GeoPoint> vertices = new List<Gis.GeoPoint>();
+            List<int> indeces = new List<int>();
+
+            for (int i = 0; i < lineRad.Length - 1; i++)
+            {
+                var p0 = lineRad[i];
+                var p1 = lineRad[i + 1];
+
+                var cPos0 = GeoHelper.SphericalToCartesian(p0);
+                var cPos1 = GeoHelper.SphericalToCartesian(p1);
+
+                var normal = DVector3.Normalize(cPos0);
+
+                var dir = cPos1 - cPos0;
+                var sideVec = DVector3.Normalize(DVector3.Cross(normal, dir));
+
+                var sideOffset = sideVec * width;
+
+
+                // Plane
+                var finalPosRight = cPos0 + sideOffset;
+                var finalPosLeft = cPos0 - sideOffset;
+
+                var lonLatRight = GeoHelper.CartesianToSpherical(finalPosRight);
+                var lonLatLeft = GeoHelper.CartesianToSpherical(finalPosLeft);
+
+                vertices.Add(new Gis.GeoPoint
+                {
+                    Lon = lonLatRight.X,
+                    Lat = lonLatRight.Y,
+                    Color = color.Value,
+                    Tex0 = Vector4.Zero,
+                });
+
+                vertices.Add(new Gis.GeoPoint
+                {
+                    Lon = lonLatLeft.X,
+                    Lat = lonLatLeft.Y,
+                    Color = color.Value,
+                    Tex0 = Vector4.Zero,
+                });
+
+                indeces.Add(i * 2);
+                indeces.Add(i * 2 + 1);
+                indeces.Add((i + 1) * 2);
+
+                indeces.Add(i * 2 + 1);
+                indeces.Add((i + 1) * 2 + 1);
+                indeces.Add((i + 1) * 2);
+
+            }
+
+            {
+                var p0 = lineRad[lineRad.Length - 1];
+                var p1 = lineRad[lineRad.Length - 2];
+
+                var cPos0 = GeoHelper.SphericalToCartesian(p0);
+                var cPos1 = GeoHelper.SphericalToCartesian(p1);
+
+                var normal = DVector3.Normalize(cPos0);
+
+                var dir = cPos0 - cPos1;
+                var sideVec = DVector3.Normalize(DVector3.Cross(normal, dir));
+
+                var sideOffset = sideVec * width;
+
+
+                // Plane
+                var finalPosRight = cPos0 + sideOffset;
+                var finalPosLeft = cPos0 - sideOffset;
+
+                var lonLatRight = GeoHelper.CartesianToSpherical(finalPosRight);
+                var lonLatLeft = GeoHelper.CartesianToSpherical(finalPosLeft);
+
+
+                vertices.Add(new Gis.GeoPoint
+                {
+                    Lon = lonLatRight.X,
+                    Lat = lonLatRight.Y,
+                    Color = color.Value,
+                    Tex0 = Vector4.Zero,
+                });
+
+                vertices.Add(new Gis.GeoPoint
+                {
+                    Lon = lonLatLeft.X,
+                    Lat = lonLatLeft.Y,
+                    Color = color.Value,
+                    Tex0 = Vector4.Zero,
+                });
+            }
+
+
+            if (usePalette)
+            {
+                return new PolyGisLayer(Game.Instance, vertices.ToArray(), indeces.ToArray(), false)
+                {
+                    Flags = (int)(PolyFlags.NO_DEPTH | PolyFlags.DRAW_TEXTURED | PolyFlags.CULL_NONE |
+                                   PolyFlags.VERTEX_SHADER | PolyFlags.PIXEL_SHADER | PolyFlags.USE_PALETTE_COLOR),
+                    Sampler = SamplerState.AnisotropicWrap
+                };
+            }
+            else
+            {
+                return new PolyGisLayer(Game.Instance, vertices.ToArray(), indeces.ToArray(), false)
+                {
+                    Flags = (int)(PolyFlags.NO_DEPTH | PolyFlags.DRAW_COLORED | PolyFlags.CULL_NONE |
+                                  PolyFlags.VERTEX_SHADER | PolyFlags.PIXEL_SHADER | PolyFlags.USE_VERT_COLOR),
+                    Sampler = SamplerState.AnisotropicWrap
+                };
+            }
+        }
+
 		public static PolyGisLayer CreatePolyFromLine(DVector2[] lineRad, double width, bool usePalette = true, Color? color = null)
 		{
 			if(lineRad.Length == 0) {
@@ -719,14 +843,14 @@ namespace Fusion.Engine.Graphics.GIS
                         indeces.Add(p0Ind);
                         indeces.Add(p2Ind);
                         indeces.Add(p3Ind);
-                       
+
                         indeces.Add(p0Ind);
                         indeces.Add(p3Ind);
                         indeces.Add(p4Ind);
-                       
-                        indeces.Add(p3Ind);
-                        indeces.Add(p4Ind);
+
                         indeces.Add(p5Ind);
+                        indeces.Add(p4Ind);
+                        indeces.Add(p3Ind);
                     }
                 }
                 else
@@ -745,7 +869,7 @@ namespace Fusion.Engine.Graphics.GIS
                     var finalPosRight = cPos0; // + sideOffset;
                     var finalPosLeft = cPos0 - sideOffset;
 
-                    var lonLatRight = GeoHelper.CartesianToSpherical(finalPosRight); 
+                    var lonLatRight = GeoHelper.CartesianToSpherical(finalPosRight);
                     var lonLatLeft = GeoHelper.CartesianToSpherical(finalPosLeft);
 
 
@@ -1082,6 +1206,70 @@ namespace Fusion.Engine.Graphics.GIS
 
 			return new PolyGisLayer(engine, points.ToArray(), indeces.ToArray(), false) { ObjectsInfo = oInfo };
 		}
+
+        public static PolyGisLayer CreateFromFBXLine(Game engine, string fileName, float heightMult = 1.0f)
+        {
+            var scene = engine.Content.Load<Scene>(fileName);
+
+            var s = fileName.Split('_');
+            double easting = double.Parse(s[1].Replace(',', '.'));
+            double northing = double.Parse(s[2].Replace(',', '.'));
+            string region = s[3];
+
+            var transforms = new Matrix[scene.Nodes.Count];
+
+            scene.ComputeAbsoluteTransforms(transforms);
+            List<DVector2> points = new List<DVector2>();
+            PolyGisLayer lineLayer = null;
+
+
+            for (int i = 0; i < scene.Nodes.Count; i++)
+            {
+                var lineIndexCount = scene.Nodes[i].LineIndexCount;
+
+                if (lineIndexCount == 0)
+                {
+                    continue;
+                }
+
+                var world = transforms[i];
+
+                double worldLon, worldLat;
+                Gis.UtmToLatLon(easting + world.TranslationVector.X, northing - world.TranslationVector.Z, region, out worldLon, out worldLat);
+
+                var worldBasis = GeoHelper.CalculateBasisOnSurface(DMathUtil.DegreesToRadians(new DVector2(worldLon, worldLat)));
+                var worldBasisInvert = DMatrix.Invert(worldBasis);
+
+                for (int j = 0; j < scene.Nodes[i].LineIndex.Count; j++)
+                {
+                    foreach (var vert in scene.Lines[scene.Nodes[i].LineIndex[j]].Points)
+                    {
+                        var pos = (Vector3)vert.Position;
+
+                        var worldPos = Vector3.TransformCoordinate(pos, world);
+
+
+                        double lon, lat;
+                        Gis.UtmToLatLon(easting + (double)worldPos.X, northing - (double)worldPos.Z, region, out lon, out lat);
+
+                        lon = DMathUtil.DegreesToRadians(lon) + 0.0000068;
+                        lat = DMathUtil.DegreesToRadians(lat) + 0.0000113;
+                        points.Add(new DVector2(lon, lat));
+                    }
+                    var buf = CreateRoadFromLineTwo(points.ToArray(), 0.0005f, false, Color.Red);
+                    if (lineLayer == null)
+                    {
+                        lineLayer = buf;
+                    }
+                    else
+                    {
+                        lineLayer.Merge(buf);
+                    }
+                    points = new List<DVector2>();
+                }
+            }
+            return lineLayer;
+        }
 
 		public static void CreateFromUtmFbxModel(Game engine, string fileName, string meshName, out Gis.GeoPoint[] outPoints, out int[] outIndeces)
 		{

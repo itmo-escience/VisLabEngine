@@ -135,14 +135,14 @@ Fusion::Engine::Graphics::Scene ^ FbxLoader::LoadScene( string ^filename, Option
 
 	Console::WriteLine("Import Geometry...");
 
-	if (options->ImportGeometry) {
+	//if (options->ImportGeometry) {
 		for each ( Node ^node in scene->Nodes ) {
-			//Console::WriteLine( "  {0}",node->Name);
+			Console::WriteLine( "  {0}",node->Name);
 
 			FbxNode *fbxNode	=	(FbxNode*)(((IntPtr)node->Tag).ToPointer());
-			HandleMesh( scene, node, fbxNode );
+			HandleNode( scene, node, fbxNode );
 		}
-	}
+	//}
 
 	//	do not destroy...
 	// 	stack overflow happens...
@@ -202,7 +202,8 @@ void Native::Fbx::FbxLoader::IterateChildren( FbxNode *fbxNode, FbxScene *fbxSce
 			int lNodeIndex = lPose->Find(fbxNode);
 			if (lNodeIndex > -1) {
 				// The bind pose is always a global matrix.
-				if (lPose->IsBindPose() || !lPose->IsLocalMatrix(lNodeIndex)) {
+				if (lPose->IsBindPose() || !lPose->IsLocalMatrix(lNodeIndex)) 
+				{
 					FbxMatrix lPoseMatrix	= lPose ->GetMatrix( lNodeIndex );
 					node->BindPose			= FbxMatrix2Matrix(lPoseMatrix);
 				}
@@ -230,9 +231,102 @@ void	TryGetDiffuseTexture ( string ^%textureName, FbxProperty pProperty, int pMa
 #pragma warning (disable: 4996)
 
 /*
+** Fusion::Fbx::FbxLoader::HandleNode
+*/
+
+void Native::Fbx::FbxLoader::HandleNode(Fusion::Engine::Graphics::Scene ^scene, Fusion::Engine::Graphics::Node ^node, FbxNode *fbxNode)
+{
+	FbxNodeAttribute::EType lAttributeType;
+
+	if (fbxNode->GetNodeAttribute() == NULL)
+	{
+		FBXSDK_printf("NULL Node Attribute\n\n");
+		return;
+	}
+
+	lAttributeType = (fbxNode->GetNodeAttribute()->GetAttributeType());
+
+	switch (lAttributeType)
+	{
+	case FbxNodeAttribute::eLine:
+		HandleLine(scene, node, fbxNode);
+		break;
+	case FbxNodeAttribute::eMesh:
+		HandleMesh(scene, node, fbxNode);
+		break;
+	default:
+		break;
+	}
+}
+
+void Native::Fbx::FbxLoader::HandleLine(Fusion::Engine::Graphics::Scene ^scene, Fusion::Engine::Graphics::Node ^node, FbxNode *fbxNode)
+{
+	FbxLine* lLines = (FbxLine*)fbxNode->GetNodeAttribute();
+
+	Fusion::Engine::Graphics::Line	^nodeLine = gcnew Fusion::Engine::Graphics::Line();
+	scene->Lines->Add(nodeLine);
+
+	int lControlPointsCount = lLines->GetControlPointsCount();
+	FbxVector4* lControlPoints = lLines->GetControlPoints();
+
+	int IndexArrayCount = lLines->GetIndexArray()->Size();
+	int* IndexArray = lLines->GetIndexArray()->GetArray();
+
+	int endArrayIndexCount = lLines->GetEndPointArray()->Size();
+	int* endArrayIndex = lLines->GetEndPointArray()->GetArray();
+
+	node->Type = Fusion::Engine::Graphics::EType::eLine;
+	node->LineIndex->Capacity = endArrayIndexCount;
+	node->LineIndex->Add(scene->Lines->Count - 1);
+
+	nodeLine->Points->Capacity = IndexArrayCount;
+
+	if (endArrayIndexCount > 1)
+	{
+		int j = 0;
+		for (int i = 0; i < IndexArrayCount; i++)
+		{
+			Fusion::Engine::Graphics::LinePoint p;
+			p.Position.X = lControlPoints[IndexArray[i]][0];
+			p.Position.Y = lControlPoints[IndexArray[i]][1];
+			p.Position.Z = lControlPoints[IndexArray[i]][2];
+			p.Position.W = lControlPoints[IndexArray[i]][3];
+			if (endArrayIndex[j] == IndexArray[i])
+			{
+				nodeLine->Points->Add(p);
+				if (j + 1 != endArrayIndexCount)
+				{
+					j = j + 1;
+					nodeLine = gcnew Fusion::Engine::Graphics::Line();
+					scene->Lines->Add(nodeLine);
+					node->LineIndex->Add(scene->Lines->Count - 1);
+				}
+			}
+			else
+			{
+				nodeLine->Points->Add(p);
+			}
+		}
+	}
+	else
+	{
+		for (int i = 0; i < IndexArrayCount; i++)
+		{
+			Fusion::Engine::Graphics::LinePoint p;
+			p.Position.X = lControlPoints[IndexArray[i]][0];
+			p.Position.Y = lControlPoints[IndexArray[i]][1];
+			p.Position.Z = lControlPoints[IndexArray[i]][2];
+			p.Position.W = lControlPoints[IndexArray[i]][3];
+
+			nodeLine->Points->Add(p);
+		}
+	}
+}
+
+/*
 **	Fusion::Fbx::FbxLoader::HandleMesh
 */
-void Native::Fbx::FbxLoader::HandleMesh( Fusion::Engine::Graphics::Scene ^scene, Fusion::Engine::Graphics::Node ^node, FbxNode *fbxNode )
+void Native::Fbx::FbxLoader::HandleMesh( Fusion::Engine::Graphics::Scene ^scene, Fusion::Engine::Graphics::Node ^node, FbxNode *fbxNode)
 {
 	FbxMesh		*fbxMesh	=	fbxNode->GetMesh();
 
@@ -246,6 +340,7 @@ void Native::Fbx::FbxLoader::HandleMesh( Fusion::Engine::Graphics::Scene ^scene,
 
 	scene->Meshes->Add( nodeMesh );
 	node->MeshIndex = scene->Meshes->Count-1;
+	node->Type = Fusion::Engine::Graphics::EType::eMesh;
 
 	if (!fbxMesh->IsTriangleMesh()) {
 		fbxMesh = fbxGConv->TriangulateMesh( fbxMesh );

@@ -18,7 +18,8 @@ namespace Fusion.Engine.Graphics {
 
 		List<Node>			nodes		= new List<Node>();
 		List<Mesh>			meshes		= new List<Mesh>();
-		List<MaterialRef>	materials	= new List<MaterialRef>();
+        List<MaterialRef>   materials   = new List<MaterialRef>();
+        List<Line>          lines       = new List<Line>();
 
 		int firstFrame = 0;
 		int lastFrame = 0;
@@ -54,6 +55,14 @@ namespace Fusion.Engine.Graphics {
 				return materials;
 			}
 		}
+
+        public IList<Line> Lines
+        {
+            get
+            {
+                return lines;
+            }
+        }
 
 
 
@@ -563,7 +572,13 @@ namespace Fusion.Engine.Graphics {
 					node.TrackIndex		=	reader.ReadInt32();
 					node.Transform		=	reader.Read<Matrix>();
 					node.BindPose		=	reader.Read<Matrix>();
-					scene.nodes.Add( node );
+                    node.Type           =   (EType)reader.ReadInt32();
+                    int lineIndexCount = reader.ReadInt32();
+                    if (lineIndexCount != 0)
+                    {
+                        node.LineIndex = reader.Read<int>(lineIndexCount).ToList();
+                    }
+                    scene.nodes.Add( node );
 				}
 
 				//---------------------------------------------
@@ -576,7 +591,17 @@ namespace Fusion.Engine.Graphics {
 					mesh.Deserialize( reader );
 					scene.Meshes.Add( mesh );
 				}
-			}
+
+                //---------------------------------------------
+                reader.ExpectFourCC("LINE", "scene");
+                var lineCount = reader.ReadInt32();
+                for (int i = 0; i < lineCount; i++)
+                {
+                    var line = new Line();
+                    line.Deserialize(reader);
+                    scene.lines.Add(line);
+                }
+            }
 
 			return scene;
 		}
@@ -636,6 +661,12 @@ namespace Fusion.Engine.Graphics {
 					writer.Write( node.TrackIndex );
 					writer.Write( node.Transform );
 					writer.Write( node.BindPose );
+                    writer.Write( (int)node.Type );
+                    writer.Write( node.LineIndexCount );
+                    if (node.LineIndexCount != 0)
+                    {
+                        writer.Write(node.LineIndex.ToArray());
+                    }
 				}
 
 				//---------------------------------------------
@@ -646,7 +677,15 @@ namespace Fusion.Engine.Graphics {
 				foreach ( var mesh in Meshes ) {
 					mesh.Serialize( writer );
 				}
-			}
+
+                writer.Write(new[] {'L', 'I','N', 'E'});
+                
+                writer.Write(Lines.Count());
+                foreach(var line in Lines)
+                {
+                    line.Serialize( writer );
+                }
+            }
 		}
 
 

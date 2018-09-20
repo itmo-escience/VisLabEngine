@@ -9,12 +9,19 @@ using Fusion.Core.Mathematics;
 
 namespace Fusion.Engine.Graphics {
 
-	public sealed class Node : IEquatable<Node> {
+    public enum EType: int
+    {
+        None = -1,
+        eMesh,
+        eLine
+    }
 
-		/// <summary>
-		/// Node name.
-		/// </summary>
-		public string Name { get; set; }
+    public sealed class Node : IEquatable<Node> {
+
+        /// <summary>
+        /// Node name.
+        /// </summary>
+        public string Name { get; set; }
 
 		/// <summary>
 		/// Parent index in scene. Zero value means root node.
@@ -48,15 +55,22 @@ namespace Fusion.Engine.Graphics {
 		/// </summary>
 		public object Tag { get; set; }
 
+        public EType Type { get; set; }
 
-		/// <summary>
-		/// Creates instance of the node.
-		/// </summary>
-		public Node () {
+        public List<int> LineIndex { get; set; }
+
+        public int LineIndexCount { get { return LineIndex.Count; } }
+
+        /// <summary>
+        /// Creates instance of the node.
+        /// </summary>
+        public Node () {
 			MeshIndex	=	-1;
 			ParentIndex	=	-1;
 			TrackIndex	=	-1;
-		}
+            Type = EType.None;
+            LineIndex = new List<int>();
+        }
 
 
 		
@@ -74,7 +88,8 @@ namespace Fusion.Engine.Graphics {
 				&& ( this.TrackIndex	== other.TrackIndex		)
 				&& ( this.Transform		== other.Transform		)
 				&& ( this.BindPose		== other.BindPose		)
-				&& ( this.Tag			== other.Tag			);
+				&& ( this.Tag			== other.Tag			)
+                && (this.Type == other.Type);
 		}
 
 

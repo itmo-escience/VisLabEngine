@@ -324,6 +324,8 @@
     <Compile Include="Engine\Graphics\Particle.cs" />
     <Compile Include="Engine\Graphics\ParticleSystem.cs" />
     <Compile Include="Engine\Graphics\RenderCounters.cs" />
+    <Compile Include="Engine\Graphics\Scene\Line.cs" />
+    <Compile Include="Engine\Graphics\Scene\LinePoint.cs" />
     <Compile Include="Engine\Graphics\Sprites\SpriteFrame.cs" />
     <Compile Include="Engine\Graphics\Sprites\SpriteDrawer.cs" />
     <Compile Include="Engine\Graphics\Sprites\SpriteLayerCollection.cs" />

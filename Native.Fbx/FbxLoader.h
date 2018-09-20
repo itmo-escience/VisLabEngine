@@ -26,6 +26,8 @@ namespace Native {
 				FbxTime::EMode			timeMode;
 
 				void IterateChildren		( FbxNode *fbxNode, FbxScene *fbxScene, Fusion::Engine::Graphics::Scene ^scene, int parentIndex, int depth );
+				void HandleNode             (Scene ^scene, Node ^node, FbxNode *fbxNode);
+				void HandleLine             (Scene ^scene, Node ^node, FbxNode *fbxNode);
 				void HandleMesh				( Scene ^scene, Node ^node, FbxNode *fbxNode );
 				void HandleSkinning			( Mesh ^nodeMesh, Scene ^scene, Node ^node, FbxNode *fbxNode, Matrix^ meshTransform, array<Int4> ^skinIndices, array<Vector4>	^skinWeights );
 				void HandleCamera			( Scene ^scene, Node ^node, FbxNode *fbxNode );
