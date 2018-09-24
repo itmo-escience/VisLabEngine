@@ -1,6 +1,7 @@
 ﻿using System;
 using System.IO;
 using Fusion.Core.Mathematics;
+using Fusion.Drivers.Graphics;
 using Fusion.Engine.Frames;
 using Fusion.Engine.Graphics;
 using FusionUI.UI.Factories;
@@ -30,7 +31,10 @@ namespace FusionUI.UI.Elements.DropDown
                 }
                 return PaletteFactory.CachedPalettes[name];
             }
-            return ApplicationInterface.Instance.Game.Content.Load<DiscTexture>(s);
+
+            return new DiscTexture(Fusion.Engine.Common.Game.Instance.RenderSystem,
+                ApplicationInterface.Instance.Game.Content.Load<Texture2D>(s));
+            //return ApplicationInterface.Instance.Game.Content.Load<DiscTexture>(s);
         };
 
         public override void Initialize(float x, float y, float w, float h, string text, Color backColor)

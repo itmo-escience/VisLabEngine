@@ -46,10 +46,9 @@ namespace FusionUI
         protected DiscTexture     debugFont;
         protected SpriteFont      textFont;
 
-		public RenderLayer ViewLayer;
+		public RenderLayer ViewLayer;        
 
-
-		[Config]
+        [Config]
         public static int gridUnitDefault = 4;
 
         [Config]

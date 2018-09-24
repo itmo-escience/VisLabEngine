@@ -144,6 +144,12 @@ namespace FusionUI.UI
             holder.UpdateParent = false;
             holder.ActionDraw += DrawScrollLine;
 
+            holder.ActionUpdate += time =>
+            {
+                if (float.IsNaN(holder.UnitY) || float.IsInfinity(holder.UnitY)) holder.UnitY = 0;
+                holder.UnitY = MathUtil.Clamp(holder.UnitY, Math.Min(MaxHeight - RealHeight, 0), 0);
+            };
+
             ActionClick += (ControlActionArgs args, ref bool flag) =>
             {
                 if (args.X > GlobalRectangle.Right - ScrollSize * ScaleMultiplier)
