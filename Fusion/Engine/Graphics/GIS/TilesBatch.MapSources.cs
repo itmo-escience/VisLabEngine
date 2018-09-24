@@ -42,6 +42,7 @@ namespace Fusion.Engine.Graphics.GIS
 
 		protected void RegisterMapSources()
 		{
+            MapSources.Clear();
 			MapSources.Add(new OpenStreetMap(Game)		);
 			MapSources.Add(new GoogleMap(Game)			);
 			MapSources.Add(new GoogleSatelliteMap(Game)	);
