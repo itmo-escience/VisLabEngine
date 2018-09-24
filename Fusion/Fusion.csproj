@@ -290,6 +290,7 @@
     <Compile Include="Engine\Graphics\GIS\PointsFbxLayer2.cs" />
     <Compile Include="Engine\Graphics\GIS\PointsGisLayerCPU.cs" />
     <Compile Include="Engine\Graphics\GIS\PropsLayer.cs" />
+    <Compile Include="Engine\Graphics\GIS\ScalarFieldSlice.cs" />
     <Compile Include="Engine\Graphics\GIS\ScalarVectorBatch.cs" />
     <Compile Include="Engine\Graphics\GIS\ScalarVectorField.cs" />
     <Compile Include="Engine\Graphics\GIS\SceneLayer.cs" />
