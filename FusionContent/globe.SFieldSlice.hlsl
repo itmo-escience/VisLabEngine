@@ -134,7 +134,7 @@ VS_OUTPUT VSMain ( VS_INPUT v )
 	output.Position	= mul(float4(posX, posY, posZ, 1), Stage.ViewProj);	
 	output.Color = v.Color;
 	
-	float val = v.Tex.x / (ValueBounds.Max - ValueBounds.Min);
+	float val = (v.Tex.x  - ValueBounds.Min) / (ValueBounds.Max - ValueBounds.Min);
 	output.Tex = float4(saturate(val), 0, 0, 0);
 	
 	return output;
