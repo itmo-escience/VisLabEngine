@@ -87,8 +87,9 @@ struct VS_INPUT {
 };
 
 struct VS_OUTPUT {
-    float4 Position		: SV_POSITION	;
-	float4 Tex			: TEXCOORD0		;
+    float4 Position		: SV_POSITION ;
+	float4 Color		: COLOR       ;
+	float4 Tex			: TEXCOORD0   ;
 };
 
 /////////////////////////////// Constant Buffers
@@ -130,9 +131,10 @@ VS_OUTPUT VSMain ( VS_INPUT v )
 	double posY = vertexPos.y - cameraPos.y;
 	double posZ = vertexPos.z - cameraPos.z;
 	
-	output.Position	= mul(float4(posX, posY, posZ, 1), Stage.ViewProj);
+	output.Position	= mul(float4(posX, posY, posZ, 1), Stage.ViewProj);	
+	output.Color = v.Color;
 	
-	float val = v.Tex / (ValueBounds.Max - ValueBounds.Min);
+	float val = v.Tex.x / (ValueBounds.Max - ValueBounds.Min);
 	output.Tex = float4(saturate(val), 0, 0, 0);
 	
 	return output;
@@ -143,8 +145,7 @@ float4 PSMain ( VS_OUTPUT input ) : SV_Target
 	float4 color = Palette.Sample(Sampler, float2(input.Tex.x, 0.5f));
 
 	//color.rgb *= input.Color.rgb;
-	//color.a *= input.Color.a * DotsData.SizeMultTimeAlpha.z;
-	//color = float4(1.0f, 0.0f, 0.0f, 1.0f);
+	color.a *= input.Color.a;
 	
 	return color;
 }
