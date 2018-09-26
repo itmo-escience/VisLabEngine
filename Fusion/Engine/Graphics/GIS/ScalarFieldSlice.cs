@@ -33,7 +33,7 @@ namespace Fusion.Engine.Graphics.GIS
         private readonly Ubershader _shader;
         private readonly ConstantBuffer _minMaxValueBuffer;
 
-        public ScalarFieldSlice(Game engine) : base(engine)
+        public ScalarFieldSlice(Game engine, string palette, float minValue, float maxValue) : base(engine)
         {
             _shader = Game.Content.Load<Ubershader>("globe.SFieldSlice.hlsl");
             _factory = _shader.CreateFactory(
@@ -44,13 +44,23 @@ namespace Fusion.Engine.Graphics.GIS
                 RasterizerState.CullNone, 
                 DepthStencilState.None
             );
-
-            Palette = Game.Content.Load<Texture2D>("pallete");
-
             _minMaxValueBuffer = new ConstantBuffer(Game.GraphicsDevice, typeof(ConstData));
+
+            UpdatePalette(palette);            
+            UpdateMinMax(minValue, maxValue);
         }
 
-        public void SetPoints(Gis.CartPoint[] newPoints, int[] indices, float minValue, float maxValue)
+        public void UpdateMinMax(float minValue, float maxValue)
+        {
+            _minMaxValueBuffer.SetData(new ConstData { Min = minValue, Max = maxValue });
+        }
+
+        public void UpdatePalette(string palette)
+        {
+            Palette = Game.Content.Load<Texture2D>(palette);
+        }
+
+        public void SetPoints(Gis.CartPoint[] newPoints, int[] indices)
         {
             _currentBuffer?.Dispose();
             _indicesBuffer?.Dispose();
@@ -60,9 +70,7 @@ namespace Fusion.Engine.Graphics.GIS
             _currentBuffer.SetData(newPoints);
 
             _indicesBuffer = new IndexBuffer(Game.GraphicsDevice, indices.Length);
-            _indicesBuffer.SetData(indices);
-
-            _minMaxValueBuffer.SetData(new ConstData { Min = minValue, Max = maxValue });
+            _indicesBuffer.SetData(indices);            
         }
 
         public override void Draw(GameTime gameTime, ConstantBuffer constBuffer)
