@@ -13,6 +13,7 @@ using Button = FusionUI.UI.Elements.Button;
 using Color = Fusion.Core.Mathematics.Color;
 using System.Drawing;
 using System.Drawing.Drawing2D;
+using Fusion.Drivers.Graphics;
 
 namespace FusionUI.UI.Factories
 {
@@ -30,8 +31,8 @@ namespace FusionUI.UI.Factories
             this.ui = ui;
             maxPosition = 1;
             minPosition = 0;
-            PaletteImage = ui.Game.Content.Load<DiscTexture> (textureName);
-            Image = ui.Game.Content.Load<DiscTexture>(@"ui-new/fv_palette_bg.png");
+            PaletteImage = new DiscTexture(ui.Game.RenderSystem, ui.Game.Content.Load<Texture2D> (textureName));
+            Image = new DiscTexture(Game.RenderSystem, ui.Game.Content.Load<Texture2D>(@"ui-new/fv_palette_bg.png"));
             ImageMode = FrameImageMode.Tiled;
         }
 
@@ -252,7 +253,7 @@ namespace FusionUI.UI.Factories
             }
             else if (!s.StartsWith("<u>"))
             {
-                holder.palette.PaletteImage = ApplicationInterface.Instance.Game.Content.Load<DiscTexture>(s);
+                holder.palette.PaletteImage = new DiscTexture(Game.Instance.RenderSystem, ApplicationInterface.Instance.Game.Content.Load<Texture2D>(s));
                 holder.PaletteChangeAction(holder.selector.Current);
                 holder.CurrentTextureName = s;
             }
