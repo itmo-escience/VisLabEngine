@@ -5,6 +5,8 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using Fusion.Core.Mathematics;
+using Fusion.Drivers.Graphics;
+using Fusion.Engine.Common;
 using Fusion.Engine.Frames;
 using Fusion.Engine.Graphics;
 using FusionUI;
@@ -91,7 +93,7 @@ namespace ForumProject.ScenarioManager.Legenda
 						UnitTextOffsetX = UIConfig.UnitLegendElementHeight,
 						TextAlignment = Alignment.MiddleLeft,
 						ImageColor = Color.White,
-						Image		= string.IsNullOrEmpty(PaletteName) ? null : ui.Game.Content.Load<DiscTexture>(PaletteName),
+						Image		= string.IsNullOrEmpty(PaletteName) ? null : new DiscTexture(ui.Game.RenderSystem, ui.Game.Content.Load<Texture2D>(PaletteName)),
 						ImageMode	= FrameImageMode.Stretched,
 						ClippingMode = ClippingMode.ClipByPadding,
 						UnitVPadding = 2,

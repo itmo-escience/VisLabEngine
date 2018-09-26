@@ -478,6 +478,8 @@ namespace Fusion.Engine.Graphics.GIS
 		{
 			var w = Viewport.Width;
 			var h = Viewport.Height;
+		    x = x - Viewport.X;
+		    y = y - Viewport.Y;
 
 			var nearPoint	= new DVector3(x, y, Parameters.FrustumZNear);
 			var farPoint	= new DVector3(x, y, Parameters.FrustumZFar);
