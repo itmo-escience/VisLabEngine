@@ -26,7 +26,7 @@ namespace Fusion.Engine.Graphics.GIS
 
         SamplerState Sampler = SamplerState.PointClamp;  
 
-        internal struct ConstData
+        protected struct ConstData
         {    
             public double Lat;
             public double Lon;
@@ -41,7 +41,7 @@ namespace Fusion.Engine.Graphics.GIS
             public Vector4 Right;
             public Vector4 Forward;   
         }
-        internal ConstData parameters;
+        protected ConstData parameters;
 
 
         public void SetWholeData(float[] data, int dimX, int dimY, int dimZ)
@@ -67,7 +67,7 @@ namespace Fusion.Engine.Graphics.GIS
             DataFirstFrameGpu = DataSecondFrameGpu;
 
             DataSecondFrameGpu = new Texture3D(Game.GraphicsDevice, dimX, dimY, dimZ, ColorFormat.R32F, false);
-            DataSecondFrameGpu.SetData(data);
+            DataSecondFrameGpu.SetData(data); 
             dataFrameSize = (dimX - 1) * (dimY - 1) * (dimZ - 1);
         }
 
@@ -79,7 +79,7 @@ namespace Fusion.Engine.Graphics.GIS
             set { parameters.IsolineValue = value; }
         }
 
-        public Color Color
+        public Color Color 
         {
             get { return (Color) parameters.Color; }
             set { parameters.Color = value.ToVector4(); }
@@ -112,13 +112,13 @@ namespace Fusion.Engine.Graphics.GIS
         void EnumFunc(PipelineState ps, int flag)
         {
             var flags = (FieldFlags) flag;
-
+             
             ps.VertexInputElements = null;
             //ps.BlendState = flags.HasFlag(FieldFlags.XRAY) ? BlendState.Additive : BlendState.AlphaBlend;
             //ps.DepthStencilState = flags.HasFlag(FieldFlags.NO_DEPTH) ? DepthStencilState.None : DepthStencilState.Default;
             //ps.RasterizerState = flags.HasFlag(FieldFlags.CULL_NONE) ? RasterizerState.CullNone : RasterizerState.CullCW;
 
-            ps.BlendState = BlendState.AlphaBlend;
+            ps.BlendState = BlendState.AlphaBlend; 
             ps.DepthStencilState = DepthStencilState.None;         
             ps.RasterizerState = RasterizerState.CullNone;
 
@@ -172,7 +172,7 @@ namespace Fusion.Engine.Graphics.GIS
         {
             shader = Game.Content.Load<Ubershader>("globe.marchingCubes.hlsl");
             factory = shader.CreateFactory(typeof(FieldFlags), EnumFunc);
-
+             
             cB = new ConstantBuffer(Game.GraphicsDevice, typeof(ConstData)); 
         }
 
@@ -196,9 +196,9 @@ namespace Fusion.Engine.Graphics.GIS
         {
             Game.GraphicsDevice.GeometryShaderConstants[0] = constBuffer;   
             Game.GraphicsDevice.VertexShaderConstants[0] = constBuffer;
-            var m = GeoHelper.CalculateBasisOnSurface(new DVector2(parameters.Lon, parameters.Lat));
-            parameters.Right = new Vector4(m.Right.ToVector3(), 0);
-            parameters.Forward = new Vector4(m.Forward.ToVector3(), 0);              
+            //var m = GeoHelper.CalculateBasisOnSurface(new DVector2(parameters.Lon, parameters.Lat));
+            //parameters.Right = new Vector4(m.Right.ToVector3(), 0);
+            //parameters.Forward = new Vector4(m.Forward.ToVector3(), 0);              
             cB.SetData(parameters);   
             Game.GraphicsDevice.VertexShaderConstants[1] = cB;
             Game.GraphicsDevice.GeometryShaderConstants[1] = cB;
@@ -207,7 +207,7 @@ namespace Fusion.Engine.Graphics.GIS
             Game.GraphicsDevice.GeometryShaderSamplers[0] = Sampler;
 
             Game.GraphicsDevice.GeometryShaderResources[1] = DataFirstFrameGpu; 
-            Game.GraphicsDevice.GeometryShaderResources[2] = DataSecondFrameGpu;
+            Game.GraphicsDevice.GeometryShaderResources[2] = DataSecondFrameGpu; 
             Game.GraphicsDevice.GeometryShaderResources[3] = depthBuffer;
 
             Game.GraphicsDevice.PipelineState = factory[(int)Flags];
