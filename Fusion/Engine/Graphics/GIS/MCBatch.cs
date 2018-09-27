@@ -4,10 +4,10 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
-using Fusion.Core.Mathematics;
 using Fusion.Drivers.Graphics;
 using Fusion.Engine.Common;
 using Fusion.Engine.Graphics.GIS.GlobeMath;
+using Fusion.Core.Mathematics;
 
 namespace Fusion.Engine.Graphics.GIS
 {
@@ -22,9 +22,10 @@ namespace Fusion.Engine.Graphics.GIS
             None = 0,
             DrawIsoSurface = 1 << 0,
             LerpBuffers = 1 << 1,
+            UsePalette = 1 << 2,
         }
 
-        SamplerState Sampler = SamplerState.PointClamp;  
+        SamplerState Sampler = SamplerState.LinearClamp;  
 
         protected struct ConstData
         {    
@@ -36,10 +37,11 @@ namespace Fusion.Engine.Graphics.GIS
             public uint dimX;
             public uint dimY;
             public uint dimZ; 
-            public uint Dummy;
+            public uint d;
             public Vector4 Color;
             public Vector4 Right;
-            public Vector4 Forward;   
+            public Vector4 Forward;
+            public Vector4 Dummy;
         }
         protected ConstData parameters;
 
@@ -190,8 +192,8 @@ namespace Fusion.Engine.Graphics.GIS
             base.Dispose();  
         }  
 
-        public FieldFlags Flags = FieldFlags.DrawIsoSurface | FieldFlags.LerpBuffers;    
-
+        public FieldFlags Flags = FieldFlags.DrawIsoSurface | FieldFlags.LerpBuffers;
+        public Texture2D Palette;
         public override void Draw(GameTime gameTime, ConstantBuffer constBuffer)
         {
             Game.GraphicsDevice.GeometryShaderConstants[0] = constBuffer;   
@@ -209,6 +211,18 @@ namespace Fusion.Engine.Graphics.GIS
             Game.GraphicsDevice.GeometryShaderResources[1] = DataFirstFrameGpu; 
             Game.GraphicsDevice.GeometryShaderResources[2] = DataSecondFrameGpu; 
             Game.GraphicsDevice.GeometryShaderResources[3] = depthBuffer;
+
+            if (Palette != null) 
+            {
+                Flags = FieldFlags.DrawIsoSurface | FieldFlags.LerpBuffers | FieldFlags.UsePalette;
+                Game.GraphicsDevice.PixelShaderResources[0] = Palette;  
+            }
+            else
+            {
+                Flags = FieldFlags.DrawIsoSurface | FieldFlags.LerpBuffers;
+            }
+
+
 
             Game.GraphicsDevice.PipelineState = factory[(int)Flags];
 

@@ -107,6 +107,7 @@ struct FieldData {
 	float4 Color;		
 	float4 Right;
 	float4 Forward;
+	float4 Dummy;
 };
 
 #define X 255
@@ -386,8 +387,9 @@ const static float3 verts[12] = {
 	float3(0.0f, 1.0f, 0.5f), //11
 };
 
+Texture2D		Palette   			: register(t0);
 Texture3D		FirstFrameData      : register(t1);
-Texture3D		SecondFrameData      : register(t2);
+Texture3D		SecondFrameData     : register(t2);
 
 StructuredBuffer<float> 	FieldDepths 	: register(t3);
 
@@ -399,7 +401,7 @@ cbuffer CBField	    : register(b1) { FieldData Field; }
 
 
 #if 0
-$ubershader DrawIsoSurface +LerpBuffers
+$ubershader DrawIsoSurface +LerpBuffers +UsePalette
 #endif
 
 uint3 XYZFromIndex(uint index, uint3 size) 
@@ -492,12 +494,12 @@ void GSMain ( point VS_OUTPUT inputArray[1], inout TriangleStream<GS_OUTPUT> str
 	// stream.Append( output );		
 	// stream.RestartStrip();
 			
-	output.Color = float3(1, 1, 1);//float3(float(cubeInd / 256.0f), float(cubeInd / 256.0f), float(cubeInd / 256.0f));
+	output.Color = float3(1, 1, 1);//float3(float(cubeInd / 256.0f), float(cubeInd / 256.0f), float(cubeInd / 256.0f));	
 	[loop]
 	for (uint i1 = 0; i1 < 5; i1++) 
 	{				
 		if (triTable[cubeInd][i1 * 3] == 255) break;
-		float4 positions[3];// = {float4(0), float4(0), float4(0)};
+		float4 positions[3];
 		[unroll]
 		for(uint j = 0; j < 3; j++) {
 			uint i = i1 * 3 + j;
@@ -532,8 +534,11 @@ float4 PSMain (GS_OUTPUT  input ) : SV_Target
 	
 	float  ndot = abs(dot( ndir, norm ));
 	float  frsn	= pow(saturate(1.1f-ndot), 0.5);
-				
+	#ifdef UsePalette
+	return Palette.Sample(Sampler, float2(Field.Dummy.x, 0.5f)) * ndot;
+	#else
 	return Field.Color * ndot;
+	#endif
 }
 
 
