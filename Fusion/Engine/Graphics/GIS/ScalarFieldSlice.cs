@@ -42,7 +42,7 @@ namespace Fusion.Engine.Graphics.GIS
                 VertexInputElement.FromStructure<Gis.CartPoint>(), 
                 BlendState.AlphaBlend, 
                 RasterizerState.CullNone, 
-                DepthStencilState.None
+                DepthStencilState.Default
             );
             _minMaxValueBuffer = new ConstantBuffer(Game.GraphicsDevice, typeof(ConstData));
 
