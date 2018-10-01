@@ -72,8 +72,8 @@ namespace Fusion.Drivers.Graphics {
 		/// </summary>
 		void SetDefault ()
 		{
-			Width			=	800;
-			Height			=	600;
+			Width			=	1920;
+			Height			=	1080;
 			FullScreen		=	false;
 			StereoMode		=	StereoMode.Disabled;
 			MsaaLevel		=	1;
