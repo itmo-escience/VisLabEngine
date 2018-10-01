@@ -219,12 +219,12 @@ namespace FusionUI.UI.Elements
                         if (l > l1)
                         {
                             var p = center + d2 * (l-l1);
-                            spriteLayer.Draw(circleTex, p.X - ArrowPointerSize / 2, p.Y - ArrowPointerSize / 2, ArrowPointerSize, ArrowPointerSize, BackColor);
-                        }
-                        else
-                        {
-                            var p = start + d1 * l;
-                            spriteLayer.Draw(circleTex, p.X - ArrowPointerSize/2, p.Y - ArrowPointerSize/2, ArrowPointerSize, ArrowPointerSize, BackColor);
+                            spriteLayer.Draw(circleTex, p.X - ArrowPointerSize, p.Y - ArrowPointerSize, ArrowPointerSize * 2, ArrowPointerSize * 2, BackColor);
+                        }                                                                                                
+                        else                                                                                             
+                        {                                                                                                
+                            var p = start + d1 * l;                                                                       
+                            spriteLayer.Draw(circleTex, p.X - ArrowPointerSize, p.Y - ArrowPointerSize, ArrowPointerSize * 2, ArrowPointerSize * 2, BackColor);
                         }
                     }
                 }                             
@@ -268,17 +268,17 @@ namespace FusionUI.UI.Elements
                         if (l > l1 + l2)
                         {
                             var p = center2 + d3 * (l - l1 - l2);
-                            spriteLayer.Draw(circleTex, p.X - ArrowPointerSize / 2, p.Y - ArrowPointerSize / 2, ArrowPointerSize, ArrowPointerSize, BackColor);
+                            spriteLayer.Draw(circleTex, p.X - ArrowPointerSize, p.Y - ArrowPointerSize, ArrowPointerSize * 2, ArrowPointerSize * 2, BackColor);
                         }
                         else if (l > l1)
                         {
                             var p = center1 + d2 * (l - l1);
-                            spriteLayer.Draw(circleTex, p.X - ArrowPointerSize / 2, p.Y - ArrowPointerSize / 2, ArrowPointerSize, ArrowPointerSize, BackColor);
+                            spriteLayer.Draw(circleTex, p.X - ArrowPointerSize, p.Y - ArrowPointerSize, ArrowPointerSize * 2, ArrowPointerSize * 2, BackColor);
                         }
                         else
                         {
                             var p = start + d1 * l;
-                            spriteLayer.Draw(circleTex, p.X - ArrowPointerSize / 2, p.Y - ArrowPointerSize / 2, ArrowPointerSize, ArrowPointerSize, BackColor);
+                            spriteLayer.Draw(circleTex, p.X - ArrowPointerSize, p.Y - ArrowPointerSize, ArrowPointerSize * 2, ArrowPointerSize * 2, BackColor);
                         }
                     }
                 }
@@ -327,17 +327,17 @@ namespace FusionUI.UI.Elements
                         if (l > l1 + l2)
                         {
                             var p = center2 + d3 * (l - l1 - l2);
-                            spriteLayer.Draw(circleTex, p.X - ArrowPointerSize / 2, p.Y - ArrowPointerSize / 2, ArrowPointerSize, ArrowPointerSize, BackColor);
+                            spriteLayer.Draw(circleTex, p.X - ArrowPointerSize, p.Y - ArrowPointerSize, ArrowPointerSize * 2, ArrowPointerSize * 2, BackColor);
                         }
                         else if (l > l1)
                         {
                             var p = center1 + d2 * (l - l1);
-                            spriteLayer.Draw(circleTex, p.X - ArrowPointerSize / 2, p.Y - ArrowPointerSize / 2, ArrowPointerSize, ArrowPointerSize, BackColor);
+                            spriteLayer.Draw(circleTex, p.X - ArrowPointerSize, p.Y - ArrowPointerSize, ArrowPointerSize * 2, ArrowPointerSize * 2, BackColor);
                         }
                         else
                         {
                             var p = start + d1 * l;
-                            spriteLayer.Draw(circleTex, p.X - ArrowPointerSize / 2, p.Y - ArrowPointerSize / 2, ArrowPointerSize, ArrowPointerSize, BackColor);
+                            spriteLayer.Draw(circleTex, p.X - ArrowPointerSize, p.Y - ArrowPointerSize, ArrowPointerSize * 2, ArrowPointerSize * 2, BackColor);
                         }
                     }
                 }
@@ -360,7 +360,7 @@ namespace FusionUI.UI.Elements
                         float l = GlobalAnimvelocity * (i + animProgress);
                         if (l > length - ArrowPointerSize || l < ArrowPointerSize) continue;
                         var p = start + d * l;
-                        spriteLayer.Draw(circleTex, p.X - ArrowPointerSize / 2, p.Y - ArrowPointerSize / 2, ArrowPointerSize, ArrowPointerSize, BackColor);                        
+                        spriteLayer.Draw(circleTex, p.X - ArrowPointerSize, p.Y - ArrowPointerSize, ArrowPointerSize * 2, ArrowPointerSize * 2, BackColor);                        
                     }
                 }
                 DrawLine(spriteLayer,whiteTex, start + d * ArrowPointerSize / 2, end - d * ArrowPointerSize / 2, BackColor, ArrowWidth);
