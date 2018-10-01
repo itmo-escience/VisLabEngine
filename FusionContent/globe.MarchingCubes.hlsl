@@ -401,7 +401,7 @@ cbuffer CBField	    : register(b1) { FieldData Field; }
 
 
 #if 0
-$ubershader DrawIsoSurface +LerpBuffers +UsePalette
+$ubershader DrawIsoSurface +LerpBuffers +UsePalette +MoveVertices
 #endif
 
 uint3 XYZFromIndex(uint index, uint3 size) 
@@ -426,15 +426,18 @@ VS_OUTPUT VSMain ( uint vertInd : SV_VertexID )
 	return output;
 }
 
+float ilerp(float min, float max, float value) 
+{
+	return (value - min) / (max - min);
+}
+
 [maxvertexcount(16)]
 void GSMain ( point VS_OUTPUT inputArray[1], inout TriangleStream<GS_OUTPUT> stream )
 {	
 
 	uint vertInd = inputArray[0].index;
 	float3 xyz = float3(XYZFromIndex(vertInd, Field.Dimension.xyz - uint3(1, 1, 1)));	
-	uint cubeInd = 0; 	
-	float4 s = float4(Field.Dimension.xyz, 1); //normalisation coefficient for texture sample
-	float4 d = float4(float3(0.5f, 0.5f, 0.5f) / Field.Dimension.xyz, 0); //half pixel offset
+	uint cubeInd = 0; 		
 
 	float f0 = FirstFrameData.Load(float4(xyz.x    , xyz.y    , xyz.z    , 0)).r;
 	float f1 = FirstFrameData.Load(float4(xyz.x + 1, xyz.y    , xyz.z    , 0)).r;
@@ -443,8 +446,7 @@ void GSMain ( point VS_OUTPUT inputArray[1], inout TriangleStream<GS_OUTPUT> str
 	float f4 = FirstFrameData.Load(float4(xyz.x    , xyz.y    , xyz.z + 1, 0)).r;
 	float f5 = FirstFrameData.Load(float4(xyz.x + 1, xyz.y    , xyz.z + 1, 0)).r;
 	float f6 = FirstFrameData.Load(float4(xyz.x + 1, xyz.y + 1, xyz.z + 1, 0)).r;
-	float f7 = FirstFrameData.Load(float4(xyz.x    , xyz.y + 1, xyz.z + 1, 0)).r;
-	
+	float f7 = FirstFrameData.Load(float4(xyz.x    , xyz.y + 1, xyz.z + 1, 0)).r;	
 	#if LerpBuffers
 		f0 = lerp(f0, SecondFrameData.Load(float4(xyz.x    , xyz.y    , xyz.z    , 0)).r, Field.Iso_Lerp.y);
 		f1 = lerp(f1, SecondFrameData.Load(float4(xyz.x + 1, xyz.y    , xyz.z    , 0)).r, Field.Iso_Lerp.y);
@@ -465,15 +467,14 @@ void GSMain ( point VS_OUTPUT inputArray[1], inout TriangleStream<GS_OUTPUT> str
 	if (f7 > Field.Iso_Lerp.x) cubeInd += 1 << 7;
 	//cubeInd = 4;
 	
-	GS_OUTPUT output;		
+	GS_OUTPUT output = (GS_OUTPUT)0 ;		
 	double3 cameraPos =  double3(asdouble(Stage.CameraX[0], Stage.CameraX[1]), asdouble(Stage.CameraY[0], Stage.CameraY[1]), asdouble(Stage.CameraZ[0], Stage.CameraZ[1]));
 
 	double lon		= asdouble(Field.Lon.x, Field.Lon.y);
 	double lat		= asdouble(Field.Lat.x, Field.Lat.y);
 	double3 originD	= SphericalToDecart(double2(lon, lat), 6378.137);
 
-	double3 normPos = originD*0.000156785594;
-	float3	normal	= normalize(float3(normPos));
+	double3 normPos = originD*0.000156785594;	
 	
 	double posX = originD.x - cameraPos.x;
 	double posY = originD.y - cameraPos.y;
@@ -483,18 +484,7 @@ void GSMain ( point VS_OUTPUT inputArray[1], inout TriangleStream<GS_OUTPUT> str
 	float3 Right = Field.Right.xyz;
 	float3 Forward = Field.Forward.xyz;
 	float3 Up = cross(Right, Forward);
-	// output.Color = xyz / float3(3, 3,3) ;
-	// output.Position	= mul(float4(origin + 5 * Right.xyz * xyz.x + 5 * Forward.xyz * xyz.y + 5 * normal * xyz.z, 1), Stage.ViewProj);
-	// stream.Append( output );	
-	// output.Position	= mul(float4(origin + 5 * Right.xyz * (xyz.x + 1) + 5 * Forward.xyz * xyz.y+ 5 * normal * xyz.z, 1), Stage.ViewProj);
-	// stream.Append( output );	
-	// output.Position	= mul(float4(origin + 5 * Right.xyz * xyz.x + 5 * Forward.xyz * (xyz.y + 1)+ 5 * normal * xyz.z, 1), Stage.ViewProj);
-	// stream.Append( output );		
-	// output.Position	= mul(float4(origin + 5 * Right.xyz * (xyz.x + 1) + 5 * Forward.xyz * (xyz.y + 1)+ 5 * normal * xyz.z, 1), Stage.ViewProj);
-	// stream.Append( output );		
-	// stream.RestartStrip();
 			
-	output.Color = float3(1, 1, 1);//float3(float(cubeInd / 256.0f), float(cubeInd / 256.0f), float(cubeInd / 256.0f));	
 	[loop]
 	for (uint i1 = 0; i1 < 5; i1++) 
 	{				
@@ -502,15 +492,33 @@ void GSMain ( point VS_OUTPUT inputArray[1], inout TriangleStream<GS_OUTPUT> str
 		float4 positions[3];
 		[unroll]
 		for(uint j = 0; j < 3; j++) {
-			uint i = i1 * 3 + j;
+			uint i = i1 * 3 + j;		
+			uint vertexIndex = triTable[cubeInd][i];
+			float3 vertex = verts[vertexIndex];
 			
-			float3 vertex = verts[triTable[cubeInd][i]];
+			#ifdef MoveVertices
+			// [flatten]
+			// switch (vertexIndex) {
+				// case 0:  output.Color = 0.25f + 0.5f * ilerp(f0, f1, Field.Iso_Lerp.x); break;
+				// case 1:  output.Color = 0.25f + 0.5f * ilerp(f1, f2, Field.Iso_Lerp.x); break;
+				// case 2:  output.Color = 0.25f + 0.5f * ilerp(f3, f2, Field.Iso_Lerp.x); break;
+				// case 3:  output.Color = 0.25f + 0.5f * ilerp(f0, f3, Field.Iso_Lerp.x); break;   
+				// case 4:  output.Color = 0.25f + 0.5f * ilerp(f4, f5, Field.Iso_Lerp.x); break;
+				// case 5:  output.Color = 0.25f + 0.5f * ilerp(f5, f6, Field.Iso_Lerp.x); break;
+				// case 6:  output.Color = 0.25f + 0.5f * ilerp(f7, f6, Field.Iso_Lerp.x); break;
+				// case 7:  output.Color = 0.25f + 0.5f * ilerp(f0, f7, Field.Iso_Lerp.x); break;
+				// case 8:  output.Color = 0.25f + 0.5f * ilerp(f0, f4, Field.Iso_Lerp.x); break;
+				// case 9:  output.Color = 0.25f + 0.5f * ilerp(f1, f5, Field.Iso_Lerp.x); break;
+				// case 10: output.Color = 0.25f + 0.5f * ilerp(f2, f6, Field.Iso_Lerp.x); break;
+				// case 11: output.Color = 0.25f + 0.5f * ilerp(f3, f7, Field.Iso_Lerp.x); break;
+			// }
+			#endif
 			float4 pos = float4(xyz.xy + vertex.xy, lerp(FieldDepths[xyz.z], FieldDepths[xyz.z + 1], vertex.z), 1);
 			
 			positions[j] = float4(origin.xyz 
 					+ Right.xyz * (-Field.FieldSize.x * 0.5f + Field.FieldSize.x * pos.x / (float(Field.Dimension.x) - 1)) 
 					+ Forward.xyz * (-Field.FieldSize.y * 0.5f + Field.FieldSize.y * pos.y / (float(Field.Dimension.y) - 1)) 
-					+ pos.z * normal, 1);			
+					+ pos.z * Up, 1);			
 		}
 		float4 normal = float4(normalize(cross(positions[2].xyz - positions[0].xyz, positions[1].xyz - positions[0].xyz)), 1);
 		for(j = 0; j < 3; j++) 
@@ -528,17 +536,18 @@ void GSMain ( point VS_OUTPUT inputArray[1], inout TriangleStream<GS_OUTPUT> str
 
 float4 PSMain (GS_OUTPUT  input ) : SV_Target
 {
-	//return float4(abs(input.Normal.xyz), 1);
 	float3 norm = normalize(input.Normal.xyz);
 	float3 ndir	= normalize(-input.WPos.xyz);
 	
 	float  ndot = abs(dot( ndir, norm ));
-	float  frsn	= pow(saturate(1.1f-ndot), 0.5);
+	float  frsn	= pow(saturate(1.1f-ndot), 0.5);		
 	#ifdef UsePalette
-	return Palette.Sample(Sampler, float2(Field.Dummy.x, 0.5f)) * ndot;
+	float4 color = Palette.Sample(Sampler, float2(Field.Dummy.x, 0.5f)) * frsn;
 	#else
-	return Field.Color * ndot;
+	float4 color = Field.Color * frsn;
 	#endif
+	//return float4(input.Color.xyz, color.a * Field.Color.a);
+	return float4(color.xyz, color.a * Field.Color.a);
 }
 
 
