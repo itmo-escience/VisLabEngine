@@ -100,16 +100,19 @@ struct ConstData {
 	uint4		CameraZ	;
 	float4		Dummy	; // Factor, Radius
 };
-
+		
 struct ValueData {
 	float  Min;
 	float  Max;
-	float2 Padding;
+	float  Time;
+	float  Dummy;
 };
 
 Texture2D		Palette		: register(t0);
 SamplerState	Sampler		: register(s0);
 
+StructuredBuffer<float> ValuesPrev	: register(t1);
+StructuredBuffer<float> ValuesNext  : register(t2);
 
 cbuffer CBStage	: register(b0) { ConstData Stage : packoffset( c0 ); }
 cbuffer CBValue	: register(b1) { ValueData ValueBounds; }
@@ -120,7 +123,7 @@ $ubershader DRAW_TEXTURED_POLY
 #endif
 
 
-VS_OUTPUT VSMain ( VS_INPUT v )
+VS_OUTPUT VSMain ( VS_INPUT v, uint vertInd : SV_VertexID )
 {
 	VS_OUTPUT	output = (VS_OUTPUT)0;
 	
@@ -134,8 +137,15 @@ VS_OUTPUT VSMain ( VS_INPUT v )
 	output.Position	= mul(float4(posX, posY, posZ, 1), Stage.ViewProj);	
 	output.Color = v.Color;
 	
-	float val = (v.Tex.x  - ValueBounds.Min) / (ValueBounds.Max - ValueBounds.Min);
-	output.Tex = float4(saturate(val), 0, 0, 0);
+	float valRange = ValueBounds.Max - ValueBounds.Min;
+	float valPrev = saturate((ValuesPrev[vertInd] - ValueBounds.Min) / valRange);
+	float valNext = saturate((ValuesNext[vertInd] - ValueBounds.Min) / valRange);
+	
+	float time = saturate(ValueBounds.Time);
+	
+	float lerpVal = lerp(valPrev, valNext, time);
+	
+	output.Tex = float4(lerpVal, 0, 0, 0);
 	
 	return output;
 }
