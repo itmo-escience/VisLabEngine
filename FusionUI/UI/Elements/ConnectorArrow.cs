@@ -191,6 +191,9 @@ namespace FusionUI.UI.Elements
 
 
 
+            if (Math.Abs(start.X - end.X) <= 10) start.X = end.X = (start.X + end.X) / 2;
+            if (Math.Abs(start.Y - end.Y) <= 10) start.Y = end.Y = (start.Y + end.Y) / 2;
+
             var whiteTex = Game.Content.Load<DiscTexture>("UI/beam");//this.Game.RenderSystem.WhiteTexture);
             
             if ((inDirection + outDirection) % 2 == 1 && !IsStraight)
@@ -243,7 +246,8 @@ namespace FusionUI.UI.Elements
                         center1 = new Vector2(start.X, (start.Y + end.Y) / 2 - 4 * ArrowPointerSize);
                         center2 = new Vector2(end.X, (start.Y + end.Y) / 2 - 4 * ArrowPointerSize);
                         break;
-                }
+                }                               
+
                 var d1 = center1 - start;
                 var d2 = center2 - center1;
                 var d3 = end - center2;
@@ -286,20 +290,20 @@ namespace FusionUI.UI.Elements
                 switch (outDirection)
                 {
                     case 1:
-                        center1 = new Vector2((start.X + end.X)/2, start.Y);
-                        center2 = new Vector2((start.X + end.X)/2, end.Y);
+                        center1 = new Vector2((start.X + end.X)/2 + ArrowPointerSize / 2, start.Y);
+                        center2 = new Vector2((start.X + end.X)/2 + ArrowPointerSize / 2, end.Y);
                         break;
                     case 2:
-                        center1 = new Vector2(start.X, (start.Y + end.Y) / 2);
-                        center2 = new Vector2(end.X, (start.Y + end.Y) / 2);
+                        center1 = new Vector2(start.X, (start.Y + end.Y) / 2 + ArrowPointerSize);
+                        center2 = new Vector2(end.X, (start.Y + end.Y) / 2 + ArrowPointerSize);
                         break;
                     case 3:
-                        center1 = new Vector2((start.X + end.X) / 2, start.Y);
-                        center2 = new Vector2((start.X + end.X) / 2, end.Y);
+                        center1 = new Vector2((start.X + end.X) / 2 - ArrowPointerSize, start.Y);
+                        center2 = new Vector2((start.X + end.X) / 2 - ArrowPointerSize, end.Y);
                         break;
                     case 4:
-                        center1 = new Vector2(start.X, (start.Y + end.Y) / 2);
-                        center2 = new Vector2(end.X, (start.Y + end.Y) / 2);
+                        center1 = new Vector2(start.X, (start.Y + end.Y) / 2 - ArrowPointerSize);
+                        center2 = new Vector2(end.X, (start.Y + end.Y) / 2 - ArrowPointerSize);
                         break;
                 }
                                 
