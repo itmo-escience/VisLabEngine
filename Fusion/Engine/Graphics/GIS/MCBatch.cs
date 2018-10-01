@@ -23,6 +23,7 @@ namespace Fusion.Engine.Graphics.GIS
             DrawIsoSurface = 1 << 0,
             LerpBuffers = 1 << 1,
             UsePalette = 1 << 2,
+            MoveVertices = 1 << 3,
         }
 
         SamplerState Sampler = SamplerState.LinearClamp;  
@@ -131,7 +132,7 @@ namespace Fusion.Engine.Graphics.GIS
         } 
 
 
-        protected ConstantBuffer cB;
+        protected ConstantBuffer cB;  
 
         Texture3D DataFirstFrameGpu;
         Texture3D DataSecondFrameGpu;        
@@ -202,24 +203,24 @@ namespace Fusion.Engine.Graphics.GIS
             //parameters.Right = new Vector4(m.Right.ToVector3(), 0);
             //parameters.Forward = new Vector4(m.Forward.ToVector3(), 0);              
             cB.SetData(parameters);   
-            Game.GraphicsDevice.VertexShaderConstants[1] = cB;
-            Game.GraphicsDevice.GeometryShaderConstants[1] = cB;
-            Game.GraphicsDevice.PixelShaderConstants[1] = cB;
+            Game.GraphicsDevice.VertexShaderConstants[1] = cB;   
+            Game.GraphicsDevice.GeometryShaderConstants[1] = cB;      
+            Game.GraphicsDevice.PixelShaderConstants[1] = cB; 
 
             Game.GraphicsDevice.GeometryShaderSamplers[0] = Sampler;
 
-            Game.GraphicsDevice.GeometryShaderResources[1] = DataFirstFrameGpu; 
+            Game.GraphicsDevice.GeometryShaderResources[1] = DataFirstFrameGpu;     
             Game.GraphicsDevice.GeometryShaderResources[2] = DataSecondFrameGpu; 
             Game.GraphicsDevice.GeometryShaderResources[3] = depthBuffer;
 
             if (Palette != null) 
             {
-                Flags = FieldFlags.DrawIsoSurface | FieldFlags.LerpBuffers | FieldFlags.UsePalette;
+                Flags = FieldFlags.DrawIsoSurface | FieldFlags.LerpBuffers | FieldFlags.UsePalette | FieldFlags.MoveVertices;
                 Game.GraphicsDevice.PixelShaderResources[0] = Palette;  
             }
             else
             {
-                Flags = FieldFlags.DrawIsoSurface | FieldFlags.LerpBuffers;
+                Flags = FieldFlags.DrawIsoSurface | FieldFlags.LerpBuffers | FieldFlags.MoveVertices;         
             }
 
 
