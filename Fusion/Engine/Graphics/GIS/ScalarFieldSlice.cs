@@ -83,7 +83,7 @@ namespace Fusion.Engine.Graphics.GIS
             _pointsBuffer?.Dispose();
             _indicesBuffer?.Dispose();
 
-            if (_pointsCpu == null)
+            if (_pointsCpu == null || _pointsCpu.Length == 0)
                 return;            
 
             _pointsBuffer = new VertexBuffer(Game.GraphicsDevice, typeof(Gis.CartPoint), _pointsCpu.Length);
