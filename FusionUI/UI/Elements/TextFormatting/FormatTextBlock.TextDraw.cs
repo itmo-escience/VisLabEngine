@@ -584,7 +584,7 @@ namespace FusionUI.UI.Elements.TextFormatting
 
                     if (alignment == "right")
                     {
-                        xOffset = (int) (Width - textWidth - PaddingRight);
+                        xOffset = (int) (Width - textWidth - PaddingRight -PaddingRight);
                     }
 
                     if (alignment == "center")
@@ -670,6 +670,24 @@ namespace FusionUI.UI.Elements.TextFormatting
                                         this.GlobalRectangle.Y + textOffset - r.Bottom + height, currentColor,
                                         clipRectIndex, 0, false);
                                 //}
+
+                                var whiteTex = Game.RenderSystem.WhiteTexture;
+                                if (IsUnderline(tagStack))
+                                {
+                                    sb.DrawBeam(whiteTex,
+                                        new Vector2(this.GlobalRectangle.X + xOffset,
+                                            this.GlobalRectangle.Y + textOffset - r.Bottom + height + r.Height),
+                                        new Vector2(this.GlobalRectangle.X + xOffset + r.Width,
+                                            this.GlobalRectangle.Y + textOffset - r.Bottom + height + r.Height), currentColor,currentColor, 2);
+                                }
+                                if (IsStriketrough(tagStack))
+                                {
+                                    sb.DrawBeam(whiteTex,
+                                        new Vector2(this.GlobalRectangle.X + xOffset,
+                                            this.GlobalRectangle.Y + textOffset - r.Bottom + height + r.Height/2),
+                                        new Vector2(this.GlobalRectangle.X + xOffset + r.Width,
+                                            this.GlobalRectangle.Y + textOffset - r.Bottom + height + r.Height/2), currentColor, currentColor, 2);
+                                }
 
                                 xOffset += r.Width;
                                 height = Math.Max(height, r.Height);

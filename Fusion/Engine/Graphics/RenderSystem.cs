@@ -124,8 +124,8 @@ namespace Fusion.Engine.Graphics {
 		{
 			Counters	=	new RenderCounters();
 
-			Width			=	1024;
-			Height			=	768;
+			Width			=	1920;
+			Height			=	1080;
 			Fullscreen		=	false;
 			StereoMode		=	StereoMode.Disabled;
 			InterlacingMode	=	InterlacingMode.HorizontalLR;

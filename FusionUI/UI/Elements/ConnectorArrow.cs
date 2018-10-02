@@ -59,10 +59,13 @@ namespace FusionUI.UI.Elements
         private float animProgress = 0;
 
 
-        public static float ArrowSpread = 10;
+        public static float ArrowSpread = 20;
         private static int Index = 0;
         private int myIndex = Index++;
 
+        public bool IsDottedLine = false;
+        public float LineDotSizeGU = 1;
+        public float LineSpaceSizeGU = 1;
         public ConnectorArrow(FrameProcessor ui, ScalableFrame from, ScalableFrame to, float width, float arrowSize) : base(ui)
         {
             FromFrame = from;
@@ -157,12 +160,12 @@ namespace FusionUI.UI.Elements
                 .Concat(ArrowController.Instance
                     .InArrowsByFrame[FromFrame]
                     .Where(a => a.inDirection == outDirection)
-                    ).OrderBy(a => a.myIndex).ToList();
+                    ).OrderBy(a => a.myIndex).Where(a => !(a.ToFrame == FromFrame && a.FromFrame == ToFrame)).ToList();
 
             var endarrows = ArrowController.Instance.InArrowsByFrame[ToFrame].Where(a => a.inDirection == inDirection).Concat(ArrowController.Instance
                 .OutArrowsByFrame[ToFrame]
                 .Where(a => a.outDirection == inDirection)
-                ).OrderBy(a => a.myIndex).ToList();
+                ).OrderBy(a => a.myIndex).Where(a => !(a.ToFrame == FromFrame && a.FromFrame == ToFrame)).ToList();
             if (startArrows.Count() > 1)
             {
                 if (outDirection % 2 == 1)
@@ -191,6 +194,9 @@ namespace FusionUI.UI.Elements
 
 
 
+            if (Math.Abs(start.X - end.X) <= 10) start.X = end.X = (start.X + end.X) / 2;
+            if (Math.Abs(start.Y - end.Y) <= 10) start.Y = end.Y = (start.Y + end.Y) / 2;
+
             var whiteTex = Game.Content.Load<DiscTexture>("UI/beam");//this.Game.RenderSystem.WhiteTexture);
             
             if ((inDirection + outDirection) % 2 == 1 && !IsStraight)
@@ -200,8 +206,8 @@ namespace FusionUI.UI.Elements
                 var d2 = end - center;
                 float l1 = d1.Length(), l2 = d2.Length();
                 d1.Normalize(); d2.Normalize();
-                spriteLayer.DrawBeam(whiteTex, start + d1 * ArrowPointerSize / 2, center, BackColor, BackColor, ArrowWidth);
-                spriteLayer.DrawBeam(whiteTex, center, end - d2 * ArrowPointerSize / 2, BackColor, BackColor, ArrowWidth);
+                DrawLine(spriteLayer, whiteTex, start + d1 * ArrowPointerSize / 2, center, BackColor, ArrowWidth);
+                DrawLine(spriteLayer, whiteTex, center, end - d2 * ArrowPointerSize / 2, BackColor, ArrowWidth);
                 if (IsAnimation)
                 {
                     float length = l1 + l2;
@@ -213,12 +219,12 @@ namespace FusionUI.UI.Elements
                         if (l > l1)
                         {
                             var p = center + d2 * (l-l1);
-                            spriteLayer.Draw(circleTex, p.X - ArrowPointerSize / 2, p.Y - ArrowPointerSize / 2, ArrowPointerSize, ArrowPointerSize, BackColor);
-                        }
-                        else
-                        {
-                            var p = start + d1 * l;
-                            spriteLayer.Draw(circleTex, p.X - ArrowPointerSize/2, p.Y - ArrowPointerSize/2, ArrowPointerSize, ArrowPointerSize, BackColor);
+                            spriteLayer.Draw(circleTex, p.X - ArrowPointerSize, p.Y - ArrowPointerSize, ArrowPointerSize * 2, ArrowPointerSize * 2, BackColor);
+                        }                                                                                                
+                        else                                                                                             
+                        {                                                                                                
+                            var p = start + d1 * l;                                                                       
+                            spriteLayer.Draw(circleTex, p.X - ArrowPointerSize, p.Y - ArrowPointerSize, ArrowPointerSize * 2, ArrowPointerSize * 2, BackColor);
                         }
                     }
                 }                             
@@ -243,7 +249,8 @@ namespace FusionUI.UI.Elements
                         center1 = new Vector2(start.X, (start.Y + end.Y) / 2 - 4 * ArrowPointerSize);
                         center2 = new Vector2(end.X, (start.Y + end.Y) / 2 - 4 * ArrowPointerSize);
                         break;
-                }
+                }                               
+
                 var d1 = center1 - start;
                 var d2 = center2 - center1;
                 var d3 = end - center2;
@@ -261,23 +268,23 @@ namespace FusionUI.UI.Elements
                         if (l > l1 + l2)
                         {
                             var p = center2 + d3 * (l - l1 - l2);
-                            spriteLayer.Draw(circleTex, p.X - ArrowPointerSize / 2, p.Y - ArrowPointerSize / 2, ArrowPointerSize, ArrowPointerSize, BackColor);
+                            spriteLayer.Draw(circleTex, p.X - ArrowPointerSize, p.Y - ArrowPointerSize, ArrowPointerSize * 2, ArrowPointerSize * 2, BackColor);
                         }
                         else if (l > l1)
                         {
                             var p = center1 + d2 * (l - l1);
-                            spriteLayer.Draw(circleTex, p.X - ArrowPointerSize / 2, p.Y - ArrowPointerSize / 2, ArrowPointerSize, ArrowPointerSize, BackColor);
+                            spriteLayer.Draw(circleTex, p.X - ArrowPointerSize, p.Y - ArrowPointerSize, ArrowPointerSize * 2, ArrowPointerSize * 2, BackColor);
                         }
                         else
                         {
                             var p = start + d1 * l;
-                            spriteLayer.Draw(circleTex, p.X - ArrowPointerSize / 2, p.Y - ArrowPointerSize / 2, ArrowPointerSize, ArrowPointerSize, BackColor);
+                            spriteLayer.Draw(circleTex, p.X - ArrowPointerSize, p.Y - ArrowPointerSize, ArrowPointerSize * 2, ArrowPointerSize * 2, BackColor);
                         }
                     }
                 }
-                spriteLayer.DrawBeam(whiteTex, start + d1 * ArrowPointerSize / 2, center1, BackColor, BackColor, ArrowWidth);
-                spriteLayer.DrawBeam(whiteTex, center1, center2, BackColor, BackColor, ArrowWidth);
-                spriteLayer.DrawBeam(whiteTex, center2, end - d3 * ArrowPointerSize / 2, BackColor, BackColor, ArrowWidth);
+                DrawLine(spriteLayer,whiteTex, start + d1 * ArrowPointerSize / 2, center1, BackColor, ArrowWidth);
+                DrawLine(spriteLayer,whiteTex, center1, center2, BackColor, ArrowWidth);
+                DrawLine(spriteLayer,whiteTex, center2, end - d3 * ArrowPointerSize / 2, BackColor, ArrowWidth);
             }
             else if (!IsStraight)
             {
@@ -290,7 +297,7 @@ namespace FusionUI.UI.Elements
                         center2 = new Vector2((start.X + end.X)/2, end.Y);
                         break;
                     case 2:
-                        center1 = new Vector2(start.X, (start.Y + end.Y) / 2);
+                        center1 = new Vector2(start.X, (start.Y + end.Y) / 2 );
                         center2 = new Vector2(end.X, (start.Y + end.Y) / 2);
                         break;
                     case 3:
@@ -299,7 +306,7 @@ namespace FusionUI.UI.Elements
                         break;
                     case 4:
                         center1 = new Vector2(start.X, (start.Y + end.Y) / 2);
-                        center2 = new Vector2(end.X, (start.Y + end.Y) / 2);
+                        center2 = new Vector2(end.X, (start.Y + end.Y) / 2 );
                         break;
                 }
                                 
@@ -320,24 +327,24 @@ namespace FusionUI.UI.Elements
                         if (l > l1 + l2)
                         {
                             var p = center2 + d3 * (l - l1 - l2);
-                            spriteLayer.Draw(circleTex, p.X - ArrowPointerSize / 2, p.Y - ArrowPointerSize / 2, ArrowPointerSize, ArrowPointerSize, BackColor);
+                            spriteLayer.Draw(circleTex, p.X - ArrowPointerSize, p.Y - ArrowPointerSize, ArrowPointerSize * 2, ArrowPointerSize * 2, BackColor);
                         }
                         else if (l > l1)
                         {
                             var p = center1 + d2 * (l - l1);
-                            spriteLayer.Draw(circleTex, p.X - ArrowPointerSize / 2, p.Y - ArrowPointerSize / 2, ArrowPointerSize, ArrowPointerSize, BackColor);
+                            spriteLayer.Draw(circleTex, p.X - ArrowPointerSize, p.Y - ArrowPointerSize, ArrowPointerSize * 2, ArrowPointerSize * 2, BackColor);
                         }
                         else
                         {
                             var p = start + d1 * l;
-                            spriteLayer.Draw(circleTex, p.X - ArrowPointerSize / 2, p.Y - ArrowPointerSize / 2, ArrowPointerSize, ArrowPointerSize, BackColor);
+                            spriteLayer.Draw(circleTex, p.X - ArrowPointerSize, p.Y - ArrowPointerSize, ArrowPointerSize * 2, ArrowPointerSize * 2, BackColor);
                         }
                     }
                 }
 
-                spriteLayer.DrawBeam(whiteTex, start + d1 * ArrowPointerSize / 2, center1, BackColor, BackColor, ArrowWidth);
-                spriteLayer.DrawBeam(whiteTex, center1, center2, BackColor, BackColor, ArrowWidth);
-                spriteLayer.DrawBeam(whiteTex, center2, end - d3 * ArrowPointerSize / 2, BackColor, BackColor, ArrowWidth);
+                DrawLine(spriteLayer,whiteTex, start + d1 * ArrowPointerSize / 2, center1, BackColor, ArrowWidth);
+                DrawLine(spriteLayer,whiteTex, center1, center2, BackColor, ArrowWidth);
+                DrawLine(spriteLayer,whiteTex, center2, end - d3 * ArrowPointerSize / 2, BackColor, ArrowWidth);
             }
             else
             {
@@ -353,10 +360,10 @@ namespace FusionUI.UI.Elements
                         float l = GlobalAnimvelocity * (i + animProgress);
                         if (l > length - ArrowPointerSize || l < ArrowPointerSize) continue;
                         var p = start + d * l;
-                        spriteLayer.Draw(circleTex, p.X - ArrowPointerSize / 2, p.Y - ArrowPointerSize / 2, ArrowPointerSize, ArrowPointerSize, BackColor);                        
+                        spriteLayer.Draw(circleTex, p.X - ArrowPointerSize, p.Y - ArrowPointerSize, ArrowPointerSize * 2, ArrowPointerSize * 2, BackColor);                        
                     }
                 }
-                spriteLayer.DrawBeam(whiteTex, start + d * ArrowPointerSize / 2, end - d * ArrowPointerSize / 2, BackColor, BackColor, ArrowWidth);
+                DrawLine(spriteLayer,whiteTex, start + d * ArrowPointerSize / 2, end - d * ArrowPointerSize / 2, BackColor, ArrowWidth);
             }
                         
 
@@ -410,5 +417,50 @@ namespace FusionUI.UI.Elements
                     break;
             }
         }
+
+        private void DrawLine(SpriteLayer spriteLayer, Texture tex, Vector2 p0, Vector2 p1, Color color, float width, float scale = 1, float offset = 0, int clipRectIndex = 0)
+        {
+            if (!IsDottedLine)
+            {
+                spriteLayer.DrawBeam(tex, p0, p1, color, color, width);
+            }
+            else
+            {
+                if (p0.X > p1.X)
+                {
+                    var p = p1;
+                    p1 = p0;
+                    p0 = p;
+                }
+                var v = p1 - p0;
+                float l = 0;
+                var length = v.Length();
+                v.Normalize();
+                int i = 0;
+                Vector2 v0 = p0;
+                while (l < length)
+                {
+                    if (i % 2 == 0)
+                    {
+                        //draw dot;
+                        var v1 = v0 + v * Math.Min(LineDotSizeGU * ApplicationInterface.ScaleMod, length - l);
+                        l += LineDotSizeGU * ApplicationInterface.ScaleMod;
+                        spriteLayer.DrawBeam(tex, v0, v1, color, color, width);
+                        v0 = v1;
+                    }
+                    else
+                    {
+                        //not draw;
+                        var v1 = v0 + v * Math.Min(LineSpaceSizeGU * ApplicationInterface.ScaleMod, length - l);
+                        l += LineSpaceSizeGU * ApplicationInterface.ScaleMod;
+                        v0 = v1;
+                    }
+
+                    i++;
+                }
+            }
+        }
     }
+
+    
 }
