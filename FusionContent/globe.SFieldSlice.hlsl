@@ -119,7 +119,8 @@ cbuffer CBValue	: register(b1) { ValueData ValueBounds; }
 
 
 #if 0
-$ubershader DRAW_TEXTURED_POLY
+$ubershader DRAW_SLICE
+$ubershader DRAW_BORDER
 #endif
 
 
@@ -136,26 +137,30 @@ VS_OUTPUT VSMain ( VS_INPUT v, uint vertInd : SV_VertexID )
 	
 	output.Position	= mul(float4(posX, posY, posZ, 1), Stage.ViewProj);	
 	output.Color = v.Color;
-	
+		
+#ifdef DRAW_SLICE
 	float valRange = ValueBounds.Max - ValueBounds.Min;
 	float valPrev = saturate((ValuesPrev[vertInd] - ValueBounds.Min) / valRange);
 	float valNext = saturate((ValuesNext[vertInd] - ValueBounds.Min) / valRange);
-	
+
 	float time = saturate(ValueBounds.Time);
-	
 	float lerpVal = lerp(valPrev, valNext, time);
-	
+
 	output.Tex = float4(lerpVal, 0, 0, 0);
+	
+#else // DRAW_BORDER
+	output.Tex = float4(0, 0, 0, 0);
+#endif
 	
 	return output;
 }
 
 float4 PSMain ( VS_OUTPUT input ) : SV_Target
-{
-	float4 color = Palette.Sample(Sampler, float2(input.Tex.x, 0.5f));
-
-	//color.rgb *= input.Color.rgb;
-	color.a *= input.Color.a;
-	
+{	
+#ifdef DRAW_SLICE
+	float4 color = Palette.Sample(Sampler, float2(input.Tex.x, 0.5f));	
+#else // DRAW_BORDER
+	float4 color = input.Color;
+#endif	
 	return color;
 }
