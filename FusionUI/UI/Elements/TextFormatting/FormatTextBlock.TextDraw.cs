@@ -584,7 +584,7 @@ namespace FusionUI.UI.Elements.TextFormatting
 
                     if (alignment == "right")
                     {
-                        xOffset = (int) (Width - textWidth - PaddingRight);
+                        xOffset = (int) (Width - textWidth - PaddingRight -PaddingRight);
                     }
 
                     if (alignment == "center")
