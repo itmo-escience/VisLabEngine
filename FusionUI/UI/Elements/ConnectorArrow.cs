@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Fusion.Core.Mathematics;
+using Fusion.Core.Utils;
 using Fusion.Drivers.Graphics;
 using Fusion.Engine.Common;
 using Fusion.Engine.Frames;
@@ -20,17 +21,17 @@ namespace FusionUI.UI.Elements
             get { return instance ?? (instance = new ArrowController()); }
         }        
 
-        public Dictionary<ScalableFrame, List<ConnectorArrow>> ArrowsByFrame
+        public SerializableDictionary<ScalableFrame, List<ConnectorArrow>> ArrowsByFrame
         {
             get
             {
-                return OutArrowsByFrame.Keys.Union(InArrowsByFrame.Keys)
+                return (SerializableDictionary<ScalableFrame,List<ConnectorArrow>>)OutArrowsByFrame.Keys.Union(InArrowsByFrame.Keys)
                     .ToDictionary(a => a, a => (OutArrowsByFrame.ContainsKey(a) ? OutArrowsByFrame[a] : new List<ConnectorArrow>()).Union(InArrowsByFrame.ContainsKey(a) ? InArrowsByFrame[a].ToList() : new List<ConnectorArrow>()).ToList());
             }
         }
 
-        public Dictionary<ScalableFrame, List<ConnectorArrow>> OutArrowsByFrame = new Dictionary<ScalableFrame, List<ConnectorArrow>>();
-        public Dictionary<ScalableFrame, List<ConnectorArrow>> InArrowsByFrame = new Dictionary<ScalableFrame, List<ConnectorArrow>>();
+        public SerializableDictionary<ScalableFrame, List<ConnectorArrow>> OutArrowsByFrame = new SerializableDictionary<ScalableFrame, List<ConnectorArrow>>();
+        public SerializableDictionary<ScalableFrame, List<ConnectorArrow>> InArrowsByFrame = new SerializableDictionary<ScalableFrame, List<ConnectorArrow>>();
 
 
         public void AddArrow(ConnectorArrow arrow)
@@ -47,7 +48,11 @@ namespace FusionUI.UI.Elements
 
     public class ConnectorArrow : ScalableFrame
     {
-        public ScalableFrame FromFrame, ToFrame;
+
+		protected ConnectorArrow()
+		{
+		}
+		public ScalableFrame FromFrame, ToFrame;
         public float ArrowWidth, ArrowPointerSize;
         public int ForceInDirection = 0, ForceOutDirection = 0;
 

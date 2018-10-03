@@ -1,14 +1,20 @@
 ﻿using System;
+using System.Runtime.Serialization;
+using System.Xml.Serialization;
 using Fusion.Core.Mathematics;
 using Fusion.Engine.Frames;
 
 namespace FusionUI.UI
 {
-    public class MainFrame : ControllableFrame {
+	public class MainFrame : ControllableFrame {
+		[XmlIgnore]
+		public FrameProcessor ui;
 
-        public FrameProcessor ui;
+		protected MainFrame()
+		{
+		}
 
-        public void Add(Frame frame)
+		public void Add(Frame frame)
         {
             frame.ZOrder = 1000;
             base.Add(frame);
@@ -53,8 +59,8 @@ namespace FusionUI.UI
         protected virtual void init()
         {
         }
-
-        public Action ActionResize;
+		[XmlIgnore]
+		public Action ActionResize;
 
         public override void UpdateResize(bool updateChildren = true)
         {

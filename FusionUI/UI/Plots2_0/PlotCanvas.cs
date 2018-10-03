@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Xml.Serialization;
 using Fusion;
 using Fusion.Core.Mathematics;
 using Fusion.Engine.Common;
@@ -13,7 +14,10 @@ namespace FusionUI.UI.Plots2_0
 {
     public class PlotCanvas : ScalableFrame
     {
-        public bool SingleScale;
+		protected PlotCanvas()
+		{
+		}
+		public bool SingleScale;
 
         public PlotScale ActiveScale = null;        
 
@@ -99,8 +103,8 @@ namespace FusionUI.UI.Plots2_0
         }
 
         public AbstractTimeManager TimeManager;
-
-        public Func<PlotCanvas, float> LineFunc;
+		[XmlIgnore]
+		public Func<PlotCanvas, float> LineFunc;
 
         public PlotContainer DataContainer;
 

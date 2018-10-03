@@ -1,11 +1,14 @@
 ﻿using System;
+using System.IO;
+using System.Runtime.Serialization;
+using System.Xml.Serialization;
 using Fusion.Core.Mathematics;
 using Fusion.Engine.Common;
 using Fusion.Engine.Frames;
 
 namespace FusionUI.UI
 {
-    public class FreeFrame : ScalableFrame {
+	public class FreeFrame : ScalableFrame {
 
         public bool DisableFree = false;
         public bool CanChangeSize = false;
@@ -18,15 +21,24 @@ namespace FusionUI.UI
         public float TopPos => ApplicationInterface.Instance.rootFrame.UnitHeight - UIConfig.UnitTopmostWindowPosition;
 
         private ScalableFrame selectedFrame;
-
-        public Action<FreeFrame> ActionMove;
+		[XmlIgnore]
+		public Action<FreeFrame> ActionMove;
 
         public FreeFrame(FrameProcessor ui, float x, float y, float w, float h, string text, Color backColor) : base(ui, x, y, w, h, text, backColor)
         {
             InitAllEvent();
         }
 
-        protected override void Update(GameTime gameTime)
+		public FreeFrame(FrameProcessor ui) : base(ui)
+		{
+			//InitAllEvent();
+		}
+
+		protected FreeFrame()
+		{
+		}
+
+		protected override void Update(GameTime gameTime)
         {
             base.Update(gameTime);
             if (ClampPos && Parent is MainFrame) UnitY = Math.Max(UnitY, TopPos);
@@ -82,5 +94,28 @@ namespace FusionUI.UI
                 }
             };
         }
-    }
+		#region Serialization
+		/*-----------------------------------------------------------------------------------------
+         * 
+         *	Serialization :
+         * 
+        -----------------------------------------------------------------------------------------*/
+
+		/// <summary>
+		/// Serializes the frame.
+		/// </summary>
+		public override void Serialize(BinaryWriter writer)
+		{
+			base.Serialize(writer);
+		}
+
+		/// <summary>
+		/// Deerializes the frame.
+		/// </summary>
+		public override void Deserialize(BinaryReader reader)
+		{
+			base.Deserialize(reader);
+		}
+		#endregion
+	}
 }

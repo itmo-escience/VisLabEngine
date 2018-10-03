@@ -9,7 +9,10 @@ namespace FusionUI.UI
 {
     public class ComplexNode : TreeNode
     {
-        private FrameProcessor ui;
+		protected ComplexNode()
+		{
+		}
+		private FrameProcessor ui;
 
         public Checkbox Checkbox;
         public DropDownSelector<DropDownSelectorTextRow> DropDown;

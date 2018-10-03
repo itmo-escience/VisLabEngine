@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Xml.Serialization;
 using Fusion.Core.Mathematics;
 using Fusion.Engine.Common;
 using Fusion.Engine.Frames;
@@ -8,12 +9,17 @@ namespace FusionUI.UI.Elements
 {
     public class Button : ScalableFrame
     {
-
-        public Color ActiveColor, InactiveColor;
+		protected Button()
+		{
+		}
+		public Color ActiveColor, InactiveColor;
         public Color ActiveFColor = UIConfig.ActiveTextColor, InactiveFColor = UIConfig.ActiveTextColor;
-        public Texture ActiveImage, PassiveImage;
-        public Action UpdateAction;
-        public Action<bool> ButtonAction;
+		[XmlIgnore]
+		public Texture ActiveImage, PassiveImage;
+		[XmlIgnore]
+		public Action UpdateAction;
+		[XmlIgnore]
+		public Action<bool> ButtonAction;
 
         private bool toggleState;
 

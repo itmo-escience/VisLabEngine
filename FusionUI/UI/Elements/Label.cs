@@ -7,7 +7,10 @@ namespace FusionUI.UI
 {
     public class Label : ScalableFrame
     {
-        public bool IsFlip = false;
+		protected Label()
+		{
+		}
+		public bool IsFlip = false;
 
         public Label(FrameProcessor ui, float x, float y, float w, float h, string text, Color backColor) : base(ui, x, y, w, h, text, backColor)
         {

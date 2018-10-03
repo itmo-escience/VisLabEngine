@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Xml.Serialization;
 using Fusion.Core.Mathematics;
 using Fusion.Engine.Frames;
 using Fusion.Engine.Graphics;
@@ -10,7 +11,10 @@ namespace FusionUI.UI
 {
     public class ForecastMenu : Window
     {
+		protected ForecastMenu()
+		{
 
+		}
         private FrameProcessor ui;
      
 

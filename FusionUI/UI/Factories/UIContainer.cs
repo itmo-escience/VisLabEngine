@@ -10,7 +10,10 @@ namespace FusionUI.UI.Factories
     /// <typeparam name="T">Active item type</typeparam>
     public class UIContainer<T> : ScalableFrame where T : ScalableFrame
     {
-        public UIContainer(FrameProcessor ui) : base(ui)
+		protected UIContainer()
+		{
+		}
+		public UIContainer(FrameProcessor ui) : base(ui)
         {
         }
 
@@ -28,7 +31,10 @@ namespace FusionUI.UI.Factories
     /// <typeparam name="T2">Active item 2 type</typeparam>
     public class UIContainer<T1, T2> : ScalableFrame where T1 : ScalableFrame where T2 : ScalableFrame
     {
-        public UIContainer(FrameProcessor ui) : base(ui)
+		protected UIContainer()
+		{
+		}
+		public UIContainer(FrameProcessor ui) : base(ui)
         {
         }
 
@@ -48,7 +54,10 @@ namespace FusionUI.UI.Factories
     /// <typeparam name="T3">Active item 3 type</typeparam>
     public class UIContainer<T1, T2, T3> : ScalableFrame where T1 : ScalableFrame where T2 : ScalableFrame where T3 : ScalableFrame
     {
-        public UIContainer(FrameProcessor ui) : base(ui)
+		protected UIContainer()
+		{
+		}
+		public UIContainer(FrameProcessor ui) : base(ui)
         {
         }
 

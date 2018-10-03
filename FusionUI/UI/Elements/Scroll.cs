@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Xml.Serialization;
 using Fusion;
 using Fusion.Core.Mathematics;
 using Fusion.Engine.Frames;
@@ -7,21 +8,27 @@ namespace FusionUI.UI.Elements
 {
     public class Scroll : ScalableFrame
     {
-        public bool IsFixedX = false;
+		protected Scroll()
+		{
+		}
+		public bool IsFixedX = false;
         public bool IsFixedY = false;
         public bool IsDrag = false;
         public Vector2? PrevPosition = null;
-        /// <summary>
-        /// Deprecated
-        /// </summary>
-        public Action<float, float> actionForMove;
-        /// <summary>
-        /// Deprecated
-        /// </summary>
-        public Action<float, float> actionClickUp;
-
-        public Action<float, float> actionForMoveRelative;
-        public Action<float, float> actionClickUpRelative
+		/// <summary>
+		/// Deprecated
+		/// </summary>
+		[XmlIgnore]
+		public Action<float, float> actionForMove;
+		/// <summary>
+		/// Deprecated
+		/// </summary>
+		[XmlIgnore]
+		public Action<float, float> actionClickUp;
+		[XmlIgnore]
+		public Action<float, float> actionForMoveRelative;
+		[XmlIgnore]
+		public Action<float, float> actionClickUpRelative
             ;
 
         public int extendedSize = 0;

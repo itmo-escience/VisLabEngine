@@ -1,15 +1,19 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using System.Runtime.Serialization;
 using Fusion.Core.Mathematics;
 using Fusion.Engine.Common;
 using Fusion.Engine.Frames;
 using Fusion.Engine.Graphics;
 using Fusion.Engine.Input;
+using Fusion;
+using System.Xml.Serialization;
 
 namespace FusionUI.UI
 {
-    public class ControllableFrame : Frame
+	public class ControllableFrame : Frame
     {
         public bool ClickToFront = true;
 
@@ -21,7 +25,11 @@ namespace FusionUI.UI
             };
         }
 
-        public ControllableFrame(FrameProcessor ui, int x, int y, int w, int h, string text, Color backColor) : base(ui, x, y, w, h, text, backColor)
+		protected ControllableFrame()
+		{
+		}
+
+		public ControllableFrame(FrameProcessor ui, int x, int y, int w, int h, string text, Color backColor) : base(ui, x, y, w, h, text, backColor)
         {
             ActionClick += (ControlActionArgs args, ref bool flag) =>
             {
@@ -355,9 +363,10 @@ namespace FusionUI.UI
             ActiveBorderColor = UIConfig.BorderColor,
             InactiveBorderColor = UIConfig.BorderColor,
             ActiveImageColor = Color.White,
-            InactiveImageColor = UIConfig.InactiveTextColor;       
+            InactiveImageColor = UIConfig.InactiveTextColor;
 
-        public Texture ActiveImage, InactiveImage;
+		[XmlIgnore]
+		public Texture ActiveImage, InactiveImage;
 
         override public Color BackColor
         {
@@ -409,8 +418,8 @@ namespace FusionUI.UI
 
         private bool selected = false;
         public virtual bool Selected {get { return selected && Visible; } set { selected = value; } }
-
-        public class ControlActionArgs : EventArgs
+		
+		public class ControlActionArgs : EventArgs
         {
             public bool IsTouch;
 
@@ -447,10 +456,12 @@ namespace FusionUI.UI
         }
 
         public delegate void MouseAction(ControlActionArgs args, ref bool flag);
-
+		[XmlIgnore]
         public MouseAction ActionClick, ActionDrag, ActionUp, ActionDown, ActionOut, ActionLost;
-        public Action<GameTime> ActionUpdate;
-        public Action<GameTime, SpriteLayer, int> ActionDraw;
+		[XmlIgnore]
+		public Action<GameTime> ActionUpdate;
+		[XmlIgnore]
+		public Action<GameTime, SpriteLayer, int> ActionDraw;
         Vector2? oldPos = null;
 
         bool InnerActionDown(ControlActionArgs args)
@@ -458,7 +469,10 @@ namespace FusionUI.UI
             if (!Active || !Visible) return false;
             bool flag = false;
             Selected = true;
-            foreach (var frame in Children.Reverse())
+			Children.Reverse();
+			var reversedChildren = Children;
+			Children.Reverse();
+			foreach (var frame in reversedChildren)
             {
                 if (flag) return flag;
                 if (frame is ControllableFrame)
@@ -476,8 +490,9 @@ namespace FusionUI.UI
                     }
                 }
             }
-            
-            if (!flag)
+			//Children.Reverse();
+
+			if (!flag)
             {
                 ActionDown?.Invoke(args, ref flag);
             }
@@ -489,7 +504,10 @@ namespace FusionUI.UI
             bool flag = false;
             bool wasSelected = Selected;
             Selected = false;
-            foreach (var frame in Children.Reverse())
+			Children.Reverse();
+			var reversedChildren = Children;
+			Children.Reverse();
+			foreach (var frame in reversedChildren)
             {
                 if (flag) return flag;
                 if (frame is ControllableFrame)
@@ -506,7 +524,9 @@ namespace FusionUI.UI
                     }
                 }
             }
-            if (!flag && wasSelected)
+			//Children.Reverse();
+
+			if (!flag && wasSelected)
             {
                 ActionUp?.Invoke(args, ref flag);
                 ActionLost?.Invoke(args, ref flag);
@@ -518,7 +538,10 @@ namespace FusionUI.UI
         {
             if (!Active || !Visible || !Selected) return false;
             bool flag = false;
-            foreach (var frame in Children.Reverse())
+			Children.Reverse();
+			var reversedChildren = Children;
+			Children.Reverse();
+			foreach (var frame in reversedChildren)
             {
                 if (flag) return flag;
                 if (frame is ControllableFrame)
@@ -535,7 +558,9 @@ namespace FusionUI.UI
                     }
                 }
             }
-            if (!flag)
+			//Children.Reverse();
+
+			if (!flag)
             {
                 ActionClick?.Invoke(args, ref flag);
             }
@@ -545,7 +570,10 @@ namespace FusionUI.UI
         {
             bool flag = false;
             if (!Active || !Visible || !Selected) return false;
-            foreach (var frame in Children.Reverse())
+			Children.Reverse();
+			var reversedChildren = Children;
+			Children.Reverse();
+			foreach (var frame in reversedChildren)
             {
                 if (flag) return flag;
                 if (frame is ControllableFrame)
@@ -555,7 +583,9 @@ namespace FusionUI.UI
                         flag |= sFrame.InnerActionDrag(args) || sFrame.SuppressActions;
                 }
             }
-            if (!flag) ActionDrag?.Invoke(args, ref flag);
+			//Children.Reverse();
+
+			if (!flag) ActionDrag?.Invoke(args, ref flag);
             return flag;
         }
 
@@ -564,7 +594,10 @@ namespace FusionUI.UI
             bool flag = false;
             if (!Active || !Visible) return false;            
             oldPos = null;
-            foreach (var frame in Children.Reverse())
+			Children.Reverse();
+			var reversedChildren = Children;
+			Children.Reverse();
+			foreach (var frame in reversedChildren)
             {
                 if (flag)
                 {
@@ -580,8 +613,9 @@ namespace FusionUI.UI
                     }
                 }                
             }
+			//Children.Reverse();
 
-            if (!flag)
+			if (!flag)
             {
                 ActionOut?.Invoke(args, ref flag);
                 if (Selected) ActionLost?.Invoke(args, ref flag);
@@ -631,13 +665,43 @@ namespace FusionUI.UI
             base.DrawFrame(gameTime, spriteLayer, clipRectIndex);
             if (Visible) ActionDraw?.Invoke(gameTime, spriteLayer, clipRectIndex);
         }
-
-        public Action OnAnchorsUpdate;
+		[XmlIgnore]
+		public Action OnAnchorsUpdate;
 
         public override void UpdateAnchors(int oldW, int oldH, int newW, int newH)
         {
             base.UpdateAnchors(oldW, oldH, newW, newH);
             OnAnchorsUpdate?.Invoke();
         }
-    }
+
+		#region Serialization
+		/*-----------------------------------------------------------------------------------------
+         * 
+         *	Serialization :
+         * 
+        -----------------------------------------------------------------------------------------*/
+
+		/// <summary>
+		/// Serializes the frame.
+		/// </summary>
+		public override void Serialize(BinaryWriter writer)
+		{
+			base.Serialize(writer);
+			writer.Write(this.Active);
+			writer.Write(this.Selected);
+			writer.Write(this.Tooltip);
+		}
+
+		/// <summary>
+		/// Deerializes the frame.
+		/// </summary>
+		public override void Deserialize(BinaryReader reader)
+		{
+			base.Deserialize(reader);
+			this.Active = reader.ReadBoolean();
+			this.Selected = reader.ReadBoolean();
+			this.Tooltip = reader.ReadString();
+		}
+		#endregion
+	}
 }

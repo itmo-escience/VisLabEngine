@@ -4,12 +4,16 @@ using System.Linq;
 using FusionUI.UI.Factories;
 using Fusion.Core.Mathematics;
 using Fusion.Engine.Frames;
+using System.Xml.Serialization;
 
 namespace FusionUI.UI.Elements
 {
     public class TabViewer : ScalableFrame
     {
-        protected FrameProcessor ui;
+		protected TabViewer()
+		{
+		}
+		protected FrameProcessor ui;
 
         public float WidthTapLabel = UIConfig.UnitDefaultTapWidth;
         public float HeightTapLabel = UIConfig.UnitDefaultTapHeight;
@@ -27,10 +31,12 @@ namespace FusionUI.UI.Elements
         protected Frame ActiveFrame;
 
         public Button addTabButton;
-
-        public Action<string> OnChangeTab;
-        public Action<string> OnRemoveTab;
-        public Action<string, string> OnRenameTab;
+		[XmlIgnore]
+		public Action<string> OnChangeTab;
+		[XmlIgnore]
+		public Action<string> OnRemoveTab;
+		[XmlIgnore]
+		public Action<string, string> OnRenameTab;
 
         public string RemoveWindowCaption = "Remove tab?";
         public string RenameWindowCaption = "Rename tab?";

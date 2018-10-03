@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Xml.Serialization;
 using Fusion.Core.Mathematics;
 using Fusion.Engine.Common;
 using Fusion.Engine.Frames;
@@ -16,15 +17,18 @@ namespace FusionUI.UI.Plots2_0
 
     public class PlotViewer<TP> : FreeFrame where TP : PlotCanvas
     {
-        public PlotCanvas Plot;        
+		protected PlotViewer()
+		{
+		}
+		public PlotCanvas Plot;        
 
         public List<PlotScale> Scales = new List<PlotScale>();
 
         public PlotLegend Legend;
 
         public bool ShowScaleX = true, ShowScaleY = true;
-
-        public Func<FrameProcessor, PlotCanvas, PlotScale> scaleConstruct;        
+		[XmlIgnore]
+		public Func<FrameProcessor, PlotCanvas, PlotScale> scaleConstruct;        
         public PlotViewer(FrameProcessor ui, float x, float y, float w, float h, Color backColor,
             AbstractTimeManager tm = null, TP plot = null, Func<FrameProcessor, TP> plotConstruct = null, Func<FrameProcessor, PlotCanvas, PlotScale> scaleConstruct = null) : base(ui, x, y, w, h, "", backColor)
         {
@@ -56,8 +60,8 @@ namespace FusionUI.UI.Plots2_0
 
         public ScaleParams ScaleSettings = ScaleParams.DrawMeasure;
         private UIConfig.FontHolder scaleFont = UIConfig.FontBody;
-
-        public UIConfig.FontHolder ScaleFont
+		
+		public UIConfig.FontHolder ScaleFont
         {
             get { return scaleFont; }
             set

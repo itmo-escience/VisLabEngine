@@ -33,6 +33,11 @@ namespace Fusion.Engine.Graphics {
 		/// Shader resource view
 		/// </summary>
 		internal ShaderResource Srv = null;
+
+
+		public string Name {
+			get; protected set;
+		}
 		
 
 		/// <summary>

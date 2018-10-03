@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Xml.Serialization;
 using Fusion.Engine.Common;
 
 namespace FusionUI
@@ -25,8 +26,8 @@ namespace FusionUI
         public bool IsAutoRewind { set; get; } = true;
 
         private bool resetTimes = false;
-
-        public Func<string> TimeFunc = null, DateFunc = null;
+		[XmlIgnore]
+		public Func<string> TimeFunc = null, DateFunc = null;
 
         public bool UpdateLayers = true;
 

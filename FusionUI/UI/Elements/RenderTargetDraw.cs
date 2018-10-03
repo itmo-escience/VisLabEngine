@@ -13,8 +13,10 @@ namespace FusionUI.UI.Elements
 {
     public class RenderTargetDraw : ScalableFrame
     {
-
-        public RenderTarget2D Target;
+		protected RenderTargetDraw()
+		{
+		}
+		public RenderTarget2D Target;
         private TargetTexture rtTexture;
         public RenderTargetDraw(FrameProcessor ui, float x, float y, float w, float h, string text, Color backColor, RenderTarget2D target = null) : base(ui, x, y, w, h, text, backColor)
         {

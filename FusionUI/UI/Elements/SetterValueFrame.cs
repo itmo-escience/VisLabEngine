@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Xml.Serialization;
 using Fusion.Core.Mathematics;
 using Fusion.Engine.Frames;
 using Fusion.Engine.Graphics;
@@ -6,15 +7,19 @@ using Fusion.Engine.Graphics;
 namespace FusionUI.UI.Elements
 {
     class SetterValueFrame : ScalableFrame{
-        private FrameProcessor ui;
+
+		protected SetterValueFrame()
+		{
+		}
+		private FrameProcessor ui;
         public string nameLabel;
 
         public int sizeButton = 30;
         public int widthValueFrame = 100;
 
         public float step = 1;
-
-        public Action<float> OnChange;
+		[XmlIgnore]
+		public Action<float> OnChange;
 
         private float _currentValue;
         public float CurrentValue {

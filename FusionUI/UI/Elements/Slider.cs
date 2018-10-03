@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Xml.Serialization;
 using Fusion.Core.Mathematics;
 using Fusion.Engine.Common;
 using Fusion.Engine.Frames;
@@ -11,15 +12,18 @@ namespace FusionUI.UI.Elements
 {
     public class Slider : ScalableFrame
     {
-        private FrameProcessor ui;
+		protected Slider()
+		{
+		}
+		private FrameProcessor ui;
 
         public float MinValue = 0;
         public float MaxValue = 1;
 
         public bool IsVertical = false;
         public bool DrawPreset = true;
-
-        public Action<float> OnChange;
+		[XmlIgnore]
+		public Action<float> OnChange;
 
         private List<float> _presetValues = null;
 

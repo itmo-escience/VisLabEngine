@@ -14,8 +14,10 @@ namespace FusionUI.UI
 
     public class LayoutFrame : FreeFrame
     {
-
-        protected LayoutType type;
+		protected LayoutFrame()
+		{
+		}
+		protected LayoutType type;
 
         private float max;
 

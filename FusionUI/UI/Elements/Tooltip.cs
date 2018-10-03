@@ -6,7 +6,10 @@ namespace FusionUI.UI.Elements
 {
     public class Tooltip : ScalableFrame
     {
-        public Tooltip(FrameProcessor ui) : base(ui)
+		protected Tooltip()
+		{
+		}
+		public Tooltip(FrameProcessor ui) : base(ui)
         {
             this.Ghost = true;
             ((Frame) this).Ghost = true;

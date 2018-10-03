@@ -161,11 +161,13 @@
     <Compile Include="Core\Shell\NoRollbackCommand.cs" />
     <Compile Include="Core\Shell\Invoker.Helper.cs" />
     <Compile Include="Core\StringConverter.cs" />
+    <Compile Include="Core\Utils\FrameSerializer.cs" />
     <Compile Include="Core\Utils\LogListener.cs" />
     <Compile Include="Core\Utils\LogMessage.cs" />
     <Compile Include="Core\Utils\LogMessageType.cs" />
     <Compile Include="Core\Utils\Crc32.cs" />
     <Compile Include="Core\Utils\Hud.cs" />
+    <Compile Include="Core\Utils\Serializer.cs" />
     <Compile Include="Core\Utils\TimeProbe.cs" />
     <Compile Include="Core\Configuration\ConfigAttribute.cs" />
     <Compile Include="Core\Content\ContentException.cs" />
@@ -246,6 +248,10 @@
     <Compile Include="Engine\Common\Commands\CrashServer.cs" />
     <Compile Include="Engine\Common\AtomAttribute.cs" />
     <Compile Include="Engine\Common\UserInterface.Internal.cs" />
+    <Compile Include="Engine\Frames\Abstract\DrawFrameItem.cs" />
+    <Compile Include="Engine\Frames\Abstract\Events.cs" />
+    <Compile Include="Engine\Frames\Abstract\IFrame.cs" />
+    <Compile Include="Engine\Frames\Abstract\TestNewframe.cs" />
     <Compile Include="Engine\Graphics\Design\TextureLocationEditor.cs" />
     <Compile Include="Engine\Graphics\Effects\BitonicSort.cs" />
     <Compile Include="Engine\Graphics\Effects\DofSettings.cs" />
@@ -606,7 +612,6 @@
     <Compile Include="Engine\Graphics\Scene\MeshVertex.cs" />
     <Compile Include="Engine\Graphics\Scene\Node.cs" />
     <Compile Include="Engine\Graphics\Scene\Scene.cs" />
-    <Compile Include="Core\Utils\Serializer.cs" />
     <Compile Include="Core\Mathematics\Temperature.cs" />
     <Compile Include="Core\Utils\Wildcard.cs" />
     <Compile Include="Core\Utils\LogRecorder.cs" />

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Xml.Serialization;
 using Fusion.Core.Mathematics;
 using Fusion.Engine.Common;
 using Fusion.Engine.Frames;
@@ -10,7 +11,10 @@ namespace FusionUI.UI.Elements
         public Progressbar(FrameProcessor ui, float x, float y, float w, float h) : base(ui, x, y, w, h, "", Color.Zero)
         {
         }
-    }
+		protected Progressbar()
+		{
+		}
+	}
 
     public class MeasuredProgressbar : Progressbar
     {
@@ -36,8 +40,8 @@ namespace FusionUI.UI.Elements
             Add(back);
             Add(progress);
         }
-
-        public Action<float> ValueUpdate;
+		[XmlIgnore]
+		public Action<float> ValueUpdate;
     }
 
     public class UnmeasuredProgressbar : Progressbar

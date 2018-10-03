@@ -9,10 +9,15 @@ using Fusion.Engine.Frames;
 using Fusion.Engine.Common;
 using Fusion.Engine.Graphics;
 using FusionUI.UI.Elements.DropDown;
+using System.Runtime.Serialization;
+using System.IO;
+using System.Xml.Serialization;
+using System.Xml.Schema;
+using System.Xml;
 
 namespace FusionUI.UI
 {
-    public class ScalableFrame : ControllableFrame
+	public class ScalableFrame : ControllableFrame
     {
         public int order = 0;
 
@@ -20,10 +25,10 @@ namespace FusionUI.UI
         {
             get { return (ApplicationInterface.ScaleMod); }
         }
-
-        public UIConfig.FontHolder FontHolder = new UIConfig.FontHolder(@"fonts\new\Base");
-
-        public override SpriteFont Font => FontHolder[ApplicationInterface.uiScale];
+		[XmlIgnore]
+		public UIConfig.FontHolder FontHolder = new UIConfig.FontHolder(@"fonts\new\Base");
+		[XmlIgnore]
+		public override SpriteFont Font => FontHolder[ApplicationInterface.uiScale];
 
         private float unitX, unitY, unitWidth, unitHeight;
 
@@ -48,8 +53,8 @@ namespace FusionUI.UI
                 unitY = value;                
             }
         }
-
-        public Action<float> OnCoordUpdate;
+		[XmlIgnore]
+		public Action<float> OnCoordUpdate;
 
         public virtual float UnitWidth
         {
@@ -273,9 +278,13 @@ namespace FusionUI.UI
         }
 
 
-        #endregion
+		#endregion
 
-        public ScalableFrame(FrameProcessor ui) : base(ui)
+		protected ScalableFrame()
+		{
+		}
+
+		public ScalableFrame(FrameProcessor ui) : base(ui)
         {
             ForeColor = UIConfig.ActiveTextColor;
         }
@@ -309,21 +318,151 @@ namespace FusionUI.UI
             UpdateMove();
             UpdateResize(false);
 
-        }        
-    }
+        }
 
-    public class FullScreenFrame<T> : FullScreenFrame where T : ScalableFrame
+		#region Serialization
+		/*-----------------------------------------------------------------------------------------
+         * 
+         *	Serialization :
+         * 
+        -----------------------------------------------------------------------------------------*/
+
+		/// <summary>
+		/// Serializes the frame.
+		/// </summary>
+		public override void Serialize(BinaryWriter writer)
+		{
+			base.Serialize(writer);
+			writer.Write(this.Height);
+			writer.Write(this.ImageOffsetX);
+			writer.Write(this.ImageOffsetY);
+			writer.Write(this.PaddingBottom);
+			writer.Write(this.PaddingLeft);
+			writer.Write(this.PaddingRight);
+			writer.Write(this.PaddingTop);
+			writer.Write(this.Text??"");
+			writer.Write(this.TextOffsetX);
+			writer.Write(this.TextOffsetY);
+
+			writer.Write(this.UnitHeight);
+			writer.Write(this.UnitImageOffsetX);
+			writer.Write(this.UnitImageOffsetY);
+			writer.Write(this.UnitPaddingBottom);
+			writer.Write(this.UnitPaddingLeft);
+			writer.Write(this.UnitPaddingRight);
+			writer.Write(this.UnitPaddingTop);
+			writer.Write(this.UnitTextOffsetX);
+			writer.Write(this.UnitTextOffsetY);
+			writer.Write(this.UnitImageOffsetX);
+			writer.Write(this.UnitWidth);
+			writer.Write(this.UnitX);
+			writer.Write(this.UnitY);
+
+			writer.Write(this.Width);
+			writer.Write(this.X);
+			writer.Write(this.Y);
+
+		}
+
+		/// <summary>
+		/// Deerializes the frame.
+		/// </summary>
+		public override void Deserialize(BinaryReader reader)
+		{
+			//this.FontHolder = new UIConfig.FontHolder(@"fonts\new\Base");
+
+			base.Deserialize(reader);
+			this.Height = reader.ReadInt32();
+			this.ImageOffsetX = reader.ReadInt32();
+			this.ImageOffsetY = reader.ReadInt32();
+			this.PaddingBottom = reader.ReadInt32();
+			this.PaddingLeft = reader.ReadInt32();
+			this.PaddingRight = reader.ReadInt32();
+			this.PaddingTop = reader.ReadInt32();
+			this.Text = reader.ReadString();
+			this.TextOffsetX = reader.ReadInt32();
+			this.TextOffsetY = reader.ReadInt32();
+
+			this.UnitHeight = reader.ReadSingle();
+			this.UnitImageOffsetX = reader.ReadSingle();
+			this.UnitImageOffsetY = reader.ReadSingle();
+			this.UnitPaddingBottom = reader.ReadSingle();
+			this.UnitPaddingLeft = reader.ReadSingle();
+			this.UnitPaddingRight = reader.ReadSingle();
+			this.UnitPaddingTop = reader.ReadSingle();
+			this.UnitTextOffsetX = reader.ReadSingle();
+			this.UnitTextOffsetY = reader.ReadSingle();
+			this.UnitImageOffsetX = reader.ReadSingle();
+			this.UnitWidth = reader.ReadSingle();
+			this.UnitX = reader.ReadSingle();
+			this.UnitY = reader.ReadSingle();
+
+			this.Width = reader.ReadInt32();
+			this.X = reader.ReadInt32();
+			this.Y = reader.ReadInt32();
+
+		}
+		#endregion
+	}
+
+	public class FullScreenFrame<T> : FullScreenFrame where T : ScalableFrame
     {
-        public FullScreenFrame(FrameProcessor ui) : base(ui)
+		public FullScreenFrame(FrameProcessor ui) : base(ui)
         {
         }
 
         public T Item;
-    }
+
+		public XmlSchema GetSchema()
+		{
+			return null;
+		}
+
+		public void ReadXml( XmlReader reader )
+		{
+			XmlSerializer itemSerializer = new XmlSerializer(typeof(T));
+
+			bool wasEmpty = reader.IsEmptyElement;
+			reader.Read();
+
+			if (wasEmpty)
+				return;
+
+			while (reader.NodeType != System.Xml.XmlNodeType.EndElement)
+			{
+				reader.ReadStartElement("item");
+
+				T item = (T)itemSerializer.Deserialize(reader);
+
+				this.Item = item;
+
+				reader.ReadEndElement();
+				reader.MoveToContent();
+			}
+			reader.ReadEndElement();
+		}
+
+		public void WriteXml( XmlWriter writer )
+		{
+			XmlSerializer itemSerializer = new XmlSerializer(typeof(T));
+
+
+
+			writer.WriteStartElement("item");
+			itemSerializer.Serialize(writer, this.Item);
+
+			writer.WriteEndElement();
+		}
+	}
+
 
     public class FullScreenFrame : ScalableFrame
     {
-        public FullScreenFrame(FrameProcessor ui) : base(ui)
+		protected FullScreenFrame()
+		{
+		}
+
+		public FullScreenFrame(FrameProcessor ui) : base(ui)
         {
             X = 0;
             Y = 0;

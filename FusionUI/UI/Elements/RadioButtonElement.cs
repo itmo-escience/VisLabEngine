@@ -5,7 +5,10 @@ namespace FusionUI.UI.Elements
 {
     public class RadioButtonElement : ScalableFrame
     {
-        public RadioButton Check;
+		protected RadioButtonElement()
+		{
+		}
+		public RadioButton Check;
         public ScalableFrame Label;
         public string Value => Label.DefaultText;
 

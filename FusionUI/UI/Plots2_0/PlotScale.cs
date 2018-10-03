@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
+using System.Xml.Serialization;
 using Fusion.Core.Mathematics;
 using Fusion.Engine.Common;
 using Fusion.Engine.Frames;
@@ -133,9 +134,12 @@ namespace FusionUI.UI.Plots2_0
     }
 
     public class PlotScale : ScalableFrame
-    {        
-        //TODO: change to plot type when it'll be developed
-        public PlotCanvas Plot;
+    {
+		protected PlotScale()
+		{
+		}
+		//TODO: change to plot type when it'll be developed
+		public PlotCanvas Plot;
         public List<PlotVariable> PlotData = new List<PlotVariable>();
 
         public string YLabel = "";
@@ -143,8 +147,10 @@ namespace FusionUI.UI.Plots2_0
         public string Measure = "";
         public bool Dirty = true;        
         public List<double> PredefinedStepsX, predefinedStepsY;
-        public UIConfig.FontHolder BoldFontHolder;
-        public SpriteFont BoldFont => BoldFontHolder[ApplicationInterface.uiScale];
+		[XmlIgnore]
+		public UIConfig.FontHolder BoldFontHolder;
+		[XmlIgnore]
+		public SpriteFont BoldFont => BoldFontHolder[ApplicationInterface.uiScale];
         
         public int Index = 0;
 

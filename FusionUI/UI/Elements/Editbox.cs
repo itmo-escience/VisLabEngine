@@ -13,7 +13,11 @@ namespace FusionUI.UI.Elements
 {
     public class Editbox : ScalableFrame
     {
-        public string Label;
+
+		protected Editbox()
+		{
+		}
+		public string Label;
 
         private bool isFixWidth = true;
         private bool isHovered = false;

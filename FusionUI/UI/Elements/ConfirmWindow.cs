@@ -5,6 +5,11 @@ namespace FusionUI.UI.Elements
 {
     class ConfirmWindow : Window {
 
+		protected ConfirmWindow()
+		{
+
+		}
+
         public ScalableFrame textMessage;
 
         public Button OkButton;

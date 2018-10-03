@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Xml.Serialization;
 using Fusion;
 using Fusion.Core.Mathematics;
+using Fusion.Core.Utils;
 using Fusion.Engine.Frames;
 using Fusion.Engine.Graphics;
 
@@ -10,7 +12,10 @@ namespace FusionUI.UI.Elements.DropDown
 {
     public class DropDownSelector<TR> : ScalableFrame where TR : DropDownSelectorRow, new()
     {
-        public List<string> Values;
+		protected DropDownSelector()
+		{
+		}
+		public List<string> Values;
         private string current;
         public string Current
         {
@@ -48,12 +53,12 @@ namespace FusionUI.UI.Elements.DropDown
                 if (MainRow != null) MainRow.ForeColor = value;
             }
         }
-
-        public Action<string> OnClicked;
+		[XmlIgnore]
+		public Action<string> OnClicked;
 		private Action<string> updateValue;
 		public bool IsOpen = false;
         private Dictionary<string, TR> rows = new Dictionary<string, TR>();
-        public Dictionary<string, bool> DisabledRows = new Dictionary<string, bool>();
+        public SerializableDictionary<string, bool> DisabledRows = new SerializableDictionary<string, bool>();
         private bool isClick = false;
 
         public int Capacity = 4;

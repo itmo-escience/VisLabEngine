@@ -8,6 +8,11 @@ namespace FusionUI.UI
 {
     public class WindowScroll : Window
     {
+		protected WindowScroll()
+		{
+
+		}
+
         protected override void HolderOnResize(object sender, ResizeEventArgs args)
         {
             //Log.Message("LoL");

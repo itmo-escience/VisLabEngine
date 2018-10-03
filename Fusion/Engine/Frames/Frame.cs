@@ -9,24 +9,30 @@ using Fusion.Engine.Input;
 using Fusion.Engine.Graphics;
 using Fusion.Engine.Common;
 using Forms = System.Windows.Forms;
-
+using System.IO;
+using System.Reflection;
+using System.Xml.Serialization;
 
 namespace Fusion.Engine.Frames {
+    public partial class Frame {
 
-	public partial class Frame {
-
-		public readonly	Game	Game;
+		[XmlIgnore]
+        public	Game	Game;
+		//
+		[XmlIgnore]
 		public FrameProcessor	ui { protected set; get; }
 
 		/// <summary>
 		/// 
 		/// </summary>
-		public	string		Name				{ get; set; }
+		
+        public	string		Name				{ get; set; }
 
 		/// <summary>
 		/// Is frame visible. Default true.
 		/// </summary>
-		public	bool		Visible				{ get; set; }
+		
+        public	bool		Visible				{ get; set; }
 
 		/// <summary>
 		/// 
@@ -41,237 +47,348 @@ namespace Fusion.Engine.Frames {
 		/// <summary>
 		/// Frame visible but does not receive input 
 		/// </summary>
-		public	bool		Ghost				{ get; set; }
+		
+        public	bool		Ghost				{ get; set; }
 
 		/// <summary>
 		/// Is frame receive input. Default true.
 		/// </summary>
-		public	bool		Enabled				{ get; set; }
+		
+        public	bool		Enabled				{ get; set; }
 
 	    /// <summary>
 	    /// Should frame fit its size to content. Default false.
 	    /// </summary>
-	    //public	bool		AutoSize			{ get; set; }
-	    public bool AutoWidth { get; set; }
-        public bool AutoHeight { get; set; }	
+	    //
+        public	bool		AutoSize			{ get; set; }
+	    
+        public bool AutoWidth { get; set; }
+        
+        public bool AutoHeight { get; set; }
 
 		/// <summary>
 		/// Text font
 		/// </summary>
+		[XmlIgnore]
 		public virtual SpriteFont	Font				{ get; set; }
 
-		/// <summary>
-		/// Tag object
-		/// </summary>
-		public	object		Tag;
+		///// <summary>
+		///// Tag object
+		///// </summary>
+		
+  //      public	object		Tag;
 
 		/// <summary>
 		/// 
 		/// </summary>
-		public	ClippingMode	 ClippingMode	{ get; set; } = ClippingMode.ClipByFrame;
+		
+        public	ClippingMode	 ClippingMode	{ get; set; } = ClippingMode.ClipByFrame;
 
         /// <summary>
         /// Overall color that used as multiplier 
         /// for all children elements
         /// </summary>
+        
         public virtual Color		OverallColor		{ get; set; }
 
         /// <summary>
         /// Background color
         /// </summary>
+        
         public virtual Color		BackColor			{ get; set; }
 
         /// <summary>
         /// Background color
         /// </summary>
+        
         public virtual Color		BorderColor			{ get; set; }
 
         /// <summary>
         /// Foreground (e.g. text) color
         /// </summary>
+        
         public virtual Color		ForeColor			{ get; set; }
 
         /// <summary>
         /// Text shadow color
         /// </summary>
+        
         public virtual Color		ShadowColor			{ get; set; }
 
         /// <summary>
         /// Shadow offset
         /// </summary>
+        
         public virtual Vector2		ShadowOffset		{ get; set; }
-
 
 		/// <summary>
 		/// Local X position of the frame
 		/// </summary>
-		public	virtual int			X					{ get; set; }
+		
+        public	virtual int			X					{ get; set; }
 
 		/// <summary>
 		/// Local Y position of the frame
 		/// </summary>
-		public virtual int Y					{ get; set; }
+		
+        public virtual int Y					{ get; set; }
 
 		/// <summary>
 		///	Width of the frame
 		/// </summary>
-		public virtual int Width				{ get; set; }
+		
+        public virtual int Width				{ get; set; }
 
 		/// <summary>
 		///	Height of the frame
 		/// </summary>
-		public virtual int Height				{ get; set; }
+		
+        public virtual int Height				{ get; set; }
 
 		/// <summary>
 		/// Left gap between frame and its content
 		/// </summary>
-		public virtual int PaddingLeft			{ get; set; }
+		
+        public virtual int PaddingLeft			{ get; set; }
 
 		/// <summary>
 		/// Right gap between frame and its content
 		/// </summary>
-		public virtual int PaddingRight		{ get; set; }
+		
+        public virtual int PaddingRight		{ get; set; }
 
 		/// <summary>
 		/// Top gap  between frame and its content
 		/// </summary>
-		public virtual int PaddingTop			{ get; set; }
+		
+        public virtual int PaddingTop			{ get; set; }
 
 		/// <summary>
 		/// Bottom gap  between frame and its content
 		/// </summary>
-		public virtual int PaddingBottom		{ get; set; }
+		
+        public virtual int PaddingBottom		{ get; set; }
 
 		/// <summary>
 		/// Top and bottom padding
 		/// </summary>
-		public virtual int VPadding			{ set { PaddingBottom = PaddingTop = value; } }
+        public virtual int VPadding			{ set { PaddingBottom = PaddingTop = value; } }
 
 		/// <summary>
 		///	Left and right padding
 		/// </summary>
-		public virtual int HPadding			{ set { PaddingLeft = PaddingRight = value; } }
+        public virtual int HPadding			{ set { PaddingLeft = PaddingRight = value; } }
 
 		/// <summary>
 		/// Top, bottom, left and right padding
 		/// </summary>
-		public virtual int Padding				{ set { VPadding = HPadding = value; } }
+        public virtual int Padding				{ set { VPadding = HPadding = value; } }
 
 		/// <summary>
 		/// 
 		/// </summary>
-		public virtual int BorderTop			{ get; set; }
+		
+        public virtual int BorderTop			{ get; set; }
 
 		/// <summary>
 		/// 
 		/// </summary>
-		public virtual int BorderBottom		{ get; set; }
+		
+        public virtual int BorderBottom		{ get; set; }
 
 		/// <summary>
 		/// 
 		/// </summary>
-		public virtual int BorderLeft			{ get; set; }
+		
+        public virtual int BorderLeft			{ get; set; }
 
 		/// <summary>
 		/// 
 		/// </summary>
-		public virtual int BorderRight			{ get; set; }
+		
+        public virtual int BorderRight			{ get; set; }
 
 		/// <summary>
 		/// 
 		/// </summary>
-		public virtual int Border				{ set { BorderTop = BorderBottom = BorderLeft = BorderRight = value; } }
+        public virtual int Border				{ set { BorderTop = BorderBottom = BorderLeft = BorderRight = value; } }
 
 		/// <summary>
 		/// 
 		/// </summary>
-		public	virtual string		Text				{ get; set; }        
+		
+        public	virtual string		Text				{ get; set; }        
         /// <summary>
         /// 
         /// </summary>
+        
         public	Alignment	TextAlignment		{ get; set; }
 
 		/// <summary>
 		/// 
 		/// </summary>
-		public virtual	int			TextOffsetX			{ get; set; }
+		
+        public virtual	int			TextOffsetX			{ get; set; }
 
 		/// <summary>
 		/// 
 		/// </summary>
-		public virtual int          TextOffsetY			{ get; set; }
+		
+        public virtual int          TextOffsetY			{ get; set; }
 
 		/// <summary>
 		/// 
 		/// </summary>
-		public	TextEffect	TextEffect			{ get; set; }
+		
+        public	TextEffect	TextEffect			{ get; set; }
 
 		/// <summary>
 		/// 
 		/// </summary>
-		public	FrameAnchor	Anchor			{ get; set; }
+		
+        public	FrameAnchor	Anchor			{ get; set; }
 
 
-		public virtual int		ImageOffsetX	{ get; set; }
-		public virtual int      ImageOffsetY	{ get; set; }
-		public FrameImageMode	ImageMode		{ get; set; }
-		public Color			ImageColor		{ get; set; }
-		public Texture			Image			{ get; set; }
+		
+        public virtual int		ImageOffsetX	{ get; set; }
+		
+        public virtual int      ImageOffsetY	{ get; set; }
+		
+        public FrameImageMode	ImageMode		{ get; set; }
+		
+        public Color			ImageColor		{ get; set; }
 
-		/// <summary>
-		/// 
-		/// </summary>
-		public LayoutEngine	Layout	{ 
-			get { return layout; }
-			set { layout = value; if (LayoutChanged!=null) LayoutChanged(this, EventArgs.Empty); }
+		private Texture image;
+		[XmlIgnore]
+		public Texture			Image			{
+			get {
+				if (this.image != null)
+				{
+					return this.image;
+				} else if (!String.IsNullOrEmpty(imageName))
+				{
+					image = ui.Game.Content.Load<DiscTexture>(imageName);
+					return image;
+				}
+				else
+				{
+					return null;
+				}
+			}
+			set {
+				image = value;
+			}
 		}
 
-		LayoutEngine layout = null;
+		private string imageName;
+
+		public string ImageName {
+			get
+			{
+				if (this.Image!=null)
+				{
+					return imageName = this.Image.Name;
+				}
+				else
+				{
+					return imageName;
+				}
+			}
+			set
+			{
+				imageName = value;
+			}
+		}
+
+
+		///// <summary>
+		///// 
+		///// </summary>
+
+		//public LayoutEngine	Layout	{ 
+		//	get { return layout; }
+		//	set { layout = value; if (LayoutChanged!=null) LayoutChanged(this, EventArgs.Empty); }
+		//}
+
+		//LayoutEngine layout = null;
 
 
 		#region	Events
+
 		public class KeyEventArgs : EventArgs {
+			
 			public Keys	Key;
 		}
 
+		
 		public class MouseEventArgs : EventArgs {
+			
 			public Keys Key = Keys.None;
+			
 			public int X = 0;
+			
 			public int Y = 0;
+			
 			public int DX = 0;
+			
 			public int DY = 0;
+			
 			public int Wheel = 0;
 		}
 
+		
 		public class StatusEventArgs : EventArgs {
-			public FrameStatus	Status;
+			
+		public FrameStatus	Status;
 		}
 
+		
 		public class MoveEventArgs : EventArgs {
+			
 			public int	X;
+			
 			public int	Y;
 		}
 
+		
 		public class ResizeEventArgs : EventArgs {
+			
 			public int	Width;
+			
 			public int	Height;
 		}
 
+		
 		public event EventHandler	Tick;
+		
 		public event EventHandler	LayoutChanged;
+		
 		public event EventHandler	Activated;
+		
 		public event EventHandler	Deactivated;
+		
 		public event EventHandler<MouseEventArgs>	MouseIn;
+		
 		public event EventHandler<MouseEventArgs>	MouseMove;
-        public event EventHandler<MouseEventArgs>   MouseDrag;
-        public event EventHandler<MouseEventArgs>	MouseOut;
+        
+		public event EventHandler<MouseEventArgs>   MouseDrag;
+        
+		public event EventHandler<MouseEventArgs>	MouseOut;
+		
 		public event EventHandler<MouseEventArgs>	MouseWheel;
+		
 		public event EventHandler<MouseEventArgs>	Click;
+		
 		public event EventHandler<MouseEventArgs>	DoubleClick;
+		
 		public event EventHandler<MouseEventArgs>	MouseDown;
+		
 		public event EventHandler<MouseEventArgs>	MouseUp;
+		
 		public event EventHandler<StatusEventArgs>	StatusChanged;
+		
 		public event EventHandler<MoveEventArgs>	Move;
+		
 		public event EventHandler<ResizeEventArgs>	Resize;
 		#endregion
 
@@ -279,18 +396,33 @@ namespace Fusion.Engine.Frames {
 		/// <summary>
 		/// Gets list of frame children
 		/// </summary>
-		public IList<Frame> Children { get { return children; } }
+		
+
+		//ILIst
+
+		public List<Frame> Children {
+			get { return children; }
+			set
+			{
+				foreach (Frame child in value)
+				{
+					this.Add(child);
+				}
+			}
+		}
 
 
 		/// <summary>
 		/// Gets frame
 		/// </summary>
-		public Frame Parent { get { return parent; } }
+		[XmlIgnore]
+		public Frame Parent { get { return parent; } /*internal set { } */}
 
 		/// <summary>
 		/// Global frame rectangle made 
 		/// after all layouting and transitioning operation
 		/// </summary>
+		[XmlIgnore]
 		public Rectangle GlobalRectangle { get; private set; }
 
 
@@ -299,11 +431,19 @@ namespace Fusion.Engine.Frames {
 		/// Constructor
 		/// </summary>
 		/// <param name="id"></param>
-		public Frame ( FrameProcessor ui )
+        public Frame ( FrameProcessor ui )
 		{
 			Game	=	ui.Game;
 			this.ui	=	ui;
 			Init();
+		}
+
+		/// <summary>
+		/// Parameterless constructor
+		/// </summary>
+		protected Frame()
+		{
+			//Init();
 		}
 
 
@@ -343,7 +483,7 @@ namespace Fusion.Engine.Frames {
 		/// <param name="h"></param>
 		/// <param name="text"></param>
 		/// <param name="backColor"></param>
-		public Frame ( FrameProcessor ui, int x, int y, int w, int h, string text, Color backColor )
+        public Frame ( FrameProcessor ui, int x, int y, int w, int h, string text, Color backColor )
 		{
 			Game	=	ui.Game;
 			this.ui	=	ui;
@@ -370,7 +510,7 @@ namespace Fusion.Engine.Frames {
 			Enabled			=	true;
 			AutoWidth		=	false;
 		    AutoHeight      =   false;
-			Font			=	ui.DefaultFont;
+			Font			=	ui?.DefaultFont;
 			ForeColor		=	Color.White;
 			Border			=	0;
 			BorderColor		=	Color.White;
@@ -383,8 +523,8 @@ namespace Fusion.Engine.Frames {
 
 			ImageColor		=	Color.White;
 
-			LayoutChanged	+= (s,e) => RunLayout(true);
-			Resize			+= (s,e) => RunLayout(true);
+			//LayoutChanged	+= (s,e) => RunLayout(true);
+			//Resize			+= (s,e) => RunLayout(true);
 		}
 
 
@@ -398,7 +538,8 @@ namespace Fusion.Engine.Frames {
 	    protected Frame		parent		=	null;
 	    private int zOrder = 0;
 
-	    public int ZOrder
+	    
+        public int ZOrder
 	    {
 	        get { return zOrder; }
 	        set
@@ -412,25 +553,41 @@ namespace Fusion.Engine.Frames {
 		/// Adds frame
 		/// </summary>
 		/// <param name="frame"></param>
-		public virtual void Add ( Frame frame )
+        public virtual void Add ( Frame frame )
 		{
 			if ( !children.Contains(frame) ) {
 				children.Add( frame );
-			    if (frame.ZOrder == 0)
+				frame.updateChildrenUI(this.ui);
+				if (frame.ZOrder == 0)
 			    {
 			        frame.ZOrder = children.Count;
                 }
 			    ReorderChildren();
 				frame.parent	=	this;
+
 				frame.OnStatusChanged( FrameStatus.None );                
 			}		    
+		}
+
+		private void updateChildrenUI( FrameProcessor ui )
+		{
+			if (this.ui != ui)
+			{
+				this.ui = ui;//
+				this.Game = ui.Game;// 
+				this.Font = ui.DefaultFont;//
+			}
+			foreach (var child in this.Children)
+			{
+				child.updateChildrenUI(ui);
+			}
 		}
 
 	    /// <summary>
 	    /// Reordering children
 	    /// </summary>
 	    /// 
-	    public void ReorderChildren()
+        public void ReorderChildren()
 	    {
             children = children.OrderBy(f => f.ZOrder).ToList();
 	        int j = 0;
@@ -443,7 +600,7 @@ namespace Fusion.Engine.Frames {
 		/// 
 		/// </summary>
 		/// <param name="frame"></param>
-		public virtual void Clear ( Frame frame )
+        public virtual void Clear ( Frame frame )
 		{
 			foreach ( var child in children ) {
 				child.parent = null;
@@ -457,7 +614,7 @@ namespace Fusion.Engine.Frames {
 		/// </summary>
 		/// <param name="index"></param>
 		/// <param name="frame"></param>
-		public void Insert ( int index, Frame frame )
+        public void Insert ( int index, Frame frame )
 		{
 			if ( !children.Contains(frame) ) {
 				children.Insert( index, frame );
@@ -472,7 +629,7 @@ namespace Fusion.Engine.Frames {
 		/// 
 		/// </summary>
 		/// <param name="frame"></param>
-		public void Remove ( Frame frame )
+        public void Remove ( Frame frame )
 		{
 			if ( this.children.Contains(frame) ) {
 				this.children.Remove( frame );
@@ -486,7 +643,7 @@ namespace Fusion.Engine.Frames {
 		/// 
 		/// </summary>
 		/// <returns></returns>
-		public List<Frame>	GetAncestorList ()
+        public List<Frame>	GetAncestorList ()
 		{
 			var list = new List<Frame>();
 
@@ -505,7 +662,7 @@ namespace Fusion.Engine.Frames {
 		/// 
 		/// </summary>
 		/// <param name="action"></param>
-		public void ForEachAncestor ( Action<Frame> action ) 
+        public void ForEachAncestor ( Action<Frame> action ) 
 		{
 			GetAncestorList().ForEach( f => action(f) );
 		}
@@ -515,7 +672,7 @@ namespace Fusion.Engine.Frames {
 		/// 
 		/// </summary>
 		/// <param name="action"></param>
-		public void ForEachChildren ( Action<Frame> action ) 
+        public void ForEachChildren ( Action<Frame> action ) 
 		{
 			children.ToList().ForEach( f => action(f) );
 		}
@@ -538,7 +695,7 @@ namespace Fusion.Engine.Frames {
 		}
 
 
-		public void OnClick (Point location, Keys key, bool doubleClick)
+        public void OnClick (Point location, Keys key, bool doubleClick)
 		{
 			int x = location.X - GlobalRectangle.X;
 			int y = location.Y - GlobalRectangle.Y;
@@ -576,7 +733,7 @@ namespace Fusion.Engine.Frames {
 			}		    
 		}
 
-	    public virtual void OnDrag(int dx, int dy)
+        public virtual void OnDrag(int dx, int dy)
 	    {
             int x = Game.InputDevice.MousePosition.X - GlobalRectangle.X;
             int y = Game.InputDevice.MousePosition.Y - GlobalRectangle.Y;
@@ -657,7 +814,7 @@ namespace Fusion.Engine.Frames {
 		 * 
 		-----------------------------------------------------------------------------------------*/
 
-		public static List<Frame> BFSList ( Frame v )
+        public static List<Frame> BFSList ( Frame v )
 		{
 			Queue<Frame> Q = new Queue<Frame>();
 			List<Frame> list = new List<Frame>();
@@ -678,7 +835,7 @@ namespace Fusion.Engine.Frames {
 		}
 			
 
-		public void UpdateGlobalRect ( int px, int py )
+        public void UpdateGlobalRect ( int px, int py )
 		{		           
             GlobalRectangle = new Rectangle(X + px, Y + py, Width, Height);
             ForEachChildren(ch => ch.UpdateGlobalRect(px + X, py + Y));
@@ -707,7 +864,7 @@ namespace Fusion.Engine.Frames {
 			UpdateGlobalRect(0,0);
 
 			if (ui.ForceLayout) {
-				bfsList.ForEach( f => f.RunLayout(true) );
+				//bfsList.ForEach( f => f.RunLayout(true) );
 			}
 
 			bfsList.ForEach( f => f.UpdateMove() );
@@ -722,7 +879,7 @@ namespace Fusion.Engine.Frames {
 
 
 		class DrawFrameItem {
-			public DrawFrameItem ( Frame frame, Color color, Rectangle outerClip, Rectangle innerClip, string text )
+        public DrawFrameItem ( Frame frame, Color color, Rectangle outerClip, Rectangle innerClip, string text )
 			{
 				this.Frame		=	frame;
 				this.OuterClip	=	outerClip;
@@ -730,11 +887,11 @@ namespace Fusion.Engine.Frames {
 				this.Color		=	color;
 				this.Text		=	text;
 			}
-			public Frame Frame;
-			public Color Color;
-			public Rectangle OuterClip;
-			public Rectangle InnerClip;
-			public string Text;
+        public Frame Frame;
+        public Color Color;
+        public Rectangle OuterClip;
+        public Rectangle InnerClip;
+        public string Text;
 		}
 
 
@@ -765,8 +922,10 @@ namespace Fusion.Engine.Frames {
 				}
 
 				list.Add( currentDrawFrame );
-
-				foreach ( var child in currentDrawFrame.Frame.Children.Reverse() ) {
+				currentDrawFrame.Frame.Children.Reverse();
+				var reversedChildren = currentDrawFrame.Frame.Children;
+				currentDrawFrame.Frame.Children.Reverse();
+				foreach ( var child in reversedChildren) {
 
 					var color = currentDrawFrame.Color * child.OverallColor;
 					var inner = Clip( child.GetBorderedRectangle(), currentDrawFrame.InnerClip );
@@ -908,7 +1067,7 @@ namespace Fusion.Engine.Frames {
 		/// <summary>
 		/// 
 		/// </summary>
-		public virtual void UpdateResize (bool UpdateChildren = true)
+        public virtual void UpdateResize (bool UpdateChildren = true)
 		{            
             AutoResize(true);
             if ( oldW != Width || oldH != Height ) {
@@ -962,16 +1121,16 @@ namespace Fusion.Engine.Frames {
 
 
 
-		/// <summary>
-		/// 
-		/// </summary>
-		/// <param name="forceTransitions"></param>
-		public void RunLayout (bool forceTransitions)
-		{
-			if (layout!=null && !ui.SuppressLayout) {
-				layout.RunLayout( this, forceTransitions );
-			}
-		}
+		///// <summary>
+		///// 
+		///// </summary>
+		///// <param name="forceTransitions"></param>
+  //      public void RunLayout (bool forceTransitions)
+		//{
+		//	if (layout!=null && !ui.SuppressLayout) {
+		//		layout.RunLayout( this, forceTransitions );
+		//	}
+		//}
 
 
 
@@ -979,7 +1138,7 @@ namespace Fusion.Engine.Frames {
 		/// Get global rectangle bound by borders
 		/// </summary>
 		/// <returns></returns>
-		public Rectangle GetBorderedRectangle ()
+        public Rectangle GetBorderedRectangle ()
 		{
 			return new Rectangle( 
 				GlobalRectangle.X + BorderLeft, 
@@ -994,7 +1153,7 @@ namespace Fusion.Engine.Frames {
 		/// Get global rectangle padded and bound by borders
 		/// </summary>
 		/// <returns></returns>
-		public Rectangle GetPaddedRectangle ( bool global = true )
+        public Rectangle GetPaddedRectangle ( bool global = true )
 		{
 			int x = global ? GlobalRectangle.X : 0;
 			int y = global ? GlobalRectangle.Y : 0;
@@ -1170,7 +1329,7 @@ namespace Fusion.Engine.Frames {
 		/// <param name="termValue"></param>
 		/// <param name="delay"></param>
 		/// <param name="period"></param>
-		public void RunTransition<T,I> ( string property, T targetValue, int delay, int period, Action callback = null) where I: IInterpolator<T>, new()
+        public void RunTransition<T,I> ( string property, T targetValue, int delay, int period, Action callback = null) where I: IInterpolator<T>, new()
 		{
 			var pi	=	GetType().GetProperty( property );
 			
@@ -1193,7 +1352,7 @@ namespace Fusion.Engine.Frames {
 		/// <param name="targetValue"></param>
 		/// <param name="delay"></param>
 		/// <param name="period"></param>
-		public void RunTransition ( string property, Color targetValue, int delay, int period, Action callback = null )
+        public void RunTransition ( string property, Color targetValue, int delay, int period, Action callback = null )
 		{
 			RunTransition<Color, ColorInterpolator>( property, targetValue, delay, period, callback );
 		}
@@ -1207,7 +1366,7 @@ namespace Fusion.Engine.Frames {
 		/// <param name="targetValue"></param>
 		/// <param name="delay"></param>
 		/// <param name="period"></param>
-		public void RunTransition ( string property, int targetValue, int delay, int period, Action callback = null)
+        public void RunTransition ( string property, int targetValue, int delay, int period, Action callback = null)
 		{
 			RunTransition<int, IntInterpolator>( property, targetValue, delay, period, callback);
 		}
@@ -1219,7 +1378,7 @@ namespace Fusion.Engine.Frames {
 	    /// <param name="targetValue"></param>
 	    /// <param name="delay"></param>
 	    /// <param name="period"></param>
-	    public void RunTransition(string property, float targetValue, int delay, int period, Action callback = null)
+        public void RunTransition(string property, float targetValue, int delay, int period, Action callback = null)
 	    {
 	        RunTransition<float, FloatInterpolator>(property, targetValue, delay, period, callback);
 	    }
@@ -1291,7 +1450,7 @@ namespace Fusion.Engine.Frames {
 		/// <param name="oldH"></param>
 		/// <param name="newW"></param>
 		/// <param name="newH"></param>
-		public virtual void UpdateAnchors ( int oldW, int oldH, int newW, int newH )
+        public virtual void UpdateAnchors ( int oldW, int oldH, int newW, int newH )
 		{
 			int dw	=	newW - oldW;
 			int dh	=	newH - oldH;
@@ -1335,6 +1494,139 @@ namespace Fusion.Engine.Frames {
 		 *	Layouting :
 		 * 
 		-----------------------------------------------------------------------------------------*/
-	}
-}
 
+		#region Serialization
+		/*-----------------------------------------------------------------------------------------
+         * 
+         *	Serialization :
+         * 
+        -----------------------------------------------------------------------------------------*/
+
+		/// <summary>
+		/// Serializes the frame.
+		/// </summary>
+		public virtual void Serialize(BinaryWriter writer)
+		{
+			writer.Write(this.children.Count);
+			foreach (var child in this.Children)
+			{
+				writer.Write(Assembly.GetAssembly(child.GetType()).FullName);
+				writer.Write(child.GetType().FullName);
+				child.Serialize(writer);
+			}
+
+			writer.Write(this.Name ?? "");
+			writer.Write(this.Visible);
+			writer.Write(this.Ghost);
+			writer.Write(this.Enabled);
+			writer.Write(this.AutoSize);
+			writer.Write(this.AutoWidth);
+			writer.Write(this.AutoHeight);
+			writer.Write((int)this.ClippingMode);
+			writer.Write(this.OverallColor);
+			writer.Write(this.BackColor);
+			writer.Write(this.BorderColor);
+			writer.Write(this.ForeColor);
+			writer.Write(this.ShadowColor);
+			writer.Write(this.ShadowOffset);
+			writer.Write(this.X);
+			writer.Write(this.Y);
+			writer.Write(this.Width);
+			writer.Write(this.Height);
+			writer.Write(this.PaddingLeft);
+			writer.Write(this.PaddingRight);
+			writer.Write(this.PaddingTop);
+			writer.Write(this.PaddingBottom);
+			writer.Write(this.BorderTop);
+			writer.Write(this.BorderBottom);
+			writer.Write(this.BorderLeft);
+			writer.Write(this.BorderRight);
+			writer.Write(this.Text??"");
+			writer.Write((int)this.TextAlignment);
+			writer.Write(this.TextOffsetX);
+			writer.Write(this.TextOffsetY);
+			writer.Write((int)this.TextEffect);
+			writer.Write((int)this.Anchor);
+			writer.Write(this.ImageOffsetX);
+			writer.Write(this.ImageOffsetY);
+			writer.Write((int)this.ImageMode);
+			writer.Write(this.ImageColor);
+			writer.Write(this.Image?.Name??"");
+			writer.Write(this.ZOrder);
+			writer.Write(this.GlobalRectangle);
+		}
+
+        /// <summary>
+        /// Deerializes the frame.
+        /// </summary>
+        public virtual void Deserialize(BinaryReader reader)
+		{
+			//this.children = new List<Frame>();
+			//this.transitions = new List<ITransition>();
+
+			var childrenCount = reader.ReadInt32();
+			var childTypeName = "";
+			var assemblyName = "";
+			object child;
+
+			for (int i = 0; i < childrenCount; i++)
+			{
+				assemblyName = reader.ReadString();
+				childTypeName = reader.ReadString();
+				var assembly = Assembly.Load(assemblyName);
+				var childType = assembly.GetType(childTypeName);
+				//child = FormatterServices.GetUninitializedObject(childType);
+				child = Activator.CreateInstance(childType,this.ui);
+
+				childType.GetMethod("Deserialize").Invoke(child, new object[] { reader });
+				this.Children.Add(child as Frame);
+			}
+
+			this.Name = reader.ReadString();
+			this.Visible = reader.ReadBoolean();
+			this.Ghost = reader.ReadBoolean();
+			this.Enabled = reader.ReadBoolean();
+			this.AutoSize = reader.ReadBoolean();
+			this.AutoWidth = reader.ReadBoolean();
+			this.AutoHeight = reader.ReadBoolean();
+			this.ClippingMode = (ClippingMode)reader.ReadInt32();
+			this.OverallColor = reader.Read<Color>();
+			this.BackColor = reader.Read<Color>();
+			this.BorderColor = reader.Read<Color>();
+			this.ForeColor = reader.Read<Color>();
+			this.ShadowColor = reader.Read<Color>();
+			this.ShadowOffset = reader.Read<Vector2>();
+			this.X = reader.ReadInt32();
+			this.Y = reader.ReadInt32();
+			this.Width = reader.ReadInt32();
+			this.Height = reader.ReadInt32();
+			this.PaddingLeft = reader.ReadInt32();
+			this.PaddingRight = reader.ReadInt32();
+			this.PaddingTop = reader.ReadInt32();
+			this.PaddingBottom = reader.ReadInt32();
+			this.BorderTop = reader.ReadInt32();
+			this.BorderBottom = reader.ReadInt32();
+			this.BorderLeft = reader.ReadInt32();
+			this.BorderRight = reader.ReadInt32();
+			this.Text = reader.ReadString();
+			this.TextAlignment = (Alignment)reader.ReadInt32();
+			this.TextOffsetX = reader.ReadInt32();
+			this.TextOffsetY = reader.ReadInt32();
+			this.TextEffect = (TextEffect)reader.ReadInt32();
+			this.Anchor = (FrameAnchor)reader.ReadInt32();
+			this.ImageOffsetX = reader.ReadInt32();
+			this.ImageOffsetY = reader.ReadInt32();
+			this.ImageMode = (FrameImageMode)reader.ReadInt32();
+			this.ImageColor = reader.Read<Color>();
+			this.ImageName = reader.ReadString();
+			if (!String.IsNullOrEmpty(ImageName))
+			{
+				Image = ui.Game.Content.Load<DiscTexture>(ImageName);
+			}
+			this.ZOrder = reader.ReadInt32();
+			this.GlobalRectangle = reader.Read<Rectangle>();
+		}
+        #endregion
+
+    }
+}

@@ -9,7 +9,10 @@ namespace FusionUI.UI.Plots
 {
     class PlotLegend : ScalableFrame
     {
-        public float UnitLineLength = 8;
+		protected PlotLegend()
+		{
+		}
+		public float UnitLineLength = 8;
         public float ElementWidth = 42;
         public float ElementHeight = 6;
         public float UnitLineWidth = 0.5f;

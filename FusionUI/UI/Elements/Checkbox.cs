@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Xml.Serialization;
 using Fusion.Core.Mathematics;
 using Fusion.Engine.Frames;
 using Fusion.Engine.Graphics;
@@ -7,11 +8,19 @@ namespace FusionUI.UI
 {
     public class Checkbox : ScalableFrame
     {
-        public Texture Checked;
-        public Texture None;
+
+		protected Checkbox()
+		{
+		}
+		[XmlIgnore]
+		public Texture Checked;
+		[XmlIgnore]
+		public Texture None;
+
         private bool _isChecked;
 
-        public Action<bool> Changed;
+		[XmlIgnore]
+		public Action<bool> Changed;
 
         public bool IsChecked {
             get { return _isChecked; }

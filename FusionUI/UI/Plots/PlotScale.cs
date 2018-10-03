@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Xml.Serialization;
 using Fusion.Core.Mathematics;
 using Fusion.Engine.Common;
 using Fusion.Engine.Frames;
@@ -9,8 +10,11 @@ using Fusion.Engine.Graphics;
 namespace FusionUI.UI.Plots
 {
     public class PlotScale : ScalableFrame {
-        //TODO: change to plot type when it'll be developed
-        public Plot Plot;
+		protected PlotScale()
+		{
+		}
+		//TODO: change to plot type when it'll be developed
+		public Plot Plot;
         public List<PlotData> PlotData = new List<PlotData>();
 
         public string Name = "";
@@ -21,8 +25,8 @@ namespace FusionUI.UI.Plots
         public float MinX = float.MaxValue, MaxX = float.MinValue, MinY = float.MaxValue, MaxY = float.MinValue;
 
         public int Index = 0;
-
-        public Func<double, string> XStringFunc = f => $"{f:0.##}", YStringFunc = f => $"{f:0.##}";
+		[XmlIgnore]
+		public Func<double, string> XStringFunc = f => $"{f:0.##}", YStringFunc = f => $"{f:0.##}";
 
         private double stepY, stepX;
         public float SuggestedStepX = 15, SuggestedStepY = 15;

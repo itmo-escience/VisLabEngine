@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Xml.Serialization;
 using Fusion.Core.Mathematics;
 using Fusion.Engine.Frames;
 using Fusion.Engine.Graphics;
@@ -10,8 +11,10 @@ namespace FusionUI.UI
 {
     public class Window : FreeFrame
     {
-
-        public void UpdateHolder()
+		protected Window()
+		{
+		}
+		public void UpdateHolder()
         {
             holder.UpdateLayout();
         }
@@ -55,7 +58,8 @@ namespace FusionUI.UI
         }
 
         public readonly bool DrawHat;
-        public Action ActionCross;
+		[XmlIgnore]
+		public Action ActionCross;
 
         public Window(FrameProcessor ui, float x, float y, float w, float h, string text, Color backColor,
             bool drawHat = true, bool drawCross = true, bool drawHelp = false, string helpText = "", bool fixedSize = false)

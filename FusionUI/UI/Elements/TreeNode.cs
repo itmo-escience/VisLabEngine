@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Drawing.Text;
+using System.Xml.Serialization;
 using Fusion.Core.Mathematics;
 using Fusion.Engine.Common;
 using Fusion.Engine.Frames;
@@ -12,7 +13,10 @@ namespace FusionUI.UI
 {
     public class TreeNode : ScalableFrame
     {
-        public bool IsExpand = false;
+		protected TreeNode()
+		{
+		}
+		public bool IsExpand = false;
 
         public int OffsetChild
         {
@@ -21,8 +25,10 @@ namespace FusionUI.UI
         }
 
         public float UnitOffsetChild { get; set; }
-        public Texture ExpandedPicture;
-        public Texture CollapsedPicture;
+		[XmlIgnore]
+		public Texture ExpandedPicture;
+		[XmlIgnore]
+		public Texture CollapsedPicture;
 
         private float UnitHeightCollaps;
         private float UnitHeightExpand;
@@ -226,7 +232,11 @@ namespace FusionUI.UI
 
     public class CheckboxNode : TreeNode
     {
-        public Action<GameTime> UpdateFunc;
+		protected CheckboxNode()
+		{
+		}
+		[XmlIgnore]
+		public Action<GameTime> UpdateFunc;
         public Checkbox Checkbox;
         public CheckboxNode(FrameProcessor ui, float x, float y, float w, float h, string text, Color backColor, Action<bool> checkboxAction, bool isChecked = false) : base(ui, x, y, w, h, text, backColor)
         {            
@@ -252,7 +262,11 @@ namespace FusionUI.UI
 
     public class RadiobuttonNode : TreeNode
     {
-        public Action<GameTime> UpdateFunc;
+		protected RadiobuttonNode()
+		{
+		}
+		[XmlIgnore]
+		public Action<GameTime> UpdateFunc;
         public RadioButton Checkbox;
         public RadiobuttonNode(FrameProcessor ui, float x, float y, float w, float h, string text, Color backColor, Action<bool> checkboxAction, bool selected) : base(ui, x, y, w, h, text, backColor)
         {

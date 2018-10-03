@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Xml.Serialization;
 using Fusion.Core.Mathematics;
 using Fusion.Engine.Common;
 using Fusion.Engine.Frames;
@@ -7,8 +8,10 @@ using Fusion.Engine.Graphics;
 namespace FusionUI.UI.Elements
 {
     public class TimeLine : ScalableFrame {
-
-        private FrameProcessor ui;
+		protected TimeLine()
+		{
+		}
+		private FrameProcessor ui;
 
         public Scroll LordOfTime;
         public ScalableFrame timeLabelTime;
@@ -43,8 +46,8 @@ namespace FusionUI.UI.Elements
                     TimeManager.EndTime = value;
             }
         }
-
-        public DiscTexture textureLord;
+		[XmlIgnore]
+		public DiscTexture textureLord;
 
         private DateTime _currentTime;
         public DateTime CurrentTime

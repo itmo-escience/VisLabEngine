@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Xml.Serialization;
 using Fusion;
 using Fusion.Core.Mathematics;
 using Fusion.Engine.Frames;
@@ -9,7 +10,10 @@ namespace FusionUI.UI.Elements
 {
     public class TimeSelectorScroll : ScalableFrame
     {
-        private List<string> values = new List<string>();
+		protected TimeSelectorScroll()
+		{
+		}
+		private List<string> values = new List<string>();
 
         public List<string> Values
         {
@@ -24,8 +28,8 @@ namespace FusionUI.UI.Elements
             Add(blueHolder);
             InitActions();
         }
-
-        public Action<string> UpdateFunction;
+		[XmlIgnore]
+		public Action<string> UpdateFunction;
 
         public float Capacity
         {

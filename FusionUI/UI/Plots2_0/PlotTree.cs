@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Xml.Serialization;
 using Fusion;
 using Fusion.Core.Mathematics;
+using Fusion.Core.Utils;
 using Fusion.Engine.Common;
 using Fusion.Engine.Frames;
 using Fusion.Engine.Graphics;
@@ -11,7 +13,10 @@ namespace FusionUI.UI.Plots2_0
 {
     public class PlotTree : ScalableFrame
     {
-        private ScalableFrame TreePanel;
+		protected PlotTree()
+		{
+		}
+		private ScalableFrame TreePanel;
         public PlotTree(FrameProcessor ui, float x, float y, float w, float h, Color backColor) : base(ui, x, y, w, h, "", backColor)
         {
             TreePanel = new ScalableFrame(ui, 0, 0, w, h - UIConfig.UnitMenuButtonHeight, "",
@@ -93,12 +98,12 @@ namespace FusionUI.UI.Plots2_0
         public TreeNode Root;
 
         public PlotContainer Plot1d, Plot2d;
+		[XmlIgnore]
+		public Action<bool> Activate;
+		[XmlIgnore]
+		public Action OnTreeUpdate;
 
-        public Action<bool> Activate;
-
-        public Action OnTreeUpdate;
-
-        public Dictionary<PlotPoint, CheckboxNode> pointNodes = new Dictionary<PlotPoint, CheckboxNode>();
+        public SerializableDictionary<PlotPoint, CheckboxNode> pointNodes = new SerializableDictionary<PlotPoint, CheckboxNode>();
 
         public void AddPoint(PlotPoint point, bool expand = false)
         {

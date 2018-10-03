@@ -10,7 +10,10 @@ namespace FusionUI.UI
 {
     public class RichTextBlock : ScalableFrame
     {
-        public float UnitOffsetLine;
+		protected RichTextBlock()
+		{
+		}
+		public float UnitOffsetLine;
 
         /// <summary>
         /// Offset between lines

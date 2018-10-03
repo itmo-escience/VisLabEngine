@@ -10,7 +10,10 @@ namespace FusionUI.UI
 {
     public class TimeLineControlPanel : FreeFrame {
 
-        private FrameProcessor ui;
+		protected TimeLineControlPanel()
+		{
+		}
+		private FrameProcessor ui;
 
         private AbstractTimeManager timeManager;
 

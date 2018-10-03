@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Xml.Serialization;
 using Fusion.Core.Mathematics;
 using Fusion.Engine.Common;
 using Fusion.Engine.Frames;
@@ -9,8 +10,11 @@ using Fusion.Engine.Graphics;
 namespace FusionUI.UI.Plots2_0
 {
     public class PlotLegend: ScalableFrame 
-    {            
-        public float UnitLineLength = 8;
+    {
+		protected PlotLegend()
+		{
+		}
+		public float UnitLineLength = 8;
         public float ElementWidth = 42;
         public float ElementHeight = 6;
         public float UnitLineWidth = 0.5f;
@@ -77,8 +81,8 @@ namespace FusionUI.UI.Plots2_0
         }
 
         protected List<Tuple<Color, String, bool>> currentPlots;
-
-        public Func<string, string> textFunc;
+		[XmlIgnore]
+		public Func<string, string> textFunc;
 
         protected virtual void DeterminePlots()
         {

@@ -7,8 +7,11 @@ namespace FusionUI.UI.Elements
 {
     public class WindowFixed : FreeFrame
     {
+		protected WindowFixed()
+		{
+		}
 
-        public Color HatColor { get { return HatPanel.BackColor; } set { HatPanel.BackColor = value; } }
+		public Color HatColor { get { return HatPanel.BackColor; } set { HatPanel.BackColor = value; } }
 
         public ScalableFrame HatPanel;
 

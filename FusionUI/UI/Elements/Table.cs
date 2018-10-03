@@ -1,13 +1,16 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Xml.Serialization;
 using Fusion.Core.Mathematics;
 using Fusion.Engine.Frames;
 
 namespace FusionUI.UI.Elements
 {
     public class Table : ScalableFrame {
-
-        public List<List<Cell>> Cells;
+		protected Table()
+		{
+		}
+		public List<List<Cell>> Cells;
 
         const float defaultCellWidth = 5;
         const float defaultCellHeight = 4;
@@ -24,8 +27,8 @@ namespace FusionUI.UI.Elements
 
         public int CellBorder = 0;
         public Color CellBorderColor = UIConfig.BorderColor;
-
-        public Action<Vector2> OnResize;
+		[XmlIgnore]
+		public Action<Vector2> OnResize;
 
         public Table(FrameProcessor ui, float x, float y, Color backColor, int i, int j, float cellWidth = defaultCellWidth, float cellHeight = defaultCellHeight) : base(ui, x, y, cellWidth * i, cellHeight * j, "", backColor)
         {            
@@ -161,8 +164,10 @@ namespace FusionUI.UI.Elements
     }
 
     public class Cell : ScalableFrame {
-
-        public int IndexRow;
+		protected Cell()
+		{
+		}
+		public int IndexRow;
         public int IndexColumn;
 
         public Table Table;

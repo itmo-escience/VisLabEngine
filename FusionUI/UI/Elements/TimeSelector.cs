@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Globalization;
+using System.Xml.Serialization;
 using Fusion.Core.Mathematics;
 using Fusion.Engine.Common;
 using Fusion.Engine.Frames;
@@ -9,7 +10,10 @@ namespace FusionUI.UI.Elements
 {
     public class TimeSelector : ScalableFrame
     {
-        private DateTime defaultVal;
+		protected TimeSelector()
+		{
+		}
+		private DateTime defaultVal;
         public DateTime Current
         {
             get
@@ -31,8 +35,10 @@ namespace FusionUI.UI.Elements
         }
 
         public DateTime Last;
-        public Action<DateTime> UpdateValue;
-        public Action<string> UpdateYear, UpdateMonth, UpdateDay, UpdateTime;
+		[XmlIgnore]
+		public Action<DateTime> UpdateValue;
+		[XmlIgnore]
+		public Action<string> UpdateYear, UpdateMonth, UpdateDay, UpdateTime;
 
         private bool isOpen = false;
 

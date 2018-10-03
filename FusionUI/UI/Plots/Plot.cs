@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using Fusion.Core.Mathematics;
+using Fusion.Core.Utils;
 using Fusion.Engine.Common;
 using Fusion.Engine.Frames;
 using Fusion.Engine.Graphics;
@@ -11,9 +12,12 @@ namespace FusionUI.UI.Plots
 {
     public class Plot : ScalableFrame
     {
-        public string ScenarioName;
-        public Dictionary<string, PlotScale> Scales = new Dictionary<string, PlotScale>();
-        public Dictionary<int, PlotMapPoint> MapPoints = new Dictionary<int, PlotMapPoint>();
+		protected Plot()
+		{
+		}
+		public string ScenarioName;
+        public SerializableDictionary<string, PlotScale> Scales = new SerializableDictionary<string, PlotScale>();
+        public SerializableDictionary<int, PlotMapPoint> MapPoints = new SerializableDictionary<int, PlotMapPoint>();
         public AbstractTimeManager TimeManager;
         public bool IsDynamic;
         public bool IsAnimated;

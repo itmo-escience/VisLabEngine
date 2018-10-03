@@ -21,7 +21,7 @@ namespace Fusion.Engine.Graphics {
 			public override object Load ( ContentManager content, Stream stream, Type requestedType, string assetPath )
 			{
 				bool srgb = assetPath.ToLowerInvariant().Contains("|srgb");
-				return new DiscTexture( content.Game.RenderSystem, new Texture2D( content.Game.GraphicsDevice, stream, srgb ) );
+				return new DiscTexture( content.Game.RenderSystem, new Texture2D( content.Game.GraphicsDevice, stream, srgb ) ) { Name = assetPath };
 			}
 		}
 
