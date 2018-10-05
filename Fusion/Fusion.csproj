@@ -426,7 +426,7 @@
     <Compile Include="Engine\Graphics\GIS\GlobeMath\DVector2.cs" />
     <Compile Include="Engine\Graphics\GIS\GlobeMath\DVector3.cs" />
     <Compile Include="Engine\Graphics\GIS\GlobeMath\DVector4.cs" />
-    <Compile Include="Engine\Graphics\GIS\LinesBatch.cs" />
+    <Compile Include="Engine\Graphics\GIS\LinesGisLayer.cs" />
     <Compile Include="Engine\Graphics\GIS\PointsBatch.cs" />
     <Compile Include="Engine\Graphics\GIS\PolyBatch.cs" />
     <Compile Include="Engine\Graphics\GIS\TilesBatch.cs" />
