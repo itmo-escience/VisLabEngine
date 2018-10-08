@@ -557,7 +557,7 @@ namespace Fusion.Engine.Frames {
 		{
 			if ( !children.Contains(frame) ) {
 				children.Add( frame );
-				frame.updateChildrenUI(this.ui);
+				frame.UpdateChildrenUI(this.ui);
 				if (frame.ZOrder == 0)
 			    {
 			        frame.ZOrder = children.Count;
@@ -569,7 +569,7 @@ namespace Fusion.Engine.Frames {
 			}		    
 		}
 
-		private void updateChildrenUI( FrameProcessor ui )
+		public void UpdateChildrenUI( FrameProcessor ui )
 		{
 			if (this.ui != ui)
 			{
@@ -579,7 +579,7 @@ namespace Fusion.Engine.Frames {
 			}
 			foreach (var child in this.Children)
 			{
-				child.updateChildrenUI(ui);
+				child.UpdateChildrenUI(ui);
 			}
 		}
 

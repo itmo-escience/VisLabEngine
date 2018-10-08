@@ -321,7 +321,7 @@ namespace Fusion.Engine.Frames
 		/// Gets frame
 		/// </summary>
 		[XmlIgnore]
-		Frame Parent { get; }
+		IFrame Parent { get; }
 
 		/// <summary>
 		/// Global frame rectangle made 

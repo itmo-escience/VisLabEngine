@@ -10,48 +10,48 @@ namespace Fusion.Engine.Frames.Abstract
 	public class KeyEventArgs : EventArgs
 	{
 
-		Keys Key;
+		public Keys Key;
 	}
 
 
 	public class MouseEventArgs : EventArgs
 	{
 
-		Keys Key = Keys.None;
+		public Keys Key = Keys.None;
 
-		int X = 0;
+		public int X = 0;
 
-		int Y = 0;
+		public int Y = 0;
 
-		int DX = 0;
+		public int DX = 0;
 
-		int DY = 0;
+		public int DY = 0;
 
-		int Wheel = 0;
+		public int Wheel = 0;
 	}
 
 
 	public class StatusEventArgs : EventArgs
 	{
 
-		FrameStatus Status;
+		public FrameStatus Status;
 	}
 
 
 	public class MoveEventArgs : EventArgs
 	{
 
-		int X;
+		public int X;
 
-		int Y;
+		public int Y;
 	}
 
 
 	public class ResizeEventArgs : EventArgs
 	{
 
-		int Width;
+		public int Width;
 
-		int Height;
+		public int Height;
 	}
 }

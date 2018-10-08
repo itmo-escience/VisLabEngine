@@ -24,10 +24,23 @@ namespace Fusion.Engine.Frames {
 		[Config]	public bool		SkipUserInterface	{ get; set; }
 		[Config]	public bool		ShowProfilingInfo	{ get; set; }
 
+
+		private Frame rootFrame;
 		/// <summary>
 		/// Sets and gets current root frame.
 		/// </summary>
-		public	Frame RootFrame { get; set; }
+		public	Frame RootFrame {
+			get {
+				return rootFrame;
+			}
+			set {
+				rootFrame = value;
+				if (rootFrame.ui == null)
+				{
+					rootFrame.UpdateChildrenUI(this);
+				}
+			}
+		}
 
 		/// <summary>
 		/// Gets and sets current target frame.
