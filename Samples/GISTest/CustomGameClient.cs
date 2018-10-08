@@ -23,7 +23,7 @@ namespace GISTest
 	}
 
 
-	class CustomGameClient : GameClient {
+	public class CustomGameClient : GameClient {
 
 		public Config Config { get; set; }
 		

@@ -33,7 +33,8 @@ namespace Fusion.Drivers.Graphics {
         public static  BlendState	AlphaBlendPremul { get; private set; }
 		public static  BlendState	AlphaMaskWrite	 { get; private set; }
 		public static  BlendState	Additive		 { get; private set; }
-		public static  BlendState	Screen			 { get; private set; }
+	    public static  BlendState   AlphaAdditive { get; private set; }
+        public static  BlendState	Screen			 { get; private set; }
 		public static  BlendState	Multiply		 { get; private set; }
 		public static  BlendState	NegMultiply		 { get; private set; }
 		public static  BlendState	AlphaOnly		 { get; private set; }
@@ -49,8 +50,9 @@ namespace Fusion.Drivers.Graphics {
             AlphaBlendPremul	=	Create( ColorChannels.All,	Blend.One,			Blend.InvSrcAlpha	);						
 			AlphaMaskWrite		=	Create( ColorChannels.Alpha );
 			AlphaOnly			=	Create( ColorChannels.Alpha );
-			Additive			=	Create( ColorChannels.All,	Blend.One,			Blend.One,			Blend.One, Blend.One );	
-			Screen				=	Create( ColorChannels.All,	Blend.InvDstColor,	Blend.One			);						
+			Additive			=	Create( ColorChannels.All,	Blend.One,			Blend.One,			Blend.One, Blend.One );
+		    AlphaAdditive       =   Create( ColorChannels.All,  Blend.SrcAlpha,     Blend.One,          Blend.Zero, Blend.One);
+            Screen				=	Create( ColorChannels.All,	Blend.InvDstColor,	Blend.One			);						
 			Multiply			=	Create( ColorChannels.All,	Blend.Zero,			Blend.SrcColor		);						
 			NegMultiply			=	Create( ColorChannels.All,	Blend.Zero,			Blend.InvSrcColor	);
 		}

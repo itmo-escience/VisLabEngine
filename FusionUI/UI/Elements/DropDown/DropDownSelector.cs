@@ -27,6 +27,7 @@ namespace FusionUI.UI.Elements.DropDown
                     if (!DisabledRows.ContainsKey(value))
                     {
                         current = value;
+                        UpdateLabel();
                     }
                     else
                     {

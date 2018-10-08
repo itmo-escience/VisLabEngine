@@ -200,6 +200,8 @@ namespace Fusion.Drivers.Graphics.Display {
 		}
 
 
+		public override bool Focused => window.Focused;
+
 
 		/// <summary>
 		/// 

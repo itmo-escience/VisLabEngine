@@ -21,6 +21,7 @@ namespace Fusion.Engine.Graphics.GIS
 		public class SelectedItem : Gis.SelectedItem
 		{
 			public int PointIndex;
+		    public DVector2 LonLat;
 		}
 
 
@@ -564,7 +565,7 @@ namespace Fusion.Engine.Graphics.GIS
 
             double minDistance = 0;
             int minIndex = -1;
-
+            DVector2 lonlat = rayLonLatRad;
             for (int i = 0; i < PointsCpu.Length; i++)
             {
                 var point = PointsCpu[i];
@@ -575,6 +576,7 @@ namespace Fusion.Engine.Graphics.GIS
                 {
                     minDistance = dist;
                     minIndex = i;
+                    lonlat = pointLonLat;
                 }
             }
 
@@ -582,7 +584,8 @@ namespace Fusion.Engine.Graphics.GIS
                 ret.Add(new SelectedItem
                 {
                     Distance = minDistance,
-                    PointIndex = minIndex
+                    PointIndex = minIndex,
+                    LonLat = lonlat,
                 });
 
             return ret;

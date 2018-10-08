@@ -28,7 +28,7 @@ namespace Fusion.Drivers.Graphics {
 			Height			=	height;
 			Format			=	format;
 			SampleCount		=	sampleCount;
-			DSV				=	dsv;
+			DSV				=	dsv;            
 		}
 
 

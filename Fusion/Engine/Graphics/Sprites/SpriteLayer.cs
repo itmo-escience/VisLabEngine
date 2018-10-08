@@ -470,12 +470,42 @@ namespace Fusion.Engine.Graphics {
 				);
 		}
 
+	    public void DrawDottedLine(Texture tex, Vector2 p0, Vector2 p1, Color color, float width, float scale = 1, float offset = 0, int clipRectIndex = 0, float dotSize = 4, float spaceSize = 4)
+	    {
+	        var v = p1 - p0;
+	        float l = 0;
+	        var length = v.Length();
+	        v.Normalize();
+	        int i = 0;
+	        Vector2 v0 = p0;
+	        while (l < length)
+	        {
+	            if (i % 2 == 0)
+	            {
+	                //draw dot;
+	                var v1 = v0 + v * Math.Min(dotSize, length - l);
+	                l += dotSize;
+	                DrawBeam(tex, v0, v1, color, color, width);
+	                v0 = v1;
+	            }
+	            else
+	            {
+	                //not draw;
+	                var v1 = v0 + v * Math.Min(spaceSize, length - l);
+	                l += spaceSize;
+	                v0 = v1;
+	            }
+
+	            i++;
+	        }	        
+	    }
 
 
-		/// <summary>
-		/// 
-		/// </summary>
-		public void DrawUV( Texture srv, Vector3 leftTopCorner, Vector3 rightBottomCorner, Color color, float u, float v, float tw, float th, int clipRectIndex=0 )
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public void DrawUV( Texture srv, Vector3 leftTopCorner, Vector3 rightBottomCorner, Color color, float u, float v, float tw, float th, int clipRectIndex=0 )
 		{
 			PushQuad(srv,
 					 new SpriteVertex(leftTopCorner.X,		leftTopCorner.Y,	leftTopCorner.Z,	 color, u + 0,  v + 0 , clipRectIndex ),

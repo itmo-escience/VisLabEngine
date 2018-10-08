@@ -49,7 +49,7 @@ namespace Fusion.Drivers.Graphics {
 		/// <param name="format"></param>
 		public RenderTarget2D ( GraphicsDevice device, ColorFormat format, int width, int height, bool enableRWBuffer = false ) : base ( device )
 		{
-			Create( format, width, height, 1, false, enableRWBuffer );
+			Create( format, width, height, 1, false, enableRWBuffer);
 		}
 
 
@@ -108,9 +108,9 @@ namespace Fusion.Drivers.Graphics {
 		/// <param name="width"></param>
 		/// <param name="height"></param>
 		/// <param name="format"></param>
-		public RenderTarget2D ( GraphicsDevice device, ColorFormat format, int width, int height, bool mips, bool enableRWBuffer ) : base ( device )
+		public RenderTarget2D ( GraphicsDevice device, ColorFormat format, int width, int height, bool mips, bool enableRWBuffer, bool isShared = false) : base ( device )
 		{
-			Create( format, width, height, 1, mips, enableRWBuffer );
+			Create( format, width, height, 1, mips, enableRWBuffer, isShared );
 		}
 
 
@@ -125,7 +125,7 @@ namespace Fusion.Drivers.Graphics {
 		/// <param name="samples"></param>
 		/// <param name="mips"></param>
 		/// <param name="debugName"></param>
-		void Create ( ColorFormat format, int width, int height, int samples, bool mips, bool enableRWBuffer )
+		void Create ( ColorFormat format, int width, int height, int samples, bool mips, bool enableRWBuffer, bool isShared = false )
 		{
 			Log.Debug("RenderTarget2D: f:{0} w:{1} h:{2} s:{3}{4}{5}", format, width, height, samples, mips?" mips":"", enableRWBuffer?" uav":"" );
 
@@ -162,6 +162,7 @@ namespace Fusion.Drivers.Graphics {
 				texDesc.BindFlags |= BindFlags.UnorderedAccess;
 			}
 
+			if (isShared) texDesc.OptionFlags |= ResourceOptionFlags.Shared;
 
 			tex2D	=	new D3D.Texture2D( device.Device, texDesc );
 			SRV		=	new ShaderResourceView( device.Device, tex2D );

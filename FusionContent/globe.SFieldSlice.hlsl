@@ -100,27 +100,31 @@ struct ConstData {
 	uint4		CameraZ	;
 	float4		Dummy	; // Factor, Radius
 };
-
+		
 struct ValueData {
 	float  Min;
 	float  Max;
-	float2 Padding;
+	float  Time;
+	float  Dummy;
 };
 
 Texture2D		Palette		: register(t0);
 SamplerState	Sampler		: register(s0);
 
+StructuredBuffer<float> ValuesPrev	: register(t1);
+StructuredBuffer<float> ValuesNext  : register(t2);
 
 cbuffer CBStage	: register(b0) { ConstData Stage : packoffset( c0 ); }
 cbuffer CBValue	: register(b1) { ValueData ValueBounds; }
 
 
 #if 0
-$ubershader DRAW_TEXTURED_POLY
+$ubershader DRAW_SLICE
+$ubershader DRAW_BORDER
 #endif
 
 
-VS_OUTPUT VSMain ( VS_INPUT v )
+VS_OUTPUT VSMain ( VS_INPUT v, uint vertInd : SV_VertexID )
 {
 	VS_OUTPUT	output = (VS_OUTPUT)0;
 	
@@ -133,19 +137,30 @@ VS_OUTPUT VSMain ( VS_INPUT v )
 	
 	output.Position	= mul(float4(posX, posY, posZ, 1), Stage.ViewProj);	
 	output.Color = v.Color;
+		
+#ifdef DRAW_SLICE
+	float valRange = ValueBounds.Max - ValueBounds.Min;
+	float valPrev = saturate((ValuesPrev[vertInd] - ValueBounds.Min) / valRange);
+	float valNext = saturate((ValuesNext[vertInd] - ValueBounds.Min) / valRange);
+
+	float time = saturate(ValueBounds.Time);
+	float lerpVal = lerp(valPrev, valNext, time);
+
+	output.Tex = float4(lerpVal, 0, 0, 0);
 	
-	float val = (v.Tex.x  - ValueBounds.Min) / (ValueBounds.Max - ValueBounds.Min);
-	output.Tex = float4(saturate(val), 0, 0, 0);
+#else // DRAW_BORDER
+	output.Tex = float4(0, 0, 0, 0);
+#endif
 	
 	return output;
 }
 
 float4 PSMain ( VS_OUTPUT input ) : SV_Target
-{
-	float4 color = Palette.Sample(Sampler, float2(input.Tex.x, 0.5f));
-
-	//color.rgb *= input.Color.rgb;
-	color.a *= input.Color.a;
-	
+{	
+#ifdef DRAW_SLICE
+	float4 color = Palette.Sample(Sampler, float2(input.Tex.x, 0.5f));	
+#else // DRAW_BORDER
+	float4 color = input.Color;
+#endif	
 	return color;
 }

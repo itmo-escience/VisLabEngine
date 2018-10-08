@@ -40,7 +40,7 @@ namespace FusionUI.UI.Elements.DropDown
         public override void Initialize(float x, float y, float w, float h, string text, Color backColor)
         {            
             ImageMode = FrameImageMode.Tiled;
-            Image = ui.Game.Content.Load<DiscTexture>(@"ui-new\fv_palette_bg.png");
+            Image = new DiscTexture(Fusion.Engine.Common.Game.Instance.RenderSystem, ui.Game.Content.Load<Texture2D>(@"ui-new\fv_palette_bg.png"));
 
             front = new ScalableFrame(ui, 0, 0, w, h, "", Color.Zero)
             {

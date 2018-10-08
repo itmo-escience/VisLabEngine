@@ -83,9 +83,6 @@ namespace Fusion.Engine.Graphics {
 		bool isFullscreen = false;
 
 
-
-		RenderTarget2D	hdrTarget;
-
 		public Texture	GrayTexture { get { return grayTexture; } }
 		public Texture	WhiteTexture { get { return whiteTexture; } }
 		public Texture	BlackTexture { get { return blackTexture; } }
@@ -124,8 +121,8 @@ namespace Fusion.Engine.Graphics {
 		{
 			Counters	=	new RenderCounters();
 
-			Width			=	1024;
-			Height			=	768;
+			Width			=	1920;
+			Height			=	1080;
 			Fullscreen		=	false;
 			StereoMode		=	StereoMode.Disabled;
 			InterlacingMode	=	InterlacingMode.HorizontalLR;
@@ -149,10 +146,7 @@ namespace Fusion.Engine.Graphics {
 			bitonicSort		=	new BitonicSort( Game );
 
 			Device.DisplayBoundsChanged += (s,e) => {
-				var handler = DisplayBoundsChanged;
-				if (handler!=null) {
-					handler(s,e);
-				}
+				DisplayBoundsChanged?.Invoke(s, e);
 			};
 		}
 

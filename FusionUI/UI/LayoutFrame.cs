@@ -23,6 +23,8 @@ namespace FusionUI.UI
 
         private List<ScalableFrame> nodes = new List<ScalableFrame>();
 
+        public List<ScalableFrame> Nodes => nodes;
+
         public bool UpdateParent = false;
 
         public bool ControlChildrenSize = true;

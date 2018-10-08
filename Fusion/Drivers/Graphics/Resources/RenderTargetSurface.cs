@@ -24,7 +24,7 @@ namespace Fusion.Drivers.Graphics {
 
 		internal	UnorderedAccessView	UAV =	null;
 		internal	RenderTargetView	RTV	=	null;
-		internal	Resource			Resource = null;
+		public		Resource			Resource = null;
 		internal	int					Subresource = 0;
 
 
