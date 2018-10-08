@@ -9,7 +9,6 @@ namespace ZWpfLib
 	{
 		public bool IsDisposed { get; protected set; }
 		Texture backBuffer;
-		SharpDX.Direct3D11.Texture2D d3d11BackBuf;
 
 		static int activeClients;
 		static D3D9 d3d9;
@@ -42,12 +41,8 @@ namespace ZWpfLib
 			if (IsDisposed)
 				throw new ObjectDisposedException(GetType().Name);
 
-			var t = d3d11BackBuf; d3d11BackBuf = null;
-			if(t != null && !t.IsDisposed) {
-				SetBackBuffer(d3d9.Device.GetSharedD3D9(t));
-			}
-
-			if (backBuffer != null) {
+			if (backBuffer == null) return;
+			{
 				Lock();
 				AddDirtyRect(new Int32Rect(0, 0, base.PixelWidth, base.PixelHeight));
 				Unlock();
@@ -57,7 +52,7 @@ namespace ZWpfLib
 
 		public void SetD3D11BackBuffer(SharpDX.Direct3D11.Texture2D texture)
 		{
-			d3d11BackBuf = texture;
+			SetBackBuffer(d3d9.Device.GetSharedD3D9(texture));
 		}
 
 

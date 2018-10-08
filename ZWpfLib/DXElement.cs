@@ -22,11 +22,6 @@ namespace ZWpfLib
     {
 		Stopwatch renderTimer;
 
-		Task gameTask;
-		CancellationTokenSource cancSource;
-		CancellationToken token;
-
-
 		/// <summary>
 		/// The image source where the DirectX scene (from the <see cref="Renderer"/>) will be rendered.
 		/// </summary>
@@ -142,25 +137,9 @@ namespace ZWpfLib
 				if (IsReallyLoopRendering) {
 					renderTimer.Start();
 					CompositionTarget.Rendering += OnLoopRendering;
-
-					cancSource = new CancellationTokenSource();
-					token = cancSource.Token;
-
-					var tok = token;
-					var ren = Renderer;
-					var sur = Surface;
-					ren.OnInitialized +=() => { SetBackBuffer(ren, sur); } ;
-					ren.RenderSystem.DisplayBoundsChanged += (o, rec) => {
-						SetBackBuffer(ren, sur);
-					};
-					gameTask = new Task(() => { ren.RunExternal(tok); } );
-					gameTask.Start();
 				} else {
 					CompositionTarget.Rendering -= OnLoopRendering;
 					renderTimer.Stop();
-					cancSource.Cancel();
-					cancSource.Dispose();
-					gameTask = null;
 				}
 			}
 		}
@@ -171,8 +150,6 @@ namespace ZWpfLib
 			if (ren == null) return;
 			sur.SetD3D11BackBuffer(ren.GraphicsDevice.BackbufferColor.Surface.Resource.QueryInterface<Texture2D>());
 		}
-
-		bool isFirstTime = false;
 
 
 		void OnLoopRendering(object sender, EventArgs e) 
@@ -189,6 +166,8 @@ namespace ZWpfLib
 			if (Renderer == null)
 				return;
 			Renderer.GraphicsDevice.Resize((int)DesiredSize.Width, (int)DesiredSize.Height);
+			Renderer.UpdateExternal();
+			SetBackBuffer(Renderer, Surface);
 			Console.WriteLine(DesiredSize);
 		}
 
@@ -201,6 +180,7 @@ namespace ZWpfLib
 			if (Renderer == null || IsInDesignMode)
 				return;
 
+			Renderer.UpdateExternal();
 			Surface.Invalidate();
 		}
 
