@@ -137,7 +137,12 @@ namespace Fusion.Drivers.Input {
 		}
 
 
-		
+		public void HandleMessage(IntPtr lParam, IntPtr window)
+		{
+			Device.HandleMessage(lParam, window);
+		}
+
+
 		/// <summary>
 		/// Disposes stuff
 		/// </summary>
@@ -221,17 +226,15 @@ namespace Fusion.Drivers.Input {
 		/// <param name="e"></param>
 		void MouseHandler ( object sender, MouseInputEventArgs e )
 		{
+			var p = Forms.Cursor.Position;
 			if (Game.GraphicsDevice.Display.Window != null && !Game.GraphicsDevice.Display.Window.IsDisposed) {
-
-				var p				= Game.GraphicsDevice.Display.Window.PointToClient(Forms.Cursor.Position);
-			
-				GlobalMouseOffset	= new Vector2(p.X, p.Y);
-				var offset = new Vector2(e.X, e.Y);
-
-				if (MouseMove!=null) {
-					MouseMove(this, new MouseMoveEventArgs(){ Position = GlobalMouseOffset, Offset = offset});
-				}
+				p = Game.GraphicsDevice.Display.Window.PointToClient(p);
 			}
+
+			GlobalMouseOffset	= new Vector2(p.X, p.Y);
+			var offset = new Vector2(e.X, e.Y);
+
+			MouseMove?.Invoke(this, new MouseMoveEventArgs() { Position = GlobalMouseOffset, Offset = offset });
 
 
 			//Console.WriteLine( "{0} {1} {2}", e.X, e.Y, e.ButtonFlags.ToString() );

@@ -56,7 +56,7 @@ namespace GISTest
 
 
 
-	class CustomGameInterface : Fusion.Engine.Common.UserInterface {
+	public class CustomGameInterface : Fusion.Engine.Common.UserInterface {
 
 		[GameModule("Console", "con", InitOrder.Before)]
 		public GameConsole Console { get { return console; } }
@@ -68,7 +68,21 @@ namespace GISTest
 		FrameProcessor userInterface;
 
 
-        SpriteLayer     testSpritelayerLayer;
+		[Command("GlobeToSpb", CommandAffinity.Default)]
+		public class GlobeToSpb : NoRollbackCommand
+		{
+			public GlobeToSpb(Invoker invoker) : base(invoker)
+			{
+			}
+
+			public override void Execute()
+			{
+				(Invoker.Game.GameInterface as CustomGameInterface).GoToSpb();
+			}
+		}
+
+
+		SpriteLayer     testSpritelayerLayer;
         SpriteLayer		uiLayer;
 		RenderWorld		masterView;
 		RenderLayer		viewLayer;
@@ -77,6 +91,13 @@ namespace GISTest
 		TilesGisLayer	tiles;
 
 		Vector2 prevMousePos;
+
+
+		public void GoToSpb()
+		{
+			viewLayer.GlobeCamera.GoToPlace(GlobeCamera.Places.SaintPetersburg_VO);
+			viewLayer.GlobeCamera.CameraDistance = GeoHelper.EarthRadius + 100;
+		}
 
 
 		/// <summary>
@@ -175,6 +196,11 @@ namespace GISTest
 			if (e.Key == Keys.Escape) {
 				Game.Exit();
 			}
+
+			if(e.Key == Keys.A)
+			{
+				viewLayer.GlobeCamera.CameraDistance = GeoHelper.EarthRadius + 500;
+			}
 		}
 
 
@@ -195,6 +221,10 @@ namespace GISTest
 		}
 
 
+		int framesCount = 0;
+		float time;
+		float fps = 0;
+
 		/// <summary>
 		/// Updates internal state of interface.
 		/// </summary>
@@ -203,16 +233,21 @@ namespace GISTest
 		{
 #if DEBUG
 		    PrintMessage("Tiles to render count: " + tiles.GetTilesToRenderCount());
+
+			framesCount++;
+			time += gameTime.ElapsedSec;
+
+			if(time > 1.0f) {
+				fps = framesCount / time;
+
+				framesCount = 0;
+				time = time - (int)time;
+			}
+			PrintMessage("FPS: " + fps);
 #endif
 
 			console.Update( gameTime );
 			tiles.Update(gameTime);
-
-		    DVector2 pos;// = new DVector2();
-            pos = GeoHelper.CartesianToSpherical(new DVector3(10, 10, 0));
-		    //GlobeCamera.Instance.ScreenToSpherical(10, 10, out pos);
-            var cartPos = GeoHelper.SphericalToCartesian(pos, GeoHelper.EarthRadius);
-            var screenPos = GlobeCamera.Instance.CartesianToScreen(cartPos);
 
             uiLayer.Clear();
 			float yPos = 0;

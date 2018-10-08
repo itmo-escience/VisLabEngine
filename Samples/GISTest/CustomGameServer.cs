@@ -13,7 +13,7 @@ using Fusion.Engine.Server;
 
 namespace GISTest
 {
-	class CustomGameServer : GameServer {
+	public class CustomGameServer : GameServer {
 
 		string[] messages = new[] {
 			"Locating hamsters"								,

@@ -9,14 +9,21 @@ using Fusion.Drivers.Graphics;
 using Fusion.Engine.Common;
 using Fusion.Engine.Graphics.GIS.DataSystem.MapSources.Projections;
 using Fusion.Engine.Graphics.GIS.GlobeMath;
+using SharpDX.Direct3D11;
+using BlendState = Fusion.Drivers.Graphics.BlendState;
+using DepthStencilState = Fusion.Drivers.Graphics.DepthStencilState;
+using Point = Fusion.Core.Mathematics.Point;
+using RasterizerState = Fusion.Drivers.Graphics.RasterizerState;
+using SamplerState = Fusion.Drivers.Graphics.SamplerState;
+using Texture2D = Fusion.Drivers.Graphics.Texture2D;
 
 namespace Fusion.Engine.Graphics.GIS
 {
 	public class LinesGisLayer : Gis.GisLayer
 	{
-		Ubershader		shader;
-		StateFactory	factory;
-		StateFactory	thinFactory;
+	    private readonly Ubershader _shader;
+	    private readonly StateFactory _factory;
+	    private readonly StateFactory _thinFactory;
 
 		[Flags]
 		public enum LineFlags : int
@@ -36,112 +43,123 @@ namespace Fusion.Engine.Graphics.GIS
 		public int Flags;
 		 
 		[StructLayout(LayoutKind.Explicit)]
-		struct LinesConstDataStruct {
+		private struct LinesConstDataStruct {
 			[FieldOffset(0)] public float TransparencyMultiplayer;
 			[FieldOffset(4)] Vector3 Dummy;
 			[FieldOffset(16)] public Color4 OverallColor; 
 		}
 
-		private LinesConstDataStruct	linesConstData = new LinesConstDataStruct();
-		private ConstantBuffer			linesConstantBuffer;
+		private LinesConstDataStruct _linesConstData = new LinesConstDataStruct();
+		private readonly ConstantBuffer _linesConstantBuffer;
 
-		bool isDirty = false;
-		public float TransparencyMultiplayer {
-			set {
-				linesConstData.TransparencyMultiplayer = value;
-				isDirty = true;
-			} 
-			get {
-				return linesConstData.TransparencyMultiplayer;
-		}}
+	    private bool _isDynamic;
+	    private bool _isDirty = false;
+		public float TransparencyMultiplier {
+		    get => _linesConstData.TransparencyMultiplayer;
+            set {
+				_linesConstData.TransparencyMultiplayer = value;
+				_isDirty = true;
+			} 			
+		}
+
 		public Color4 OverallColor {
-			set {
-				linesConstData.OverallColor = value;
-				isDirty = true;
-			} 
-			get {
-				return linesConstData.OverallColor;
-			}
+		    get => _linesConstData.OverallColor;
+            set {
+				_linesConstData.OverallColor = value;
+				_isDirty = true;
+			} 			
 		}
 
 		public bool IsDoubleBuffer { get; protected set; }
 
 		public Texture2D Texture;
 
-		VertexBuffer firstBuffer;
-		VertexBuffer secondBuffer;
-		VertexBuffer currentBuffer;
+	    private VertexBuffer _currentBuffer;
 
 		public Gis.GeoPoint[] PointsCpu { get; protected set; }
 
-
 		public class SelectedItem : Gis.SelectedItem {}
-
 
 		public override void Dispose()
 		{
-			if (firstBuffer != null)	firstBuffer.Dispose();
-			if (secondBuffer != null)	secondBuffer.Dispose();
+		    _currentBuffer?.Dispose();
 		}
-
 
 		public LinesGisLayer(Game engine, int linesPointsCount, bool isDynamic = false) : base(engine)
 		{
-			shader		= Game.Content.Load<Ubershader>("globe.Line.hlsl");
-			factory		= shader.CreateFactory( typeof(LineFlags), Primitive.LineList, VertexInputElement.FromStructure<Gis.GeoPoint>(), BlendState.AlphaBlend, RasterizerState.CullNone, DepthStencilState.None);
-			thinFactory = shader.CreateFactory( typeof(LineFlags), Primitive.LineList, VertexInputElement.FromStructure<Gis.GeoPoint>(), BlendState.AlphaBlend, RasterizerState.CullNone, DepthStencilState.None);
-			
-			TransparencyMultiplayer = 1.0f;
-			OverallColor			= Color4.White;
-			linesConstantBuffer		= new ConstantBuffer(engine.GraphicsDevice, typeof(LinesConstDataStruct));
+		    TransparencyMultiplier = 1.0f;
+		    OverallColor = Color4.White;
 
-			var vbOptions = isDynamic ? VertexBufferOptions.Dynamic : VertexBufferOptions.Default;
+		    _isDynamic = isDynamic;
+            _shader = Game.Content.Load<Ubershader>("globe.Line.hlsl");
+			_factory = _shader.CreateFactory( typeof(LineFlags), Primitive.LineList, VertexInputElement.FromStructure<Gis.GeoPoint>(), BlendState.AlphaBlend, RasterizerState.CullNone, DepthStencilState.None);
+			_thinFactory = _shader.CreateFactory( typeof(LineFlags), Primitive.LineList, VertexInputElement.FromStructure<Gis.GeoPoint>(), BlendState.AlphaBlend, RasterizerState.CullNone, DepthStencilState.None);
+			_linesConstantBuffer = new ConstantBuffer(engine.GraphicsDevice, typeof(LinesConstDataStruct));		    
 
-			firstBuffer		= new VertexBuffer(engine.GraphicsDevice, typeof(Gis.GeoPoint), linesPointsCount, vbOptions);
-			currentBuffer	= firstBuffer;
-
-			PointsCpu	= new Gis.GeoPoint[linesPointsCount];
+            PointsCpu	= new Gis.GeoPoint[linesPointsCount];
 			Flags		= (int)(LineFlags.THIN_LINE);
-		}
 
+		    var vbOptions = _isDynamic ? VertexBufferOptions.Dynamic : VertexBufferOptions.Default;
+		    _currentBuffer = new VertexBuffer(Game.Instance.GraphicsDevice, typeof(Gis.GeoPoint), PointsCpu.Length, vbOptions);
+        }
 
 		public void UpdatePointsBuffer()
 		{
-			if (currentBuffer == null) return;
+		    if (_currentBuffer != null && _currentBuffer.Capacity != PointsCpu.Length)
+		    {
+		        _currentBuffer.Dispose();
 
-			currentBuffer.SetData(PointsCpu);
+		        var vbOptions = _isDynamic ? VertexBufferOptions.Dynamic : VertexBufferOptions.Default;
+		        _currentBuffer = new VertexBuffer(Game.Instance.GraphicsDevice, typeof(Gis.GeoPoint), PointsCpu.Length, vbOptions);
+		    }
+
+		    _currentBuffer?.SetData(PointsCpu);
 		}
 
+	    public void AddLine(List<Gis.GeoPoint> lonLatPoints)
+	    {            
+	        var newPoints = new List<Gis.GeoPoint>(PointsCpu);
+
+	        newPoints.Add(new Gis.GeoPoint { Lon = lonLatPoints[0].Lon, Lat = lonLatPoints[0].Lat, Color = OverallColor });	        
+            for (var i = 1; i < lonLatPoints.Count - 1; i++)
+	        {
+	            newPoints.Add(new Gis.GeoPoint { Lon = lonLatPoints[i].Lon, Lat = lonLatPoints[i].Lat, Color = OverallColor });
+	            newPoints.Add(new Gis.GeoPoint { Lon = lonLatPoints[i].Lon, Lat = lonLatPoints[i].Lat, Color = OverallColor });
+            }
+	        newPoints.Add(new Gis.GeoPoint { Lon = lonLatPoints[lonLatPoints.Count - 1].Lon, Lat = lonLatPoints[lonLatPoints.Count - 1].Lat, Color = OverallColor });
+
+            PointsCpu = newPoints.ToArray();
+
+            UpdatePointsBuffer();
+	    }
 
 		public override void Draw(GameTime gameTime, ConstantBuffer constBuffer)
 		{
 			var dev = Game.GraphicsDevice;
 
 			if (((LineFlags) Flags).HasFlag(LineFlags.THIN_LINE)) {
-				dev.PipelineState = thinFactory[Flags];
+				dev.PipelineState = _thinFactory[Flags];
 			}
 			else {
-				dev.PipelineState = factory[Flags];
+				dev.PipelineState = _factory[Flags];
 			}
 
-			if (isDirty) {
-				linesConstantBuffer.SetData(linesConstData);
-				isDirty = false;
+			if (_isDirty) {
+				_linesConstantBuffer.SetData(_linesConstData);
+				_isDirty = false;
 			}
 
 			dev.GeometryShaderConstants[0]	= constBuffer;
 			dev.VertexShaderConstants[0]	= constBuffer;
 			dev.PixelShaderConstants[0]		= constBuffer;
-			dev.PixelShaderConstants[1]		= linesConstantBuffer;
+			dev.PixelShaderConstants[1]		= _linesConstantBuffer;
 
 			dev.PixelShaderResources[0] = Texture;
 			dev.PixelShaderSamplers[0]	= SamplerState.AnisotropicWrap;
 
-
-			dev.SetupVertexInput(currentBuffer, null);
-			dev.Draw(currentBuffer.Capacity, 0);
+			dev.SetupVertexInput(_currentBuffer, null);
+			dev.Draw(_currentBuffer.Capacity, 0);
 		}
-
 
 		public static LinesGisLayer GenerateGrid(Game Game, DVector2 leftTop, DVector2 rightBottom, int dimX, int dimY, Color color, MapProjection projection, bool keepQuad = false)
 		{
@@ -201,8 +219,6 @@ namespace Fusion.Engine.Graphics.GIS
 
 			return linesLayer;
 		}
-
-
 
 		public static LinesGisLayer GenerateDistanceGrid(Game Game, DVector2 lonLatLeftBottomCorner, double step, int xStepsCount, int yStepsCount, Color color)
 		{
@@ -286,7 +302,6 @@ namespace Fusion.Engine.Graphics.GIS
 
 			return linesLayer;
 		}
-
 
 		public override List<Gis.SelectedItem> Select(DVector3 nearPoint, DVector3 farPoint)
 		{

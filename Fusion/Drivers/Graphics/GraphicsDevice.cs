@@ -237,11 +237,17 @@ namespace Fusion.Drivers.Graphics {
 			this.GraphicsProfile	=	parameters.GraphicsProfile;
 
 			try {
-				if (parameters.StereoMode==StereoMode.Disabled) 	display	=	new GenericDisplay( Game, this, parameters ); else
-				if (parameters.StereoMode==StereoMode.NV3DVision)	display	=	new NV3DVisionDisplay( Game, this, parameters ); else 
-				if (parameters.StereoMode==StereoMode.DualHead)		display	=	new StereoDualHeadDisplay( Game, this, parameters ); else 
-				if (parameters.StereoMode==StereoMode.Interlaced)	display	=	new StereoInterlacedDisplay( Game, this, parameters ); else 
-				if (parameters.StereoMode==StereoMode.OculusRift)	display	=	new OculusRiftDisplay( Game, this, parameters ); else 
+				if (parameters.StereoMode == StereoMode.Disabled) display = new GenericDisplay(Game, this, parameters);
+				else
+				if (parameters.StereoMode == StereoMode.NV3DVision) display = new NV3DVisionDisplay(Game, this, parameters);
+				else
+				if (parameters.StereoMode == StereoMode.DualHead) display = new StereoDualHeadDisplay(Game, this, parameters);
+				else
+				if (parameters.StereoMode == StereoMode.Interlaced) display = new StereoInterlacedDisplay(Game, this, parameters);
+				else
+				if (parameters.StereoMode == StereoMode.OculusRift) display = new OculusRiftDisplay(Game, this, parameters);
+				else
+					if (parameters.StereoMode == StereoMode.WpfEditor) display = new WpfDisplay(Game, this, parameters); else
 					throw new ArgumentException("parameters.StereoMode");
 
 			} catch ( GraphicsException e ) {
@@ -1018,6 +1024,12 @@ namespace Fusion.Drivers.Graphics {
 			lock (deviceContext) {
 				DeviceContext.ComputeShader.SetUnorderedAccessView ( register, volumeTexture==null?null:volumeTexture.UAV, -1 ); 
 			}
+		}
+
+
+		public void Resize(int width, int height)
+		{
+			display?.Resize(width, height);
 		}
 	}
 }

@@ -250,10 +250,23 @@ namespace Fusion.Engine.Common {
 		/// </summary>
 		public void Run ()
 		{
-			InitInternal();
+			if(InitInternal()) {
+				OnInitialized?.Invoke();
+			}
 			RenderLoop.Run( GraphicsDevice.Display.Window, UpdateInternal );
 		}
 
+
+		/// <summary>
+		/// Run game without window creation
+		/// </summary>
+		public void RunExternal(CancellationToken token)
+		{
+			if(InitInternal()) {
+				OnInitialized?.Invoke();
+			}
+			while (!token.IsCancellationRequested) UpdateInternal();
+		}
 
 
 		/// <summary>
@@ -401,6 +414,8 @@ namespace Fusion.Engine.Common {
 		/// </summary>
 		internal bool InitInternal ()
 		{
+			if (initialized) throw new NotImplementedException();
+
 			Log.Message("");
 			Log.Message("-------- Game Initializing --------");
 
@@ -534,7 +549,7 @@ namespace Fusion.Engine.Common {
 		/// </summary>
 		public bool IsActive {
 			get {
-				return GraphicsDevice.Display.Window.Focused;
+				return GraphicsDevice.Display?.Focused ?? false;
 			}
 		}
 
@@ -650,7 +665,7 @@ namespace Fusion.Engine.Common {
 		private void CheckExitInternal () 
 		{
 			if (requestExit) {
-				GraphicsDevice.Display.Window.Close();
+				GraphicsDevice.Display?.Window?.Close();
 			}
 		}
 
@@ -749,5 +764,13 @@ namespace Fusion.Engine.Common {
 			GameClient.DisconnectInternal(message);
 			//	Kill server!
 		}
+
+
+		public void HandleMessage(IntPtr lParam, IntPtr window)
+		{
+			InputDevice?.HandleMessage(lParam, window);
+		}
+
+		public event Action OnInitialized;
 	}
 }

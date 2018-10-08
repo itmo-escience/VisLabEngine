@@ -70,6 +70,10 @@ namespace Fusion.Drivers.Graphics.Display {
 		}
 
 
+		public virtual void Resize(int newWidth, int newHeight)
+		{
+
+		}
 
 
 		/// <summary>
@@ -128,7 +132,9 @@ namespace Fusion.Drivers.Graphics.Display {
 			get; set;
 		}
 
-
+		public abstract bool Focused {
+			get;
+		}
 
 		/// <summary>
 		/// List of stereo eye to render.

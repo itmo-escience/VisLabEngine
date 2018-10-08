@@ -24,7 +24,8 @@ namespace Fusion.Engine.Graphics {
 		NV3DVision,	///	NVidia 3DVision stereo
 		DualHead,	///	Dual-head projector stereo
 		OculusRift,	///	Oculus Rift
-		Interlaced,	///	Interlaced mode for TVs
+		Interlaced,	///	Interlaced mode for TVs,
+		WpfEditor,
 	}
 
 
