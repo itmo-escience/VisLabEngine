@@ -284,8 +284,10 @@
     <Compile Include="Engine\Graphics\GIS\GlobeMath\Size2D.cs" />
     <Compile Include="Engine\Graphics\GIS\GlobeMath\Viewport.cs" />
     <Compile Include="Engine\Graphics\GIS\GlobeMath\ViewportD.cs" />
+    <Compile Include="Engine\Graphics\GIS\HeightmapBatch.cs" />
     <Compile Include="Engine\Graphics\GIS\InstanceLayer.cs" />
     <Compile Include="Engine\Graphics\GIS\LasPointsCloud.cs" />
+    <Compile Include="Engine\Graphics\GIS\VolumePointsBatch.cs" />
     <Compile Include="Engine\Graphics\GIS\MCBatch.cs" />
     <Compile Include="Engine\Graphics\GIS\PointsFbxLayer.cs" />
     <Compile Include="Engine\Graphics\GIS\PointsFbxLayer2.cs" />
