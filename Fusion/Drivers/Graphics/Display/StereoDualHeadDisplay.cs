@@ -331,6 +331,8 @@ namespace Fusion.Drivers.Graphics.Display {
 		}
 
 
+		public override bool Focused => targetForm.Focused;
+
 
 		/// <summary>
 		/// 

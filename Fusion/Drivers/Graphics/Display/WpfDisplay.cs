@@ -15,7 +15,7 @@ using Native.NvApi;
 using Fusion.Engine.Common;
 using D3DDevice = SharpDX.Direct3D11.Device;
 
-/*
+
 namespace Fusion.Drivers.Graphics.Display
 {
 	class WpfDisplay : BaseDisplay
@@ -30,44 +30,92 @@ namespace Fusion.Drivers.Graphics.Display
 
 		public WpfDisplay(Game game, GraphicsDevice device, GraphicsParameters parameters) : base(game, device, parameters)
 		{
-			var factory = new Factory1();
+			clientWidth		= parameters.Width;
+			clientHeight	= parameters.Height;
 
+			var factory = new Factory1();
 			var adapter = factory.GetAdapter(0);
 			//for(int i = 0; i < factory.GetAdapterCount(); i++)
 			//	Console.WriteLine(factory.GetAdapter(i).Description.Description);
 
-			d3dDevice = new D3DDevice(adapter, DeviceCreationFlags.BgraSupport | DeviceCreationFlags.Debug, new SharpDX.Direct3D.FeatureLevel[] { SharpDX.Direct3D.FeatureLevel.Level_11_1, SharpDX.Direct3D.FeatureLevel.Level_11_0 });
+			d3dDevice = new D3DDevice(adapter, DeviceCreationFlags.BgraSupport
+#if Debug
+				| DeviceCreationFlags.Debug
+#endif               
+				, new SharpDX.Direct3D.FeatureLevel[] { SharpDX.Direct3D.FeatureLevel.Level_11_1, SharpDX.Direct3D.FeatureLevel.Level_11_0 });
+
+
 
 		}
 
-		public override StereoEye TargetEye { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
+		public override StereoEye TargetEye { get; set; }
 
-		public override StereoEye[] StereoEyeList => throw new NotImplementedException();
+		public override StereoEye[] StereoEyeList => eyeList;
 
-		public override RenderTarget2D BackbufferColor => throw new NotImplementedException();
+		public override RenderTarget2D BackbufferColor => backbufferColor;
 
-		public override DepthStencil2D BackbufferDepth => throw new NotImplementedException();
+		public override DepthStencil2D BackbufferDepth => backbufferDepth;
 
-		public override bool Fullscreen { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
+		public override bool Fullscreen { get => false; set { } }
 
-		public override Rectangle Bounds => throw new NotImplementedException();
+		public override Rectangle Bounds => new Rectangle(0,0, clientWidth, clientHeight);
 
-		public override Form Window => throw new NotImplementedException();
+		public override Form Window => null;
+
+		public override bool Focused { get => true; }
+
+
+		public override void CreateDisplayResources()
+		{
+			base.CreateDisplayResources();
+
+			backbufferColor?.Dispose();
+			backbufferDepth?.Dispose();
+
+			backbufferColor = new RenderTarget2D(device, ColorFormat.Bgra8, clientWidth, clientHeight, false, false, true);
+			backbufferDepth = new DepthStencil2D(device, DepthFormat.D24S8, backbufferColor.Width, backbufferColor.Height, backbufferColor.SampleCount);
+		}
+
 
 		public override void Prepare()
 		{
-			throw new NotImplementedException();
+			
 		}
 
 		public override void SwapBuffers(int syncInterval)
 		{
-			throw new NotImplementedException();
+			d3dDevice.ImmediateContext.Flush();
 		}
 
 		public override void Update()
 		{
-			throw new NotImplementedException();
+			if(isResizeRequested) {
+				clientWidth = reqWidth;
+				clientHeight = reqHeight;
+
+				CreateDisplayResources();
+
+				device.NotifyViewportChanges();
+
+				isResizeRequested = false;
+			}
 		}
+
+
+		public override void Resize(int width, int height)
+		{
+			if (width == 0 || height == 0) return;
+			if (clientWidth == width && clientHeight == height) return;
+
+			reqWidth = width;
+			reqHeight = height;
+			isResizeRequested = true;
+		}
+
+
+		bool isResizeRequested = false;
+		int reqWidth = 1;
+		int reqHeight = 1;
+
 	}
 }
-*/
