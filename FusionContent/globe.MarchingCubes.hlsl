@@ -402,6 +402,7 @@ cbuffer CBField	    : register(b1) { FieldData Field; }
 
 #if 0
 $ubershader DrawIsoSurface +LerpBuffers +UsePalette +MoveVertices
+$ubershader DrawVoxel
 #endif
 
 uint3 XYZFromIndex(uint index, uint3 size) 
@@ -434,7 +435,7 @@ float ilerp(float min, float max, float value)
 [maxvertexcount(16)]
 void GSMain ( point VS_OUTPUT inputArray[1], inout TriangleStream<GS_OUTPUT> stream )
 {	
-
+	
 	uint vertInd = inputArray[0].index;
 	float3 xyz = float3(XYZFromIndex(vertInd, Field.Dimension.xyz - uint3(1, 1, 1)));	
 	uint cubeInd = 0; 		
@@ -466,15 +467,12 @@ void GSMain ( point VS_OUTPUT inputArray[1], inout TriangleStream<GS_OUTPUT> str
 	if (f6 > Field.Iso_Lerp.x) cubeInd += 1 << 6;
 	if (f7 > Field.Iso_Lerp.x) cubeInd += 1 << 7;
 	//cubeInd = 4;
-	
 	GS_OUTPUT output = (GS_OUTPUT)0 ;		
 	double3 cameraPos =  double3(asdouble(Stage.CameraX[0], Stage.CameraX[1]), asdouble(Stage.CameraY[0], Stage.CameraY[1]), asdouble(Stage.CameraZ[0], Stage.CameraZ[1]));
 
 	double lon		= asdouble(Field.Lon.x, Field.Lon.y);
 	double lat		= asdouble(Field.Lat.x, Field.Lat.y);
 	double3 originD	= SphericalToDecart(double2(lon, lat), 6378.137);
-
-	double3 normPos = originD*0.000156785594;	
 	
 	double posX = originD.x - cameraPos.x;
 	double posY = originD.y - cameraPos.y;
@@ -497,21 +495,13 @@ void GSMain ( point VS_OUTPUT inputArray[1], inout TriangleStream<GS_OUTPUT> str
 			float3 vertex = verts[vertexIndex];
 			
 			#ifdef MoveVertices
-			// [flatten]
-			// switch (vertexIndex) {
-				// case 0:  output.Color = 0.25f + 0.5f * ilerp(f0, f1, Field.Iso_Lerp.x); break;
-				// case 1:  output.Color = 0.25f + 0.5f * ilerp(f1, f2, Field.Iso_Lerp.x); break;
-				// case 2:  output.Color = 0.25f + 0.5f * ilerp(f3, f2, Field.Iso_Lerp.x); break;
-				// case 3:  output.Color = 0.25f + 0.5f * ilerp(f0, f3, Field.Iso_Lerp.x); break;   
-				// case 4:  output.Color = 0.25f + 0.5f * ilerp(f4, f5, Field.Iso_Lerp.x); break;
-				// case 5:  output.Color = 0.25f + 0.5f * ilerp(f5, f6, Field.Iso_Lerp.x); break;
-				// case 6:  output.Color = 0.25f + 0.5f * ilerp(f7, f6, Field.Iso_Lerp.x); break;
-				// case 7:  output.Color = 0.25f + 0.5f * ilerp(f0, f7, Field.Iso_Lerp.x); break;
-				// case 8:  output.Color = 0.25f + 0.5f * ilerp(f0, f4, Field.Iso_Lerp.x); break;
-				// case 9:  output.Color = 0.25f + 0.5f * ilerp(f1, f5, Field.Iso_Lerp.x); break;
-				// case 10: output.Color = 0.25f + 0.5f * ilerp(f2, f6, Field.Iso_Lerp.x); break;
-				// case 11: output.Color = 0.25f + 0.5f * ilerp(f3, f7, Field.Iso_Lerp.x); break;
-			// }
+			[flatten]
+			switch (vertexIndex) {
+				case 8:  vertex.z = ilerp(f0, f4, Field.Iso_Lerp.x); break;
+				case 9:  vertex.z = ilerp(f1, f5, Field.Iso_Lerp.x); break;
+				case 10: vertex.z = ilerp(f2, f6, Field.Iso_Lerp.x); break;
+				case 11: vertex.z = ilerp(f3, f7, Field.Iso_Lerp.x); break;
+			}
 			#endif
 			float4 pos = float4(xyz.xy + vertex.xy, lerp(FieldDepths[xyz.z], FieldDepths[xyz.z + 1], vertex.z), 1);
 			
@@ -542,21 +532,10 @@ float4 PSMain (GS_OUTPUT  input ) : SV_Target
 	float  ndot = abs(dot( ndir, norm ));
 	float  frsn	= pow(saturate(1.1f-ndot), 0.5);		
 	#ifdef UsePalette
-	float4 color = Palette.Sample(Sampler, float2(Field.Dummy.x, 0.5f)) * frsn;
+	float4 color = Palette.Sample(Sampler, float2(Field.Dummy.x, 0.5f));// * frsn;
 	#else
 	float4 color = Field.Color * frsn;
 	#endif
 	//return float4(input.Color.xyz, color.a * Field.Color.a);
-	return float4(color.xyz, color.a * Field.Color.a);
+	return float4(color.xyz, color.a * 0.035f);
 }
-
-
-
-
-
-
-
-
-
-
-

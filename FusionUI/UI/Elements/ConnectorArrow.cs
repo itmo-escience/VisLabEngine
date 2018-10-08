@@ -363,6 +363,14 @@ namespace FusionUI.UI.Elements
                         spriteLayer.Draw(circleTex, p.X - ArrowPointerSize, p.Y - ArrowPointerSize, ArrowPointerSize * 2, ArrowPointerSize * 2, BackColor);                        
                     }
                 }
+
+                //if (!string.IsNullOrWhiteSpace(Text))
+                //{
+                //    var b = Font.MeasureStringF(Text);
+                //    var offset = (length - b.Width) / 2;
+
+                //    Font.DrawString(spriteLayer, Text, (start + offset * d).X, (start + offset * d).Y, UIConfig.ActiveTextColor);
+                //}
                 DrawLine(spriteLayer,whiteTex, start + d * ArrowPointerSize / 2, end - d * ArrowPointerSize / 2, BackColor, ArrowWidth);
             }
                         

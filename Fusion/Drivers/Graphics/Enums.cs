@@ -218,27 +218,53 @@ namespace Fusion.Drivers.Graphics {
 	}
 
 
-	/// <summary>
-	/// Defines color blending factors.
-	/// </summary>
-	public enum Blend {
-		Zero				,	///	Each component of the color is multiplied by (0, 0, 0, 0).
-		One					,	///	Each component of the color is multiplied by (1, 1, 1, 1).
-		SrcColor			,	///	Each component of the color is multiplied by the source color. This can be represented as (Rs, Gs, Bs, As), where R, G, B, and A respectively stand for the red, green, blue, and alpha source values.
-		InvSrcColor			,	///	Each component of the color is multiplied by the inverse of the source color. This can be represented as (1 − Rs, 1 − Gs, 1 − Bs, 1 − As) where R, G, B, and A respectively stand for the red, green, blue, and alpha destination values.
-		SrcAlpha			,	///	Each component of the color is multiplied by the alpha value of the source. This can be represented as (As, As, As, As), where As is the alpha source value.
-		InvSrcAlpha			,	///	Each component of the color is multiplied by the inverse of the alpha value of the source. This can be represented as (1 − As, 1 − As, 1 − As, 1 − As), where As is the alpha destination value.
-		DstAlpha			,	///	Each component of the color is multiplied by the alpha value of the destination. This can be represented as (Ad, Ad, Ad, Ad), where Ad is the destination alpha value.
-		InvDstAlpha			,	///	Each component of the color is multiplied by the inverse of the alpha value of the destination. This can be represented as (1 − Ad, 1 − Ad, 1 − Ad, 1 − Ad), where Ad is the alpha destination value.
-		DstColor			,	///	Each component color is multiplied by the destination color. This can be represented as (Rd, Gd, Bd, Ad), where R, G, B, and A respectively stand for red, green, blue, and alpha destination values.
-		InvDstColor			,	///	Each component of the color is multiplied by the inverse of the destination color. This can be represented as (1 − Rd, 1 − Gd, 1 − Bd, 1 − Ad), where Rd, Gd, Bd, and Ad respectively stand for the red, green, blue, and alpha destination values.
-		SrcAlphaSaturation	,	///	Each component of the color is multiplied by either the alpha of the source color, or the inverse of the alpha of the source color, whichever is greater. This can be represented as (f, f, f, 1), where f = min(A, 1 − Ad).
-		BlendFactor			,	///	Each component of the color is multiplied by a constant set in BlendFactor.
-		InvBlendFactor		,	///	Each component of the color is multiplied by the inverse of a constant set in BlendFactor. 
-	}
+    /// <summary>
+    /// Defines color blending factors.
+    /// </summary>
+    public enum Blend
+    {
+        ///	Each component of the color is multiplied by (0, 0, 0, 0).
+        Zero,
+
+        ///	Each component of the color is multiplied by (1, 1, 1, 1).
+        One,
+
+        ///	Each component of the color is multiplied by the source color. This can be represented as (Rs, Gs, Bs, As), where R, G, B, and A respectively stand for the red, green, blue, and alpha source values.
+        SrcColor,
+
+        ///	Each component of the color is multiplied by the inverse of the source color. This can be represented as (1 − Rs, 1 − Gs, 1 − Bs, 1 − As) where R, G, B, and A respectively stand for the red, green, blue, and alpha destination values.
+        InvSrcColor,
+
+        ///	Each component of the color is multiplied by the alpha value of the source. This can be represented as (As, As, As, As), where As is the alpha source value.
+        SrcAlpha,
+
+        ///	Each component of the color is multiplied by the inverse of the alpha value of the source. This can be represented as (1 − As, 1 − As, 1 − As, 1 − As), where As is the alpha destination value.
+        InvSrcAlpha,
+
+        ///	Each component of the color is multiplied by the alpha value of the destination. This can be represented as (Ad, Ad, Ad, Ad), where Ad is the destination alpha value.
+        DstAlpha,
+
+        ///	Each component of the color is multiplied by the inverse of the alpha value of the destination. This can be represented as (1 − Ad, 1 − Ad, 1 − Ad, 1 − Ad), where Ad is the alpha destination value.
+        InvDstAlpha,
+
+        ///	Each component color is multiplied by the destination color. This can be represented as (Rd, Gd, Bd, Ad), where R, G, B, and A respectively stand for red, green, blue, and alpha destination values.
+        DstColor,
+
+        ///	Each component of the color is multiplied by the inverse of the destination color. This can be represented as (1 − Rd, 1 − Gd, 1 − Bd, 1 − Ad), where Rd, Gd, Bd, and Ad respectively stand for the red, green, blue, and alpha destination values.
+        InvDstColor,
+
+        ///	Each component of the color is multiplied by either the alpha of the source color, or the inverse of the alpha of the source color, whichever is greater. This can be represented as (f, f, f, 1), where f = min(A, 1 − Ad).
+        SrcAlphaSaturation,
+
+        ///	Each component of the color is multiplied by a constant set in BlendFactor.
+        BlendFactor,
+
+        ///	Each component of the color is multiplied by the inverse of a constant set in BlendFactor. 
+        InvBlendFactor,
+    }
 
 
-	/// <summary>
+    /// <summary>
 	/// Defines how to combine a source color with the destination color already on the render target for color blending. 
 	/// </summary>
 	public enum BlendOp {
@@ -406,7 +432,8 @@ namespace Fusion.Drivers.Graphics {
 		public static Format ConvertToTex ( DepthFormat format )
 		{
 			switch ( format ) {
-				case DepthFormat.D24S8	: return Format.R24G8_Typeless;
+			    case DepthFormat.D32F: return Format.R32_Typeless;
+                case DepthFormat.D24S8	: return Format.R24G8_Typeless;
 				case DepthFormat.D16	: return Format.R16_Typeless;
 			}
 			throw new ArgumentException("bad format");
