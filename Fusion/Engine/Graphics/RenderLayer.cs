@@ -193,6 +193,12 @@ namespace Fusion.Engine.Graphics {
 			Game.GraphicsDevice.SetTargets(GlobeDepthStencil.Surface, targetSurface);
 		}
 
+	    public void ClearDepthBuffer(DepthStencil2D ds = null)
+	    {
+	        ds = ds ?? GlobeDepthStencil;
+	        rs.Device.Clear(ds.Surface);
+        }
+
 
 		/// <summary>
 		/// 

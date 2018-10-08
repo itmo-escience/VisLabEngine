@@ -9,18 +9,18 @@ using Fusion.Engine.Common;
 using Fusion.Engine.Graphics.GIS.GlobeMath;
 using Fusion.Core.Mathematics;
 
-namespace Fusion.Engine.Graphics.GIS  
-{ 
-    public class MCBatch : Gis.GisLayer
+namespace Fusion.Engine.Graphics.GIS
+{
+    public class VPBatch : Gis.GisLayer  
     {
         Ubershader shader;
-        StateFactory factory; 
+        StateFactory factory;   
 
         [Flags]
         public enum FieldFlags : int 
         {
             None = 0,
-            DrawIsoSurface = 1 << 0,
+            Draw_points = 1 << 0,
             LerpBuffers = 1 << 1,
             UsePalette = 1 << 2,
             MoveVertices = 1 << 3,
@@ -32,21 +32,32 @@ namespace Fusion.Engine.Graphics.GIS
         {    
             public double Lat;
             public double Lon;
-            public Vector2 FieldSize;            
-            public float IsolineValue;
+            public Vector3 FieldSize;            
             public float LerpValue;
             public uint dimX;
             public uint dimY;
             public uint dimZ; 
-            public uint d;
-            public Vector4 Color;
+            public uint dimW;            
             public Vector4 Right;
             public Vector4 Forward;
-            public Vector4 Dummy; 
+            public Matrix View;
+            public Matrix Proj;
+            public Vector2 MinMax;
+            public Vector2 Dummy; 
         }
         protected ConstData parameters;
 
+        public Matrix View
+        {
+            get => parameters.View;
+            set => parameters.View = value;
+        }
 
+        public Matrix Proj
+        {
+            get => parameters.Proj;
+            set => parameters.Proj = value;
+        }
         public void SetWholeData(float[] data, int dimX, int dimY, int dimZ)
         {
             DataFirstFrameGpu?.Dispose();
@@ -61,9 +72,10 @@ namespace Fusion.Engine.Graphics.GIS
 
             parameters.dimX = (uint)dimX;
             parameters.dimY = (uint)dimY;
-            parameters.dimZ = (uint)dimZ; 
+            parameters.dimZ = (uint)dimX;
+            parameters.dimW = (uint)dimZ; 
         }
-             
+
         public void AddFrame(float[] data, int dimX, int dimY, int dimZ)
         {
             DataFirstFrameGpu.Dispose();
@@ -71,24 +83,36 @@ namespace Fusion.Engine.Graphics.GIS
 
             DataSecondFrameGpu = new Texture3D(Game.GraphicsDevice, dimX, dimY, dimZ, ColorFormat.R32F, false);
             DataSecondFrameGpu.SetData(data); 
-            dataFrameSize = (dimX - 1) * (dimY - 1) * (dimZ - 1);
+            dataFrameSize = (dimX - 1) * (dimY - 1) * (dimX - 1);            
         }
 
         private int dataFrameSize;
 
-        public float Bordervalue
+        public float Min
         {
-            get { return parameters.IsolineValue; }
-            set { parameters.IsolineValue = value; }
+            get { return parameters.MinMax.X; }
+            set { parameters.MinMax.X = value; }
         }
 
-        public Color Color 
+        public Vector4 Right
         {
-            get { return (Color) parameters.Color; }
-            set { parameters.Color = value.ToVector4(); }
-        }    
+            get { return parameters.Right; }
+            set { parameters.Right= value; }
+        }
 
-        public Vector2 FieldSize
+        public Vector4 Forward
+        {
+            get { return parameters.Forward; }
+            set { parameters.Forward = value; }
+        }
+
+        public float Max
+        {
+            get { return parameters.MinMax.Y; }
+            set { parameters.MinMax.Y = value; }
+        }  
+
+        public Vector3 FieldSize
         {
             get { return parameters.FieldSize; }
             set { parameters.FieldSize = value; }
@@ -117,16 +141,10 @@ namespace Fusion.Engine.Graphics.GIS
             var flags = (FieldFlags) flag;
              
             ps.VertexInputElements = null; 
-            //ps.BlendState = flags.HasFlag(FieldFlags.XRAY) ? BlendState.Additive : BlendState.AlphaBlend;
-            //ps.DepthStencilState = flags.HasFlag(FieldFlags.NO_DEPTH) ? DepthStencilState.None : DepthStencilState.Default;
-            //ps.RasterizerState = flags.HasFlag(FieldFlags.CULL_NONE) ? RasterizerState.CullNone : RasterizerState.CullCW;
              
-            ps.BlendState = BlendState.AlphaAdditive;      
-            ps.DepthStencilState = DepthStencilState.Readonly;             
-            ps.RasterizerState = RasterizerState.CullNone;  
-
-
-            //if (flags.HasFlag(FieldFlags.DrawIsoSurface)) ps.BlendState = BlendState.Opaque;
+            ps.BlendState = BlendState.AlphaAdditive;       
+            ps.DepthStencilState = DepthStencilState.Readonly;                
+            ps.RasterizerState = RasterizerState.CullNone;   
 
             ps.Primitive = Primitive.PointList;   
         } 
@@ -142,9 +160,9 @@ namespace Fusion.Engine.Graphics.GIS
         { 
             set
             { 
-                depths = new float[parameters.dimZ];
+                depths = new float[parameters.dimW];
 
-                for (int i = 0; i < parameters.dimZ; i++)
+                for (int i = 0; i < parameters.dimW; i++)
                 {
                     if (value.Length >  i)
                     {
@@ -171,9 +189,9 @@ namespace Fusion.Engine.Graphics.GIS
         private StructuredBuffer depthBuffer;   
         
                    
-        public MCBatch(Game engine) : base(engine)
+        public VPBatch(Game engine) : base(engine)
         {
-            shader = Game.Content.Load<Ubershader>("globe.marchingCubes.hlsl");    
+            shader = Game.Content.Load<Ubershader>("globe.VolumPoints.hlsl");    
             factory = shader.CreateFactory(typeof(FieldFlags), EnumFunc);
              
             cB = new ConstantBuffer(Game.GraphicsDevice, typeof(ConstData)); 
@@ -193,7 +211,7 @@ namespace Fusion.Engine.Graphics.GIS
             base.Dispose();  
         }  
 
-        public FieldFlags Flags = FieldFlags.DrawIsoSurface | FieldFlags.LerpBuffers;
+        public FieldFlags Flags = FieldFlags.Draw_points | FieldFlags.LerpBuffers;
         public Texture2D Palette;
         public override void Draw(GameTime gameTime, ConstantBuffer constBuffer)
         {
@@ -201,26 +219,27 @@ namespace Fusion.Engine.Graphics.GIS
             Game.GraphicsDevice.VertexShaderConstants[0] = constBuffer;
             //var m = GeoHelper.CalculateBasisOnSurface(new DVector2(parameters.Lon, parameters.Lat));
             //parameters.Right = new Vector4(m.Right.ToVector3(), 0);
-            //parameters.Forward = new Vector4(m.Forward.ToVector3(), 0);              
+            //parameters.Forward = new Vector4(m.Forward.ToVector3(), 0);                                       
             cB.SetData(parameters);   
             Game.GraphicsDevice.VertexShaderConstants[1] = cB;   
             Game.GraphicsDevice.GeometryShaderConstants[1] = cB;      
             Game.GraphicsDevice.PixelShaderConstants[1] = cB; 
 
-            Game.GraphicsDevice.GeometryShaderSamplers[0] = Sampler;
+            Game.GraphicsDevice.GeometryShaderSamplers[0] = Sampler; 
 
             Game.GraphicsDevice.GeometryShaderResources[1] = DataFirstFrameGpu;     
             Game.GraphicsDevice.GeometryShaderResources[2] = DataSecondFrameGpu; 
             Game.GraphicsDevice.GeometryShaderResources[3] = depthBuffer;
-
+            Game.GraphicsDevice.GeometryShaderResources[0] = Palette;
+            Game.GraphicsDevice.PixelShaderResources[0] = Palette; 
             if (Palette != null) 
             {
-                Flags = FieldFlags.DrawIsoSurface | FieldFlags.LerpBuffers | FieldFlags.UsePalette | FieldFlags.MoveVertices;
-                Game.GraphicsDevice.PixelShaderResources[0] = Palette;  
+                Flags = FieldFlags.Draw_points | FieldFlags.LerpBuffers | FieldFlags.UsePalette | FieldFlags.MoveVertices;
+               
             }
             else
             {
-                Flags = FieldFlags.DrawIsoSurface | FieldFlags.LerpBuffers | FieldFlags.MoveVertices;         
+                Flags = FieldFlags.Draw_points | FieldFlags.LerpBuffers | FieldFlags.MoveVertices;         
             }
 
 
@@ -229,7 +248,7 @@ namespace Fusion.Engine.Graphics.GIS
 
             Game.GraphicsDevice.SetupVertexInput(null, null);    
 
-            Game.GraphicsDevice.Draw(dataFrameSize, 0);          
+            Game.GraphicsDevice.Draw(dataFrameSize, 0);
                
         } 
 
