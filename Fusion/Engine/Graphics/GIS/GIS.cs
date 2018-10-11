@@ -157,7 +157,7 @@ namespace Fusion.Engine.Graphics.GIS
 
                 foreach (var batch in batches)
                 {
-                    if (batch.GetType() == typeof(TilesGisLayer))
+                    if (batch.GetType() == typeof(TilesGisLayer) )
                     {
                         switch (((TilesGisLayer)batch).CurrentMapSource.ShortName)
                         {
@@ -180,6 +180,32 @@ namespace Fusion.Engine.Graphics.GIS
                             case "CDN":
                                 constantData.Dummy.Y = 5;
                                 break; 
+                        }
+                    }
+
+                    if (batch.GetType() == typeof(TilesAtlasLayer))
+                    {
+                        switch (((TilesAtlasLayer)batch).CurrentMapSource.ShortName) 
+                        {
+                            case "BMS":
+                                constantData.Dummy.Y = 0;
+                                break;
+                            case "YSM":
+                                constantData.Dummy.Y = 1;
+                                break;
+                            case "BM":
+                                constantData.Dummy.Y = 2;
+                                break;
+                            case "YM":
+                                constantData.Dummy.Y = 3;
+                                break;
+                            case "OSM":
+                                constantData.Dummy.Y = 4;
+                                break;
+                            case "Dark":
+                            case "CDN":
+                                constantData.Dummy.Y = 5;
+                                break;
                         }
                     }
 
