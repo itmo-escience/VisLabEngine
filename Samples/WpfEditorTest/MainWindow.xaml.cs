@@ -33,15 +33,18 @@ namespace WpfEditorTest
 			engine.GameClient		= new CustomGameClient(engine);
 			engine.GameInterface	= new CustomGameInterface(engine);
 
+			engine.LoadConfiguration("Config.ini");
+
 			engine.RenderSystem.StereoMode = Fusion.Engine.Graphics.StereoMode.WpfEditor;
 			engine.RenderSystem.Width	= 1920;
 			engine.RenderSystem.Height	= 1080;
+			engine.RenderSystem.VSyncInterval = 1;
 
-			engine.LoadConfiguration("Config.ini");
+			//var t = Directory.GetCurrentDirectory();
+			Directory.SetCurrentDirectory(@"..\..\..\..\GISTest\bin\x64\Debug");
+			engine.InitExternal();
 
 			DxElem.Renderer = engine;
-
-			Directory.SetCurrentDirectory(@"E:\GitHub\VisLabEngine\Samples\GISTest\bin\x64\Debug");
 		}
 
 		protected override void OnSourceInitialized(EventArgs e)

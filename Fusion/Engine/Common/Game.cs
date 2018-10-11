@@ -220,6 +220,10 @@ namespace Fusion.Engine.Common {
 
 		GameTime	gameTimeInternal;
 
+
+		public GameTime Time => gameTimeInternal;
+
+
 		GameServer	sv;
 		GameClient cl;
 		UserInterface gi;
@@ -268,6 +272,17 @@ namespace Fusion.Engine.Common {
 			while (!token.IsCancellationRequested) UpdateInternal();
 		}
 
+
+		public void InitExternal()
+		{
+			InitInternal();
+		}
+
+
+		public void UpdateExternal()
+		{
+			UpdateInternal();
+		}
 
 		/// <summary>
 		/// 

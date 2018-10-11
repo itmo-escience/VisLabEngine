@@ -95,15 +95,15 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Fusion\Fusion.csproj">
+    <ProjectReference Include="..\..\Fusion\Fusion.csproj">
       <Project>{085c9e62-cddf-4b95-994d-085c74fa90fc}</Project>
       <Name>Fusion</Name>
     </ProjectReference>
-    <ProjectReference Include="..\Samples\GISTest\GISTest.csproj">
+    <ProjectReference Include="..\GISTest\GISTest.csproj">
       <Project>{83fa42c3-612d-47bb-b883-2646a71712b1}</Project>
       <Name>GISTest</Name>
     </ProjectReference>
-    <ProjectReference Include="..\ZWpfLib\ZWpfLib.csproj">
+    <ProjectReference Include="..\..\ZWpfLib\ZWpfLib.csproj">
       <Project>{7394e12a-44fb-4e44-b0cb-2e27d36465f2}</Project>
       <Name>ZWpfLib</Name>
     </ProjectReference>

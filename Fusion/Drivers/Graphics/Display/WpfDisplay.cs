@@ -14,7 +14,7 @@ using Fusion.Core.Mathematics;
 using Native.NvApi;
 using Fusion.Engine.Common;
 using D3DDevice = SharpDX.Direct3D11.Device;
-
+using System.Threading;
 
 namespace Fusion.Drivers.Graphics.Display
 {
@@ -27,6 +27,7 @@ namespace Fusion.Drivers.Graphics.Display
 		int clientWidth;
 		int clientHeight;
 
+		int syncTime = (int)(1000.0 / 60.0);
 
 		public WpfDisplay(Game game, GraphicsDevice device, GraphicsParameters parameters) : base(game, device, parameters)
 		{
@@ -85,6 +86,14 @@ namespace Fusion.Drivers.Graphics.Display
 		public override void SwapBuffers(int syncInterval)
 		{
 			d3dDevice.ImmediateContext.Flush();
+
+			//if (syncInterval < 0) return;
+			//
+			//int miliseconds = (int)(Game.Time.ElapsedSec * 1000);
+			//
+			//if(miliseconds < syncTime) {
+			//	Thread.Sleep(syncTime - miliseconds);
+			//}
 		}
 
 		public override void Update()

@@ -18,22 +18,27 @@ namespace ZWpfLib
 	/// It does no Direct3D work, which is delegated to
 	/// the <see cref="IDirect3D"/> <see cref="Renderer"/> object.
 	/// </summary>
-	public class DXElement : FrameworkElement
+	public class DXElementAsync : FrameworkElement
     {
 		Stopwatch renderTimer;
+
+		Task gameTask;
+		CancellationTokenSource cancSource;
+		CancellationToken token;
+
 
 		/// <summary>
 		/// The image source where the DirectX scene (from the <see cref="Renderer"/>) will be rendered.
 		/// </summary>
-		public DXImageSource Surface { get; }
+		public DXImageSourceAsync Surface { get; }
 
 
-		public DXElement()
+		public DXElementAsync()
         {
 			base.SnapsToDevicePixels = true;
 
             renderTimer = new Stopwatch();
-			Surface = new DXImageSource();
+			Surface = new DXImageSourceAsync();
 			Surface.IsFrontBufferAvailableChanged += delegate {
 				UpdateReallyLoopRendering();
 				if (!IsReallyLoopRendering && Surface.IsFrontBufferAvailable)
@@ -74,8 +79,8 @@ namespace ZWpfLib
 			DependencyProperty.Register(
 				"Renderer",
 				typeof(Game),
-				typeof(DXElement),
-				new PropertyMetadata((d, e) => ((DXElement)d).OnRendererChanged((Game)e.OldValue, (Game)e.NewValue)));
+				typeof(DXElementAsync),
+				new PropertyMetadata((d, e) => ((DXElementAsync)d).OnRendererChanged((Game)e.OldValue, (Game)e.NewValue)));
 
 
 		private void OnRendererChanged(Game oldValue, Game newValue)
@@ -137,15 +142,31 @@ namespace ZWpfLib
 				if (IsReallyLoopRendering) {
 					renderTimer.Start();
 					CompositionTarget.Rendering += OnLoopRendering;
+
+					cancSource = new CancellationTokenSource();
+					token = cancSource.Token;
+
+					var tok = token;
+					var ren = Renderer;
+					var sur = Surface;
+					ren.OnInitialized +=() => { SetBackBuffer(ren, sur); } ;
+					ren.RenderSystem.DisplayBoundsChanged += (o, rec) => {
+						SetBackBuffer(ren, sur);
+					};
+					gameTask = new Task(() => { ren.RunExternal(tok); } );
+					gameTask.Start();
 				} else {
 					CompositionTarget.Rendering -= OnLoopRendering;
 					renderTimer.Stop();
+					cancSource.Cancel();
+					cancSource.Dispose();
+					gameTask = null;
 				}
 			}
 		}
 
 
-		void SetBackBuffer(Game ren, DXImageSource sur)
+		void SetBackBuffer(Game ren, DXImageSourceAsync sur)
 		{
 			if (ren == null) return;
 			sur.SetD3D11BackBuffer(ren.GraphicsDevice.BackbufferColor.Surface.Resource.QueryInterface<Texture2D>());
@@ -166,8 +187,6 @@ namespace ZWpfLib
 			if (Renderer == null)
 				return;
 			Renderer.GraphicsDevice.Resize((int)DesiredSize.Width, (int)DesiredSize.Height);
-			Renderer.UpdateExternal();
-			SetBackBuffer(Renderer, Surface);
 			Console.WriteLine(DesiredSize);
 		}
 
@@ -180,7 +199,6 @@ namespace ZWpfLib
 			if (Renderer == null || IsInDesignMode)
 				return;
 
-			Renderer.UpdateExternal();
 			Surface.Invalidate();
 		}
 
