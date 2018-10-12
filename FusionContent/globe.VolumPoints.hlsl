@@ -112,6 +112,12 @@ struct FieldData {
 	float2 Dummy;
 };
 
+struct ConfData {
+	float4 Size__MinMaxLowHight;
+	float4 Transp__MinMaxLowHight;		
+	float4 Transp_MulPowerDD;		
+};
+
 //#ifdef Draw_points
 Texture2D		Palette   			: register(t0);
 Texture3D		FirstFrameData      : register(t1);
@@ -134,6 +140,11 @@ cbuffer CB : register( b2 )
 {
     uint g_iLevel;    
 	uint g_iInnerLevel;
+};
+
+cbuffer CBConf : register( b3 )
+{
+	ConfData Config;
 };
 
 
@@ -253,10 +264,10 @@ void GSMain ( point VS_OUTPUT inputArray[1], inout TriangleStream<GS_OUTPUT> str
 
 		
 				
-		float3 d =  Right.xyz * Field.FieldSize.x / Field.Dimension.y
+		float3 d =  (Right.xyz * Field.FieldSize.x / Field.Dimension.y
 				  + Forward.xyz * Field.FieldSize.y / Field.Dimension.x
-				  + Up.xyz * Field.FieldSize.z / Field.Dimension.z;
-		position += float4((normalize(random3(position.xyz)) - 1) * d, 0);
+				  + Up.xyz * Field.FieldSize.z / Field.Dimension.z) / 2;
+		position += float4((normalize(random3(position.xyz)) - 1) * random(position.xyz) * d * 4, 0);
 		position += float4(origin.xyz, 0);
 		//float4 position = FinalPositions[vertInd];
 		float4 localPosition = mul(position , Field.View);
@@ -265,7 +276,7 @@ void GSMain ( point VS_OUTPUT inputArray[1], inout TriangleStream<GS_OUTPUT> str
 		tex[1] = float2( 1, -1);
 		tex[2] = float2(-1,  1);
 		tex[3] = float2(1, 1);		
-		d *= 0.25f;
+		d *= lerp(Config.Size__MinMaxLowHight.x, Config.Size__MinMaxLowHight.y, saturate(ilerp(Config.Size__MinMaxLowHight.z, Config.Size__MinMaxLowHight.w, f)));
 		float delta = min(min(d.x, d.y), d.z);
 		positions[0] = localPosition + float4(-1, -1, 0, 0) * delta;
 		positions[1] = localPosition + float4( 1, -1, 0, 0) * delta;
@@ -273,7 +284,7 @@ void GSMain ( point VS_OUTPUT inputArray[1], inout TriangleStream<GS_OUTPUT> str
 		positions[3] = localPosition + float4(1,  1, 0, 0) * delta;		
 
 		output.Color = Palette.SampleLevel(Sampler, float2(ilerp(Field.Min_Max.x, Field.Min_Max.y, f), 0.5f), 0);
-		output.Color.a = 1.0f;	
+		output.Color.a = lerp(Config.Transp__MinMaxLowHight.x, Config.Transp__MinMaxLowHight.y, saturate(ilerp(Config.Transp__MinMaxLowHight.z, Config.Transp__MinMaxLowHight.w, f)));	
 		[unroll]
 		for ( i = 0; i < 4; i++) {		
 			output.Tex = float4(tex[i], 0, 0);
@@ -290,7 +301,7 @@ float4 PSMain (GS_OUTPUT  input ) : SV_Target
 {		
 	float l = length(input.Tex);
 	clip (1 - l);
-	float a = pow(saturate(1 - l), 0.25f) * input.Color.a * 0.25f;
+	float a = pow(saturate(1 - l), Config.Transp_MulPowerDD.y) * input.Color.a * Config.Transp_MulPowerDD.x;
 	//clip(a > 0.00000001f);
 	return float4(input.Color.xyz, a);
 }

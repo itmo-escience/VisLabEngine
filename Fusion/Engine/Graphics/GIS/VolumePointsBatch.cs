@@ -13,6 +13,16 @@ namespace Fusion.Engine.Graphics.GIS
 {
     public class VPBatch : Gis.GisLayer  
     {
+        public VPBatch(Game engine) : base(engine)
+        {
+            shader = Game.Content.Load<Ubershader>("globe.VolumPoints.hlsl");
+            factory = shader.CreateFactory(typeof(FieldFlags), EnumFunc);
+
+            cB = new ConstantBuffer(Game.GraphicsDevice, typeof(ConstData));
+
+            confBuffer = new ConstantBuffer(Game.GraphicsDevice, typeof(ConfData));             
+        }
+
         Ubershader shader;
         StateFactory factory;   
 
@@ -29,8 +39,8 @@ namespace Fusion.Engine.Graphics.GIS
             Depth_Sort_FirstMerge = 1 << 6,             
         }
 
-        SamplerState Sampler = SamplerState.LinearClamp;  
-
+        SamplerState Sampler = SamplerState.LinearClamp;
+        #region FieldData
         public struct ConstData
         {    
             public double Lat;
@@ -48,7 +58,6 @@ namespace Fusion.Engine.Graphics.GIS
             public Vector2 MinMax;
             public Vector2 Dummy; 
         }
-        protected ConstData parameters;
 
         public Matrix View
         {
@@ -61,6 +70,156 @@ namespace Fusion.Engine.Graphics.GIS
             get => parameters.Proj;
             set => parameters.Proj = value;
         }
+
+        public float Min
+        {
+            get { return parameters.MinMax.X; }
+            set { parameters.MinMax.X = value; }
+        }
+
+        public Vector4 Right
+        {
+            get { return parameters.Right; }
+            set { parameters.Right = value; }
+        }
+
+        public Vector4 Forward
+        {
+            get { return parameters.Forward; }
+            set { parameters.Forward = value; }
+        }
+
+        public float Max
+        {
+            get { return parameters.MinMax.Y; }
+            set { parameters.MinMax.Y = value; }
+        }
+
+        public Vector3 FieldSize
+        {
+            get { return parameters.FieldSize; }
+            set { parameters.FieldSize = value; }
+        }
+
+        public double Lat
+        {
+            get { return parameters.Lat; }
+            set { parameters.Lat = value; }
+        }
+
+        public double Lon
+        {
+            get { return parameters.Lon; }
+            set { parameters.Lon = value; }
+        }
+
+        public float Lerp
+        {
+            get { return parameters.LerpValue; }
+            set { parameters.LerpValue = value; }
+        }
+
+        #endregion
+
+        #region ConfData
+
+        public struct ConfData
+        {
+            public float MinSize;
+            public float MaxSize;
+            public float LowSizeValue;
+            public float HighSizeValue;            
+            public float MinTransp;
+            public float MaxTransp;
+            public float LowTranspValue;
+            public float HighTranspValue;
+            public float TransparencyMult;
+            public float TransparencyPower;
+            public Vector2 Dummy;
+        }
+
+        public float MinPointSize
+        {
+            get => configParameters.MinSize;
+            set => configParameters.MinSize = value;
+        }
+
+        public float MaxPointSize
+        {
+            get => configParameters.MaxSize;
+            set => configParameters.MaxSize = value;
+        }
+
+        public float MinPointSizeValue 
+        {
+            get => configParameters.LowSizeValue;
+            set => configParameters.LowSizeValue = value;
+        }
+
+        public float MaxPointSizeValue
+        {
+            get => configParameters.HighSizeValue;
+            set => configParameters.HighSizeValue = value;
+        }
+
+        public float MinPointValue
+        {
+            set
+            {
+                configParameters.LowSizeValue = value;
+                configParameters.LowTranspValue = value;
+            }            
+        }
+
+        public float MaxPointValue
+        {
+            set
+            {
+                configParameters.HighSizeValue = value;
+                configParameters.HighTranspValue = value;
+            }
+        }
+        
+        public float MinPointTransp 
+        {
+            get => configParameters.MinTransp;
+            set => configParameters.MinTransp = value;
+        }
+
+        public float MaxPointTransp
+        {
+            get => configParameters.MaxTransp;
+            set => configParameters.MaxTransp = value;
+        }
+
+        public float MinPointTranspValue
+        {
+            get => configParameters.LowTranspValue;
+            set => configParameters.LowTranspValue = value;
+        }
+
+        public float MaxPointTranspValue
+        {
+            get => configParameters.HighTranspValue;
+            set => configParameters.HighTranspValue = value;
+        }
+
+        public float TransparencyMult
+        {
+            get => configParameters.TransparencyMult;
+            set => configParameters.TransparencyMult = value;
+        }
+
+        public float TransparencyPower
+        {
+            get => configParameters.TransparencyPower;
+            set => configParameters.TransparencyPower = value;
+        }
+
+        #endregion
+        protected ConstData parameters;
+        public ConfData configParameters;
+        
         public void SetWholeData(float[] data, int dimX, int dimY, int dimZ)   
         {
             DataFirstFrameGpu?.Dispose();
@@ -101,55 +260,7 @@ namespace Fusion.Engine.Graphics.GIS
             dataFrameSize = dimX * dimY * dimX;            
         }
 
-        private int dataFrameSize;
-
-        public float Min
-        {
-            get { return parameters.MinMax.X; }
-            set { parameters.MinMax.X = value; }
-        }
-
-        public Vector4 Right
-        {
-            get { return parameters.Right; }
-            set { parameters.Right= value; }
-        }
-
-        public Vector4 Forward
-        {
-            get { return parameters.Forward; }
-            set { parameters.Forward = value; }
-        }
-
-        public float Max
-        {
-            get { return parameters.MinMax.Y; }
-            set { parameters.MinMax.Y = value; }
-        }  
-
-        public Vector3 FieldSize
-        {
-            get { return parameters.FieldSize; }
-            set { parameters.FieldSize = value; }
-        }
-
-        public double Lat
-        {
-            get { return parameters.Lat; }
-            set { parameters.Lat = value; }
-        }
-
-        public double Lon
-        {
-            get { return parameters.Lon; }
-            set { parameters.Lon = value; }
-        }
-
-        public float Lerp
-        {
-            get { return parameters.LerpValue; }
-            set { parameters.LerpValue = value; }
-        }
+        private int dataFrameSize;       
 
         void EnumFunc(PipelineState ps, int flag)
         {
@@ -165,7 +276,7 @@ namespace Fusion.Engine.Graphics.GIS
         } 
 
 
-        protected ConstantBuffer cB;  
+        protected ConstantBuffer cB, confBuffer;  
 
         Texture3D DataFirstFrameGpu;
         Texture3D DataSecondFrameGpu;        
@@ -201,19 +312,10 @@ namespace Fusion.Engine.Graphics.GIS
             }
         }
 
-        private StructuredBuffer depthBuffer;   
-        
-                   
-        public VPBatch(Game engine) : base(engine)
-        {
-            shader = Game.Content.Load<Ubershader>("globe.VolumPoints.hlsl");    
-            factory = shader.CreateFactory(typeof(FieldFlags), EnumFunc);
-             
-            cB = new ConstantBuffer(Game.GraphicsDevice, typeof(ConstData));            
-        }
+        private StructuredBuffer depthBuffer;                                      
 
 
-        private StructuredBuffer distBuffer, indBuffer, posBuffer; 
+        private StructuredBuffer distBuffer, indBuffer, posBuffer;  
 
         private const int BITONIC_BLOCK_SIZE = 1024;
         void GPUSort(ConstantBuffer constBuffer)
@@ -327,11 +429,16 @@ namespace Fusion.Engine.Graphics.GIS
             Game.GraphicsDevice.VertexShaderConstants[0] = constBuffer;
             Game.GraphicsDevice.ComputeShaderConstants[0] = constBuffer;
             parameters.Dummy.X = 0;//(float)gameTime.Total.TotalSeconds / 100;  
-            cB.SetData(parameters);           
+            cB.SetData(parameters);       
+            confBuffer.SetData(configParameters);   
             Game.GraphicsDevice.VertexShaderConstants[1] = cB;     
             Game.GraphicsDevice.GeometryShaderConstants[1] = cB;      
             Game.GraphicsDevice.PixelShaderConstants[1] = cB;
-            
+
+            Game.GraphicsDevice.VertexShaderConstants[3] = confBuffer;
+            Game.GraphicsDevice.GeometryShaderConstants[3] = confBuffer;
+            Game.GraphicsDevice.PixelShaderConstants[3] = confBuffer;  
+
             Game.GraphicsDevice.ComputeShaderConstants[1] = cB;
             Game.GraphicsDevice.GeometryShaderSamplers[0] = Sampler;
 

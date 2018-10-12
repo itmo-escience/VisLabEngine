@@ -85,10 +85,10 @@ namespace FusionUI.UI
 
         public void UpdatePadding()
         {
-            scrollHolder.UnitY = DrawHat ? UIConfig.UnitHatHeight : 0 + UnitPaddingTop;
+            scrollHolder.UnitY = (DrawHat ? UIConfig.UnitHatHeight : 0) + UnitPaddingTop;
             scrollHolder.UnitX = UnitPaddingLeft;
             scrollHolder.UnitWidth = UnitWidth - UnitPaddingLeft - UnitPaddingRight;
-            scrollHolder.UnitHeight = HeightLimit - UnitPaddingTop - UnitPaddingBottom;
+            scrollHolder.UnitHeight = HeightLimit - UnitPaddingTop - UnitPaddingBottom;            
             holder.UnitWidth = scrollHolder.UnitWidth;
         }
 
@@ -206,7 +206,7 @@ namespace FusionUI.UI
             if (AllowShrink)
             {
                 scrollHolder.UnitHeight = Math.Min(HeightLimit, holder.UnitHeight);
-                UnitHeight = (HatPanel?.UnitHeight ?? 0) + (scrollHolder.UnitHeight) + (BasementPanel?.UnitHeight ?? 0);
+                UnitHeight = (HatPanel?.UnitHeight ?? 0) + (scrollHolder.UnitHeight) + (BasementPanel?.UnitHeight ?? 0) + UnitPaddingTop + UnitPaddingBottom;
             }                        
             holder.UnitY = MathUtil.Clamp(holder.UnitY, Math.Min(MaxHeight - RealHeight, 0), 0);
         }
