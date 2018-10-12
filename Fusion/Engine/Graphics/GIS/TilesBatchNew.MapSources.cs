@@ -43,6 +43,9 @@ namespace Fusion.Engine.Graphics.GIS
 
         protected void RegisterMapSources()
 		{
+            MapSources.ForEach(a => a.Dispose());
+            MapSources.Clear();
+
 			MapSources.Add(new OpenStreetMap(Game)		);
 			MapSources.Add(new GoogleMap(Game)			);
 			MapSources.Add(new GoogleSatelliteMap(Game)	);
@@ -68,7 +71,7 @@ namespace Fusion.Engine.Graphics.GIS
 	    {
 			var oldProj = CurrentMapSource.Projection;
 
-			CurrentMapSource = MapSources[(int)map];
+			CurrentMapSource = MapSources[(int)map];  
 	        CurrentMapSourecEnum = map;            
 
 

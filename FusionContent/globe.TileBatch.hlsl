@@ -13,6 +13,13 @@ struct ConstData {
     float2      ScreenData ;
 };
 
+struct InfoData {
+	float4		SnowColor;
+	float4		SeaColor;	
+	float4		D1;
+	float4		D2;
+};
+
 
 struct VS_INPUT {	
 	//uint2 lon				: TEXCOORD0	;
@@ -48,6 +55,7 @@ struct VS_OUTPUT {
 };
 
 cbuffer CBStage		: register(b0) 	{	ConstData	Stage		: 	packoffset( c0 );	}
+cbuffer CBInfo      : register(b1) 	{	InfoData	Info		: 	packoffset( c0 );	}
 StructuredBuffer<INST_INPUT> InstData : register(t2);
 
 #if 0
@@ -223,6 +231,20 @@ VS_OUTPUT DSMain(PATCH_OUTPUT input, float2 uvwCoord : SV_DomainLocation, const 
         double2 innerPos = getInnerPos(InstData[id].x, InstData[id].y, lerp(patch[0].xydd.x, patch[2].xydd.x, uvwCoord.x), lerp(patch[0].xydd.y, patch[2].xydd.y, uvwCoord.y), InstData[id].level, InstData[id].density);
         double lon		= innerPos.x;
         double lat		= innerPos.y;
+		
+		if (lat < -1.4835298641951801403851371532153) 
+		{
+			double PI		=	3.141592653589793;	
+			double PI_HALF	=	0.5*PI;
+			lat = -PI_HALF;							
+		}	
+		
+		if (lat > 1.4835298641951801403851371532153) 
+		{
+			double PI		=	3.141592653589793;	
+			double PI_HALF	=	0.5*PI;
+			lat = PI_HALF;							
+		}
         
         double3 cPos	= SphericalToDecart(double2(lon, lat), 6378.137);
         double3 normPos = cPos*0.000156785594;
@@ -247,8 +269,23 @@ VS_OUTPUT DSMain(PATCH_OUTPUT input, float2 uvwCoord : SV_DomainLocation, const 
     }   
     #endif
     double2 innerPos = getInnerPos(InstData[id].x, InstData[id].y, lerp(patch[0].xydd.x, patch[2].xydd.x, uvwCoord.x), lerp(patch[0].xydd.y, patch[2].xydd.y, uvwCoord.y), InstData[id].level, InstData[id].density);
-        double lon		= innerPos.x;
-        double lat		= innerPos.y;  
+	double lon		= innerPos.x;
+	double lat		= innerPos.y;  
+		
+	if (lat < -1.4835298641951801403851371532153) 
+	{
+		double PI		=	3.141592653589793;	
+		double PI_HALF	=	0.5*PI;
+		lat = -PI_HALF;						
+	}	
+	
+	if (lat > 1.4835298641951801403851371532153) 
+	{
+		double PI		=	3.141592653589793;	
+		double PI_HALF	=	0.5*PI;
+		lat = PI_HALF;						
+	}
+		
     float4 Tex = output.Tex = lerp(lerp(patch[0].Tex, patch[1].Tex, uvwCoord.x), lerp(patch[3].Tex, patch[2].Tex, uvwCoord.x), uvwCoord.y);	
 	output.Normal	=	lerp(lerp(patch[0].Normal, patch[1].Normal, uvwCoord.x), lerp(patch[3].Normal, patch[2].Normal, uvwCoord.x), uvwCoord.y);	
 	output.CapFade  =   lerp(lerp(patch[0].CapFade, patch[1].CapFade, uvwCoord.x), lerp(patch[3].CapFade, patch[2].CapFade, uvwCoord.x), uvwCoord.y);
@@ -306,6 +343,10 @@ float4 PSMain ( VS_OUTPUT input ) : SV_Target
 		case 4:
 			waterColor = float3(181.0f/255.0f, 208.0f/255.0f, 208.0f/255.0f);
 			snowColor = float3(242.0f/255.0f, 239.0f/255.0f, 239.0f/255.0f);			
+		break;
+		case 5:
+			waterColor = float3(38.0f/255.0f, 38.0f/255.0f, 38.0f/255.0f);
+			snowColor = float3(9.0f/255.0f, 9.0f/255.0f, 9.0f/255.0f);			
 		break;
 		default:
 		break;

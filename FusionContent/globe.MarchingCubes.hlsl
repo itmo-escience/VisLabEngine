@@ -537,5 +537,5 @@ float4 PSMain (GS_OUTPUT  input ) : SV_Target
 	float4 color = Field.Color * frsn;
 	#endif
 	//return float4(input.Color.xyz, color.a * Field.Color.a);
-	return float4(color.xyz, color.a * 0.035f);
+	return float4(color.xyz, color.a * 0.015f);
 }

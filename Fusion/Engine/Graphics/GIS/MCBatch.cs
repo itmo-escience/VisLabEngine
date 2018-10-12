@@ -194,7 +194,16 @@ namespace Fusion.Engine.Graphics.GIS
         }  
 
         public FieldFlags Flags = FieldFlags.DrawIsoSurface | FieldFlags.LerpBuffers;
-        public Texture2D Palette;
+        public Texture2D Palette
+        {
+            get => palette;
+            set
+            {
+                //palette?.Dispose();
+                palette = value;
+            }
+        }
+        private Texture2D palette;
         public override void Draw(GameTime gameTime, ConstantBuffer constBuffer)
         {
             Game.GraphicsDevice.GeometryShaderConstants[0] = constBuffer;   
@@ -223,8 +232,7 @@ namespace Fusion.Engine.Graphics.GIS
                 Flags = FieldFlags.DrawIsoSurface | FieldFlags.LerpBuffers | FieldFlags.MoveVertices;         
             }
 
-
-
+            
             Game.GraphicsDevice.PipelineState = factory[(int)Flags];
 
             Game.GraphicsDevice.SetupVertexInput(null, null);    
