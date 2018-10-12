@@ -47,8 +47,14 @@ namespace Fusion.Engine.Graphics.GIS
             TESSELLATE = 0x0008,
         }
 
-        StructuredBuffer instDataGpu;
+        struct InfoData
+        {
+            public Color SnowColor;
+            public Color SeaColor;
+        }
 
+        StructuredBuffer instDataGpu;
+        private ConstantBuffer InfoBuffer;
         private int tilesLimit => TileAtlasContainer.MaxTiles;
 
         public TilesAtlasLayer(Game engine, GlobeCamera camera) : base(engine)
@@ -72,11 +78,11 @@ namespace Fusion.Engine.Graphics.GIS
             shader = Game.Content.Load<Ubershader>("globe.TileBatch.hlsl");
             factory = shader.CreateFactory(typeof(TileFlags), Primitive.PatchList4CP, VertexInputElement.FromStructure<InstPoint>(), BlendState.AlphaBlend, RasterizerState.CullCW, DepthStencilState.Default);
             factoryWire = shader.CreateFactory(typeof(TileFlags), Primitive.PatchList4CP, VertexInputElement.FromStructure<InstPoint>(), BlendState.AlphaBlend, RasterizerState.Wireframe, DepthStencilState.Default);
-
+              
             instDataGpu = new StructuredBuffer(engine.GraphicsDevice, typeof(InstStruct), tilesLimit, StructuredBufferFlags.None);
 
             CreateStaticBuffers(tileDensity, ref tileVertexBuffer, out tileIndexBuffer);
-
+            //InfoBuffer = new ConstantBuffer(Game.GraphicsDevice, typeof(InfoData));
         }
 
         public override void Update(GameTime gameTime)
@@ -87,6 +93,11 @@ namespace Fusion.Engine.Graphics.GIS
 
             DetermineTilesNew();           
         }
+
+        public Dictionary<MapSource, Tuple<Color, Color>> MapCapColors =
+            new Dictionary<MapSource, Tuple<Color, Color>>()
+            {
+            };
       
         public override void Draw(GameTime gameTime, ConstantBuffer constBuffer)
         {
@@ -96,6 +107,11 @@ namespace Fusion.Engine.Graphics.GIS
             //Gis.Debug.DrawSphere(100, Color.Red, DMatrix.Translation(localCameraPos));
 
             //dev.PipelineState = factory[0];
+
+
+
+
+
             lock (tilesLock)
             {
                 if (tilesToRender.Count > maxTilesToRender)
@@ -153,7 +169,7 @@ namespace Fusion.Engine.Graphics.GIS
 
                 flags |= FixWater ? TileFlags.FIX_WATER : 0;
                 flags |= yandexMercator ? TileFlags.YANDEX : 0;
-                if (!Game.Keyboard.IsKeyDown(Keys.T))
+                if (Game.Keyboard.IsKeyDown(Keys.T))
                 {
                     flags |= TileFlags.TESSELLATE;
                 }

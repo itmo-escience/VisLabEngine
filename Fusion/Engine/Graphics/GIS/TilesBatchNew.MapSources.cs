@@ -68,7 +68,7 @@ namespace Fusion.Engine.Graphics.GIS
 	    {
 			var oldProj = CurrentMapSource.Projection;
 
-			CurrentMapSource = MapSources[(int)map];
+			CurrentMapSource = MapSources[(int)map];  
 	        CurrentMapSourecEnum = map;            
 
 

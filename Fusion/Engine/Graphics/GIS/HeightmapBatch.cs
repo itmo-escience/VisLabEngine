@@ -93,8 +93,8 @@ namespace Fusion.Engine.Graphics.GIS
 
         public float ScaleMult
         {
-            get => parameters.LerpValue;
-            set => parameters.LerpValue = value;
+            get => parameters.IsolineValue;
+            set => parameters.IsolineValue = value;
         }
         protected ConstantBuffer cB;
 
