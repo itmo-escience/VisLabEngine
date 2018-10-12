@@ -100,9 +100,7 @@ namespace FusionUI.UI.Elements
         {
             timeLabelTime.UnitX = LordOfTime.UnitX + LordOfTime.UnitWidth / 2 - UIConfig.UnitTimelineLabelWidth / 2;
             timeLabelDate.UnitX = LordOfTime.UnitX + LordOfTime.UnitWidth / 2 - UIConfig.UnitTimelineLabelWidth / 2;
-            lineLineBeforeLord.UnitWidth = LordOfTime.UnitX + emptySizeImage - UnitPaddingLeft;
-            lineLineAfterLord.UnitX = LordOfTime.UnitX + LordOfTime.UnitWidth - emptySizeImage;
-            lineLineAfterLord.UnitWidth = this.UnitWidth - lineLineAfterLord.UnitX - UnitPaddingRight;         
+            lineLineBeforeLord.UnitWidth = LordOfTime.UnitX - UnitPaddingLeft + LordOfTime.UnitWidth / 2;
         }        
 
         public DateTime XPositionToDateTime(float x)
@@ -124,7 +122,7 @@ namespace FusionUI.UI.Elements
                 IsFixedY = true,
                 Image = textureLord,
                 ImageColor = UIConfig.TimeLineColor1,
-                ImageMode = FrameImageMode.Centered,                
+                ImageMode = FrameImageMode.Centered, 
             };
 
             var font = ui.DefaultFont;
@@ -166,13 +164,15 @@ namespace FusionUI.UI.Elements
             lineLineBeforeLord = new ScalableFrame(ui, UnitPaddingLeft , this.UnitHeight/2 - thinknessLine/2, LordOfTime.UnitX + emptySizeImage / ScaleMultiplier, thinknessLine, "", UIConfig.TimeLineColor1)
             {
                 //Anchor = FrameAnchor.Bottom | FrameAnchor.Left | FrameAnchor.Right,
-                Ghost = true
+                Ghost = true,
+                ZOrder = 3,
             };
 
-            lineLineAfterLord = new ScalableFrame(ui, LordOfTime.UnitX + LordOfTime.UnitWidth - emptySizeImage, this.UnitHeight/2 - thinknessLine/2, this.UnitWidth - LordOfTime.UnitX - LordOfTime.UnitWidth + emptySizeImage / ScaleMultiplier - UnitPaddingRight, thinknessLine, "", UIConfig.TimeLineColor2)
+            lineLineAfterLord = new ScalableFrame(ui, UnitPaddingLeft, this.UnitHeight/2 - thinknessLine/2, UnitWidth - UnitPaddingLeft - UnitPaddingRight, thinknessLine, "", UIConfig.TimeLineColor2)
             {
                 //Anchor = FrameAnchor.Bottom | FrameAnchor.Left | FrameAnchor.Right,
-                Ghost = true
+                Ghost = true,
+                ZOrder = 2,
             };
 
             LordOfTime.SuppressActions = true;
@@ -193,8 +193,9 @@ namespace FusionUI.UI.Elements
                 UpdatedTimeElement();
             };
 
-            this.Add(lineLineBeforeLord);
             this.Add(lineLineAfterLord);
+            this.Add(lineLineBeforeLord);
+            
 
             this.Add(timeLabelTime);
             this.Add(timeLabelDate);
