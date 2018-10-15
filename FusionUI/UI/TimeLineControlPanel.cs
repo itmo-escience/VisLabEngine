@@ -317,13 +317,13 @@ namespace FusionUI.UI
 
 		public void AddSideLables(string lableLeftText, string lableRightText )
 		{
-			var leftTimeLineLable = new Elements.TextFormatting.FormatTextBlock(ui, 0, UIConfig.UnitTimelineHeight, 60, 6, lableLeftText, Color.Zero, this.FontHolder, 0)
+			var leftTimeLineLable = new ScalableFrame(ui, 0, UIConfig.UnitTimelineHeight, 60, 6, lableLeftText, Color.Zero)
 			{
 				TextAlignment = Alignment.MiddleLeft,
 			};
-			var rightTimeLineLable = new Elements.TextFormatting.FormatTextBlock(ui, this.UnitWidth - 60, UIConfig.UnitTimelineHeight, 60, 6, lableRightText, Color.Zero, this.FontHolder, 0)
+			var rightTimeLineLable = new ScalableFrame(ui, this.UnitWidth - 60, UIConfig.UnitTimelineHeight, 60, 6, lableRightText, Color.Zero)
 			{
-				TextAlignment = Alignment.MiddleCenter,
+				TextAlignment = Alignment.MiddleRight,
 			};
 			this.Add(leftTimeLineLable);
 			this.Add(rightTimeLineLable);
