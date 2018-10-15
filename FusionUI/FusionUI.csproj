@@ -83,6 +83,7 @@
     <Compile Include="UI\Elements\Editbox.cs" />
     <Compile Include="UI\Elements\GraphRenderTargetGraph.cs" />
     <Compile Include="UI\Elements\GisRenderTargtDraw.cs" />
+    <Compile Include="UI\Elements\MinimizeableFrame.cs" />
     <Compile Include="UI\Elements\RenderTargetDraw.cs" />
     <Compile Include="UI\Elements\TextFormatting\FormatTextBlock.Tags.cs" />
     <Compile Include="UI\Elements\Label.cs" />
