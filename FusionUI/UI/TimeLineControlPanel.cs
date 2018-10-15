@@ -50,7 +50,10 @@ namespace FusionUI.UI
         public ScalableFrame NameLabel;
         public string NameLabelText;
 
-        public int currentStep = 0;
+		bool addToolButtons;
+
+
+		public int currentStep = 0;
         public List<Tuple<double, string>> listStepName = new List<Tuple<double, string>>()
         {
             new Tuple<double, string>(1, "1h"),
@@ -68,13 +71,15 @@ namespace FusionUI.UI
         public bool ShowStartAndEndDate = true;
         
 
-        public TimeLineControlPanel(FrameProcessor ui, float x, float y, float w, float h, string text, Color backColor) : base(ui, x, y, w, h, text, backColor)
+        public TimeLineControlPanel(FrameProcessor ui, float x, float y, float w, float h, string text, Color backColor, bool addToolButtons = true) : base(ui, x, y, w, h, text, backColor)
         {
             NameLabelText = text;
             Text = "";
             this.ui = ui;
             ((Frame) this).Ghost = false;
-            Init();
+			this.addToolButtons = addToolButtons;
+
+			Init();
             SuppressActions = true;
             //Anchor = FrameAnchor.Bottom | FrameAnchor.Left | FrameAnchor.Right;
 
@@ -128,7 +133,7 @@ namespace FusionUI.UI
             };
 
 
-            createControlButtons(this.UnitWidth/2 - sizeButton*5/2, UIConfig.UnitTimelineHeight);
+            createControlButtons(this.UnitWidth/2 - sizeButton*5/2, UIConfig.UnitTimelineHeight, this.addToolButtons);
             //this.Resize += TimeLineControlPanel_Resize;
 
             var sizeText = Font.MeasureString(templateDate);
@@ -163,7 +168,7 @@ namespace FusionUI.UI
 
         }        
 
-        private void createControlButtons(float x, float y)
+        private void createControlButtons(float x, float y, bool addToolButtons)
         {
             downStepButton    =   createClickableButton(x + 0 * sizeButton, y, @"UI\timeline\fv-icons_playback-slow");            
             buttonStepBack    =   createClickableButton(x + 1 * sizeButton, y, @"UI\timeline\fv-icons_playback-stp-bckw");
@@ -173,8 +178,6 @@ namespace FusionUI.UI
             stepValueLabel    =        createLableFrame(x + 5 * sizeButton, y, listStepName[currentStep].Item2);
             buttonLoop        =  createToggleableButton(x + 6 * sizeButton, y, @"UI\timeline\fv-icons_playback-loop", @"UI\timeline\fv-icons_playback-loop");
 
-            buttonEnsembles   = createClickableButton(this.UnitWidth - UIConfig.UnitTimelineOffsetX - 2 * sizeButton, y, @"UI\timeline\fv-icons_ensembles");
-            buttonMinimize    = createClickableButton(this.UnitWidth - UIConfig.UnitTimelineOffsetX - 1 * sizeButton, y, @"UI\timeline\fv-icons_timeline-minimize");
 
             downStepButton.Tooltip = "Slow playback";
             buttonStepBack.Tooltip = "Jump Back";
@@ -183,8 +186,15 @@ namespace FusionUI.UI
             upStepButton.Tooltip = "Fasten playback";
             stepValueLabel.Tooltip = "Current speed";
             buttonLoop.Tooltip = "Auto replay";
-            buttonEnsembles.Tooltip = "Ensembles";
-            buttonMinimize.Tooltip = "Minimize ui";
+
+
+			if (addToolButtons)
+			{
+				buttonEnsembles = createClickableButton(this.UnitWidth - UIConfig.UnitTimelineOffsetX - 2 * sizeButton, y, @"UI\timeline\fv-icons_ensembles");
+				buttonMinimize = createClickableButton(this.UnitWidth - UIConfig.UnitTimelineOffsetX - 1 * sizeButton, y, @"UI\timeline\fv-icons_timeline-minimize");
+				buttonEnsembles.Tooltip = "Ensembles";
+				buttonMinimize.Tooltip = "Minimize ui"; 
+			}
             
             this.Resize += (sender, args) =>
             {
@@ -304,5 +314,20 @@ namespace FusionUI.UI
             timeManager.TimeStep	= TimeSpan.FromHours(stepConfig.Item1);
             stepValueLabel.Text		= stepConfig.Item2;
         }
-    }
+
+		public void AddSideLables(string lableLeftText, string lableRightText )
+		{
+			var leftTimeLineLable = new Elements.TextFormatting.FormatTextBlock(ui, 0, UIConfig.UnitTimelineHeight, 60, 6, lableLeftText, Color.Zero, this.FontHolder, 0)
+			{
+				TextAlignment = Alignment.MiddleLeft,
+			};
+			var rightTimeLineLable = new Elements.TextFormatting.FormatTextBlock(ui, this.UnitWidth - 60, UIConfig.UnitTimelineHeight, 60, 6, lableRightText, Color.Zero, this.FontHolder, 0)
+			{
+				TextAlignment = Alignment.MiddleCenter,
+			};
+			this.Add(leftTimeLineLable);
+			this.Add(rightTimeLineLable);
+
+		}
+	}
 }
