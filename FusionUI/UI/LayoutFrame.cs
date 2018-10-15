@@ -90,8 +90,22 @@ namespace FusionUI.UI
         {
             base.Add(frame);
             nodes.Add(frame);
-            UpdateResize();
-            UpdateLayout();
+
+			List<FrameAnchor> frameAnchors = new List<FrameAnchor>();
+			foreach (var child in this.Children)
+			{
+				frameAnchors.Add(child.Anchor);
+				child.Anchor = FrameAnchor.None;
+			}
+
+			UpdateResize();
+
+			foreach (var child in this.Children)
+			{
+				child.Anchor = frameAnchors[this.Children.IndexOf(child)];
+			}
+
+			UpdateLayout();
             //switch (type)
             //{
             //    case LayoutType.Vertical:
