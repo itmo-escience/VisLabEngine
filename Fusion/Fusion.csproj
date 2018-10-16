@@ -287,6 +287,8 @@
     <Compile Include="Engine\Graphics\GIS\HeightmapBatch.cs" />
     <Compile Include="Engine\Graphics\GIS\InstanceLayer.cs" />
     <Compile Include="Engine\Graphics\GIS\LasPointsCloud.cs" />
+    <Compile Include="Engine\Graphics\GIS\ScalarFieldSliceUI.cs" />
+    <Compile Include="Engine\Graphics\GIS\TextLabelGisLayer.cs" />
     <Compile Include="Engine\Graphics\GIS\VolumePointsBatch.cs" />
     <Compile Include="Engine\Graphics\GIS\MCBatch.cs" />
     <Compile Include="Engine\Graphics\GIS\PointsFbxLayer.cs" />
