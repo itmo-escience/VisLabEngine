@@ -150,7 +150,7 @@ namespace Fusion.Engine.Graphics.GIS
             set => configParameters.MaxSize = value;
         }
 
-        public float MinPointSizeValue 
+        public float MinPointSizeValue  
         {
             get => configParameters.LowSizeValue;
             set => configParameters.LowSizeValue = value;
@@ -424,8 +424,8 @@ namespace Fusion.Engine.Graphics.GIS
         }
         private Texture2D palette;
         public override void Draw(GameTime gameTime, ConstantBuffer constBuffer)
-        {                
-            Game.GraphicsDevice.GeometryShaderConstants[0] = constBuffer;   
+        {
+            Game.GraphicsDevice.GeometryShaderConstants[0] = constBuffer;
             Game.GraphicsDevice.VertexShaderConstants[0] = constBuffer;
             Game.GraphicsDevice.ComputeShaderConstants[0] = constBuffer;
             parameters.Dummy.X = 0;//(float)gameTime.Total.TotalSeconds / 100;  

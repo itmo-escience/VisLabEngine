@@ -3,6 +3,9 @@ using Fusion.Engine.Common;
 
 namespace FusionUI
 {
+    /// <summary>
+    /// Abstract instance of time-manager, for UI purposes
+    /// </summary>
     public abstract class AbstractTimeManager {
         private Game Game;
 
