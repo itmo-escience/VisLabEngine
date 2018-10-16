@@ -29,8 +29,15 @@ namespace FusionUI.UI.Elements
             set
             {                
                 _presetValues = value.ToList();
-                _presetValues.Add(MinValue);
-                _presetValues.Add(MaxValue);
+				_presetValues.Sort();
+				if (MinValue!= _presetValues.First())
+				{
+					_presetValues.Add(MinValue); 
+				}
+				if (MaxValue != _presetValues.Last())
+				{
+					_presetValues.Add(MaxValue); 
+				}
                 _presetValues.Sort();
             }
         }
