@@ -10,6 +10,13 @@ namespace Fusion.Engine.Graphics.GIS
 {
     public class TextLabelGisLayer : Gis.GisLayer
     {
+        public enum AnchorPoint
+        {
+            TopLeft,       Top,    TopRight,
+            Left,                     Right,
+            BottomLeft, Bottom, BottomRight,
+        }
+
         public class TextLabel
         {
             public DVector3 Position;
@@ -18,19 +25,25 @@ namespace Fusion.Engine.Graphics.GIS
             public string Text;
             public float Angle;
             public bool Visible = true;
+            public AnchorPoint AnchorPoint;
 
-            public TextLabel(DVector3 position, string text, Color textColor) : this(position, text, textColor, backgroundColor: Color.Zero, angle: 0) { }
+            public TextLabel(DVector3 position, string text, Color textColor) 
+                : this(position, text, textColor, backgroundColor: Color.Zero, anchorPoint: AnchorPoint.TopLeft, angle: 0) { }
 
             public TextLabel(DVector3 position, string text, Color textColor, Color backgroundColor)
-                : this(position, text, textColor, backgroundColor, angle: 0) { }
+                : this(position, text, textColor, backgroundColor, anchorPoint: AnchorPoint.TopLeft, angle: 0) { }
 
-            public TextLabel(DVector3 position, string text, Color textColor, Color backgroundColor, float angle)
+            public TextLabel(DVector3 position, string text, Color textColor, Color backgroundColor, AnchorPoint anchorPoint)
+                : this(position, text, textColor, backgroundColor, anchorPoint, angle: 0) { }
+
+            public TextLabel(DVector3 position, string text, Color textColor, Color backgroundColor, AnchorPoint anchorPoint, float angle)
             {
                 Position = position;
                 Text = text;
                 TextColor = textColor;
                 BackgroundColor = backgroundColor;
                 Angle = angle;
+                AnchorPoint = anchorPoint;
             }
         }
 
@@ -66,8 +79,40 @@ namespace Fusion.Engine.Graphics.GIS
                 
                 var textRect = _font.MeasureStringF(label.Text);
 
+                var x = screenPos.X + textRect.Width / 2;
+                var y = screenPos.Y + textRect.Height / 2;
+                switch (label.AnchorPoint)
+                {
+                    case AnchorPoint.TopLeft:
+                        break;
+                    case AnchorPoint.Top:
+                        x -= textRect.Width / 2;
+                        break;
+                    case AnchorPoint.TopRight:
+                        x -= textRect.Width;
+                        break;
+                    case AnchorPoint.BottomLeft:
+                        y -= textRect.Height;
+                        break;
+                    case AnchorPoint.Bottom:
+                        x -= textRect.Width / 2;
+                        y -= textRect.Height;
+                        break;
+                    case AnchorPoint.BottomRight:
+                        x -= textRect.Width;
+                        y -= textRect.Height;
+                        break;
+                    case AnchorPoint.Left:
+                        y -= textRect.Height / 2;
+                        break;
+                    case AnchorPoint.Right:
+                        x -= textRect.Width;
+                        y -= textRect.Height / 2;
+                        break;
+                }
+
                 _spriteLayer.DrawSprite(whiteTex, 
-                    screenPos.X, screenPos.Y, 
+                    x, y,
                     textRect.Width, textRect.Height, 
                     0, label.BackgroundColor
                 );
@@ -75,8 +120,8 @@ namespace Fusion.Engine.Graphics.GIS
                 _font.DrawString(
                     _spriteLayer,
                     label.Text,
-                    screenPos.X - textRect.Width / 2,
-                    screenPos.Y - textRect.Height / 2,
+                    x - textRect.Width / 2,
+                    y - textRect.Height / 2,
                     label.TextColor,
                     useBaseLine: false
                 );
