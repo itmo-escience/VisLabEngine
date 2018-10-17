@@ -75,8 +75,9 @@ namespace Fusion.Engine.Graphics.GIS
 		public Texture2D Texture;
 
 	    private VertexBuffer _currentBuffer;
+	    private int _initialPointsCount;
 
-		public Gis.GeoPoint[] PointsCpu { get; protected set; }
+	    public Gis.GeoPoint[] PointsCpu { get; protected set; }
 
 		public class SelectedItem : Gis.SelectedItem {}
 
@@ -90,7 +91,8 @@ namespace Fusion.Engine.Graphics.GIS
 		    TransparencyMultiplier = 1.0f;
 		    OverallColor = Color4.White;
 
-		    _isDynamic = isDynamic;
+		    _initialPointsCount = linesPointsCount;
+            _isDynamic = isDynamic;
             _shader = Game.Content.Load<Ubershader>("globe.Line.hlsl");
 			_factory = _shader.CreateFactory( typeof(LineFlags), Primitive.LineList, VertexInputElement.FromStructure<Gis.GeoPoint>(), BlendState.AlphaBlend, RasterizerState.CullNone, DepthStencilState.None);
 			_thinFactory = _shader.CreateFactory( typeof(LineFlags), Primitive.LineList, VertexInputElement.FromStructure<Gis.GeoPoint>(), BlendState.AlphaBlend, RasterizerState.CullNone, DepthStencilState.None);
@@ -151,11 +153,18 @@ namespace Fusion.Engine.Graphics.GIS
 	                    Color = lineColor,
                         Lon = g.X,
                         Lat = g.Y,
-                        Tex0 = new Vector4(height, 0, 0, 0)
+                        Tex1 = new Vector4(height, 0, 0, 0)
 	                };
 	            }).ToList();
 
             AddLine(geoPoints);
+	    }
+
+	    public void Clear()
+	    {
+	        PointsCpu = new Gis.GeoPoint[_initialPointsCount];
+
+            UpdatePointsBuffer();
 	    }
 
         public override void Draw(GameTime gameTime, ConstantBuffer constBuffer)

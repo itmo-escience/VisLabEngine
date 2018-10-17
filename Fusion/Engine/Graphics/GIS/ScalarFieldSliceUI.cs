@@ -23,17 +23,20 @@ namespace Fusion.Engine.Graphics.GIS
         public SliceUI Add(List<DVector3> XAxis, List<string> XLabels, List<DVector3> YAxis, List<string> YLabels)
         {
             var result = new SliceUI();
-            
-            //_lines.AddLine(XAxis, Color4.White);
-            for(var i = 0; i < XAxis.Count; i++)
+            result.XAxis = XAxis;
+            result.YAxis = YAxis;
+            result.AxisColor = Color4.White;
+
+            _lines.AddLine(XAxis, result.AxisColor);
+            for(var i = 0; i < XLabels.Count; i++)
             {
                 var l = _labels.AddLabel(new TextLabelGisLayer.TextLabel(XAxis[i], XLabels[i], Color.White, Color.Zero));
 
                 result.XLabels.Add(l);
             }
 
-            //_lines.AddLine(YAxis, Color4.White);
-            for (var i = 0; i < YAxis.Count; i++)
+            _lines.AddLine(YAxis, result.AxisColor);
+            for (var i = 0; i < YLabels.Count; i++)
             {
                 var l = _labels.AddLabel(new TextLabelGisLayer.TextLabel(YAxis[i], YLabels[i], Color.White, Color.Zero));
 
@@ -57,6 +60,13 @@ namespace Fusion.Engine.Graphics.GIS
             }
 
             _slices.Remove(toBeRemoved);
+
+            _lines.Clear();
+            foreach (var slice in _slices)
+            {
+                _lines.AddLine(slice.XAxis, slice.AxisColor);
+                _lines.AddLine(slice.YAxis, slice.AxisColor);
+            }
         }
 
         public override void Draw(GameTime gameTime, ConstantBuffer constBuffer)
@@ -103,6 +113,9 @@ namespace Fusion.Engine.Graphics.GIS
     {
         public List<TextLabelGisLayer.TextLabel> XLabels = new List<TextLabelGisLayer.TextLabel>();
         public List<TextLabelGisLayer.TextLabel> YLabels = new List<TextLabelGisLayer.TextLabel>();
-        public DVector3 Normal;
+
+        public List<DVector3> XAxis = new List<DVector3>();
+        public List<DVector3> YAxis = new List<DVector3>();
+        public Color4 AxisColor = Color4.White;
     }
 }
