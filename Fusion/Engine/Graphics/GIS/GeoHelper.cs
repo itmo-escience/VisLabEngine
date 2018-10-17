@@ -13,6 +13,12 @@ namespace Fusion.Engine.Graphics.GIS
 		public static readonly double EarthOneDegreeLengthOnEquatorMeters = 111152.8928;
 
 
+		public static double GetAzimuth(DVector2 p0, DVector2 p1)
+		{
+			var y = Math.Sin(p1.Y - p0.Y) * Math.Cos(p1.X);
+			var x = Math.Cos(p0.X) * Math.Sin(p1.X) - Math.Sin(p0.X) * Math.Cos(p1.X) * Math.Cos(p1.Y - p0.Y);
+			return Math.Atan2(x, y);
+		}
 
 		public static DVector2 LonLatDegToWebMercatorMet(double lon, double lat)
 		{
