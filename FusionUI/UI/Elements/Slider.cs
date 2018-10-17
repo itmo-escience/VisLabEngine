@@ -53,7 +53,7 @@ namespace FusionUI.UI.Elements
             set
             {
                 _currentValue = MathUtil.Clamp((RoundValues ? (float)Math.Round(value) : value), MinValue, MaxValue);                
-                OnChange?.Invoke(value);
+                OnChange?.Invoke(_currentValue/*value*/);
             }
         }
 
