@@ -64,8 +64,8 @@ namespace FusionUI.UI.Elements
         {
             this.emptySizeImage = emptyWidth;
             this.textureLord = lordTexture;
-            UnitHPadding = UIConfig.UnitTimelineOffsetX;    
-            Init(ui);            
+            UnitHPadding = UIConfig.UnitTimelineOffsetX;
+			Init(ui);            
         }
 
         public void initTimeValue(AbstractTimeManager timeManager)
@@ -127,7 +127,7 @@ namespace FusionUI.UI.Elements
 
             var font = ui.DefaultFont;
             var yLabel = 0;
-            timeLabelTime = new ScalableFrame(ui, LordOfTime.UnitX + LordOfTime.UnitWidth/2 - UIConfig.UnitTimelineLabelWidth/2, yLabel > 0 ? yLabel : 1.5f, UIConfig.UnitTimelineLabelWidth, font.CapHeight / ScaleMultiplier, "Time", Color.Zero)
+            timeLabelTime = new ScalableFrame(ui, LordOfTime.UnitX + LordOfTime.UnitWidth/2 - UIConfig.UnitTimelineLabelWidth/2, yLabel/* > 0 ? yLabel : 1.5f*/, UIConfig.UnitTimelineLabelWidth, font.CapHeight / ScaleMultiplier, "Time", Color.Zero)
             {
                 ForeColor = UIConfig.TimeLineColor1,
 //                Border = 1,
