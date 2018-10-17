@@ -75,8 +75,9 @@ namespace Fusion.Engine.Graphics.GIS
 		public Texture2D Texture;
 
 	    private VertexBuffer _currentBuffer;
+	    private int _initialPointsCount;
 
-		public Gis.GeoPoint[] PointsCpu { get; protected set; }
+	    public Gis.GeoPoint[] PointsCpu { get; protected set; }
 
 		public class SelectedItem : Gis.SelectedItem {}
 
@@ -90,7 +91,8 @@ namespace Fusion.Engine.Graphics.GIS
 		    TransparencyMultiplier = 1.0f;
 		    OverallColor = Color4.White;
 
-		    _isDynamic = isDynamic;
+		    _initialPointsCount = linesPointsCount;
+            _isDynamic = isDynamic;
             _shader = Game.Content.Load<Ubershader>("globe.Line.hlsl");
 			_factory = _shader.CreateFactory( typeof(LineFlags), Primitive.LineList, VertexInputElement.FromStructure<Gis.GeoPoint>(), BlendState.AlphaBlend, RasterizerState.CullNone, DepthStencilState.None);
 			_thinFactory = _shader.CreateFactory( typeof(LineFlags), Primitive.LineList, VertexInputElement.FromStructure<Gis.GeoPoint>(), BlendState.AlphaBlend, RasterizerState.CullNone, DepthStencilState.None);
@@ -117,23 +119,55 @@ namespace Fusion.Engine.Graphics.GIS
 		}
 
 	    public void AddLine(List<Gis.GeoPoint> lonLatPoints)
-	    {            
+	    {
+	        Gis.GeoPoint Clone(Gis.GeoPoint p)
+	        {
+	            return new Gis.GeoPoint {Lon = p.Lon, Lat = p.Lat, Color = p.Color, Tex0 = p.Tex0, Tex1 = p.Tex1};
+	        }
+
 	        var newPoints = new List<Gis.GeoPoint>(PointsCpu);
 
-	        newPoints.Add(new Gis.GeoPoint { Lon = lonLatPoints[0].Lon, Lat = lonLatPoints[0].Lat, Color = OverallColor });	        
+	        newPoints.Add(Clone(lonLatPoints[0]));
             for (var i = 1; i < lonLatPoints.Count - 1; i++)
-	        {
-	            newPoints.Add(new Gis.GeoPoint { Lon = lonLatPoints[i].Lon, Lat = lonLatPoints[i].Lat, Color = OverallColor });
-	            newPoints.Add(new Gis.GeoPoint { Lon = lonLatPoints[i].Lon, Lat = lonLatPoints[i].Lat, Color = OverallColor });
+            {
+                newPoints.Add(Clone(lonLatPoints[i]));
+                newPoints.Add(Clone(lonLatPoints[i]));
             }
-	        newPoints.Add(new Gis.GeoPoint { Lon = lonLatPoints[lonLatPoints.Count - 1].Lon, Lat = lonLatPoints[lonLatPoints.Count - 1].Lat, Color = OverallColor });
+	        newPoints.Add(Clone(lonLatPoints[lonLatPoints.Count - 1]));
 
             PointsCpu = newPoints.ToArray();
 
             UpdatePointsBuffer();
 	    }
 
-		public override void Draw(GameTime gameTime, ConstantBuffer constBuffer)
+	    public void AddLine(List<DVector3> cartPoints, Color4 lineColor)
+	    {
+	        var geoPoints = cartPoints
+	            .Select(p =>
+	            {
+	                var height = (float) (p.Length() - GeoHelper.EarthRadius);
+                    var g = GeoHelper.CartesianToSpherical(p.Normalized() * GeoHelper.EarthRadius);
+                    
+	                return new Gis.GeoPoint
+	                {
+	                    Color = lineColor,
+                        Lon = g.X,
+                        Lat = g.Y,
+                        Tex1 = new Vector4(height, 0, 0, 0)
+	                };
+	            }).ToList();
+
+            AddLine(geoPoints);
+	    }
+
+	    public void Clear()
+	    {
+	        PointsCpu = new Gis.GeoPoint[_initialPointsCount];
+
+            UpdatePointsBuffer();
+	    }
+
+        public override void Draw(GameTime gameTime, ConstantBuffer constBuffer)
 		{
 			var dev = Game.GraphicsDevice;
 

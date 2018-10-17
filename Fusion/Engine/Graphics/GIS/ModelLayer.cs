@@ -57,6 +57,7 @@ namespace Fusion.Engine.Graphics.GIS
 
 		public DVector3 CartesianPos { get; protected set; }
 		public DVector2 LonLatPosition;
+	    public double Height = 0; 
 
 		private Matrix			modelRotationMatrix;
 
@@ -153,7 +154,7 @@ namespace Fusion.Engine.Graphics.GIS
 			var dev = Game.GraphicsDevice;
 			var gis = Game.RenderSystem.Gis;
 
-			CartesianPos = GeoHelper.SphericalToCartesian(DMathUtil.DegreesToRadians(LonLatPosition), gis.Camera.EarthRadius);
+			CartesianPos = GeoHelper.SphericalToCartesian(DMathUtil.DegreesToRadians(LonLatPosition), gis.Camera.EarthRadius + Height);
 
 			var viewPosition	= CartesianPos - gis.Camera.FinalCamPosition;
 
