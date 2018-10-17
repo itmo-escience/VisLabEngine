@@ -47,7 +47,7 @@ namespace Fusion.Engine.Graphics.GIS
             }
         }
 
-        public double MaxVisibleDistance = 1000;
+        public double MaxVisibleDistance = 1500;
 
         private readonly SpriteFont _font;
         private readonly SpriteLayer _spriteLayer;

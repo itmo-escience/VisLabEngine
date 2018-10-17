@@ -254,6 +254,7 @@
     <Compile Include="Engine\Graphics\Effects\SsaoFilter.Config.cs" />
     <Compile Include="Engine\Graphics\GIS\BuildingsLayer.cs" />
     <Compile Include="Engine\Graphics\GIS\CartesianPoints.cs" />
+    <Compile Include="Engine\Graphics\GIS\CartesianLineLayer.cs" />
     <Compile Include="Engine\Graphics\GIS\Concurrent\ElementPool.cs" />
     <Compile Include="Engine\Graphics\GIS\Concurrent\JobHelper.cs" />
     <Compile Include="Engine\Graphics\GIS\Concurrent\MessageQueue.cs" />

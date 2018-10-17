@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using Fusion.Core.Mathematics;
 using Fusion.Drivers.Graphics;
 using Fusion.Engine.Common;
@@ -21,21 +20,22 @@ namespace Fusion.Engine.Graphics.GIS
             _labels = new TextLabelGisLayer(engine, labelFont, layer, camera);
         }
 
-        public SliceUI Add(List<Tuple<DVector3, string>> XAxis, List<Tuple<DVector3, string>> YAxis)
+        public SliceUI Add(List<DVector3> XAxis, List<string> XLabels, List<DVector3> YAxis, List<string> YLabels)
         {
             var result = new SliceUI();
             
-            //_lines.AddLine(XAxis);
-            foreach (var p in XAxis)
+            //_lines.AddLine(XAxis, Color4.White);
+            for(var i = 0; i < XAxis.Count; i++)
             {
-                var l = _labels.AddLabel(new TextLabelGisLayer.TextLabel(p.Item1, p.Item2, Color.White, Color.Zero));
+                var l = _labels.AddLabel(new TextLabelGisLayer.TextLabel(XAxis[i], XLabels[i], Color.White, Color.Zero));
 
                 result.XLabels.Add(l);
             }
 
-            foreach (var p in YAxis)
+            //_lines.AddLine(YAxis, Color4.White);
+            for (var i = 0; i < YAxis.Count; i++)
             {
-                var l = _labels.AddLabel(new TextLabelGisLayer.TextLabel(p.Item1, p.Item2, Color.White, Color.Zero));
+                var l = _labels.AddLabel(new TextLabelGisLayer.TextLabel(YAxis[i], YLabels[i], Color.White, Color.Zero));
 
                 result.YLabels.Add(l);
             }
