@@ -65,9 +65,12 @@ namespace Fusion.Engine.Graphics.GIS
         {
             _spriteLayer.Clear();
 
+            var viewport = _camera.Viewport.Bounds;
+
             var whiteTex = Game.RenderSystem.WhiteTexture;
             var sortedLabels = _labels
                 .Where(l => l.Visible)
+                .Where(l => viewport.Contains(GetBoundingRect(l)))
                 .Select(l => new Tuple<TextLabel, double>(l, (l.Position - _camera.FinalCamPosition).Length()))
                 .Where(t => t.Item2 < MaxVisibleDistance)
                 .OrderBy(t => -t.Item2)
@@ -75,53 +78,19 @@ namespace Fusion.Engine.Graphics.GIS
 
             foreach (var label in sortedLabels)
             {
-                var screenPos = _camera.CartesianToScreen(label.Position);
-                
-                var textRect = _font.MeasureStringF(label.Text);
-
-                var x = screenPos.X + textRect.Width / 2;
-                var y = screenPos.Y + textRect.Height / 2;
-                switch (label.AnchorPoint)
-                {
-                    case AnchorPoint.TopLeft:
-                        break;
-                    case AnchorPoint.Top:
-                        x -= textRect.Width / 2;
-                        break;
-                    case AnchorPoint.TopRight:
-                        x -= textRect.Width;
-                        break;
-                    case AnchorPoint.BottomLeft:
-                        y -= textRect.Height;
-                        break;
-                    case AnchorPoint.Bottom:
-                        x -= textRect.Width / 2;
-                        y -= textRect.Height;
-                        break;
-                    case AnchorPoint.BottomRight:
-                        x -= textRect.Width;
-                        y -= textRect.Height;
-                        break;
-                    case AnchorPoint.Left:
-                        y -= textRect.Height / 2;
-                        break;
-                    case AnchorPoint.Right:
-                        x -= textRect.Width;
-                        y -= textRect.Height / 2;
-                        break;
-                }
+                var rect = GetBoundingRect(label);                
 
                 _spriteLayer.DrawSprite(whiteTex, 
-                    x, y,
-                    textRect.Width, textRect.Height, 
+                    rect.X + rect.Width / 2, rect.Y + rect.Height / 2,
+                    rect.Width, rect.Height, 
                     0, label.BackgroundColor
                 );
 
                 _font.DrawString(
                     _spriteLayer,
                     label.Text,
-                    x - textRect.Width / 2,
-                    y - textRect.Height / 2,
+                    rect.X,
+                    rect.Y,
                     label.TextColor,
                     useBaseLine: false
                 );
@@ -151,6 +120,47 @@ namespace Fusion.Engine.Graphics.GIS
         public void Clear()
         {
             _labels.Clear();
+        }
+
+        public Rectangle GetBoundingRect(TextLabel label)
+        {
+            var screenPos = _camera.CartesianToScreen(label.Position);
+
+            var textRect = _font.MeasureStringF(label.Text);
+
+            var x = screenPos.X;
+            var y = screenPos.Y;
+            switch (label.AnchorPoint)
+            {
+                case AnchorPoint.TopLeft:
+                    break;
+                case AnchorPoint.Top:
+                    x -= textRect.Width / 2;
+                    break;
+                case AnchorPoint.TopRight:
+                    x -= textRect.Width;
+                    break;
+                case AnchorPoint.BottomLeft:
+                    y -= textRect.Height;
+                    break;
+                case AnchorPoint.Bottom:
+                    x -= textRect.Width / 2;
+                    y -= textRect.Height;
+                    break;
+                case AnchorPoint.BottomRight:
+                    x -= textRect.Width;
+                    y -= textRect.Height;
+                    break;
+                case AnchorPoint.Left:
+                    y -= textRect.Height / 2;
+                    break;
+                case AnchorPoint.Right:
+                    x -= textRect.Width;
+                    y -= textRect.Height / 2;
+                    break;
+            }
+
+            return new Rectangle((int) x, (int) y, (int) textRect.Width, (int) textRect.Height);
         }
     }
 }
