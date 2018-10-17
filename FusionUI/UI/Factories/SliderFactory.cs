@@ -131,23 +131,26 @@ namespace FusionUI.UI.Factories
             ScalableFrame parent, string label,
             Action<float> changeAction, float min, float max, float initValue, out Slider slider,
             bool minMaxSelector = false, string imageSlider = null,
-            bool IsVertical = false, bool showValue = true, Alignment labelAlignment = Alignment.TopCenter, bool percent = false, Color? labelBackColor = null)
+            bool IsVertical = false, bool showValue = true, Alignment labelAlignment = Alignment.TopCenter, bool percent = false, Color? labelBackColor = null, bool isLabelNeeded = true)
         {
             var sizeLabel = UIConfig.FontBody[1].MeasureString(ScalableFrame.TryGetText(label));
 
             UIContainer<Slider> holder = new UIContainer<Slider>(ui, parent.UnitPaddingLeft, 0, parent.UnitWidth - parent.UnitPaddingLeft - parent.UnitPaddingRight, sizeLabel.Height / ApplicationInterface.gridUnitDefault + height + OffsetY, "", Color.Zero)
             {
             };
-            
 
-            ScalableFrame labelFrame = new FormatTextBlock(ui, OffsetX, OffsetY, holder.UnitWidth, (sizeLabel.Height) /ApplicationInterface.gridUnitDefault, label, labelBackColor ?? Color.Zero, UIConfig.FontBody, 0)
-            {
-                TextAlignment = labelAlignment,
-                //UnitTextOffsetY = 4,
-                FontHolder = UIConfig.FontBody,                                    
-            };
+			ScalableFrame labelFrame = null;
+			if (isLabelNeeded)
+			{
+				labelFrame = new FormatTextBlock(ui, OffsetX, OffsetY, holder.UnitWidth, (sizeLabel.Height) / ApplicationInterface.gridUnitDefault, label, labelBackColor ?? Color.Zero, UIConfig.FontBody, 0)
+				{
+					TextAlignment = labelAlignment,
+					//UnitTextOffsetY = 4,
+					FontHolder = UIConfig.FontBody,
+				}; 
+			}
 
-            slider = new Slider(ui, OffsetX, labelFrame.UnitHeight + OffsetY, holder.UnitWidth, height, "", Color.Zero)
+            slider = new Slider(ui, OffsetX, labelFrame?.UnitHeight??0 + OffsetY, holder.UnitWidth, height, "", Color.Zero)
             {
                 backColorForSlider = ColorConstant.BackColorForSlider,
                 ForeColor = ColorConstant.ForeColor,
@@ -162,7 +165,7 @@ namespace FusionUI.UI.Factories
                 Image = ui.Game.Content.Load<DiscTexture>(imageSlider ?? @"UI-new\fv-icons_slider"),
                 IsVertical = IsVertical,                
             };
-            holder.UnitHeight = labelFrame.UnitHeight + slider.UnitHeight;
+            holder.UnitHeight = labelFrame?.UnitHeight??0 + slider.UnitHeight;
             if (showValue)
             {
                 ScalableFrame valueFrame = new ScalableFrame(ui, OffsetX, OffsetY, holder.UnitWidth - 2 * OffsetX,
@@ -185,7 +188,10 @@ namespace FusionUI.UI.Factories
             }
 
             slider.OnChange += changeAction;
-            holder.Add(labelFrame);
+			if (labelFrame!=null)
+			{
+				holder.Add(labelFrame); 
+			}
             holder.Add(slider);
             holder.Item = slider;
 

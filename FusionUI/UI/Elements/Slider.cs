@@ -29,8 +29,15 @@ namespace FusionUI.UI.Elements
             set
             {                
                 _presetValues = value.ToList();
-                _presetValues.Add(MinValue);
-                _presetValues.Add(MaxValue);
+				_presetValues.Sort();
+				if (MinValue!= _presetValues.First())
+				{
+					_presetValues.Add(MinValue); 
+				}
+				if (MaxValue != _presetValues.Last())
+				{
+					_presetValues.Add(MaxValue); 
+				}
                 _presetValues.Sort();
             }
         }
@@ -46,7 +53,7 @@ namespace FusionUI.UI.Elements
             set
             {
                 _currentValue = MathUtil.Clamp((RoundValues ? (float)Math.Round(value) : value), MinValue, MaxValue);                
-                OnChange?.Invoke(value);
+                OnChange?.Invoke(_currentValue/*value*/);
             }
         }
 

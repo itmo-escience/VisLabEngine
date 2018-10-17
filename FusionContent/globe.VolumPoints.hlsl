@@ -194,9 +194,9 @@ float3 random3( float3 p )
         2.665144142690225, // 2^sqrt(2) (Gelfondâ€“Schneider constant)
 		1.0f
     );
-    return float3(frac( cos( dot(p,K1) + Field.Dummy.x * 0.000165146) * 12345.6789 ),
-				  frac( cos( dot(p,K1.xzy) + Field.Dummy.x * 0.000198786 ) * 32498.4984 ),
- 				  frac( cos( dot(p,K1.yxz) + Field.Dummy.x * 0.000261464) * 15644.4897 )) % float3(1, 1, 1);
+    return float3(frac( (dot(p,K1.xyz) + cos( Field.Dummy.x * 0.000165146)) * 12345.6789 ),
+				  frac( (dot(p,K1.xzy) + cos( Field.Dummy.x * 0.000198786)) * 32498.4984 ),
+ 				  frac( (dot(p,K1.yxz) + cos( Field.Dummy.x * 0.000261464)) * 15644.4897 ));
 }
 #ifdef Draw_points
 VS_OUTPUT VSMain ( uint vertInd : SV_VertexID )
@@ -218,6 +218,7 @@ void GSMain ( point VS_OUTPUT inputArray[1], inout TriangleStream<GS_OUTPUT> str
 	float vz = lerp(minV, maxV, xyz.z/float(Field.Dimension.z));
 	float zLerp = 0;
 	float zInd = 0;
+	
 	[unroll(32)]
 	for (uint i = 0; i < Field.Dimension.w; i++) {
 		if (FieldDepths[i] > vz) {
@@ -238,7 +239,7 @@ void GSMain ( point VS_OUTPUT inputArray[1], inout TriangleStream<GS_OUTPUT> str
 	#endif
 	//if (f < 0) return; // ignore null values
 	
-	if (f >= 0 || f < 0) {
+	if ((f >= 0) && vz <= FieldDepths[Field.Dimension.w - 1]) {
 	//if (1) {
 		GS_OUTPUT output = (GS_OUTPUT)0 ;		
 		double3 cameraPos =  double3(asdouble(Stage.CameraX[0], Stage.CameraX[1]), asdouble(Stage.CameraY[0], Stage.CameraY[1]), asdouble(Stage.CameraZ[0], Stage.CameraZ[1]));
