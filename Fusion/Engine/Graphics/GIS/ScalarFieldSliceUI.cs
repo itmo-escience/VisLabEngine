@@ -28,14 +28,14 @@ namespace Fusion.Engine.Graphics.GIS
             //_lines.AddLine(XAxis);
             foreach (var p in XAxis)
             {
-                var l = _labels.AddLabel(new TextLabelGisLayer.TextLabel(p.Item1, p.Item2, Color.White, Color.Black));
+                var l = _labels.AddLabel(new TextLabelGisLayer.TextLabel(p.Item1, p.Item2, Color.White, Color.Zero));
 
                 result.XLabels.Add(l);
             }
 
             foreach (var p in YAxis)
             {
-                var l = _labels.AddLabel(new TextLabelGisLayer.TextLabel(p.Item1, p.Item2, Color.White, Color.Black));
+                var l = _labels.AddLabel(new TextLabelGisLayer.TextLabel(p.Item1, p.Item2, Color.White, Color.Zero));
 
                 result.YLabels.Add(l);
             }
