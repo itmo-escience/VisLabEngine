@@ -126,6 +126,7 @@ namespace FusionUI.UI.Elements.TextFormatting
                 Resource, //[r] [/r]
                 NoTag, //[notag][nobb] [notag][/nobb]
                 Break, //[break]
+                Column, //[Column=###]
                 Unsupported,
             }
 
@@ -192,6 +193,14 @@ namespace FusionUI.UI.Elements.TextFormatting
                     Type = TagType.Alignment;
                     OpenString = "align";
                     Param = s.Substring(6);
+                    return;
+                }
+
+                if (s.StartsWith("column", StringComparison.OrdinalIgnoreCase))
+                {
+                    Type = TagType.Column;
+                    OpenString = "column";
+                    Param = s.Substring(7);
                     return;
                 }
 

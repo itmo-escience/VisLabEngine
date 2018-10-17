@@ -56,6 +56,7 @@ namespace FusionUI.UI.Elements.TextFormatting
                 textWidth = 0;
                 var height = 0;
                 string stp = "";
+                int column = 0;
                 foreach (var word in Words)
                 {
                     if (Tag.IsTag(word))
@@ -76,9 +77,13 @@ namespace FusionUI.UI.Elements.TextFormatting
                                     var img = block.ImageCache[tagStack.Peek().Param];
                                     Rect = new Rectangle(0, 0, block.Width, block.Width * img.Height / img.Width);
                                     return;
-                                }                                
+                                }
                             }
-
+                        }else if (new Tag(word).Type == Tag.TagType.Column)
+                        {
+                            var t = new Tag(word);                            
+                            textWidth = Math.Max(int.Parse(t.Param), textWidth);
+                            column = int.Parse(t.Param);
                         } else 
                         {
                             tagStack.Push(new Tag(word));
@@ -137,6 +142,32 @@ namespace FusionUI.UI.Elements.TextFormatting
             public IEnumerable<string> TagWords => Words.Where(a => Tag.IsTag(a));
         }
 
+        public override float UnitPaddingLeft
+        {
+            get { return base.UnitPaddingLeft;  }
+            set { base.UnitPaddingLeft = value; Dirty = true; }
+        }
+
+        public override float UnitPaddingRight
+        {
+            get { return base.UnitPaddingRight; }
+            set { base.UnitPaddingRight = value; Dirty = true; }
+        }
+
+        public override float UnitPaddingTop
+        {
+            get { return base.UnitPaddingTop; }
+            set { base.UnitPaddingTop = value; Dirty = true; }
+        }
+
+        public override float UnitPaddingBottom
+        {
+            get { return base.UnitPaddingBottom; }
+            set { base.UnitPaddingBottom = value;
+                Dirty = true;
+            }
+        }
+
         private List<SingleString> strings;
 
         public string DefaultAlignment = "left";
@@ -146,10 +177,11 @@ namespace FusionUI.UI.Elements.TextFormatting
         public Dictionary<string, Texture> ImageCache;
 
         private int lastWidth = 0;
-
+        public bool Dirty = false;
         protected override void splitByString()
         {
-            if (LastText == Text && strings != null && lastWidth == this.Width|| Text == null ) return;
+            if ((LastText == Text && strings != null && lastWidth == this.Width|| Text == null) && !Dirty ) return;
+            Dirty = false;
             MaxLineWidth = 0;
             lastWidth = this.Width;
             ImageCache = new Dictionary<string, Texture>();
@@ -162,7 +194,8 @@ namespace FusionUI.UI.Elements.TextFormatting
             SpriteFont currentFont = GetFont(tagStack);
             Tag lastTag;
             float Width = this.Width - PaddingLeft - PaddingRight;
-            //string align = DefaultAlignment;            
+            //string align = DefaultAlignment;        
+            float columnOffset = 0;
             for (int i = 0; i < Text.Length; i++)
             {
                 if (Text[i] == '[')
@@ -171,12 +204,13 @@ namespace FusionUI.UI.Elements.TextFormatting
                     if (width > Width - 10)
                     {
                         strings.Add(currentString);
-                        width = 0;
+                        width = columnOffset;
                         currentString.Prepare();
                         currentString = new SingleString(this)
                         {
                             InTags = (TagStack)tagStack.Clone() ?? new TagStack(),
                         };
+                        currentString.AddWord($"[column={columnOffset}]");
                     }
 
                     if (!string.IsNullOrWhiteSpace(currentWord))
@@ -205,9 +239,10 @@ namespace FusionUI.UI.Elements.TextFormatting
                             tag.Type == Tag.TagType.Alignment)
                         {
                             currentString.AddWord("\n");
-                            strings.Add(currentString);                            
+                            strings.Add(currentString);
                             //tagStack.Push(tag);
-                            width = 0;
+                            columnOffset = 0;
+                            width = columnOffset;
                             currentString.Prepare();
                             currentString = new SingleString(this)
                             {
@@ -238,7 +273,8 @@ namespace FusionUI.UI.Elements.TextFormatting
                                     //currentString.AddWord("\n");
                                     strings.Add(currentString);
                                     tagStack.Push(tag);
-                                    width = 0;
+                                    columnOffset = 0;
+                                    width = columnOffset;
                                     currentString.Prepare();
                                     currentString = new SingleString(this)
                                     {
@@ -299,7 +335,8 @@ namespace FusionUI.UI.Elements.TextFormatting
                                         }
                                     }, null);
                                 }, null);
-                                width = 0;
+                                columnOffset = 0;
+                                width = columnOffset;
                                 currentString.InTags = currentString.InTags ?? new TagStack();
                                 currentString.AddWord("\n");
                                 strings.Add(currentString);
@@ -328,6 +365,11 @@ namespace FusionUI.UI.Elements.TextFormatting
                             else
                             {
                                 currentString.AddWord(s);
+                                if (tag.Type == Tag.TagType.Column)
+                                {
+                                    width = Math.Max(int.Parse(tag.Param), width);
+                                    columnOffset = int.Parse(tag.Param);
+                                }
                                 tagStack.Push(tag);
                             }
                         }
@@ -338,7 +380,8 @@ namespace FusionUI.UI.Elements.TextFormatting
                                 DefaultAlignment, StringComparison.OrdinalIgnoreCase))
                             {
                                 strings.Add(currentString);
-                                width = 0;
+                                columnOffset = 0;
+                                width = columnOffset;
                                 currentString.Prepare();
                                 currentString = new SingleString(this)
                                 {
@@ -360,20 +403,20 @@ namespace FusionUI.UI.Elements.TextFormatting
                     if (width > Width - 10)
                     {
                         strings.Add(currentString);
-                        width = currentFont.MeasureString(currentWord + " ").Width;
+                        width = columnOffset + currentFont.MeasureString(currentWord + " ").Width;
                         ;
                         currentString.Prepare();
                         currentString = new SingleString(this)
                         {
                             InTags = (TagStack)tagStack.Clone() ?? new TagStack(),
                         };
-                    }
-
+                    }                    
                     currentString.AddWord(currentWord);
                     currentWord = "";
                     currentString.AddWord("\n");
                     strings.Add(currentString);
-                    width = 0;
+                    columnOffset = 0;
+                    width = columnOffset;
                     currentString.Prepare();
                     currentString = new SingleString(this)
                     {
@@ -389,7 +432,7 @@ namespace FusionUI.UI.Elements.TextFormatting
                     if (width > Width - 10)
                     {
                         strings.Add(currentString);
-                        width = currentFont.MeasureString(currentWord + " ").Width;
+                        width = columnOffset + currentFont.MeasureString(currentWord + " ").Width;
                         ;
                         currentString.Prepare();
                         currentString = new SingleString(this)
@@ -397,7 +440,7 @@ namespace FusionUI.UI.Elements.TextFormatting
                             InTags = (TagStack)tagStack.Clone() ?? new TagStack(),
                         };
                     }
-
+                    currentString.AddWord($"[column={columnOffset}]");
                     currentString.AddWord(currentWord);
                     currentString.AddWord(" ");
                     currentWord = "";
@@ -414,15 +457,14 @@ namespace FusionUI.UI.Elements.TextFormatting
                 if (width > Width - 10)
                 {
                     strings.Add(currentString);
-                    width = currentFont.MeasureString(currentWord + " ").Width;
-                    ;
+                    width = columnOffset + currentFont.MeasureString(currentWord + " ").Width;
                     currentString.Prepare();
                     currentString = new SingleString(this)
                     {
                         InTags = (TagStack)tagStack.Clone() ?? new TagStack(),
                     };
                 }
-
+                currentString.AddWord($"[column={columnOffset}]");
                 currentString.AddWord(currentWord);
                 currentString.AddWord(" ");
                 currentWord = "";
@@ -589,7 +631,7 @@ namespace FusionUI.UI.Elements.TextFormatting
 
                     if (alignment == "center")
                     {
-                        xOffset = (int) (Width - textWidth) / 2;
+                        xOffset = (int) (Width - PaddingLeft - PaddingRight - textWidth) / 2;
                     }
 
                     xOffset += PaddingLeft;
@@ -629,6 +671,12 @@ namespace FusionUI.UI.Elements.TextFormatting
                                             this.GlobalRectangle.Y + textOffset - r.Bottom + height, currentColor,
                                             clipRectIndex, 0, false);
                                     }
+                                }
+                                else if (tagStack.Peek()?.Type == Tag.TagType.Column)
+                                {
+                                    var tag = new Tag(word);
+                                    var p = int.Parse(tag.Param);
+                                    xOffset = Math.Max(p, xOffset);
                                 }
                                 else
                                 {
