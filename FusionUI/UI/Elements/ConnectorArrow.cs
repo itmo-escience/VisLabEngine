@@ -8,6 +8,7 @@ using Fusion.Drivers.Graphics;
 using Fusion.Engine.Common;
 using Fusion.Engine.Frames;
 using Fusion.Engine.Graphics;
+using Fusion.Engine.Graphics.GIS.GlobeMath;
 
 namespace FusionUI.UI.Elements
 {
@@ -53,13 +54,24 @@ namespace FusionUI.UI.Elements
 
         public bool IsStraight = false;
 
+        public bool DoStraighten
+        {
+            set
+            {
+                DoStraightenFrom = value;
+                DoStraightenTo = value;
+            }
+        }
+        public bool DoStraightenFrom = true;
+        public bool DoStraightenTo = true;
+
         public bool IsAnimation = false;
         public float AnimVelocityMult = 2f;
         public float GlobalAnimvelocity = 50;
         private float animProgress = 0;
 
 
-        public static float ArrowSpread = 20;
+        public float ArrowSpread = 20;
         private static int Index = 0;
         private int myIndex = Index++;
 
@@ -71,8 +83,7 @@ namespace FusionUI.UI.Elements
             FromFrame = from;
             ToFrame = to;
             ArrowWidth = width;
-            ArrowPointerSize = arrowSize;
-
+            ArrowPointerSize = arrowSize;            
             ArrowController.Instance.AddArrow(this);
         }
        
@@ -166,27 +177,58 @@ namespace FusionUI.UI.Elements
                 .OutArrowsByFrame[ToFrame]
                 .Where(a => a.outDirection == inDirection)
                 ).OrderBy(a => a.myIndex).Where(a => !(a.ToFrame == FromFrame && a.FromFrame == ToFrame)).ToList();
+
+            float startSpread = DoStraightenFrom ? ((outDirection % 2 == 1) ? FromFrame.Height - ArrowPointerSize: FromFrame.Width -ArrowPointerSize): ArrowSpread;
+            float endSpread = DoStraightenTo ? ((inDirection % 2 == 1) ? ToFrame.Height - ArrowPointerSize: ToFrame.Width - ArrowPointerSize) : ArrowSpread;
             if (startArrows.Count() > 1)
             {
+                if (DoStraightenFrom) startSpread /= startArrows.Count;
                 if (outDirection % 2 == 1)
-                {
-                    start.Y = FromFrame.GlobalRectangle.Center.Y - ArrowSpread * ((float)(startArrows.Count - 1) / 2 - startArrows.IndexOf(this));
+                {                    
+                    start.Y = FromFrame.GlobalRectangle.Center.Y - startSpread * ((float)(startArrows.Count - 1) / 2 - startArrows.IndexOf(this));                    
+
                 }
                 else
                 {
-                    start.X = FromFrame.GlobalRectangle.Center.X - ArrowSpread * ((float)(startArrows.Count - 1) / 2 - startArrows.IndexOf(this));
+                    start.X = FromFrame.GlobalRectangle.Center.X - startSpread * ((float)(startArrows.Count - 1) / 2 - startArrows.IndexOf(this));
                 }
             }
 
             if (endarrows.Count() > 1)
             {
+                if (DoStraightenTo) endSpread /= endarrows.Count;
                 if (inDirection % 2 == 1)
                 {
-                    end.Y = ToFrame.GlobalRectangle.Center.Y - ArrowSpread * ((float)(endarrows.Count - 1) / 2 - endarrows.IndexOf(this));
+                    end.Y = ToFrame.GlobalRectangle.Center.Y - endSpread * ((float)(endarrows.Count - 1) / 2 - endarrows.IndexOf(this));
                 }
                 else
                 {
-                    end.X = ToFrame.GlobalRectangle.Center.X - ArrowSpread * ((float)(endarrows.Count - 1) / 2 - endarrows.IndexOf(this));
+                    end.X = ToFrame.GlobalRectangle.Center.X - endSpread * ((float)(endarrows.Count - 1) / 2 - endarrows.IndexOf(this));
+                }
+            }
+
+            if (DoStraightenFrom)
+            {
+                if (outDirection % 2 == 1)
+                {
+                    start.Y = (int) DMathUtil.Clamp(end.Y, start.Y - startSpread / 2, start.Y + startSpread / 2);
+                }
+                else
+                {
+                    start.X = (int) DMathUtil.Clamp(end.X, start.X - startSpread / 2, start.X + startSpread / 2);
+                }
+            }
+
+            if (DoStraightenTo)
+            {
+
+                if (inDirection % 2 == 1)
+                {
+                    end.Y = (int) DMathUtil.Clamp(start.Y, end.Y - endSpread / 2, end.Y + endSpread / 2);
+                }
+                else
+                {
+                    end.X = (int) DMathUtil.Clamp(start.X, end.X - endSpread / 2, end.X + endSpread / 2);
                 }
             }
 
@@ -206,8 +248,8 @@ namespace FusionUI.UI.Elements
                 var d2 = end - center;
                 float l1 = d1.Length(), l2 = d2.Length();
                 d1.Normalize(); d2.Normalize();
-                DrawLine(spriteLayer, whiteTex, start + d1 * ArrowPointerSize / 2, center, BackColor, ArrowWidth);
-                DrawLine(spriteLayer, whiteTex, center, end - d2 * ArrowPointerSize / 2, BackColor, ArrowWidth);
+                DrawLine(spriteLayer, whiteTex, start + d1 * ArrowPointerSize / 4, center, BackColor, ArrowWidth);
+                DrawLine(spriteLayer, whiteTex, center, end - d2 * ArrowPointerSize / 4, BackColor, ArrowWidth);
                 if (IsAnimation)
                 {
                     float length = l1 + l2;
@@ -282,9 +324,9 @@ namespace FusionUI.UI.Elements
                         }
                     }
                 }
-                DrawLine(spriteLayer,whiteTex, start + d1 * ArrowPointerSize / 2, center1, BackColor, ArrowWidth);
+                DrawLine(spriteLayer,whiteTex, start + d1 * ArrowPointerSize / 4, center1, BackColor, ArrowWidth);
                 DrawLine(spriteLayer,whiteTex, center1, center2, BackColor, ArrowWidth);
-                DrawLine(spriteLayer,whiteTex, center2, end - d3 * ArrowPointerSize / 2, BackColor, ArrowWidth);
+                DrawLine(spriteLayer,whiteTex, center2, end - d3 * ArrowPointerSize / 4, BackColor, ArrowWidth);
             }
             else if (!IsStraight)
             {
@@ -342,9 +384,9 @@ namespace FusionUI.UI.Elements
                     }
                 }
 
-                DrawLine(spriteLayer,whiteTex, start + d1 * ArrowPointerSize / 2, center1, BackColor, ArrowWidth);
+                DrawLine(spriteLayer,whiteTex, start + d1 * ArrowPointerSize / 4, center1, BackColor, ArrowWidth);
                 DrawLine(spriteLayer,whiteTex, center1, center2, BackColor, ArrowWidth);
-                DrawLine(spriteLayer,whiteTex, center2, end - d3 * ArrowPointerSize / 2, BackColor, ArrowWidth);
+                DrawLine(spriteLayer,whiteTex, center2, end - d3 * ArrowPointerSize / 4, BackColor, ArrowWidth);
             }
             else
             {
@@ -371,7 +413,7 @@ namespace FusionUI.UI.Elements
 
                 //    Font.DrawString(spriteLayer, Text, (start + offset * d).X, (start + offset * d).Y, UIConfig.ActiveTextColor);
                 //}
-                DrawLine(spriteLayer,whiteTex, start + d * ArrowPointerSize / 2, end - d * ArrowPointerSize / 2, BackColor, ArrowWidth);
+                DrawLine(spriteLayer,whiteTex, start + d * ArrowPointerSize / 4, end - d * ArrowPointerSize / 4, BackColor, ArrowWidth);
             }
                         
 
