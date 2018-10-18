@@ -25,11 +25,23 @@ namespace Fusion.Engine.Graphics.GIS
         public SliceUI Add(List<DVector3> XAxis, List<string> XLabels, List<DVector3> YAxis, List<string> YLabels)
         {
             var result = new SliceUI();
-            result.XAxis = XAxis;
-            result.YAxis = YAxis;
             result.AxisColor = Color4.White;
 
-            _lines.AddLine(XAxis, result.AxisColor);
+            var xLineWithTicks = new List<DVector3>();
+            xLineWithTicks.Add(XAxis[0]);
+            for (var i = 1; i < XAxis.Count - 1; i++)
+            {
+                xLineWithTicks.Add(XAxis[i]);
+
+                var s = GeoHelper.CartesianToSpherical(XAxis[i]);
+                var t = GeoHelper.SphericalToCartesian(s, GeoHelper.EarthRadius + 4);
+                xLineWithTicks.Add(t);
+
+                xLineWithTicks.Add(XAxis[i]);
+            }
+            xLineWithTicks.Add(XAxis[XAxis.Count - 1]);
+            result.XAxis = xLineWithTicks;
+
             for(var i = 0; i < XLabels.Count; i++)
             {
                 var l = _labels.AddLabel(new TextLabelGisLayer.TextLabel(XAxis[i], XLabels[i], Color.White, Color.Zero));
@@ -37,13 +49,21 @@ namespace Fusion.Engine.Graphics.GIS
                 result.XLabels.Add(l);
             }
 
-            _lines.AddLine(YAxis, result.AxisColor);
+            var yLineWithTicks = new List<DVector3>();
+            var padding = (XAxis[0] - XAxis[1]).Normalized() * 3;
             for (var i = 0; i < YLabels.Count; i++)
             {
-                var l = _labels.AddLabel(new TextLabelGisLayer.TextLabel(YAxis[i], YLabels[i], Color.White, Color.Zero));
+                var l = _labels.AddLabel(new TextLabelGisLayer.TextLabel(YAxis[i] + padding, YLabels[i], Color.White, Color.Zero));
 
                 result.YLabels.Add(l);
+                yLineWithTicks.Add(YAxis[i]);
+                yLineWithTicks.Add(YAxis[i] - padding / 2);
+                yLineWithTicks.Add(YAxis[i]);
             }
+            result.YAxis = yLineWithTicks;
+
+            _lines.AddLine(result.XAxis, result.AxisColor);
+            _lines.AddLine(result.YAxis, result.AxisColor);
 
             _slices.Add(result);
             return result;
@@ -91,8 +111,8 @@ namespace Fusion.Engine.Graphics.GIS
                 foreach (var label in slice.YLabels)
                 {
                     label.AnchorPoint = showYLabelsAtLeft
-                        ? TextLabelGisLayer.AnchorPoint.BottomLeft
-                        : TextLabelGisLayer.AnchorPoint.BottomRight;
+                        ? TextLabelGisLayer.AnchorPoint.Left
+                        : TextLabelGisLayer.AnchorPoint.Right;
                 }
             }
 
