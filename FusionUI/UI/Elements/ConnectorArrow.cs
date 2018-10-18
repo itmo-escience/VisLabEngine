@@ -71,7 +71,7 @@ namespace FusionUI.UI.Elements
         private float animProgress = 0;
 
 
-        public float ArrowSpread = 20;
+        public static float ArrowSpread = 20;
         private static int Index = 0;
         private int myIndex = Index++;
 
