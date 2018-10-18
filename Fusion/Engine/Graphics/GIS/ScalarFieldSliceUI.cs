@@ -9,7 +9,8 @@ namespace Fusion.Engine.Graphics.GIS
     public class ScalarFieldSliceUI : Gis.GisLayer
     {
         private readonly GlobeCamera _camera;
-        private readonly LinesGisLayer _lines;
+        private readonly LinesGisLayer _axis;
+        private readonly LinesGisLayer _intentions;
         private readonly TextLabelGisLayer _labels;
         private readonly List<SliceUI> _slices = new List<SliceUI>();
         public SpriteLayer SpriteLayer { get; private set; }
@@ -17,7 +18,8 @@ namespace Fusion.Engine.Graphics.GIS
         public ScalarFieldSliceUI(Game engine, GlobeCamera camera, SpriteFont labelFont, SpriteLayer layer) : base(engine)
         {
             _camera = camera;
-            _lines = new LinesGisLayer(engine, 2);
+            _axis = new LinesGisLayer(engine, 2);
+            _intentions = new LinesGisLayer(engine, 2);
             _labels = new TextLabelGisLayer(engine, labelFont, layer, camera);
             SpriteLayer = layer;
         }
@@ -62,8 +64,8 @@ namespace Fusion.Engine.Graphics.GIS
             }
             result.YAxis = yLineWithTicks;
 
-            _lines.AddLine(result.XAxis, result.AxisColor);
-            _lines.AddLine(result.YAxis, result.AxisColor);
+            _axis.AddLine(result.XAxis, result.AxisColor);
+            _axis.AddLine(result.YAxis, result.AxisColor);
 
             _slices.Add(result);
             return result;
@@ -83,12 +85,23 @@ namespace Fusion.Engine.Graphics.GIS
 
             _slices.Remove(toBeRemoved);
 
-            _lines.Clear();
+            _axis.Clear();
             foreach (var slice in _slices)
             {
-                _lines.AddLine(slice.XAxis, slice.AxisColor);
-                _lines.AddLine(slice.YAxis, slice.AxisColor);
+                _axis.AddLine(slice.XAxis, slice.AxisColor);
+                _axis.AddLine(slice.YAxis, slice.AxisColor);
             }
+        }
+
+        public void DisplayIntention(DVector3 from, DVector3 to)
+        {
+            ClearIntentions();
+            _intentions.AddLine(new List<DVector3>{from, to}, Color.White);
+        }
+
+        public void ClearIntentions()
+        {
+            _intentions.Clear();
         }
 
         public override void Draw(GameTime gameTime, ConstantBuffer constBuffer)
@@ -116,7 +129,8 @@ namespace Fusion.Engine.Graphics.GIS
                 }
             }
 
-            _lines.Draw(gameTime, constBuffer);
+            _intentions.Draw(gameTime, constBuffer);
+            _axis.Draw(gameTime, constBuffer);
             _labels.Draw(gameTime, constBuffer);
 
             base.Draw(gameTime, constBuffer);
@@ -124,7 +138,8 @@ namespace Fusion.Engine.Graphics.GIS
 
         public override void Update(GameTime gameTime)
         {
-            _lines.Update(gameTime);
+            _axis.Update(gameTime);
+            _intentions.Update(gameTime);
             _labels.Update(gameTime);
 
             base.Update(gameTime);
