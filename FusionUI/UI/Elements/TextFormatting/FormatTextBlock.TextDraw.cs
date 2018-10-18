@@ -535,7 +535,7 @@ namespace FusionUI.UI.Elements.TextFormatting
             splitByString();
             float th = 0;
             var textOffset = IsShortText ?  (BaseHeight - strings.TakeWhile(a => (th += a.Rect.Height) < BaseHeight).Sum(a => a.Rect.Height)) * 0.5f: 
-                TextAlignment == Alignment.MiddleLeft || TextAlignment == Alignment.MiddleCenter || TextAlignment == Alignment.MiddleRight ? (Height - TextHeight)/2  :
+                TextAlignment == Alignment.MiddleLeft || TextAlignment == Alignment.MiddleCenter || TextAlignment == Alignment.MiddleRight ? (Height - PaddingTop - PaddingBottom - TextHeight)/2  :
                 TextAlignment == Alignment.BottomLeft || TextAlignment == Alignment.BottomCenter || TextAlignment == Alignment.BottomRight ? Height - TextHeight : PaddingTop;
             DefaultAlignment = TextAlignment == Alignment.MiddleLeft || TextAlignment == Alignment.BottomLeft ||
                                TextAlignment == Alignment.TopLeft ? "left" :
@@ -715,7 +715,7 @@ namespace FusionUI.UI.Elements.TextFormatting
                                 //if (h + r.Height > GlobalRectangle.Top && h < GlobalRectangle.Bottom)
                                 //{
                                     currentFont.DrawString(sb, stp, this.GlobalRectangle.X + xOffset,
-                                        this.GlobalRectangle.Y + textOffset - r.Bottom + height, currentColor,
+                                        this.GlobalRectangle.Y + textOffset - r.Height + height, currentColor,
                                         clipRectIndex, 0, false);
                                 //}
 
