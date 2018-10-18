@@ -50,6 +50,11 @@ namespace FusionUI.UI
         public ScalableFrame NameLabel;
         public string NameLabelText;
 
+		public ScalableFrame leftTimeLineLable;
+		public string labelLeftBaseText;
+		public ScalableFrame rightTimeLineLable;
+		public string labelRightBaseText;
+
 		bool addToolButtons;
 
 
@@ -78,7 +83,6 @@ namespace FusionUI.UI
             this.ui = ui;
             ((Frame) this).Ghost = false;
 			this.addToolButtons = addToolButtons;
-
 			Init();
             SuppressActions = true;
             //Anchor = FrameAnchor.Bottom | FrameAnchor.Left | FrameAnchor.Right;
@@ -137,7 +141,7 @@ namespace FusionUI.UI
             //this.Resize += TimeLineControlPanel_Resize;
 
             var sizeText = Font.MeasureString(templateDate);
-            labelStartTime = new ScalableFrame(ui, UIConfig.UnitTimelineOffsetX, timeLine.UnitY + timeLine.UnitHeight - (sizeText.Height / ScaleMultiplier) + 1,
+            labelStartTime = new ScalableFrame(ui, UIConfig.UnitTimelineOffsetX, timeLine.UnitY + timeLine.UnitHeight - (sizeText.Height / ScaleMultiplier) + 1.25f,
                 (sizeText.Width / ScaleMultiplier), (sizeText.Height / ScaleMultiplier), "", Color.Zero)
             {
                 //Anchor = FrameAnchor.Left
@@ -145,7 +149,7 @@ namespace FusionUI.UI
                 TextAlignment = Alignment.MiddleLeft
             };
             labelEndTime = new ScalableFrame(ui, this.UnitWidth - UIConfig.UnitTimelineOffsetX - (sizeText.Width / ScaleMultiplier),
-                timeLine.UnitY + timeLine.UnitHeight - (sizeText.Height / ScaleMultiplier) + 1,
+                timeLine.UnitY + timeLine.UnitHeight - (sizeText.Height / ScaleMultiplier) + 1.25f,
                 (sizeText.Width / ScaleMultiplier), (sizeText.Height / ScaleMultiplier), "", Color.Zero)
             {
                 //Anchor = FrameAnchor.Right
@@ -315,15 +319,19 @@ namespace FusionUI.UI
             stepValueLabel.Text		= stepConfig.Item2;
         }
 
-		public void AddSideLables(string lableLeftText, string lableRightText )
+		public void AddSideLables(string labelLeftBaseText, string labelRightBaseText )
 		{
-			var leftTimeLineLable = new ScalableFrame(ui, 0, UIConfig.UnitTimelineHeight, 70, 6, lableLeftText, Color.Zero)
+			this.labelLeftBaseText = labelLeftBaseText;
+			this.labelRightBaseText = labelRightBaseText;
+			this.leftTimeLineLable = new ScalableFrame(ui, 0, this.UnitHeight - 4 - 4,
+				(this.downStepButton.UnitX + this.downStepButton.UnitWidth) , 4, labelLeftBaseText, Color.Zero)
 			{
 				FontHolder = UIConfig.FontSubtitle,
 				TextAlignment = Alignment.MiddleLeft,
 				ForeColor = Color.Gray,
 			};
-			var rightTimeLineLable = new ScalableFrame(ui, this.UnitWidth - 70, UIConfig.UnitTimelineHeight, 70, 6, lableRightText, Color.Zero)
+			this.rightTimeLineLable = new ScalableFrame(ui, (this.buttonLoop.UnitX + this.buttonLoop.UnitWidth), this.UnitHeight- 4 -4,
+				this.UnitWidth-(this.buttonLoop.UnitX+ this.buttonLoop.UnitWidth), 4, labelRightBaseText, Color.Zero)
 			{
 				FontHolder = UIConfig.FontSubtitle,
 				TextAlignment = Alignment.MiddleRight,
@@ -333,5 +341,15 @@ namespace FusionUI.UI
 			this.Add(rightTimeLineLable);
 
 		}
+		public void UpdateLeftLableText( string labelLeftText )
+		{
+			this.leftTimeLineLable.Text = labelLeftBaseText + labelLeftText;
+		}
+
+		public void UpdateRightLableText( string labelRightText )
+		{
+			this.rightTimeLineLable.Text = labelRightBaseText + labelRightText;
+		}
+
 	}
 }

@@ -68,7 +68,7 @@ namespace FusionUI.UI
         public static float UnitDefaultTapWidth = 25;
         public static float UnitDefaultTapHeight = 8;
 
-        public static float UnitTimelineHeight = 13;
+        public static float UnitTimelineHeight = 12;
         public static float UnitTimelineWidth = 198;
         public static float UnitTimelineWindowHeight = 26;
         public static float UnitTimelineWindowWidth = 200;
