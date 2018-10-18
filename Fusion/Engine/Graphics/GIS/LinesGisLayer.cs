@@ -77,7 +77,7 @@ namespace Fusion.Engine.Graphics.GIS
 	    private VertexBuffer _currentBuffer;
 	    private int _initialPointsCount;
 
-	    public Gis.GeoPoint[] PointsCpu { get; protected set; }
+	    public Gis.GeoPoint[] PointsCpu { get; set; }
 
 		public class SelectedItem : Gis.SelectedItem {}
 
@@ -160,7 +160,70 @@ namespace Fusion.Engine.Graphics.GIS
             AddLine(geoPoints);
 	    }
 
-	    public void Clear()
+
+		public void AddLine(List<DVector3> cartPoints, float halfWidth, Color4 lineColor)
+		{
+			var geoPoints = cartPoints
+				.Select(p =>
+				{
+					var g = GeoHelper.CartesianToSpherical(p.Normalized() * GeoHelper.EarthRadius);
+
+					return new Gis.GeoPoint
+					{
+						Color = lineColor,
+						Lon = g.X,
+						Lat = g.Y,
+						Tex0 = new Vector4(halfWidth, 0, 0, 0),
+						Tex1 = new Vector4(0, 0, 0, 0)
+					};
+				}).ToList();
+
+			AddLine(geoPoints);
+		}
+
+
+		public void AddLine(List<DVector4> cartPoints, Color4 lineColor)
+		{
+			var geoPoints = cartPoints
+				.Select(p =>
+				{
+					var pp = new DVector3(p.X, p.Y, p.Z);
+					var g = GeoHelper.CartesianToSpherical(pp.Normalized() * GeoHelper.EarthRadius);
+
+					return new Gis.GeoPoint
+					{
+						Color = lineColor,
+						Lon = g.X,
+						Lat = g.Y,
+						Tex0 = new Vector4((float)p.W, 0, 0, 0),
+						Tex1 = new Vector4(0, 0, 0, 0)
+					};
+				}).ToList();
+
+			AddLine(geoPoints);
+		}
+
+
+		public void AddLine(List<DVector2> lonLatPoints, float halfWidth, Color4 lineColor)
+		{
+			var geoPoints = lonLatPoints
+				.Select(p =>
+				{
+					return new Gis.GeoPoint
+					{
+						Color = lineColor,
+						Lon = p.X,
+						Lat = p.Y,
+						Tex0 = new Vector4(halfWidth, 0, 0, 0),
+						Tex1 = new Vector4(0, 0, 0, 0)
+					};
+				}).ToList();
+
+			AddLine(geoPoints);
+		}
+
+
+		public void Clear()
 	    {
 	        PointsCpu = new Gis.GeoPoint[_initialPointsCount];
 
