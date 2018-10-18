@@ -303,7 +303,10 @@ namespace FusionUI.UI
         public static FontHolder FontBaseAlt = new FontHolder(@"fonts\new\BaseAlt");
         public static FontHolder FontCaptionAlt = new FontHolder(@"fonts\new\CaptionAlt");
 
-        public static List<string> ListPalettes = new List<string>
+		public static FontHolder MullerExtraBold = new FontHolder(@"fonts\Muller\MullerExtraBold");
+		public static FontHolder MullerLight = new FontHolder(@"fonts\Muller\MullerLight");
+
+		public static List<string> ListPalettes = new List<string>
         {
             "pallete.tga",
             "pallete_atmo_pressure.png",
