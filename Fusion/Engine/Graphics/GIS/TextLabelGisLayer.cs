@@ -27,7 +27,7 @@ namespace Fusion.Engine.Graphics.GIS
             public bool Visible = true;
             public AnchorPoint AnchorPoint;
 
-            public TextLabel(DVector3 position, string text, Color textColor) 
+            public TextLabel(DVector3 position, string text, Color textColor)
                 : this(position, text, textColor, backgroundColor: Color.Zero, anchorPoint: AnchorPoint.TopLeft, angle: 0) { }
 
             public TextLabel(DVector3 position, string text, Color textColor, Color backgroundColor)
@@ -47,7 +47,7 @@ namespace Fusion.Engine.Graphics.GIS
             }
         }
 
-        public double MaxVisibleDistance = 1500;
+        public double MaxVisibleDistance = 3500;
 
         private readonly SpriteFont _font;
         private readonly SpriteLayer _spriteLayer;
@@ -63,27 +63,12 @@ namespace Fusion.Engine.Graphics.GIS
 
         public override void Draw(GameTime gameTime, ConstantBuffer constBuffer)
         {
-            _spriteLayer.Clear();
-
-            var viewport = _camera.Viewport.Bounds;
-
-            var whiteTex = Game.RenderSystem.WhiteTexture;
-            var sortedLabels = _labels
-                .Where(l => l.Visible)
-                .Where(l => viewport.Contains(GetBoundingRect(l)))
-                .Select(l => new Tuple<TextLabel, double>(l, (l.Position - _camera.FinalCamPosition).Length()))
-                .Where(t => t.Item2 < MaxVisibleDistance)
-                .OrderBy(t => -t.Item2)
-                .Select(t => t.Item1);
-
-            foreach (var label in sortedLabels)
+            void Display(TextLabel label, Rectangle rect, Color bgColor)
             {
-                var rect = GetBoundingRect(label);                
-
-                _spriteLayer.DrawSprite(whiteTex, 
+                _spriteLayer.DrawSprite(Game.RenderSystem.WhiteTexture,
                     rect.X + rect.Width / 2, rect.Y + rect.Height / 2,
-                    rect.Width, rect.Height, 
-                    0, label.BackgroundColor
+                    rect.Width, rect.Height,
+                    0, bgColor
                 );
 
                 _font.DrawString(
@@ -94,6 +79,36 @@ namespace Fusion.Engine.Graphics.GIS
                     label.TextColor,
                     useBaseLine: false
                 );
+            }
+            _spriteLayer.Clear();
+
+            var viewport = _camera.Viewport.Bounds;
+
+            var sortedLabels = _labels
+                .Where(l => l.Visible)
+                .Where(l => viewport.Contains(GetBoundingRect(l)))
+                .Select(l => new Tuple<TextLabel, double>(l, (l.Position - _camera.FinalCamPosition).Length()))
+                .Where(t => t.Item2 < MaxVisibleDistance)
+                .OrderBy(t => t.Item2)
+                .Select(t => t.Item1)
+                .ToList();
+
+            if(sortedLabels.Count == 0)
+                return;
+
+            var lastDisplayedRect = GetBoundingRect(sortedLabels[0]);
+            Display(sortedLabels[0], lastDisplayedRect, sortedLabels[0].BackgroundColor);
+            for (var i = 1; i < sortedLabels.Count; i++)
+            {
+                var label = sortedLabels[i];
+                var rect = GetBoundingRect(label);
+
+                if (!rect.Intersects(lastDisplayedRect))
+                {
+                    Display(label, rect, label.BackgroundColor);
+
+                    lastDisplayedRect = rect;
+                }
             }
         }
 
@@ -106,7 +121,7 @@ namespace Fusion.Engine.Graphics.GIS
         }
 
         public TextLabel AddLabel(TextLabel label)
-        {           
+        {
             _labels.Add(label);
 
             return label;

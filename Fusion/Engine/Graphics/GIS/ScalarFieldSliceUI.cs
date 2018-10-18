@@ -12,12 +12,14 @@ namespace Fusion.Engine.Graphics.GIS
         private readonly LinesGisLayer _lines;
         private readonly TextLabelGisLayer _labels;
         private readonly List<SliceUI> _slices = new List<SliceUI>();
+        public SpriteLayer SpriteLayer { get; private set; }
 
         public ScalarFieldSliceUI(Game engine, GlobeCamera camera, SpriteFont labelFont, SpriteLayer layer) : base(engine)
         {
             _camera = camera;
             _lines = new LinesGisLayer(engine, 2);
             _labels = new TextLabelGisLayer(engine, labelFont, layer, camera);
+            SpriteLayer = layer;
         }
 
         public SliceUI Add(List<DVector3> XAxis, List<string> XLabels, List<DVector3> YAxis, List<string> YLabels)
