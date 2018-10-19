@@ -15,15 +15,15 @@ namespace Fusion.Engine.Graphics.GIS
     {
         public VPBatch(Game engine) : base(engine)
         {
-            shader = Game.Content.Load<Ubershader>("globe.VolumPoints.hlsl");
+            shader = Game.Content.Load<Ubershader>("globe.VolumPoints.hlsl");    
             factory = shader.CreateFactory(typeof(FieldFlags), EnumFunc);
 
-            cB = new ConstantBuffer(Game.GraphicsDevice, typeof(ConstData));
+            cB = new ConstantBuffer(Game.GraphicsDevice, typeof(ConstData));    
 
             confBuffer = new ConstantBuffer(Game.GraphicsDevice, typeof(ConfData));             
         }
-
-        Ubershader shader;
+         
+        Ubershader shader;    
         StateFactory factory;   
 
         [Flags]

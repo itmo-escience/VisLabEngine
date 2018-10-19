@@ -193,10 +193,10 @@ float3 random3( float3 p )
         23.14069263277926, // e^pi (Gelfond's constant)
         2.665144142690225, // 2^sqrt(2) (Gelfondâ€“Schneider constant)
 		1.0f
-    );
-    return float3(frac( (dot(p,K1.xyz) + cos( Field.Dummy.x * 0.000165146)) * 12345.6789 ),
-				  frac( (dot(p,K1.xzy) + cos( Field.Dummy.x * 0.000198786)) * 32498.4984 ),
- 				  frac( (dot(p,K1.yxz) + cos( Field.Dummy.x * 0.000261464)) * 15644.4897 ));
+    );	
+    return float3(frac( (dot(p,K1)) * 12345.6789 ),
+				  frac( (dot(p,K1)) * 98765.4321 ),
+ 				  frac( (dot(p,K1)) * 13975.2486 ));
 }
 #ifdef Draw_points
 VS_OUTPUT VSMain ( uint vertInd : SV_VertexID )
@@ -268,7 +268,8 @@ void GSMain ( point VS_OUTPUT inputArray[1], inout TriangleStream<GS_OUTPUT> str
 		float3 d =  (Right.xyz * Field.FieldSize.x / Field.Dimension.y
 				  + Forward.xyz * Field.FieldSize.y / Field.Dimension.x
 				  + Up.xyz * Field.FieldSize.z / Field.Dimension.z) / 2;
-		position += float4((normalize(random3(position.xyz)) - 1) * random(position.xyz) * d * 4, 0);
+		position += float4(normalize(random3(position.xyz) - 0.5f) * d * 2, 0);
+		position += float4(normalize(random3(position.xyz) - 0.5f) * d * 2, 0);
 		position += float4(origin.xyz, 0);
 		//float4 position = FinalPositions[vertInd];
 		float4 localPosition = mul(position , Field.View);
