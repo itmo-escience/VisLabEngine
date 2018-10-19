@@ -96,6 +96,13 @@ namespace FusionUI.UI.Elements
             UpdatePosition();
         }
 
+		public void UpdateRelative()
+		{
+			XVal = this.X;
+			YVal = this.Y;
+			UpdatePosition();			
+		}
+
         public float GetRelativeX()
         {
             return MathUtil.Clamp((float)(XVal + extendedSize/2 - this.parent.PaddingLeft) /
