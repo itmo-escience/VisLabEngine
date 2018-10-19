@@ -1119,8 +1119,9 @@ namespace Fusion.Engine.Frames {
 			if ( hAlign  > 0 )	x	=	gp.X + (int)( gp.Width - r.Width );
 
 			if ( vAlign  < 0 )	y	=	gp.Y + (int)( 0 );
-			if ( vAlign == 0 )	y	=	gp.Y + (int)( Font.CapHeight/2 - Font.BaseLine + gp.Height/2 );
-			if ( vAlign  > 0 )	y	=	gp.Y + (int)( gp.Height - Font.LineHeight );
+			if ( vAlign == 0 )	y	=	gp.Y + (int)( -r.Height/2 + Font.LineHeight/2 - Font.BaseLine/2 + gp.Height/2 );
+		    //if (vAlign == 0) y = gp.Y + (int)(Font.CapHeight / 2 - Font.BaseLine + gp.Height / 2);
+            if ( vAlign  > 0 )	y	=	gp.Y + (int)( gp.Height - Font.LineHeight );
 			if ( vAlign == 2 )	y	=	gp.Y - Font.BaseLine;
 
 			/*if (TextAlignment==Alignment.BaselineLeft) {
@@ -1182,6 +1183,7 @@ namespace Fusion.Engine.Frames {
 			var toCancel = transitions.Where( t => t.TagName == property ).ToList();
 
 			transitions.Add( new Transition<T,I>( this, pi, targetValue, delay, period, toCancel, callback) { TagName = property } );
+		    toCancel.ForEach(a => transitions.Remove(a));
 		}
 
 
@@ -1235,7 +1237,7 @@ namespace Fusion.Engine.Frames {
 				t.Update( gameTime );
 			}
 		    var done = transitions.Where(t => t.IsDone);
-		    foreach (var t in done)
+		    foreach (var t in done.ToList())
 		    {
 		        t.Callback?.Invoke();
 		    }

@@ -49,9 +49,9 @@ namespace FusionUI.UI.Elements
     public class ConnectorArrow : ScalableFrame
     {
         public ScalableFrame FromFrame, ToFrame;
-        public float ArrowWidth, ArrowPointerSize;
+        public float ArrowWidth, ArrowPointerSize, DotMarkerSize;
         public int ForceInDirection = 0, ForceOutDirection = 0;
-
+        
         public bool IsStraight = false;
 
         public bool DoStraighten
@@ -78,12 +78,13 @@ namespace FusionUI.UI.Elements
         public bool IsDottedLine = false;
         public float LineDotSizeGU = 1;
         public float LineSpaceSizeGU = 1;
-        public ConnectorArrow(FrameProcessor ui, ScalableFrame from, ScalableFrame to, float width, float arrowSize) : base(ui)
+        public ConnectorArrow(FrameProcessor ui, ScalableFrame from, ScalableFrame to, float width, float arrowSize, float markerSize) : base(ui)
         {
             FromFrame = from;
             ToFrame = to;
             ArrowWidth = width;
-            ArrowPointerSize = arrowSize;            
+            ArrowPointerSize = arrowSize;
+            DotMarkerSize = markerSize;
             ArrowController.Instance.AddArrow(this);
         }
        
@@ -248,25 +249,35 @@ namespace FusionUI.UI.Elements
                 var d2 = end - center;
                 float l1 = d1.Length(), l2 = d2.Length();
                 d1.Normalize(); d2.Normalize();
+                //start += d1 * ArrowPointerSize / 4;
+                end -= d2 * ArrowPointerSize / 4;
                 DrawLine(spriteLayer, whiteTex, start + d1 * ArrowPointerSize / 4, center, BackColor, ArrowWidth);
                 DrawLine(spriteLayer, whiteTex, center, end - d2 * ArrowPointerSize / 4, BackColor, ArrowWidth);
                 if (IsAnimation)
                 {
                     float length = l1 + l2;
-                    var circleTex = Game.Content.Load<DiscTexture>("UI/icons_lord-of-time-without-wand");
+                    var circleTex = Game.Content.Load<DiscTexture>("UIArrow");
                     for (int i = 0; i < (int) (length / GlobalAnimvelocity) + 1; i++)
                     {
                         float l = GlobalAnimvelocity * (i + animProgress);
-                        if (l > length - ArrowPointerSize || l < ArrowPointerSize) continue;
+                        if (l > length - ArrowPointerSize || l < DotMarkerSize) continue;
                         if (l > l1)
                         {
                             var p = center + d2 * (l-l1);
-                            spriteLayer.Draw(circleTex, p.X - ArrowWidth / 4, p.Y - ArrowWidth / 4, ArrowWidth / 2, ArrowWidth / 2, BackColor);
+                            var d = d2;
+                            var r = new Vector2(d.Y, d.X);
+                            spriteLayer.DrawFreeUV(circleTex, p + (-d + r) * DotMarkerSize / 2, p + (d + r) * DotMarkerSize / 2, p + (-d - r) * DotMarkerSize / 2, p + (d - r) * DotMarkerSize / 2, ForeColor,
+                                new Vector2(0, 0), new Vector2(1, 0), new Vector2(0, 1), new Vector2(1, 1));
+                            //spriteLayer.Draw(circleTex, p.X - DotMarkerSize / 2, p.Y - DotMarkerSize / 2, ArrowWidth / 2, ArrowWidth / 2, BackColor);
                         }                                                                                                
                         else                                                                                             
                         {                                                                                                
-                            var p = start + d1 * l;                                                                       
-                            spriteLayer.Draw(circleTex, p.X - ArrowWidth / 4, p.Y - ArrowWidth / 4, ArrowWidth / 2, ArrowWidth / 2, BackColor);
+                            var p = start + d1 * l;
+                            var d = d1;
+                            var r = new Vector2(d.Y, d.X);
+                            spriteLayer.DrawFreeUV(circleTex, p + (-d + r) * DotMarkerSize / 2, p + (d + r) * DotMarkerSize / 2, p + (-d - r) * DotMarkerSize / 2, p + (d - r) * DotMarkerSize / 2, ForeColor,
+                                new Vector2(0, 0), new Vector2(1, 0), new Vector2(0, 1), new Vector2(1, 1));
+                            //spriteLayer.Draw(circleTex, p.X - DotMarkerSize / 2, p.Y - DotMarkerSize / 2, ArrowWidth / 2, ArrowWidth / 2, BackColor);
                         }
                     }
                 }                             
@@ -298,31 +309,45 @@ namespace FusionUI.UI.Elements
                 var d3 = end - center2;
                 float l1 = d1.Length(), l2 = d2.Length(), l3 = d3.Length();
                 d1.Normalize(); d2.Normalize(); d3.Normalize();
+                //start += d1 * ArrowPointerSize / 4;
+                end -= d3 * ArrowPointerSize / 4;
                 DrawLine(spriteLayer, whiteTex, start + d1 * ArrowPointerSize / 4, center1, BackColor, ArrowWidth);
                 DrawLine(spriteLayer, whiteTex, center1, center2, BackColor, ArrowWidth);
                 DrawLine(spriteLayer, whiteTex, center2, end - d3 * ArrowPointerSize / 4, BackColor, ArrowWidth);
                 if (IsAnimation)
                 {
                     float length = l1 + l2 + l3;
-                    var circleTex = Game.Content.Load<DiscTexture>("UI/icons_lord-of-time-without-wand");
+                    var circleTex = Game.Content.Load<DiscTexture>("UIArrow");
                     for (int i = 0; i < (int)(length / GlobalAnimvelocity) + 1; i++)
                     {
                         float l = GlobalAnimvelocity * (i + animProgress);
-                        if (l > length - ArrowPointerSize || l < ArrowPointerSize) continue;
+                        if (l > length - ArrowPointerSize || l < DotMarkerSize) continue;
                         if (l > l1 + l2)
                         {
                             var p = center2 + d3 * (l - l1 - l2);
-                            spriteLayer.Draw(circleTex, p.X - ArrowWidth / 4, p.Y - ArrowWidth / 4, ArrowWidth / 2, ArrowWidth / 2, BackColor);
+                            var d = d3;
+                            var r = new Vector2(d.Y, d.X);
+                            spriteLayer.DrawFreeUV(circleTex, p + (-d + r) * DotMarkerSize / 2, p + (d + r) * DotMarkerSize / 2, p + (-d - r) * DotMarkerSize / 2, p + (d - r) * DotMarkerSize / 2, ForeColor,
+                                new Vector2(0, 0), new Vector2(1, 0), new Vector2(0, 1), new Vector2(1, 1));
+                            //spriteLayer.Draw(circleTex, p.X - DotMarkerSize / 2, p.Y - DotMarkerSize / 2, ArrowWidth / 2, ArrowWidth / 2, BackColor);
                         }
                         else if (l > l1)
                         {
                             var p = center1 + d2 * (l - l1);
-                            spriteLayer.Draw(circleTex, p.X - ArrowWidth / 4, p.Y - ArrowWidth / 4, ArrowWidth / 2, ArrowWidth / 2, BackColor);
+                            var d = d2;
+                            var r = new Vector2(d.Y, d.X);
+                            spriteLayer.DrawFreeUV(circleTex, p + (-d + r) * DotMarkerSize / 2, p + (d + r) * DotMarkerSize / 2, p + (-d - r) * DotMarkerSize / 2, p + (d - r) * DotMarkerSize / 2, ForeColor,
+                                new Vector2(0, 0), new Vector2(1, 0), new Vector2(0, 1), new Vector2(1, 1));
+                            //spriteLayer.Draw(circleTex, p.X - DotMarkerSize / 2, p.Y - DotMarkerSize / 2, ArrowWidth / 2, ArrowWidth / 2, BackColor);
                         }
                         else
                         {
                             var p = start + d1 * l;
-                            spriteLayer.Draw(circleTex, p.X - ArrowWidth / 4, p.Y - ArrowWidth / 4, ArrowWidth / 2, ArrowWidth / 2, BackColor);
+                            var d = d1;
+                            var r = new Vector2(d.Y, d.X);
+                            spriteLayer.DrawFreeUV(circleTex, p + (-d + r) * DotMarkerSize / 2, p + (d + r) * DotMarkerSize / 2, p + (-d - r) * DotMarkerSize / 2, p + (d - r) * DotMarkerSize / 2, ForeColor,
+                                new Vector2(0, 0), new Vector2(1, 0), new Vector2(0, 1), new Vector2(1, 1));
+                            //spriteLayer.Draw(circleTex, p.X - DotMarkerSize / 2, p.Y - DotMarkerSize / 2, ArrowWidth / 2, ArrowWidth / 2, BackColor);
                         }
                     }
                 }
@@ -357,31 +382,46 @@ namespace FusionUI.UI.Elements
                 var d3 = end - center2;
                 float l1 = d1.Length(), l2 = d2.Length(), l3 = d3.Length();
                 d1.Normalize(); d2.Normalize(); d3.Normalize();
+                //start += d1 * ArrowPointerSize / 4;
+                end -= d3 * ArrowPointerSize / 4;
                 DrawLine(spriteLayer, whiteTex, start + d1 * ArrowPointerSize / 4, center1, BackColor, ArrowWidth);
                 DrawLine(spriteLayer, whiteTex, center1, center2, BackColor, ArrowWidth);
                 DrawLine(spriteLayer, whiteTex, center2, end - d3 * ArrowPointerSize / 4, BackColor, ArrowWidth);
                 if (IsAnimation)
                 {
                     float length = l1 + l2 + l3;
-                    var circleTex = Game.Content.Load<DiscTexture>("UI/icons_lord-of-time-without-wand");
+                    var circleTex = Game.Content.Load<DiscTexture>("UIArrow");
                     for (int i = 0; i < (int)(length / GlobalAnimvelocity) + 1; i++)
                     {
                         float l = GlobalAnimvelocity * (i + animProgress);
-                        if (l > length - ArrowPointerSize || l < ArrowPointerSize) continue;
+                        if (l > length - ArrowPointerSize || l < DotMarkerSize) continue;
                         if (l > l1 + l2)
                         {
                             var p = center2 + d3 * (l - l1 - l2);
-                            spriteLayer.Draw(circleTex, p.X - ArrowWidth/4, p.Y - ArrowWidth / 4, ArrowWidth / 2, ArrowWidth / 2, BackColor);
+                            var d = d3;
+                            var r = new Vector2(d.Y, d.X);
+                            spriteLayer.DrawFreeUV(circleTex, p + (-d + r) * DotMarkerSize / 2, p + (d + r) * DotMarkerSize / 2, p + (-d - r) * DotMarkerSize / 2, p + (d - r) * DotMarkerSize / 2, ForeColor,
+                                new Vector2(0, 0), new Vector2(1, 0), new Vector2(0, 1), new Vector2(1, 1));
+                            //spriteLayer.Draw(circleTex, p.X - ArrowWidth/4, p.Y - DotMarkerSize / 2, ArrowWidth / 2, ArrowWidth / 2, BackColor);
+
                         }
                         else if (l > l1)
                         {
                             var p = center1 + d2 * (l - l1);
-                            spriteLayer.Draw(circleTex, p.X - ArrowWidth / 4, p.Y - ArrowWidth / 4, ArrowWidth / 2, ArrowWidth / 2, BackColor);
+                            var d = d2;
+                            var r = new Vector2(d.Y, d.X);
+                            spriteLayer.DrawFreeUV(circleTex, p + (-d + r) * DotMarkerSize / 2, p + (d + r) * DotMarkerSize / 2, p + (-d - r) * DotMarkerSize / 2, p + (d - r) * DotMarkerSize / 2, ForeColor,
+                                new Vector2(0, 0), new Vector2(1, 0), new Vector2(0, 1), new Vector2(1, 1));
+                            //spriteLayer.Draw(circleTex, p.X - DotMarkerSize / 2, p.Y - DotMarkerSize / 2, ArrowWidth / 2, ArrowWidth / 2, BackColor);
                         }
                         else
                         {
                             var p = start + d1 * l;
-                            spriteLayer.Draw(circleTex, p.X - ArrowWidth / 4, p.Y - ArrowWidth / 4, ArrowWidth / 2, ArrowWidth / 2, BackColor);
+                            var d = d1;
+                            var r = new Vector2(d.Y, d.X);
+                            spriteLayer.DrawFreeUV(circleTex, p + (-d + r) * DotMarkerSize / 2, p + (d + r) * DotMarkerSize / 2, p + (-d - r) * DotMarkerSize / 2, p + (d - r) * DotMarkerSize / 2, ForeColor,
+                                new Vector2(0, 0), new Vector2(1, 0), new Vector2(0, 1), new Vector2(1, 1));
+                            //spriteLayer.Draw(circleTex, p.X - DotMarkerSize / 2, p.Y - DotMarkerSize / 2, ArrowWidth / 2, ArrowWidth / 2, BackColor);
                         }
                     }
                 }
@@ -393,17 +433,22 @@ namespace FusionUI.UI.Elements
                 var d = end - start;
                 var length = d.Length();
                 d.Normalize();
+
+                //start += d * ArrowPointerSize / 4;
+                end -= d * ArrowPointerSize / 4;
                 DrawLine(spriteLayer, whiteTex, start + d * ArrowPointerSize / 4, end - d * ArrowPointerSize / 4, BackColor, ArrowWidth);
                 if (IsAnimation)
                 {
                     
-                    var circleTex = Game.Content.Load<DiscTexture>("UI/icons_lord-of-time-without-wand");
+                    var circleTex = Game.Content.Load<DiscTexture>("UIArrow");
                     for (int i = 0; i < (int)(length / GlobalAnimvelocity) + 1; i++)
                     {
                         float l = GlobalAnimvelocity * (i + animProgress);
-                        if (l > length - ArrowPointerSize || l < ArrowPointerSize) continue;
+                        if (l > length - ArrowPointerSize || l < DotMarkerSize ) continue;
                         var p = start + d * l;
-                        spriteLayer.Draw(circleTex, p.X - ArrowWidth / 4, p.Y - ArrowWidth / 4, ArrowWidth / 2, ArrowWidth / 2, BackColor);                        
+                        var r = new Vector2(d.Y, d.X);
+                        spriteLayer.DrawFreeUV(circleTex, p + (-d + r) * DotMarkerSize / 2, p + (d + r) * DotMarkerSize / 2, p + (-d - r) * DotMarkerSize / 2, p + (d - r) * DotMarkerSize / 2, ForeColor,
+                            new Vector2(0, 0), new Vector2(1, 0), new Vector2(0, 1), new Vector2(1,1));                        
                     }
                 }
 
@@ -491,7 +536,7 @@ namespace FusionUI.UI.Elements
                 Vector2 v0 = p0;
                 while (l < length)
                 {
-                    if (i % 2 == 0)
+                    if (i % 2 == 0) 
                     {
                         //draw dot;
                         var v1 = v0 + v * Math.Min(LineDotSizeGU * ApplicationInterface.ScaleMod, length - l);
