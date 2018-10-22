@@ -17,7 +17,7 @@ namespace FusionUI.UI.Plots2_0
         StartFromZeroX = 1,
         StartFromZeroY = 2,
         StartFromZero = 3,
-        DrawMeasure = 4,
+        DrawMeasureX = 4,
         DrawScaleX = 8,
         DrawScaleY = 16,
         DrawAtZero = 32,
@@ -28,6 +28,10 @@ namespace FusionUI.UI.Plots2_0
         NoActiveCheckY = 1024,
         NotDisplayName = 2048,
         NotWriteNumbersX = 4096,
+        DrawMeasureY = 4096 << 1,
+        DrawMeasure = DrawMeasureX + DrawMeasureY,
+        DrawZeroLineX = 4096 << 2,
+        DrawZeroLineY = 4096 << 3,
     }
 
     public class CatScale : PlotScale
@@ -143,9 +147,12 @@ namespace FusionUI.UI.Plots2_0
         public string Measure = "";
         public bool Dirty = true;        
         public List<double> PredefinedStepsX, predefinedStepsY;
-        public UIConfig.FontHolder BoldFontHolder;
-        public SpriteFont BoldFont => BoldFontHolder[ApplicationInterface.uiScale];
-        
+        public UIConfig.FontHolder CaptionsFontHolder = UIConfig.FontBody;
+        public UIConfig.FontHolder NumbersFontHolder = UIConfig.FontBody;
+        private SpriteFont CaptionsFont => CaptionsFontHolder[ApplicationInterface.uiScale];
+        private SpriteFont NumbersFont => NumbersFontHolder[ApplicationInterface.uiScale];
+
+
         public int Index = 0;
 
         //public Func<double, string> XStringFunc = f => $"{f:0.##}", YStringFunc = f => $"{f:0.##}";
@@ -363,20 +370,12 @@ namespace FusionUI.UI.Plots2_0
             var color = Plot.ActiveScale == this || Plot.ActiveScale == null ? CaptionsColor : ForeColor;
             
             //sb.Draw(whiteTex, new RectangleF(Plot.GlobalRectangle.Left + offset + (int)(r.Height / 2) - r.Height, Plot.GlobalRectangle.Bottom + UIConfig.UnitPlotNumbersHeight + UIConfig.UnitPlotVerticalOffset, r.Height, r.Width), Color.Green);
-            if ((Settings & ScaleParams.NotDisplayName) == 0)
-            {
-                var r = Font.MeasureStringF(this.YLabel);
-                Font.DrawString(sb, this.YLabel, Plot.GlobalRectangle.Left + offset - (int) (r.Height / 2) * 0,
-                    Plot.GlobalRectangle.Bottom + r.Width * 0 +
-                    (UIConfig.UnitPlotNumbersHeight + UIConfig.UnitPlotVerticalOffset) * ScaleMultiplier, color,
-                    clipRectIndex,
-                    useBaseLine: false, flip: true);
-            }
+            var wMax = 0.0f;
 
             if (Measure != "")
             {
                 var r = Font.MeasureStringF(this.Measure);
-                Font.DrawString(sb, this.Measure, Plot.GlobalRectangle.Left + offset - (int)(r.Width) * (left ? 0 : 1) + (left ? 8 : -8),
+                CaptionsFont.DrawString(sb, this.Measure, Plot.GlobalRectangle.Left + offset - (int)(r.Width) * (left ? 0 : 1) + (left ? 8 : -8),
                     Plot.GlobalRectangle.Top, color,
                     0,
                     useBaseLine: false);
@@ -392,12 +391,18 @@ namespace FusionUI.UI.Plots2_0
                 if (left)
                 {
                     if (h < Plot.GlobalRectangle.Bottom)
-                        Font.DrawString (sb, s, -b.Width + Plot.GlobalRectangle.Left + offset - 2, h + (b.Height + b.Y) / 2,
+                        NumbersFont.DrawString (sb, s, -b.Width + Plot.GlobalRectangle.Left + offset - 10, h + (b.Height) * 0.25f,
                             color, clipRectIndex);
                 } else {
                     if (h < Plot.GlobalRectangle.Bottom)
-                        Font.DrawString (sb, s, Plot.GlobalRectangle.Left + offset + 22, h + (b.Height + b.Y) / 2,
+                        NumbersFont.DrawString (sb, s, Plot.GlobalRectangle.Left + offset + 22, h + (b.Height) / 2,
                             color, clipRectIndex);
+                }
+
+                wMax = Math.Max(wMax, b.Width);
+                if ((Settings & ScaleParams.DrawZeroLineX) != 0 && Math.Abs(pos) < StepY)
+                {
+                    sb.DrawDottedLine(whiteTex, new Vector2(Plot.GlobalRectangle.Left, h), new Vector2(Plot.GlobalRectangle.Right, h), UIConfig.PlotScaleColor, 1, dotSize: 8, spaceSize: 6);
                 }
 
                 if (pos < 0 && pos + StepY > 0 && -pos > b.Height * 2 && pos + StepY > b.Height * 2)
@@ -406,16 +411,30 @@ namespace FusionUI.UI.Plots2_0
                     h = Plot.GlobalRectangle.Bottom - ((0 - MinY) / (MaxY - MinY) * Plot.GlobalRectangle.Height);
                     if (left)
                     {
-                        Font.DrawString(sb, s, -b.Width + Plot.GlobalRectangle.Left + offset - 2, h + (b.Height+b.Y) / 2,
+                        NumbersFont.DrawString(sb, s, -b.Width + Plot.GlobalRectangle.Left + offset - 10, h + (b.Height) / 2,
                             color, clipRectIndex);
                     }
                     else
                     {
-                        Font.DrawString(sb, s, Plot.GlobalRectangle.Left + offset + 2, h + (b.Height + b.Y) / 2,
+                        NumbersFont.DrawString(sb, s, Plot.GlobalRectangle.Left + offset + 2, h + (b.Height) / 2,
                             color, clipRectIndex);
                     }
-                }                
-            }           
+                    
+                }
+                if (h > Plot.GlobalRectangle.Top && h < Plot.GlobalRectangle.Bottom && (Settings & ScaleParams.DrawMeasureY) != 0)
+                {
+                    sb.Draw(whiteTex, Plot.GlobalRectangle.Left - 4, h - 1, 8, 2, CaptionsColor, clipRectIndex);
+                 
+                }
+            }
+            if ((Settings & ScaleParams.NotDisplayName) == 0)
+            {
+                var r = Font.MeasureStringF(this.YLabel);
+                CaptionsFont.DrawString(sb, this.YLabel, -r.Height + Plot.GlobalRectangle.Left + offset - wMax - 10,
+                    Plot.GlobalRectangle.Center.Y + r.Width * 0.5f, color,
+                    0,
+                    useBaseLine: false, flip: true);
+            }
         }
 
         private void DrawHorizontal (GameTime gameTime, SpriteLayer sb, int clipRectIndex) {
@@ -434,17 +453,17 @@ namespace FusionUI.UI.Plots2_0
             sb.Draw(whiteTex,
                 new RectangleF(Plot.GlobalRectangle.Left, Plot.GlobalRectangle.Bottom - zeroH + Index * UIConfig.UnitPlotScaleHeight * ScaleMultiplier,
                     Plot.GlobalRectangle.Width, UIConfig.UnitPlotScaleLineWidth * ScaleMultiplier),
-                UIConfig.PlotScaleColor, clipRectIndex);
+                UIConfig.PlotLineColor, clipRectIndex);
             var r = Font.MeasureStringF(XLabel);
             if ((Settings & ScaleParams.NotDisplayName) == 0)
             {
-                Font.DrawString(sb, XLabel, Plot.GlobalRectangle.Center.X - r.Width / 2,
+                CaptionsFont.DrawString(sb, XLabel, Plot.GlobalRectangle.Center.X - r.Width / 2,
                     Plot.GlobalRectangle.Bottom - zeroH + (Index + 1) * UIConfig.UnitPlotScaleHeight * ScaleMultiplier,
                     CaptionsColor, clipRectIndex);
             }
 
             if (StepX < float.Epsilon || (MaxX - MinX) / StepX > 100) return;
-            for (double pos = MinX; pos <= MaxX + StepX; pos += StepX) {
+            for (double pos = RoundToStep(MinX, StepX); pos <= MaxX + StepX; pos += StepX) {
                 var s = xFunc.Invoke(pos) ?? "";
                 var b = Font.MeasureStringF(s);
                 bool flip = false;//b.Width > StepX / (MaxX - MinX) * Plot.GlobalRectangle.Width * 1.25f;
@@ -454,26 +473,37 @@ namespace FusionUI.UI.Plots2_0
                 {
                     if (!flip)
                     {
-                        Font.DrawString(sb, s, Plot.GlobalRectangle.Left + w,
+                        NumbersFont.DrawString(sb, s, Plot.GlobalRectangle.Left + w,
                             Plot.GlobalRectangle.Bottom + Index * UIConfig.UnitPlotScaleHeight * ScaleMultiplier +
                             Font.LineHeight - ((float) zeroH / Plot.GlobalRectangle.Height > 0.9 ? 0 : zeroH),
                             CaptionsColor, clipRectIndex);
                     }
                     else
                     {
-                        Font.DrawString(sb, s, Plot.GlobalRectangle.Left + w,
+                        NumbersFont.DrawString(sb, s, Plot.GlobalRectangle.Left + w,
                             Plot.GlobalRectangle.Bottom + b.Width,
                             CaptionsColor, 0, flip:true);
                     }
                 }
 
-                if (w > 0 && w < Plot.GlobalRectangle.Width && (Settings & ScaleParams.NotWriteNumbersX) == 0 && (Settings & ScaleParams.DrawMeasure) != 0)
+                if (w > 0 && w < Plot.GlobalRectangle.Width && (Settings & ScaleParams.NotWriteNumbersX) == 0 && (Settings & ScaleParams.DrawMeasureX) != 0)
                 {
-                    sb.Draw(whiteTex, Plot.GlobalRectangle.Left + w + b.Width / 2 - 1, Plot.GlobalRectangle.Bottom - zeroH + Index * UIConfig.UnitPlotScaleHeight * ScaleMultiplier - 8, 1, 12, CaptionsColor, clipRectIndex);
+                    sb.Draw(whiteTex, Plot.GlobalRectangle.Left + w + b.Width / 2 - 1, Plot.GlobalRectangle.Bottom - zeroH + Index * UIConfig.UnitPlotScaleHeight * ScaleMultiplier - 4, 2, 8, UIConfig.PlotLineColor, clipRectIndex);
+                    if ((Settings & ScaleParams.DrawZeroLineY) != 0 && Math.Abs(pos) < StepX)
+                    {
+                        sb.DrawDottedLine(whiteTex, new Vector2(Plot.GlobalRectangle.Left + w + b.Width / 2 - 1, Plot.GlobalRectangle.Top), new Vector2(Plot.GlobalRectangle.Left + w + b.Width / 2 - 1, Plot.GlobalRectangle.Bottom), UIConfig.PlotScaleColor, 1, dotSize:8, spaceSize:6);
+                    }
                 }
             }
         }
 
+        private static double RoundToStep(double value, double step)
+        {
+            var offset = value % step;
+            var d = value - offset;
+            return d;
+        }
+    
         public void AddData(PlotData data)
         {            
         }
