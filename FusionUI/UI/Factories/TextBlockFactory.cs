@@ -83,7 +83,9 @@ namespace FusionUI.UI.Factories
             var refBlock = textBlock;
             holder.ActionUpdate += time =>
             {
+                holder.UnitWidth = parent.UnitWidth - parent.UnitPaddingLeft - parent.UnitPaddingRight;
                 holder.UnitHeight = refBlock.UnitHeight + 2 * OffsetY;
+
                 refBlock.UnitX = OffsetX;
                 refBlock.UnitWidth = holder.UnitWidth - 2 * OffsetX;
             };
