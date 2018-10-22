@@ -37,8 +37,15 @@ namespace FusionUI.UI.Plots2_0
             this.Add(Plot);
             Plot.DataContainer = new PlotContainer();
             AddLegend();
-            Dirty = true;
+            Dirty = true;            
         }
+
+        public virtual void Init()
+        {
+
+        }
+
+        
 
         public virtual void AddLegend()
         {
@@ -51,10 +58,11 @@ namespace FusionUI.UI.Plots2_0
         }
 
         public bool Dirty;
+        public bool IsInit = false;
         public bool IsTime;
         protected List<double> predefinedTimeSteps = new List<double>() {1.0/1440, 1.0 /288, 1.0/144, 1.0/48, 1.0/24, 1.0/12, 1.0/4, 1.0/2, 1, 2, 5, 10, 30, 60, 180, 365, 365*2, 365*5, 365*10};
 
-        public ScaleParams ScaleSettings = ScaleParams.DrawMeasure;
+        public ScaleParams ScaleSettings = ScaleParams.DrawMeasureX | ScaleParams.DrawMeasureY | ScaleParams.DrawZeroLineX | ScaleParams.DrawZeroLineY;
         private UIConfig.FontHolder scaleFont = UIConfig.FontBody;
 
         public UIConfig.FontHolder ScaleFont
@@ -136,7 +144,7 @@ namespace FusionUI.UI.Plots2_0
                     scales[name].XLabel = "Time";
                     scales[name].ZOrder = 1000;
                     scales[name].FontHolder = scaleFont;
-                    scales[name].BoldFontHolder = UIConfig.FontSubtitleAlt;
+                    scales[name].CaptionsFontHolder = UIConfig.FontSubtitleAlt;
                     scales[name].ForeColor = UIConfig.InactiveTextColor;
                     scales[name].SuggestedStepX = scaleStepX;
                     scales[name].SuggestedStepY = scaleStepY;
@@ -170,6 +178,12 @@ namespace FusionUI.UI.Plots2_0
             {
                 GenerateScales();
                 Dirty = false;
+            }
+
+            if (!IsInit)
+            {
+                Init();
+                IsInit = true;
             }
             Legend.PlotData = Plot.DataContainer;
             base.Update(gameTime);
