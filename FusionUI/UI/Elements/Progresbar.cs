@@ -27,12 +27,19 @@ namespace FusionUI.UI.Elements
             }
         }
 
+
+		public Color ProgressColor {
+			get => progress.BackColor;
+			set => progress.BackColor = value;
+		}
+
+
         private ScalableFrame back, progress;
 
         public MeasuredProgressbar(FrameProcessor ui, float x, float y, float w, float h) : base(ui, x, y, w, h)
         {
-            back = new ScalableFrame(ui, 0, 0, w, h, "", UIConfig.ButtonColor);
-            progress = new ScalableFrame(ui, 0, 0, 0, h, "", UIConfig.ActiveColor);
+            back		= new ScalableFrame(ui, 0, 0, w, h, "", UIConfig.ButtonColor);
+            progress	= new ScalableFrame(ui, 0, 0, 0, h, "", UIConfig.ActiveColor);
             Add(back);
             Add(progress);
         }
