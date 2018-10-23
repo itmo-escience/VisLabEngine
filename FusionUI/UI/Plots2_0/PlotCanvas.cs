@@ -118,8 +118,8 @@ namespace FusionUI.UI.Plots2_0
             var whiteTex = Game.RenderSystem.WhiteTexture;
             if (ActiveScale != null)
             {
-                var MaxY = (float) ActiveScale.Limits.Bottom;
-                var MinY = (float) ActiveScale.Limits.Top;
+                var MaxY = (float)ActiveScale.Limits.Bottom;
+                var MinY = (float)ActiveScale.Limits.Top;
                 if (ActiveScale.StepY < float.Epsilon || (MaxY - MinY) / ActiveScale.StepY > 100) return;
                 int i = 0;
                 for (double pos = Math.Floor(MinY / ActiveScale.StepY) * ActiveScale.StepY;
@@ -127,22 +127,22 @@ namespace FusionUI.UI.Plots2_0
                     pos += ActiveScale.StepY)
                 {
                     i++;
-                    float t = (float) (ActiveScale.GlobalRectangle.Bottom -
+                    float t = (float)(ActiveScale.GlobalRectangle.Bottom -
                                        ((pos - MinY) / (MaxY - MinY) * GlobalRectangle.Height));
                     float b = (float)(ActiveScale.GlobalRectangle.Bottom -
-                                      ((pos + ActiveScale.StepY - MinY) / (MaxY - MinY) * ActiveScale.GlobalRectangle.Height));                    
+                                      ((pos + ActiveScale.StepY - MinY) / (MaxY - MinY) * ActiveScale.GlobalRectangle.Height));
                     b = Math.Min(b, GlobalRectangle.Bottom);
                     var l = Math.Min(ActiveScale.GlobalRectangle.Left, GlobalRectangle.Left);
                     var r = Math.Max(ActiveScale.GlobalRectangle.Right, GlobalRectangle.Right);
-                    sb.Draw(whiteTex, l, t, r-l, b-t, i % 2 == 0 ? UIConfig.BackColorLayer : Color.Zero, clipRectIndex);
+                    sb.Draw(whiteTex, l, t, r - l, b - t, i % 2 == 0 ? UIConfig.BackColorLayer : Color.Zero, clipRectIndex);
                 }
             }
 
             hintPoints = new List<Tuple<Vector2, string, double, PlotData>>();
             int nBarCharts = DataContainer.Data.Values.Sum(pv =>
                 pv.IsActive
-                    ? pv.Data.Values.Sum(pd => 
-                        pd.Sum(a => 
+                    ? pv.Data.Values.Sum(pd =>
+                        pd.Sum(a =>
                             a.Value.IsPresent && a.Value.IsBarChart ? 1 : 0))
                     : 0);
             int plotIndex = 0;
@@ -166,33 +166,26 @@ namespace FusionUI.UI.Plots2_0
                                 {
                                     DrawPlot(sb, kv.Value, clipRectIndex);
                                 }
-                            }                            
+                            }
                         }
                     }
-                }                                
+                }
             }
             var beamTex = Game.Content.Load<DiscTexture>(@"UI/beam");
-            
+
             if (LineFunc != null)
             {
-                var x = LineFunc(this);                
+                var x = LineFunc(this);
                 var p1 = new Vector2(this.GlobalRectangle.Left + this.GlobalRectangle.Width * x, this.GlobalRectangle.Top);
                 var p2 = new Vector2(this.GlobalRectangle.Left + this.GlobalRectangle.Width * x, this.GlobalRectangle.Bottom);
                 sb.DrawBeam(beamTex, p1, p2, LineColor, LineColor,
                     UIConfig.UnitPlotLineWidth * ScaleMultiplier, clipRectIndex: clipRectIndex);
             }
-
             if (Game.Keyboard.IsKeyDown(Keys.LeftShift) || Game.Keyboard.IsKeyDown(Keys.RightShift) &&
                 GlobalRectangle.Contains(Game.Mouse.Position))
             {
-                var x = ((float)Game.Mouse.Position.X - GlobalRectangle.Left) / GlobalRectangle.Width;
-                
-                var p1 = new Vector2(this.GlobalRectangle.Left + this.GlobalRectangle.Width * x, this.GlobalRectangle.Top);
-                var p2 = new Vector2(this.GlobalRectangle.Left + this.GlobalRectangle.Width * x, this.GlobalRectangle.Bottom);
-                sb.DrawBeam(beamTex, p1, p2, UIConfig.ActiveColor, UIConfig.ActiveColor,
-                    UIConfig.UnitPlotLineWidth * ScaleMultiplier, clipRectIndex: clipRectIndex);
+                DrawMouseLine(sb, clipRectIndex, beamTex);
             }
-
             hintPoints.Sort((a, b) => -Math.Abs(a.Item1.Y - Game.Mouse.Position.Y).CompareTo(Math.Abs(b.Item1.Y - Game.Mouse.Position.Y)));
             for (int i = 0; i < hintPoints.Count; i++)
             {
@@ -203,7 +196,7 @@ namespace FusionUI.UI.Plots2_0
                 var r = Font.MeasureStringF(s);
                 if (pointScreen.Y - r.Height - r.Y < GlobalRectangle.Top && pointScreen.Y > GlobalRectangle.Top)
                 {
-                    pointScreen.Y = GlobalRectangle.Top + r.Height + r.Y; 
+                    pointScreen.Y = GlobalRectangle.Top + r.Height + r.Y;
                 }
                 if (pointScreen.Y > GlobalRectangle.Bottom && pointScreen.Y - r.Height - r.Y < GlobalRectangle.Bottom)
                 {
@@ -211,7 +204,7 @@ namespace FusionUI.UI.Plots2_0
                 }
                 sb.Draw(whiteTex, pointScreen.X, pointScreen.Y - r.Height - r.Y, r.Width, r.Height,
                     UIConfig.PopupColor, clipRectIndex);
-                Font.DrawString(sb, s, pointScreen.X, pointScreen.Y, pd.ColorsByDepth[depth], clipRectIndex);
+                Font.DrawString(sb, s, pointScreen.X, pointScreen.Y, depth >= 0 ? pd.ColorsByDepth[depth] : pd.BaseColor, clipRectIndex);
             }
 
             if (IsDraggingBox)
@@ -220,7 +213,7 @@ namespace FusionUI.UI.Plots2_0
                 Vector2 brScreen = GlobalRectangle.TopLeft + DragRect.BottomRight.ToVector2() * GlobalRectangle.Size;
                 Vector2 trScreen = new Vector2(brScreen.X, tlScreen.Y);
                 Vector2 blScreen = new Vector2(tlScreen.X, brScreen.Y);
-                sb.DrawBeam(beamTex, tlScreen, trScreen, Color.White, Color.White, UIConfig.UnitPlotLineWidth * ScaleMultiplier, clipRectIndex:clipRectIndex);
+                sb.DrawBeam(beamTex, tlScreen, trScreen, Color.White, Color.White, UIConfig.UnitPlotLineWidth * ScaleMultiplier, clipRectIndex: clipRectIndex);
                 sb.DrawBeam(beamTex, blScreen, brScreen, Color.White, Color.White, UIConfig.UnitPlotLineWidth * ScaleMultiplier, clipRectIndex: clipRectIndex);
                 sb.DrawBeam(beamTex, tlScreen, blScreen, Color.White, Color.White, UIConfig.UnitPlotLineWidth * ScaleMultiplier, clipRectIndex: clipRectIndex);
                 sb.DrawBeam(beamTex, trScreen, brScreen, Color.White, Color.White, UIConfig.UnitPlotLineWidth * ScaleMultiplier, clipRectIndex: clipRectIndex);
@@ -228,6 +221,17 @@ namespace FusionUI.UI.Plots2_0
                 c.A = 64;
                 sb.Draw(whiteTex, tlScreen.X, tlScreen.Y, (float)(DragRect.Width * GlobalRectangle.Width), (float)(DragRect.Height * GlobalRectangle.Height), UIConfig.ActiveColor, clipRectIndex: clipRectIndex);
             }
+        }
+
+        protected virtual void DrawMouseLine(SpriteLayer sb, int clipRectIndex, DiscTexture beamTex)
+        {
+            
+                var x = ((float)Game.Mouse.Position.X - GlobalRectangle.Left) / GlobalRectangle.Width;
+
+                var p1 = new Vector2(this.GlobalRectangle.Left + this.GlobalRectangle.Width * x, this.GlobalRectangle.Top);
+                var p2 = new Vector2(this.GlobalRectangle.Left + this.GlobalRectangle.Width * x, this.GlobalRectangle.Bottom);
+                sb.DrawBeam(beamTex, p1, p2, UIConfig.ActiveColor, UIConfig.ActiveColor,
+                    UIConfig.UnitPlotLineWidth * ScaleMultiplier, clipRectIndex: clipRectIndex);            
         }
 
         public RectangleD ScaleRect = new RectangleD(0, 0, 1, 1);

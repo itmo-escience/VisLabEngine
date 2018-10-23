@@ -59,12 +59,12 @@ namespace FusionUI.UI.Elements
             }
         }
 
-        public TimeLine(FrameProcessor ui, float x, float y, float w, float h, string text, Color backColor, DiscTexture lordTexture=null, int emptyWidth = 0)
+        public TimeLine(FrameProcessor ui, float x, float y, float w, float h, string text, Color backColor, DiscTexture lordTexture=null, int emptyWidth = 0, float? initialUnitHPadding = null )
             : base(ui, x, y, w, h, text, backColor)
         {
             this.emptySizeImage = emptyWidth;
             this.textureLord = lordTexture;
-            UnitHPadding = UIConfig.UnitTimelineOffsetX;
+            UnitHPadding = initialUnitHPadding ?? UIConfig.UnitTimelineOffsetX;
 			Init(ui);            
         }
 
@@ -98,9 +98,11 @@ namespace FusionUI.UI.Elements
 
         private void UpdatedTimeElement()
         {
-            timeLabelTime.UnitX = LordOfTime.UnitX + LordOfTime.UnitWidth / 2 - UIConfig.UnitTimelineLabelWidth / 2;
-            timeLabelDate.UnitX = LordOfTime.UnitX + LordOfTime.UnitWidth / 2 - UIConfig.UnitTimelineLabelWidth / 2;
-            lineLineBeforeLord.UnitWidth = LordOfTime.UnitX - UnitPaddingLeft + LordOfTime.UnitWidth / 2;
+            timeLabelTime.UnitX = Math.Max(LordOfTime.UnitX + LordOfTime.UnitWidth / 2 - timeLabelTime.UnitWidth / 2,0);
+			timeLabelTime.UnitX = Math.Min(timeLabelTime.UnitX, this.UnitWidth - timeLabelTime.UnitWidth);
+			timeLabelDate.UnitX = Math.Max(LordOfTime.UnitX + LordOfTime.UnitWidth / 2 - timeLabelDate.UnitWidth / 2,0);
+			timeLabelDate.UnitX = Math.Min(timeLabelDate.UnitX, this.UnitWidth - timeLabelDate.UnitWidth);
+			lineLineBeforeLord.UnitWidth = LordOfTime.UnitX - UnitPaddingLeft + LordOfTime.UnitWidth / 2;
         }        
 
         public DateTime XPositionToDateTime(float x)
@@ -130,9 +132,9 @@ namespace FusionUI.UI.Elements
             timeLabelTime = new ScalableFrame(ui, LordOfTime.UnitX + LordOfTime.UnitWidth/2 - UIConfig.UnitTimelineLabelWidth/2, yLabel/* > 0 ? yLabel : 1.5f*/, UIConfig.UnitTimelineLabelWidth, font.CapHeight / ScaleMultiplier, "Time", Color.Zero)
             {
                 ForeColor = UIConfig.TimeLineColor1,
-//                Border = 1,
-//                BorderColor = new Color(110, 110, 110),
-                TextAlignment = Alignment.MiddleCenter,
+				//Border = 1,
+				//BorderColor = new Color(110, 110, 110),
+				TextAlignment = Alignment.MiddleCenter,
                 FontHolder = UIConfig.FontCaption,                
                 Ghost = true
             };
@@ -140,9 +142,9 @@ namespace FusionUI.UI.Elements
             var yLabelDate = this.UnitHeight - font.CapHeight / ScaleMultiplier;
             timeLabelDate = new ScalableFrame(ui, LordOfTime.UnitX + LordOfTime.UnitWidth / 2 - UIConfig.UnitTimelineLabelWidth / 2, yLabelDate, UIConfig.UnitTimelineLabelWidth, font.CapHeight / ScaleMultiplier, "Date", Color.Zero)
             {
-                //                Border = 1,
-                //                BorderColor = new Color(110, 110, 110),
-                ForeColor = UIConfig.TimeLineColor1,
+				//Border = 1,
+				//BorderColor = new Color(110, 110, 110),
+				ForeColor = UIConfig.TimeLineColor1,
                 TextAlignment = Alignment.MiddleCenter,
                 FontHolder = UIConfig.FontCaption,
                 Ghost = true
@@ -163,14 +165,14 @@ namespace FusionUI.UI.Elements
             var thinknessLine = UIConfig.UnitTimelineTickness;
             lineLineBeforeLord = new ScalableFrame(ui, UnitPaddingLeft , this.UnitHeight/2 - thinknessLine/2, LordOfTime.UnitX + emptySizeImage / ScaleMultiplier, thinknessLine, "", UIConfig.TimeLineColor1)
             {
-                //Anchor = FrameAnchor.Bottom | FrameAnchor.Left | FrameAnchor.Right,
+                Anchor = /*FrameAnchor.Bottom | */FrameAnchor.Left | FrameAnchor.Right,
                 Ghost = true,
                 ZOrder = 3,
             };
 
             lineLineAfterLord = new ScalableFrame(ui, UnitPaddingLeft, this.UnitHeight/2 - thinknessLine/2, UnitWidth - UnitPaddingLeft - UnitPaddingRight, thinknessLine, "", UIConfig.TimeLineColor2)
             {
-                //Anchor = FrameAnchor.Bottom | FrameAnchor.Left | FrameAnchor.Right,
+                Anchor = /*FrameAnchor.Bottom | */FrameAnchor.Left | FrameAnchor.Right,
                 Ghost = true,
                 ZOrder = 2,
             };

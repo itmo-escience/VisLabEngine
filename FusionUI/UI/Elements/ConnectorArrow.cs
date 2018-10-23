@@ -179,8 +179,8 @@ namespace FusionUI.UI.Elements
                 .Where(a => a.outDirection == inDirection)
                 ).OrderBy(a => a.myIndex).Where(a => !(a.ToFrame == FromFrame && a.FromFrame == ToFrame)).ToList();
 
-            float startSpread = DoStraightenFrom ? ((outDirection % 2 == 1) ? FromFrame.Height - ArrowPointerSize: FromFrame.Width -ArrowPointerSize): ArrowSpread;
-            float endSpread = DoStraightenTo ? ((inDirection % 2 == 1) ? ToFrame.Height - ArrowPointerSize: ToFrame.Width - ArrowPointerSize) : ArrowSpread;
+            float startSpread = DoStraightenFrom ? ((outDirection % 2 == 1) ? FromFrame.Height: FromFrame.Width): ArrowSpread;
+            float endSpread = DoStraightenTo ? ((inDirection % 2 == 1) ? ToFrame.Height: ToFrame.Width) : ArrowSpread;
             if (startArrows.Count() > 1)
             {
                 if (DoStraightenFrom) startSpread /= startArrows.Count;
@@ -265,7 +265,7 @@ namespace FusionUI.UI.Elements
                         {
                             var p = center + d2 * (l-l1);
                             var d = d2;
-                            var r = new Vector2(d.Y, d.X);
+                            var r = new Vector2(d.Y, -d.X);
                             spriteLayer.DrawFreeUV(circleTex, p + (-d + r) * DotMarkerSize / 2, p + (d + r) * DotMarkerSize / 2, p + (-d - r) * DotMarkerSize / 2, p + (d - r) * DotMarkerSize / 2, ForeColor,
                                 new Vector2(0, 0), new Vector2(1, 0), new Vector2(0, 1), new Vector2(1, 1));
                             //spriteLayer.Draw(circleTex, p.X - DotMarkerSize / 2, p.Y - DotMarkerSize / 2, ArrowWidth / 2, ArrowWidth / 2, BackColor);
@@ -274,7 +274,7 @@ namespace FusionUI.UI.Elements
                         {                                                                                                
                             var p = start + d1 * l;
                             var d = d1;
-                            var r = new Vector2(d.Y, d.X);
+                            var r = new Vector2(d.Y, -d.X);
                             spriteLayer.DrawFreeUV(circleTex, p + (-d + r) * DotMarkerSize / 2, p + (d + r) * DotMarkerSize / 2, p + (-d - r) * DotMarkerSize / 2, p + (d - r) * DotMarkerSize / 2, ForeColor,
                                 new Vector2(0, 0), new Vector2(1, 0), new Vector2(0, 1), new Vector2(1, 1));
                             //spriteLayer.Draw(circleTex, p.X - DotMarkerSize / 2, p.Y - DotMarkerSize / 2, ArrowWidth / 2, ArrowWidth / 2, BackColor);
@@ -326,7 +326,7 @@ namespace FusionUI.UI.Elements
                         {
                             var p = center2 + d3 * (l - l1 - l2);
                             var d = d3;
-                            var r = new Vector2(d.Y, d.X);
+                            var r = new Vector2(d.Y, -d.X);
                             spriteLayer.DrawFreeUV(circleTex, p + (-d + r) * DotMarkerSize / 2, p + (d + r) * DotMarkerSize / 2, p + (-d - r) * DotMarkerSize / 2, p + (d - r) * DotMarkerSize / 2, ForeColor,
                                 new Vector2(0, 0), new Vector2(1, 0), new Vector2(0, 1), new Vector2(1, 1));
                             //spriteLayer.Draw(circleTex, p.X - DotMarkerSize / 2, p.Y - DotMarkerSize / 2, ArrowWidth / 2, ArrowWidth / 2, BackColor);
@@ -335,7 +335,7 @@ namespace FusionUI.UI.Elements
                         {
                             var p = center1 + d2 * (l - l1);
                             var d = d2;
-                            var r = new Vector2(d.Y, d.X);
+                            var r = new Vector2(d.Y, -d.X);
                             spriteLayer.DrawFreeUV(circleTex, p + (-d + r) * DotMarkerSize / 2, p + (d + r) * DotMarkerSize / 2, p + (-d - r) * DotMarkerSize / 2, p + (d - r) * DotMarkerSize / 2, ForeColor,
                                 new Vector2(0, 0), new Vector2(1, 0), new Vector2(0, 1), new Vector2(1, 1));
                             //spriteLayer.Draw(circleTex, p.X - DotMarkerSize / 2, p.Y - DotMarkerSize / 2, ArrowWidth / 2, ArrowWidth / 2, BackColor);
@@ -344,7 +344,7 @@ namespace FusionUI.UI.Elements
                         {
                             var p = start + d1 * l;
                             var d = d1;
-                            var r = new Vector2(d.Y, d.X);
+                            var r = new Vector2(d.Y, -d.X);
                             spriteLayer.DrawFreeUV(circleTex, p + (-d + r) * DotMarkerSize / 2, p + (d + r) * DotMarkerSize / 2, p + (-d - r) * DotMarkerSize / 2, p + (d - r) * DotMarkerSize / 2, ForeColor,
                                 new Vector2(0, 0), new Vector2(1, 0), new Vector2(0, 1), new Vector2(1, 1));
                             //spriteLayer.Draw(circleTex, p.X - DotMarkerSize / 2, p.Y - DotMarkerSize / 2, ArrowWidth / 2, ArrowWidth / 2, BackColor);
@@ -399,7 +399,7 @@ namespace FusionUI.UI.Elements
                         {
                             var p = center2 + d3 * (l - l1 - l2);
                             var d = d3;
-                            var r = new Vector2(d.Y, d.X);
+                            var r = new Vector2(d.Y, -d.X);
                             spriteLayer.DrawFreeUV(circleTex, p + (-d + r) * DotMarkerSize / 2, p + (d + r) * DotMarkerSize / 2, p + (-d - r) * DotMarkerSize / 2, p + (d - r) * DotMarkerSize / 2, ForeColor,
                                 new Vector2(0, 0), new Vector2(1, 0), new Vector2(0, 1), new Vector2(1, 1));
                             //spriteLayer.Draw(circleTex, p.X - ArrowWidth/4, p.Y - DotMarkerSize / 2, ArrowWidth / 2, ArrowWidth / 2, BackColor);
@@ -409,7 +409,7 @@ namespace FusionUI.UI.Elements
                         {
                             var p = center1 + d2 * (l - l1);
                             var d = d2;
-                            var r = new Vector2(d.Y, d.X);
+                            var r = new Vector2(d.Y, -d.X);
                             spriteLayer.DrawFreeUV(circleTex, p + (-d + r) * DotMarkerSize / 2, p + (d + r) * DotMarkerSize / 2, p + (-d - r) * DotMarkerSize / 2, p + (d - r) * DotMarkerSize / 2, ForeColor,
                                 new Vector2(0, 0), new Vector2(1, 0), new Vector2(0, 1), new Vector2(1, 1));
                             //spriteLayer.Draw(circleTex, p.X - DotMarkerSize / 2, p.Y - DotMarkerSize / 2, ArrowWidth / 2, ArrowWidth / 2, BackColor);
@@ -418,7 +418,7 @@ namespace FusionUI.UI.Elements
                         {
                             var p = start + d1 * l;
                             var d = d1;
-                            var r = new Vector2(d.Y, d.X);
+                            var r = new Vector2(d.Y, -d.X);
                             spriteLayer.DrawFreeUV(circleTex, p + (-d + r) * DotMarkerSize / 2, p + (d + r) * DotMarkerSize / 2, p + (-d - r) * DotMarkerSize / 2, p + (d - r) * DotMarkerSize / 2, ForeColor,
                                 new Vector2(0, 0), new Vector2(1, 0), new Vector2(0, 1), new Vector2(1, 1));
                             //spriteLayer.Draw(circleTex, p.X - DotMarkerSize / 2, p.Y - DotMarkerSize / 2, ArrowWidth / 2, ArrowWidth / 2, BackColor);
@@ -446,8 +446,8 @@ namespace FusionUI.UI.Elements
                         float l = GlobalAnimvelocity * (i + animProgress);
                         if (l > length - ArrowPointerSize || l < DotMarkerSize ) continue;
                         var p = start + d * l;
-                        var r = new Vector2(d.Y, d.X);
-                        spriteLayer.DrawFreeUV(circleTex, p + (-d + r) * DotMarkerSize / 2, p + (d + r) * DotMarkerSize / 2, p + (-d - r) * DotMarkerSize / 2, p + (d - r) * DotMarkerSize / 2, ForeColor,
+                        var r = new Vector2(d.Y, -d.X);
+                        spriteLayer.DrawFreeUV(circleTex, p + (-d + r) * DotMarkerSize /2, p + (d + r) * DotMarkerSize /2, p + (-d - r) * DotMarkerSize /2, p + (d - r) * DotMarkerSize /2, ForeColor,
                             new Vector2(0, 0), new Vector2(1, 0), new Vector2(0, 1), new Vector2(1,1));                        
                     }
                 }
