@@ -145,7 +145,7 @@ namespace FusionUI.UI
             labelStartTime = new ScalableFrame(ui, timeLine.UnitPaddingLeft/*UIConfig.UnitTimelineOffsetX*/, timeLine.UnitY + timeLine.UnitHeight - (sizeText.Height / ScaleMultiplier) + 1.25f,
                 (sizeText.Width / ScaleMultiplier), (sizeText.Height / ScaleMultiplier), "", Color.Zero)
             {
-                //Anchor = FrameAnchor.Left
+                Anchor = FrameAnchor.Left,
                 FontHolder = UIConfig.FontCaption,
                 TextAlignment = Alignment.MiddleLeft
             };
@@ -153,7 +153,7 @@ namespace FusionUI.UI
                 timeLine.UnitY + timeLine.UnitHeight - (sizeText.Height / ScaleMultiplier) + 1.25f,
                 (sizeText.Width / ScaleMultiplier), (sizeText.Height / ScaleMultiplier), "", Color.Zero)
             {
-                //Anchor = FrameAnchor.Right
+                Anchor = FrameAnchor.Right,
                 FontHolder = UIConfig.FontCaption,
                 TextAlignment = Alignment.MiddleRight
             };
@@ -330,6 +330,7 @@ namespace FusionUI.UI
 				FontHolder = UIConfig.FontSubtitle,
 				TextAlignment = Alignment.MiddleLeft,
 				ForeColor = Color.Gray,
+				Anchor = FrameAnchor.Left
 			};
 			this.rightTimeLineLable = new ScalableFrame(ui, (this.buttonLoop.UnitX + this.buttonLoop.UnitWidth), this.UnitHeight- 4 -4,
 				this.UnitWidth-(this.buttonLoop.UnitX+ this.buttonLoop.UnitWidth), 4, labelRightBaseText, Color.Zero)
@@ -337,6 +338,7 @@ namespace FusionUI.UI
 				FontHolder = UIConfig.FontSubtitle,
 				TextAlignment = Alignment.MiddleRight,
 				ForeColor = Color.Gray,
+				Anchor = FrameAnchor.Right
 			};
 			this.Add(leftTimeLineLable);
 			this.Add(rightTimeLineLable);

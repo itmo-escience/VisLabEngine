@@ -165,14 +165,14 @@ namespace FusionUI.UI.Elements
             var thinknessLine = UIConfig.UnitTimelineTickness;
             lineLineBeforeLord = new ScalableFrame(ui, UnitPaddingLeft , this.UnitHeight/2 - thinknessLine/2, LordOfTime.UnitX + emptySizeImage / ScaleMultiplier, thinknessLine, "", UIConfig.TimeLineColor1)
             {
-                //Anchor = FrameAnchor.Bottom | FrameAnchor.Left | FrameAnchor.Right,
+                Anchor = /*FrameAnchor.Bottom | */FrameAnchor.Left | FrameAnchor.Right,
                 Ghost = true,
                 ZOrder = 3,
             };
 
             lineLineAfterLord = new ScalableFrame(ui, UnitPaddingLeft, this.UnitHeight/2 - thinknessLine/2, UnitWidth - UnitPaddingLeft - UnitPaddingRight, thinknessLine, "", UIConfig.TimeLineColor2)
             {
-                //Anchor = FrameAnchor.Bottom | FrameAnchor.Left | FrameAnchor.Right,
+                Anchor = /*FrameAnchor.Bottom | */FrameAnchor.Left | FrameAnchor.Right,
                 Ghost = true,
                 ZOrder = 2,
             };
