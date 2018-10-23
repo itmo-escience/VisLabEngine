@@ -13,9 +13,10 @@ namespace Fusion.Engine.Frames {
 
 	public interface ITransition {
 		void	Update	( GameTime gameTime );
-		void	Terminate ();
+		void	Terminate (bool cancel = false);
 		bool	IsDone { get; }
 		bool	IsActive { get; }
+		bool	IsCancelled { get; }
 		string	TagName { get; set; }
 		float	Timer { get; }
 	    Action Callback { get; set; }
@@ -34,7 +35,7 @@ namespace Fusion.Engine.Frames {
 		}
 	}
 
-	
+
 	public class IntInterpolator : IInterpolator<int> {
 		public int Lerp ( int init, int term, float factor )
 		{
@@ -118,7 +119,7 @@ namespace Fusion.Engine.Frames {
 		readonly T				targetValue;
 		readonly float			period;
 		readonly I				interpolator;
-        
+
 
 		T		originValue;
 		float	timer;
@@ -132,6 +133,7 @@ namespace Fusion.Engine.Frames {
 
         public Action Callback { get; set; }
 
+        public bool IsCancelled { get; private set; }
 
 		public bool IsDone {
 			get {
@@ -157,7 +159,7 @@ namespace Fusion.Engine.Frames {
 
 
 		/// <summary>
-		/// 
+		///
 		/// </summary>
 		/// <param name="targetObject"></param>
 		/// <param name="targetProperty"></param>
@@ -178,7 +180,7 @@ namespace Fusion.Engine.Frames {
 
 
 		/// <summary>
-		/// 
+		///
 		/// </summary>
 		/// <param name="gameTime"></param>
 		public void Update ( GameTime gameTime )
@@ -194,7 +196,7 @@ namespace Fusion.Engine.Frames {
 			//	until time not come
 			if ( timer < 0 ) {
 				return;
-			} 
+			}
 
 			//	timer just jumped over :
 			if ( timer - delta <= 0 ) {
@@ -204,12 +206,12 @@ namespace Fusion.Engine.Frames {
 				if (toCancel!=null && toCancel.Any()) {
 					foreach ( var t in toCancel ) {
 						if (t.Timer>0 && t!=this) {
-							t.Terminate();                            
+							t.Terminate(true);
 						}
 					}
 				}
 			}
-			
+
 			//	calc factor :
 			if ( timer >= period ) {
 				factor	=	1;
@@ -234,14 +236,16 @@ namespace Fusion.Engine.Frames {
 
 
 		/// <summary>
-		/// 
+		///
 		/// </summary>
-		public void Terminate ()
+		public void Terminate (bool cancel=false)
 		{
 			timer	=	int.MaxValue;
 			targetProperty.SetValue( targetObject, targetValue );
+
+		    IsCancelled = cancel;
 		}
 
-		
+
 	}
 }

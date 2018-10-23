@@ -105,7 +105,7 @@ namespace Fusion.Engine.Graphics.GIS
 
 
 		/// <summary>
-		/// 
+		///
 		/// </summary>
 		/// <param name="lon"></param>
 		/// <param name="lat"></param>
@@ -158,6 +158,26 @@ namespace Fusion.Engine.Graphics.GIS
 			return d;
 		}
 
+	    public static List<DVector2> LineBetweenTwoPoints(DVector2 from, DVector2 to, int segmentsNumber = 10)
+	    {
+	        var u = SphericalToCartesian(from).Normalized();
+	        var v = SphericalToCartesian(to).Normalized();
+	        var w = DVector3.Cross(DVector3.Cross(u, v), u).Normalized();
+
+	        var len = DistanceBetweenTwoPoints(from, to) / (2 * Math.PI * EarthRadius);
+
+	        var result = new List<DVector2>();
+	        for (var i = 0; i < segmentsNumber + 1; i++)
+	        {
+	            var t = 2 * Math.PI * len * i / segmentsNumber;
+	            var p = u * Math.Cos(t) + w * Math.Sin(t);
+	            var pEarth = p * EarthRadius;
+
+                result.Add(CartesianToSpherical(pEarth));
+	        }
+
+	        return result;
+	    }
 
 		public static DVector2 RhumbDestinationPoint(DVector2 startPoint, double bearing, double distance, double radius = 6378.137)
 		{
@@ -213,8 +233,8 @@ namespace Fusion.Engine.Graphics.GIS
 			bool oddNodes = false;
 
 			for (int i = 0; i < simPoly.Length; i++) {
-				if ((simPoly[i].Y < point.Y && simPoly[j].Y >= point.Y || simPoly[j].Y < point.Y && simPoly[i].Y >= point.Y) && 
-					(simPoly[i].X <= point.X || simPoly[j].X <= point.X)) 
+				if ((simPoly[i].Y < point.Y && simPoly[j].Y >= point.Y || simPoly[j].Y < point.Y && simPoly[i].Y >= point.Y) &&
+					(simPoly[i].X <= point.X || simPoly[j].X <= point.X))
 				{
 					oddNodes ^= (simPoly[i].X + (point.Y - simPoly[i].Y) / (simPoly[j].Y - simPoly[i].Y) * (simPoly[j].X - simPoly[i].X) < point.X);
 				}
@@ -285,25 +305,25 @@ namespace Fusion.Engine.Graphics.GIS
 			var e2 = Math.Pow(((c_sa * c_sa) - (c_sb * c_sb)), 0.5) / c_sb;
 			var e2cuadrada = (e2 * e2);
 			var c = (c_sa * c_sa) / c_sb;
-			
+
 			var x = utmX - 500000;
 			var y = isNorthHemisphere ? utmY : utmY - 10000000;
 
 			var s = ((zone * 6.0) - 183.0);
 			var lat = y / (c_sa * 0.9996);
-			
+
 			var latCos		= Math.Cos(lat);
 			var latCosSqr	= latCos*latCos;
 			var v = (c / Math.Pow(1 + (e2cuadrada * latCosSqr), 0.5)) * 0.9996;
-			
+
 			var a = x / v;
 			var a1 = Math.Sin(2 * lat);
 			var a2 = a1 * Math.Pow((latCos), 2);
-			
+
 			var j2 = lat + (a1 / 2.0);
 			var j4 = ((3 * j2) + a2) / 4.0;
 			var j6 = ((5 * j4) + Math.Pow(a2 * latCos, 2)) / 3.0;
-			
+
 			var alfa = (3.0 / 4.0) * e2cuadrada;
 			var beta = (5.0 / 3.0) * (alfa * alfa);
 			var gama = (35.0 / 27.0) * (alfa * alfa * alfa);
@@ -312,7 +332,7 @@ namespace Fusion.Engine.Graphics.GIS
 
 			var epsi = ((e2cuadrada * (a*a)) / 2.0) * latCosSqr;
 			var eps = a * (1 - (epsi / 3.0));
-			
+
 			var nab = (b * (1 - epsi)) + lat;
 			var senoheps = (Math.Exp(eps) - Math.Exp(-eps)) / 2.0;
 			var delt = Math.Atan(senoheps / (Math.Cos(nab)));

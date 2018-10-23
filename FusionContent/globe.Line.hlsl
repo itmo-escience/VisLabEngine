@@ -79,6 +79,34 @@ double dlerp(double a, double b, float t)
 {
 	return a + (b - a) * double(t);
 }
+
+float DistanceBetweenTwoPoints(float2 from, float2 to, float r)
+{
+	float phi0 = (float) from.y;
+	float phi1 = (float) to.y;
+	float deltaPhi = phi1 - phi0;
+	float deltaLam = (float) (to.x - from.x);
+
+	float a = sin(deltaPhi / 2.0) * sin(deltaPhi / 2.0) + cos(phi0) * cos(phi1) * sin(deltaLam / 2.0) * sin(deltaLam / 2.0);
+	float c = 2 * atan2(sqrt(a), sqrt(1 - a));
+
+	return r * c;
+}
+
+float2 DecartToSpherical(float3 cart)
+{
+	float radius = length(cart);
+
+	if (radius == 0.0) {
+		return float2(0, 0);
+	}
+
+	float lon = atan2(cart.x, cart.z);
+	float lat = asin(cart.y / radius);
+	
+	return float2(lon, lat);
+}	
+
 ////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
@@ -292,13 +320,18 @@ inout TriangleStream<GS_OUTPUT> stream
 #endif
 
 #ifdef GEO_LINES
-	double lon0		= asdouble(p0.lon.x, p0.lon.y);
-	double lat0		= asdouble(p0.lat.x, p0.lat.y);
-	
-	double lon1		= asdouble(p1.lon.x, p1.lon.y);
-	double lat1		= asdouble(p1.lat.x, p1.lat.y);
+	float2 from		= float2(asdouble(p0.lon.x, p0.lon.y), asdouble(p0.lat.x, p0.lat.y));
+	float2 to 		= float2(asdouble(p1.lon.x, p1.lon.y), asdouble(p1.lat.x, p1.lat.y));
 	
 	float slicesCount = 10;//max(length(float2(float(lon1-lon0), float(lat1 - lat0))), 30);	
+	
+	float3 u = normalize(SphericalToDecart(from, 6378.137));
+	float3 v = normalize(SphericalToDecart(  to, 6378.137));
+    float3 w = normalize(cross(cross(u, v), u));
+
+	//float TWO_PI = 6.2831853;
+    float len = DistanceBetweenTwoPoints(from, to, 6378.137) / 6378.137;
+	
 #endif
 
 #ifdef ARC_LINE	
@@ -312,14 +345,18 @@ inout TriangleStream<GS_OUTPUT> stream
 	texMaxX = texMaxX - frac(texMaxX);
 #endif
 
+
 	[unroll]
 	for(float i = 0; i < slicesCount; i = i + 1) {
 
 	#ifdef GEO_LINES
-		float f = i / (slicesCount-1);
+		float f = i / (slicesCount-1);		
+		float t = len * f;
+		float3 p = u * cos(t) + w * sin(t);
+		float2 geoP = DecartToSpherical(p);
 		
-		double lon = dlerp(lon0, lon1, f);
-		double lat = dlerp(lat0, lat1, f);
+		double lon = geoP.x; //dlerp(lon0, lon1, f);
+		double lat = geoP.y; //dlerp(lat0, lat1, f);
 		float h = lerp(p0.Tex1.x, p1.Tex1.x, f);
 		double3 cPos = SphericalToDecart(double2(lon, lat), 6378.137 + h);
 		

@@ -44,7 +44,7 @@ namespace Fusion.Engine.Graphics.GIS
 		// Camera stuff
 		public DMatrix ViewMatrix;
 		public DMatrix ProjMatrix;
-		
+
 		public Matrix ViewMatrixFloat;
 		public Matrix ProjMatrixFloat;
 
@@ -91,7 +91,7 @@ namespace Fusion.Engine.Graphics.GIS
 
 		public readonly double EarthRadius = 6378.137;
 		double cameraDistance	= 90000.0;
-		
+
 
 
 		public enum Places
@@ -112,7 +112,7 @@ namespace Fusion.Engine.Graphics.GIS
 
 			public double MaxViewToPointPitch { set; get; }
 			public double MinViewToPointPitch { set; get; }
-			
+
 			public double CameraFovDegrees	{ set; get; }
 			public double FrustumZNear		{ set; get; }
 			public double FrustumZFar		{ set; get; }
@@ -126,7 +126,7 @@ namespace Fusion.Engine.Graphics.GIS
 
 			public double MinCameraDistance { set; get; }
 
-		}	    
+		}
 
 		public GlobeCamera(Game engine)
 		{
@@ -211,7 +211,7 @@ namespace Fusion.Engine.Graphics.GIS
 			    CameraState = CameraStates.TopDown;
 			} else {
 				CameraState = CameraStates.ViewToPoint;
-			} 
+			}
 		}
 
 		public void ToggleFreeSurfaceCamera()
@@ -254,7 +254,7 @@ namespace Fusion.Engine.Graphics.GIS
 
 			RotateViewToPointCamera(yawDelta, pitDelta);
 		}
-		
+
 		public void RotateViewToPointCamera(double yawDelta, double pitchDelta)
 		{
 			ViewToPointYaw		+= yawDelta;
@@ -328,7 +328,7 @@ namespace Fusion.Engine.Graphics.GIS
 				ViewMatrix.TranslationVector = DVector3.Zero;
 			} else if (CameraState == CameraStates.FreeSurface) {
 				var mat = CalculateBasisOnSurface();
-				
+
 				#region Input
 					// Update surface camera yaw and pitch
 					//if (input.IsKeyDown(Keys.RightButton)) {
@@ -368,7 +368,7 @@ namespace Fusion.Engine.Graphics.GIS
 					if (velDir.Length() != 0) {
 						velDir.Normalize();
 					}
-				
+
 				#endregion
 
 				double fac = ((CameraDistance - EarthRadius) - Parameters.MinDistVelocityThreshold) / (Parameters.MaxDistVelocityThreshold - Parameters.MinDistVelocityThreshold);
@@ -483,7 +483,7 @@ namespace Fusion.Engine.Graphics.GIS
 
 			var nearPoint	= new DVector3(x, y, Parameters.FrustumZNear);
 			var farPoint	= new DVector3(x, y, Parameters.FrustumZFar);
-			
+
 			var vm	= ViewMatrixWithTranslation;
 			var mVP = vm * ProjMatrix;
 
@@ -533,7 +533,7 @@ namespace Fusion.Engine.Graphics.GIS
 			public DVector3	FreeSurfacePosition;
 			public double	FreeSurfaceYaw;
 			public double	FreeSurfacePitch;
-			
+
 			public float	WaitTime;
 			public float	TransitionTime;
 
@@ -601,7 +601,7 @@ namespace Fusion.Engine.Graphics.GIS
 
 			for (int i = 0; i < lines.Length; i++) {
 				var line = lines[i];
-				
+
 				var s = line.Split(new char[] {'\t'}, StringSplitOptions.RemoveEmptyEntries);
 
 				var curState = new SurfaceCameraState();
@@ -633,7 +633,7 @@ namespace Fusion.Engine.Graphics.GIS
 
 
 			curTime += gameTime.ElapsedSec; // 0.016f; //
-			
+
 			if (curTime < state.WaitTime || curStateInd >= cameraAnimTrackStates.Count - 1) {
 				SetState(state);
 
@@ -673,7 +673,7 @@ namespace Fusion.Engine.Graphics.GIS
 			var newLonLat = GetCameraLonLat();
 			Yaw		= newLonLat.X;
 			Pitch	= -newLonLat.Y;
-			
+
 			if (curTime > state.WaitTime + state.TransitionTime) {
 				curStateInd++;
 				curTime = 0;
@@ -714,7 +714,7 @@ namespace Fusion.Engine.Graphics.GIS
 			if(state != null) SetState(state);
 			else Log.Warning("No such camera state found: " + name);
 		}
-		
+
 
 		void GetEulerAngles(DMatrix q, out double yaw, out double pitch, out double roll)
 		{
@@ -733,7 +733,7 @@ namespace Fusion.Engine.Graphics.GIS
 		    double abcd = q.W*q.X + q.Y*q.Z;
 		    double eps = 1e-7;    // TODO: pick from your math lib instead of hardcoding.
 		    double pi = 3.14159265358979323846;   // TODO: pick from your math lib instead of hardcoding.
-		    
+
 			if (abcd > (0.5-eps)*unitLength) {
 		        yaw		= 2 * Math.Atan2(q.Y, q.W);
 		        pitch	= pi;
@@ -759,9 +759,9 @@ namespace Fusion.Engine.Graphics.GIS
 
 
 	    /*-----------------------------------------------------------------------------------------
-           * 
+           *
            *	Animation stuff :
-           * 
+           *
         -----------------------------------------------------------------------------------------*/
 
 	    List<ITransition> transitions = new List<ITransition>();
@@ -769,79 +769,62 @@ namespace Fusion.Engine.Graphics.GIS
 
 	    /// <summary>
 	    /// Pushes new transition to the chain of animation transitions.
-	    /// Origin value will be retrived when transition starts.
+	    /// Origin value will be retrieved when transition starts.
 	    /// When one of the newest transitions starts, previous transitions on same property will be terminated.
 	    /// </summary>
-	    /// <typeparam name="T"></typeparam>
-	    /// <typeparam name="I"></typeparam>
-	    /// <param name="property"></param>
-	    /// <param name="termValue"></param>
-	    /// <param name="delay"></param>
-	    /// <param name="period"></param>
-	    public void RunTransition<T, I>(string property, T targetValue, int delay, int period) where I : IInterpolator<T>, new()
+	    /// <typeparam name="T">Property type</typeparam>
+	    /// <typeparam name="I">Property interpolator</typeparam>
+	    /// <param name="property">Name of the property</param>
+	    /// <param name="targetValue">Final property value</param>
+	    /// <param name="delay">Start delay in seconds</param>
+	    /// <param name="period">Transition length in seconds</param>
+	    /// <param name="callback">Called after transition</param>
+	    public Transition<T, I> RunTransition<T, I>(string property, T targetValue, float delay, float period, Action callback = null) where I : IInterpolator<T>, new()
 	    {
 	        var pi = GetType().GetProperty(property);
 
 	        if (pi.PropertyType != typeof(T))
 	        {
-	            throw new ArgumentException(string.Format("Bad property and types: {0} is {1}, but values are {2}", property, pi.PropertyType, typeof(T)));
+	            throw new ArgumentException($"Bad property and types: {property} is {pi.PropertyType}, but values are {typeof(T)}");
 	        }
 
 	        //	call ToList() to terminate LINQ evaluation :
 	        var toCancel = transitions.Where(t => t.TagName == property).ToList();
 
-	        transitions.Add(new Transition<T, I>(this, pi, targetValue, delay, period, toCancel) { TagName = property });
+	        var transition = new Transition<T, I>(this, pi, targetValue, delay, period, toCancel, callback) {TagName = property};
+            transitions.Add(transition);
+
+	        return transition;
 	    }
 
 	    public void StopTransition(string property)
 	    {
 	        transitions.RemoveAll(t => t.TagName == property);
-
 	    }
 
-
-
-	    /// <summary>
-	    /// 
-	    /// </summary>
-	    /// <param name="property"></param>
-	    /// <param name="targetValue"></param>
-	    /// <param name="delay"></param>
-	    /// <param name="period"></param>
-	    public void RunTransition(string property, int targetValue, int delay, int period)
+	    /// <inheritdoc cref="RunTransition{T,I}"/>
+	    /// <remarks>Run this for int properties</remarks>
+        public Transition<int, IntInterpolator> RunTransition(string property, int targetValue, float delay, float period, Action callback = null)
 	    {
-	        RunTransition<int, IntInterpolator>(property, targetValue, delay, period);
+	        return RunTransition<int, IntInterpolator>(property, targetValue, delay, period, callback);
 	    }
 
-
-	    /// <summary>
-	    /// 
-	    /// </summary>
-	    /// <param name="property"></param>
-	    /// <param name="targetValue"></param>
-	    /// <param name="delay"></param>
-	    /// <param name="period"></param>
-	    public void RunTransition(string property, float targetValue, int delay, int period)
+	    /// <inheritdoc cref="RunTransition{T,I}"/>
+	    /// <remarks>Run this for float properties</remarks>
+        public Transition<float, FloatInterpolator> RunTransition(string property, float targetValue, float delay, float period, Action callback = null)
 	    {
-	        RunTransition<float, FloatInterpolator>(property, targetValue, delay, period);
+	        return RunTransition<float, FloatInterpolator>(property, targetValue, delay, period, callback);
 	    }
 
-	    /// <summary>
-	    /// 
-	    /// </summary>
-	    /// <param name="property"></param>
-	    /// <param name="targetValue"></param>
-	    /// <param name="delay"></param>
-	    /// <param name="period"></param>
-	    public void RunTransition(string property, double targetValue, int delay, int period)
+	    /// <inheritdoc cref="RunTransition{T,I}"/>
+	    /// <remarks>Run this for double properties</remarks>
+        public Transition<double, DoubleInterpolator> RunTransition(string property, double targetValue, float delay, float period, Action callback = null)
 	    {
-	        RunTransition<double, DoubleInterpolator>(property, targetValue, delay, period);
+	        return RunTransition<double, DoubleInterpolator>(property, targetValue, delay, period, callback);
 	    }
-
-
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         /// <param name="gameTime"></param>
         void UpdateTransitions(GameTime gameTime)
@@ -851,7 +834,14 @@ namespace Fusion.Engine.Graphics.GIS
 	            t.Update(gameTime);
 	        }
 
-	        transitions.RemoveAll(t => t.IsDone);
+	        var toRemove = transitions.Where(t => t.IsDone || t.IsCancelled).ToList();
+	        foreach (var transition in toRemove)
+	        {
+                if(!transition.IsCancelled)
+	                transition.Callback?.Invoke();
+
+	            transitions.Remove(transition);
+	        }
 	    }
 
         #endregion
