@@ -374,8 +374,9 @@ namespace FusionUI.UI.Plots2_0
 
             if (Measure != "")
             {
-                var r = Font.MeasureStringF(this.Measure);
-                CaptionsFont.DrawString(sb, this.Measure, Plot.GlobalRectangle.Left + offset - (int)(r.Width) * (left ? 0 : 1) + (left ? 8 : -8),
+                var measure = TryGetText(this.Measure);
+                var r = Font.MeasureStringF(measure);
+                CaptionsFont.DrawString(sb, measure, Plot.GlobalRectangle.Left + offset - (int)(r.Width) * (left ? 0 : 1) + (left ? 8 : -8),
                     Plot.GlobalRectangle.Top, color,
                     0,
                     useBaseLine: false);
@@ -429,8 +430,9 @@ namespace FusionUI.UI.Plots2_0
             }
             if ((Settings & ScaleParams.NotDisplayName) == 0)
             {
-                var r = Font.MeasureStringF(this.YLabel);
-                CaptionsFont.DrawString(sb, this.YLabel, -r.Height + Plot.GlobalRectangle.Left + offset - wMax - 10,
+                var yLabel = TryGetText(YLabel);
+                var r = Font.MeasureStringF(yLabel);
+                CaptionsFont.DrawString(sb, yLabel, -r.Height + Plot.GlobalRectangle.Left + offset - wMax - 10,
                     Plot.GlobalRectangle.Center.Y + r.Width * 0.5f, color,
                     0,
                     useBaseLine: false, flip: true);
@@ -454,10 +456,11 @@ namespace FusionUI.UI.Plots2_0
                 new RectangleF(Plot.GlobalRectangle.Left, Plot.GlobalRectangle.Bottom - zeroH + Index * UIConfig.UnitPlotScaleHeight * ScaleMultiplier,
                     Plot.GlobalRectangle.Width, UIConfig.UnitPlotScaleLineWidth * ScaleMultiplier),
                 UIConfig.PlotLineColor, clipRectIndex);
-            var r = Font.MeasureStringF(XLabel);
+            var xLabel = TryGetText(XLabel);
+            var r = Font.MeasureStringF(xLabel);
             if ((Settings & ScaleParams.NotDisplayName) == 0)
             {
-                CaptionsFont.DrawString(sb, XLabel, Plot.GlobalRectangle.Center.X - r.Width / 2,
+                CaptionsFont.DrawString(sb, xLabel, Plot.GlobalRectangle.Center.X - r.Width / 2,
                     Plot.GlobalRectangle.Bottom - zeroH + (Index + 1) * UIConfig.UnitPlotScaleHeight * ScaleMultiplier,
                     CaptionsColor, clipRectIndex);
             }

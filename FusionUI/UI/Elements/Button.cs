@@ -3,6 +3,8 @@ using Fusion.Core.Mathematics;
 using Fusion.Engine.Common;
 using Fusion.Engine.Frames;
 using Fusion.Engine.Graphics;
+using FusionUI.UI.Elements.TextFormatting;
+using static FusionUI.UI.UIConfig;
 
 namespace FusionUI.UI.Elements
 {
@@ -180,6 +182,54 @@ namespace FusionUI.UI.Elements
         {
             UpdateAction?.Invoke();
             base.Update(gameTime);
+        }
+    }
+
+    public class FormatTexstButton : Button
+    {
+        private FormatTextBlock block;
+
+        protected FormatTextBlock Block => block ?? InitTextBlock();
+
+        private FormatTextBlock InitTextBlock()
+        {
+            block = new FormatTextBlock(ui, 0, 0, UnitWidth, UnitHeight, Text, Color.Zero, FontHolder, minHeight:UnitHeight)
+            {
+                TextAlignment = Alignment.MiddleCenter,
+            };
+            Add(block);
+            Text = "";
+            return block;
+        }
+
+        public override FontHolder FontHolder
+        {
+            get => base.FontHolder;
+            set
+            {
+                base.FontHolder = value;
+                Block.FontHolder = value;
+            }
+        }
+
+        public override string Text
+        {
+            get => base.Text;
+            set
+            {
+                base.Text = value;
+                Block.Text = TryGetText(value);
+            }
+        }
+
+        public FormatTexstButton(FrameProcessor ui, float x, float y, float w, float h, string text, Color activeColor, Color inactiveColor, Texture activeImage = null, Texture passiveImage = null, Action<bool> action = null, bool active = false, int timeTransition = 0, Color? activeFColor = null, Color? inactiveFColor = null) : base(ui, x, y, w, h, text, activeColor, inactiveColor, activeImage, passiveImage, action, active, timeTransition, activeFColor, inactiveFColor)
+        {
+            InitTextBlock();
+        }
+
+        public FormatTexstButton(FrameProcessor ui, float x, float y, float w, float h, string text, Color mainColor, Color transitionColor, int transitionTime, Action action = null, Color? activeFColor = null, Color? inActiveFColor = null) : base(ui, x, y, w, h, text, mainColor, transitionColor, transitionTime, action, activeFColor, inActiveFColor)
+        {
+            InitTextBlock();
         }
     }
 }

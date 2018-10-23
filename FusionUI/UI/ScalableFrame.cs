@@ -21,7 +21,7 @@ namespace FusionUI.UI
             get { return (ApplicationInterface.ScaleMod); }
         }
 
-        public UIConfig.FontHolder FontHolder = new UIConfig.FontHolder(@"fonts\new\Base");
+        public virtual UIConfig.FontHolder FontHolder { get; set; } = new UIConfig.FontHolder(@"fonts\new\Base");
 
         public override SpriteFont Font => FontHolder[ApplicationInterface.uiScale];
 
