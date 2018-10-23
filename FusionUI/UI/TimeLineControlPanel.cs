@@ -56,7 +56,7 @@ namespace FusionUI.UI
 		public string labelRightBaseText;
 
 		bool addToolButtons;
-
+		float unitHPadding;
 
 		public int currentStep = 0;
         public List<Tuple<double, string>> listStepName = new List<Tuple<double, string>>()
@@ -76,13 +76,14 @@ namespace FusionUI.UI
         public bool ShowStartAndEndDate = true;
         
 
-        public TimeLineControlPanel(FrameProcessor ui, float x, float y, float w, float h, string text, Color backColor, bool addToolButtons = true) : base(ui, x, y, w, h, text, backColor)
+        public TimeLineControlPanel(FrameProcessor ui, float x, float y, float w, float h, string text, Color backColor, bool addToolButtons = true, float? unitHPadding = null) : base(ui, x, y, w, h, text, backColor)
         {
             NameLabelText = text;
             Text = "";
             this.ui = ui;
             ((Frame) this).Ghost = false;
 			this.addToolButtons = addToolButtons;
+			this.unitHPadding = unitHPadding?? UIConfig.UnitTimelineOffsetX;
 			Init();
             SuppressActions = true;
             //Anchor = FrameAnchor.Bottom | FrameAnchor.Left | FrameAnchor.Right;
@@ -119,7 +120,7 @@ namespace FusionUI.UI
         {
             var lordTexture = ui.Game.Content.Load<DiscTexture>("ui/timeline/fv-icons_timeline-slider.png");
             timeLine = new TimeLine(ui, 0, 0, this.UnitWidth,
-                UIConfig.UnitTimelineHeight, "", Color.Zero, lordTexture, 4);
+                UIConfig.UnitTimelineHeight, "", Color.Zero, lordTexture, 4, unitHPadding);
             this.Add(timeLine);
             timeLine.ActionClick += (ControlActionArgs args, ref bool flag) =>
             {
@@ -141,18 +142,18 @@ namespace FusionUI.UI
             //this.Resize += TimeLineControlPanel_Resize;
 
             var sizeText = Font.MeasureString(templateDate);
-            labelStartTime = new ScalableFrame(ui, UIConfig.UnitTimelineOffsetX, timeLine.UnitY + timeLine.UnitHeight - (sizeText.Height / ScaleMultiplier) + 1.25f,
+            labelStartTime = new ScalableFrame(ui, timeLine.UnitPaddingLeft/*UIConfig.UnitTimelineOffsetX*/, timeLine.UnitY + timeLine.UnitHeight - (sizeText.Height / ScaleMultiplier) + 1.25f,
                 (sizeText.Width / ScaleMultiplier), (sizeText.Height / ScaleMultiplier), "", Color.Zero)
             {
-                //Anchor = FrameAnchor.Left
+                Anchor = FrameAnchor.Left,
                 FontHolder = UIConfig.FontCaption,
                 TextAlignment = Alignment.MiddleLeft
             };
-            labelEndTime = new ScalableFrame(ui, this.UnitWidth - UIConfig.UnitTimelineOffsetX - (sizeText.Width / ScaleMultiplier),
+            labelEndTime = new ScalableFrame(ui, this.UnitWidth - timeLine.UnitPaddingRight/*UIConfig.UnitTimelineOffsetX*/ - (sizeText.Width / ScaleMultiplier),
                 timeLine.UnitY + timeLine.UnitHeight - (sizeText.Height / ScaleMultiplier) + 1.25f,
                 (sizeText.Width / ScaleMultiplier), (sizeText.Height / ScaleMultiplier), "", Color.Zero)
             {
-                //Anchor = FrameAnchor.Right
+                Anchor = FrameAnchor.Right,
                 FontHolder = UIConfig.FontCaption,
                 TextAlignment = Alignment.MiddleRight
             };
@@ -329,6 +330,7 @@ namespace FusionUI.UI
 				FontHolder = UIConfig.FontSubtitle,
 				TextAlignment = Alignment.MiddleLeft,
 				ForeColor = Color.Gray,
+				Anchor = FrameAnchor.Left
 			};
 			this.rightTimeLineLable = new ScalableFrame(ui, (this.buttonLoop.UnitX + this.buttonLoop.UnitWidth), this.UnitHeight- 4 -4,
 				this.UnitWidth-(this.buttonLoop.UnitX+ this.buttonLoop.UnitWidth), 4, labelRightBaseText, Color.Zero)
@@ -336,6 +338,7 @@ namespace FusionUI.UI
 				FontHolder = UIConfig.FontSubtitle,
 				TextAlignment = Alignment.MiddleRight,
 				ForeColor = Color.Gray,
+				Anchor = FrameAnchor.Right
 			};
 			this.Add(leftTimeLineLable);
 			this.Add(rightTimeLineLable);
