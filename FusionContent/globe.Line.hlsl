@@ -325,8 +325,8 @@ inout TriangleStream<GS_OUTPUT> stream
 	
 	float slicesCount = 10;//max(length(float2(float(lon1-lon0), float(lat1 - lat0))), 30);	
 	
-	float3 u = normalize(SphericalToDecart(from, 6378.137));
-	float3 v = normalize(SphericalToDecart(  to, 6378.137));
+	float3 u = normalize(float3(SphericalToDecart(from, 6378.137)));
+	float3 v = normalize(float3(SphericalToDecart(to, 6378.137)));
     float3 w = normalize(cross(cross(u, v), u));
 
 	//float TWO_PI = 6.2831853;
