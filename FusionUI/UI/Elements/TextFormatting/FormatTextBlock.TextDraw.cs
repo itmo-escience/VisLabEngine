@@ -210,7 +210,7 @@ namespace FusionUI.UI.Elements.TextFormatting
                         {
                             InTags = (TagStack)tagStack.Clone() ?? new TagStack(),
                         };
-                        currentString.AddWord($"[column={columnOffset}]");
+                        if (columnOffset > 0) currentString.AddWord($"[column={columnOffset}]");
                     }
 
                     if (!string.IsNullOrWhiteSpace(currentWord))
@@ -440,7 +440,7 @@ namespace FusionUI.UI.Elements.TextFormatting
                             InTags = (TagStack)tagStack.Clone() ?? new TagStack(),
                         };
                     }
-                    currentString.AddWord($"[column={columnOffset}]");
+                    if (columnOffset > 0) currentString.AddWord($"[column={columnOffset}]");
                     currentString.AddWord(currentWord);
                     currentString.AddWord(" ");
                     currentWord = "";
@@ -464,7 +464,7 @@ namespace FusionUI.UI.Elements.TextFormatting
                         InTags = (TagStack)tagStack.Clone() ?? new TagStack(),
                     };
                 }
-                currentString.AddWord($"[column={columnOffset}]");
+                if (columnOffset > 0) currentString.AddWord($"[column={columnOffset}]");
                 currentString.AddWord(currentWord);
                 currentString.AddWord(" ");
                 currentWord = "";
