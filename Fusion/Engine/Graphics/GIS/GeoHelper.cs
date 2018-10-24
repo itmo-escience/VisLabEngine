@@ -158,6 +158,16 @@ namespace Fusion.Engine.Graphics.GIS
 			return d;
 		}
 
+	    public static DVector2 MiddlePoint(DVector2 lonLatP0, DVector2 lonLatP1)
+        {
+            var p0 = SphericalToCartesian(lonLatP0);
+            var p1 = SphericalToCartesian(lonLatP1);
+
+            var p = ((p0 + p1) / 2).Normalized() * EarthRadius;
+
+            return CartesianToSpherical(p);
+        }
+
 	    public static List<DVector2> LineBetweenTwoPoints(DVector2 from, DVector2 to, int segmentsNumber = 10)
 	    {
 	        var u = SphericalToCartesian(from).Normalized();

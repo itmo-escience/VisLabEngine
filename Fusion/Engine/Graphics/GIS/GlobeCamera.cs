@@ -767,19 +767,19 @@ namespace Fusion.Engine.Graphics.GIS
 	    List<ITransition> transitions = new List<ITransition>();
 
 
-	    /// <summary>
-	    /// Pushes new transition to the chain of animation transitions.
-	    /// Origin value will be retrieved when transition starts.
-	    /// When one of the newest transitions starts, previous transitions on same property will be terminated.
-	    /// </summary>
-	    /// <typeparam name="T">Property type</typeparam>
-	    /// <typeparam name="I">Property interpolator</typeparam>
-	    /// <param name="property">Name of the property</param>
-	    /// <param name="targetValue">Final property value</param>
-	    /// <param name="delay">Start delay in seconds</param>
-	    /// <param name="period">Transition length in seconds</param>
-	    /// <param name="callback">Called after transition</param>
-	    public Transition<T, I> RunTransition<T, I>(string property, T targetValue, float delay, float period, Action callback = null) where I : IInterpolator<T>, new()
+        /// <summary>
+        /// Pushes new transition to the chain of animation transitions.
+        /// Origin value will be retrieved when transition starts.
+        /// When one of the newest transitions starts, previous transitions on same property will be terminated.
+        /// </summary>
+        /// <typeparam name="T">Property type</typeparam>
+        /// <typeparam name="I">Property interpolator</typeparam>
+        /// <param name="property">Name of the property</param>
+        /// <param name="targetValue">Final property value</param>
+        /// <param name="delay">Start delay in milliseconds</param>
+        /// <param name="period">Transition length in milliseconds</param>
+        /// <param name="callback">Called after transition</param>
+        public Transition<T, I> RunTransition<T, I>(string property, T targetValue, float delay, float period, Action callback = null) where I : IInterpolator<T>, new()
 	    {
 	        var pi = GetType().GetProperty(property);
 

@@ -238,14 +238,12 @@ namespace Fusion.Engine.Frames {
 		/// <summary>
 		///
 		/// </summary>
-		public void Terminate (bool cancel=false)
+		public void Terminate (bool cancel = false)
 		{
 			timer	=	int.MaxValue;
 			targetProperty.SetValue( targetObject, targetValue );
 
 		    IsCancelled = cancel;
 		}
-
-
 	}
 }

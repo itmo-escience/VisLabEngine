@@ -19,7 +19,7 @@ namespace Fusion.Engine.Frames {
 		public FrameProcessor	ui { protected set; get; }
 
 		/// <summary>
-		/// 
+		///
 		/// </summary>
 		public	string		Name				{ get; set; }
 
@@ -29,17 +29,17 @@ namespace Fusion.Engine.Frames {
 		public	bool		Visible				{ get; set; }
 
 		/// <summary>
-		/// 
+		///
 		/// </summary>
 		internal bool		CanAcceptControl	{ get { return Visible && OverallColor.A != 0 && !Ghost; } }
 
 		/// <summary>
-		/// 
+		///
 		/// </summary>
 		internal bool		IsDrawable			{ get { return Visible && OverallColor.A != 0; } }
 
 		/// <summary>
-		/// Frame visible but does not receive input 
+		/// Frame visible but does not receive input
 		/// </summary>
 		public	bool		Ghost				{ get; set; }
 
@@ -53,7 +53,7 @@ namespace Fusion.Engine.Frames {
 	    /// </summary>
 	    //public	bool		AutoSize			{ get; set; }
 	    public bool AutoWidth { get; set; }
-        public bool AutoHeight { get; set; }	
+        public bool AutoHeight { get; set; }
 
 		/// <summary>
 		/// Text font
@@ -66,12 +66,12 @@ namespace Fusion.Engine.Frames {
 		public	object		Tag;
 
 		/// <summary>
-		/// 
+		///
 		/// </summary>
 		public	ClippingMode	 ClippingMode	{ get; set; } = ClippingMode.ClipByFrame;
 
         /// <summary>
-        /// Overall color that used as multiplier 
+        /// Overall color that used as multiplier
         /// for all children elements
         /// </summary>
         public virtual Color		OverallColor		{ get; set; }
@@ -158,56 +158,56 @@ namespace Fusion.Engine.Frames {
 		public virtual int Padding				{ set { VPadding = HPadding = value; } }
 
 		/// <summary>
-		/// 
+		///
 		/// </summary>
 		public virtual int BorderTop			{ get; set; }
 
 		/// <summary>
-		/// 
+		///
 		/// </summary>
 		public virtual int BorderBottom		{ get; set; }
 
 		/// <summary>
-		/// 
+		///
 		/// </summary>
 		public virtual int BorderLeft			{ get; set; }
 
 		/// <summary>
-		/// 
+		///
 		/// </summary>
 		public virtual int BorderRight			{ get; set; }
 
 		/// <summary>
-		/// 
+		///
 		/// </summary>
 		public virtual int Border				{ set { BorderTop = BorderBottom = BorderLeft = BorderRight = value; } }
 
 		/// <summary>
-		/// 
+		///
 		/// </summary>
-		public	virtual string		Text				{ get; set; }        
+		public	virtual string		Text				{ get; set; }
         /// <summary>
-        /// 
+        ///
         /// </summary>
         public	Alignment	TextAlignment		{ get; set; }
 
 		/// <summary>
-		/// 
+		///
 		/// </summary>
 		public virtual	int			TextOffsetX			{ get; set; }
 
 		/// <summary>
-		/// 
+		///
 		/// </summary>
 		public virtual int          TextOffsetY			{ get; set; }
 
 		/// <summary>
-		/// 
+		///
 		/// </summary>
 		public	TextEffect	TextEffect			{ get; set; }
 
 		/// <summary>
-		/// 
+		///
 		/// </summary>
 		public	FrameAnchor	Anchor			{ get; set; }
 
@@ -219,9 +219,9 @@ namespace Fusion.Engine.Frames {
 		public Texture			Image			{ get; set; }
 
 		/// <summary>
-		/// 
+		///
 		/// </summary>
-		public LayoutEngine	Layout	{ 
+		public LayoutEngine	Layout	{
 			get { return layout; }
 			set { layout = value; if (LayoutChanged!=null) LayoutChanged(this, EventArgs.Empty); }
 		}
@@ -288,7 +288,7 @@ namespace Fusion.Engine.Frames {
 		public Frame Parent { get { return parent; } }
 
 		/// <summary>
-		/// Global frame rectangle made 
+		/// Global frame rectangle made
 		/// after all layouting and transitioning operation
 		/// </summary>
 		public Rectangle GlobalRectangle { get; private set; }
@@ -309,7 +309,7 @@ namespace Fusion.Engine.Frames {
 
 
 		/// <summary>
-		/// 
+		///
 		/// </summary>
 		/// <param name="game"></param>
 		/// <param name="x"></param>
@@ -358,9 +358,9 @@ namespace Fusion.Engine.Frames {
 		}
 
 
-		
+
 		/// <summary>
-		/// Common init 
+		/// Common init
 		/// </summary>
 		/// <param name="game"></param>
 		void Init ()
@@ -376,7 +376,7 @@ namespace Fusion.Engine.Frames {
 			BorderColor		=	Color.White;
 			ShadowColor		=	Color.Zero;
 			OverallColor	=	Color.White;
-		
+
 			TextAlignment	=	Alignment.TopLeft;
 
 			Anchor			=	FrameAnchor.Left | FrameAnchor.Top;
@@ -389,9 +389,9 @@ namespace Fusion.Engine.Frames {
 
 
 		/*-----------------------------------------------------------------------------------------
-		 * 
+		 *
 		 *	Hierarchy stuff
-		 * 
+		 *
 		-----------------------------------------------------------------------------------------*/
 
 		private	List<Frame>	children	=	new List<Frame>();
@@ -422,14 +422,14 @@ namespace Fusion.Engine.Frames {
                 }
 			    ReorderChildren();
 				frame.parent	=	this;
-				frame.OnStatusChanged( FrameStatus.None );                
-			}		    
+				frame.OnStatusChanged( FrameStatus.None );
+			}
 		}
 
 	    /// <summary>
 	    /// Reordering children
 	    /// </summary>
-	    /// 
+	    ///
 	    public void ReorderChildren()
 	    {
             children = children.OrderBy(f => f.ZOrder).ToList();
@@ -440,7 +440,7 @@ namespace Fusion.Engine.Frames {
 	        }
         }
 		/// <summary>
-		/// 
+		///
 		/// </summary>
 		/// <param name="frame"></param>
 		public virtual void Clear ( Frame frame )
@@ -469,7 +469,7 @@ namespace Fusion.Engine.Frames {
 
 
 		/// <summary>
-		/// 
+		///
 		/// </summary>
 		/// <param name="frame"></param>
 		public void Remove ( Frame frame )
@@ -483,7 +483,7 @@ namespace Fusion.Engine.Frames {
 
 
 		/// <summary>
-		/// 
+		///
 		/// </summary>
 		/// <returns></returns>
 		public List<Frame>	GetAncestorList ()
@@ -502,29 +502,29 @@ namespace Fusion.Engine.Frames {
 
 
 		/// <summary>
-		/// 
+		///
 		/// </summary>
 		/// <param name="action"></param>
-		public void ForEachAncestor ( Action<Frame> action ) 
+		public void ForEachAncestor ( Action<Frame> action )
 		{
 			GetAncestorList().ForEach( f => action(f) );
 		}
 
 
 		/// <summary>
-		/// 
+		///
 		/// </summary>
 		/// <param name="action"></param>
-		public void ForEachChildren ( Action<Frame> action ) 
+		public void ForEachChildren ( Action<Frame> action )
 		{
 			children.ToList().ForEach( f => action(f) );
 		}
 
 
 		/*-----------------------------------------------------------------------------------------
-		 * 
+		 *
 		 *	Input stuff :
-		 * 
+		 *
 		-----------------------------------------------------------------------------------------*/
 
 		FrameStatus oldStatus = FrameStatus.None;
@@ -533,7 +533,7 @@ namespace Fusion.Engine.Frames {
 		{
 			if (StatusChanged!=null) {
 				oldStatus = status;
-				StatusChanged( this, new StatusEventArgs(){ Status = status } ); 
+				StatusChanged( this, new StatusEventArgs(){ Status = status } );
 			}
 		}
 
@@ -573,7 +573,7 @@ namespace Fusion.Engine.Frames {
 
 			if (MouseMove!=null) {
 				MouseMove(this, new MouseEventArgs(){ Key = Keys.None, X = x, Y = y, DX = dx, DY = dy });
-			}		    
+			}
 		}
 
 	    public virtual void OnDrag(int dx, int dy)
@@ -652,9 +652,9 @@ namespace Fusion.Engine.Frames {
 		}
 
 		/*-----------------------------------------------------------------------------------------
-		 * 
+		 *
 		 *	Update and draw stuff :
-		 * 
+		 *
 		-----------------------------------------------------------------------------------------*/
 
 		public static List<Frame> BFSList ( Frame v )
@@ -665,7 +665,7 @@ namespace Fusion.Engine.Frames {
 			Q.Enqueue( v );
 
 			while ( Q.Any() ) {
-				
+
 				var t = Q.Dequeue();
 				list.Add( t );
 
@@ -676,10 +676,10 @@ namespace Fusion.Engine.Frames {
 
 			return list;
 		}
-			
+
 
 		public void UpdateGlobalRect ( int px, int py )
-		{		           
+		{
             GlobalRectangle = new Rectangle(X + px, Y + py, Width, Height);
             ForEachChildren(ch => ch.UpdateGlobalRect(px + X, py + Y));
         }
@@ -687,7 +687,7 @@ namespace Fusion.Engine.Frames {
 
 
 		/// <summary>
-		/// 
+		///
 		/// </summary>
 		/// <param name="gameTime"></param>
 		/// <param name="parentX"></param>
@@ -740,7 +740,7 @@ namespace Fusion.Engine.Frames {
 
 
 		/// <summary>
-		/// 
+		///
 		/// </summary>
 		/// <param name="gameTime"></param>
 		/// <param name="sb"></param>
@@ -757,7 +757,7 @@ namespace Fusion.Engine.Frames {
 
 
 			while (stack.Any()) {
-				
+
 				var currentDrawFrame = stack.Pop();
 
 				if (!currentDrawFrame.Frame.IsDrawable) {
@@ -842,10 +842,10 @@ namespace Fusion.Engine.Frames {
 
 			var clr	=	BorderColor;
 
-			spriteLayer.Draw( whiteTex,	gx,				gy,				w,		bt,				clr, clipRectIndex ); 
-			spriteLayer.Draw( whiteTex,	gx,				gy + h - bb,	w,		bb,				clr, clipRectIndex ); 
-			spriteLayer.Draw( whiteTex,	gx,				gy + bt,		bl,		h - bt - bb,	clr, clipRectIndex ); 
-			spriteLayer.Draw( whiteTex,	gx + w - br,	gy + bt,		br,		h - bt - bb,	clr, clipRectIndex ); 
+			spriteLayer.Draw( whiteTex,	gx,				gy,				w,		bt,				clr, clipRectIndex );
+			spriteLayer.Draw( whiteTex,	gx,				gy + h - bb,	w,		bb,				clr, clipRectIndex );
+			spriteLayer.Draw( whiteTex,	gx,				gy + bt,		bl,		h - bt - bb,	clr, clipRectIndex );
+			spriteLayer.Draw( whiteTex,	gx + w - br,	gy + bt,		br,		h - bt - bb,	clr, clipRectIndex );
 
 			spriteLayer.Draw( whiteTex,	GetBorderedRectangle(), BackColor, clipRectIndex );
 		}
@@ -877,9 +877,9 @@ namespace Fusion.Engine.Frames {
 
 
 		/*-----------------------------------------------------------------------------------------
-		 * 
+		 *
 		 *	Utils :
-		 * 
+		 *
 		-----------------------------------------------------------------------------------------*/
 
 		int oldX = int.MinValue;
@@ -894,7 +894,7 @@ namespace Fusion.Engine.Frames {
 		/// </summary>
 		protected void UpdateMove ()
 		{
-			if ( oldX != X || oldY != Y ) {					
+			if ( oldX != X || oldY != Y ) {
 				if (Move!=null) {
 					Move( this, new MoveEventArgs(){ X = X, Y = Y } );
 				}
@@ -906,10 +906,10 @@ namespace Fusion.Engine.Frames {
 
 
 		/// <summary>
-		/// 
+		///
 		/// </summary>
 		public virtual void UpdateResize (bool UpdateChildren = true)
-		{            
+		{
             AutoResize(true);
             if ( oldW != Width || oldH != Height ) {
 
@@ -927,8 +927,8 @@ namespace Fusion.Engine.Frames {
 				oldH = Height;
                 if (parent != null)
                 {
-                    parent.AutoResize();                    
-                }                
+                    parent.AutoResize();
+                }
             }
 
         }
@@ -941,7 +941,7 @@ namespace Fusion.Engine.Frames {
 
                 foreach (var frame in children.ToList())
                 {
-                    if (frame == this || frame.Visible==false) continue;                    
+                    if (frame == this || frame.Visible==false) continue;
                     rect.Right = Math.Max(frame.X + frame.Width + PaddingRight, rect.Right);
                     rect.Bottom = Math.Max(frame.Y + frame.Height + PaddingBottom, rect.Bottom);
                 }
@@ -956,14 +956,14 @@ namespace Fusion.Engine.Frames {
                     //this.Y += rect.Y;
                     this.Height = rect.Height;
                 }
-                if (!fromUpdate) UpdateResize();                
+                if (!fromUpdate) UpdateResize();
             }
         }
 
 
 
 		/// <summary>
-		/// 
+		///
 		/// </summary>
 		/// <param name="forceTransitions"></param>
 		public void RunLayout (bool forceTransitions)
@@ -981,9 +981,9 @@ namespace Fusion.Engine.Frames {
 		/// <returns></returns>
 		public Rectangle GetBorderedRectangle ()
 		{
-			return new Rectangle( 
-				GlobalRectangle.X + BorderLeft, 
-				GlobalRectangle.Y + BorderTop, 
+			return new Rectangle(
+				GlobalRectangle.X + BorderLeft,
+				GlobalRectangle.Y + BorderTop,
 				Width - BorderLeft - BorderRight,
 				Height - BorderTop - BorderBottom );
 		}
@@ -999,17 +999,17 @@ namespace Fusion.Engine.Frames {
 			int x = global ? GlobalRectangle.X : 0;
 			int y = global ? GlobalRectangle.Y : 0;
 
-			return new Rectangle( 
-				x + BorderLeft + PaddingLeft, 
-				y + BorderTop + PaddingTop, 
+			return new Rectangle(
+				x + BorderLeft + PaddingLeft,
+				y + BorderTop + PaddingTop,
 				Width  - BorderLeft - BorderRight - PaddingLeft - PaddingRight,
 				Height - BorderTop - BorderBottom - PaddingTop - PaddingBottom );
 		}
 
 
-		
+
 		/// <summary>
-		/// 
+		///
 		/// </summary>
 		protected virtual void DrawFrameImage (SpriteLayer spriteLayer, int clipRectIndex )
 		{
@@ -1042,7 +1042,7 @@ namespace Fusion.Engine.Frames {
 				spriteLayer.Draw(Image, bp, bp, ImageColor, clipRectIndex );
 				return;
 			}
-            if (ImageMode == FrameImageMode.Fitted) {                
+            if (ImageMode == FrameImageMode.Fitted) {
                 float wm = (float) gp.Width/Image.Width, hm = (float) gp.Height/Image.Height;
 
                 if (wm < hm)
@@ -1060,7 +1060,7 @@ namespace Fusion.Engine.Frames {
                 return;
             }
             if (ImageMode == FrameImageMode.Cropped) {
-                float wm = (float)gp.Width/Image.Width, hm = (float)gp.Height/Image.Height;                
+                float wm = (float)gp.Width/Image.Width, hm = (float)gp.Height/Image.Height;
                 if (wm > hm) {
                     float x = gp.X + gp.Width / 2 - Image.Width * wm / 2 + ImageOffsetX;
                     float y = gp.Y + gp.Height / 2 - Image.Height * wm / 2 + ImageOffsetY;
@@ -1083,7 +1083,7 @@ namespace Fusion.Engine.Frames {
 		/// </summary>
 		/// <param name="text"></param>
 		protected virtual void DrawFrameText ( SpriteLayer spriteLayer, int clipRectIndex )
-		{											
+		{
 			if (string.IsNullOrEmpty(Text)) {
 				return;
 			}
@@ -1152,9 +1152,9 @@ namespace Fusion.Engine.Frames {
 
 
 		/*-----------------------------------------------------------------------------------------
-		 * 
+		 *
 		 *	Animation stuff :
-		 * 
+		 *
 		-----------------------------------------------------------------------------------------*/
 
 		List<ITransition>	transitions	=	new List<ITransition>();
@@ -1174,8 +1174,8 @@ namespace Fusion.Engine.Frames {
 		public void RunTransition<T,I> ( string property, T targetValue, int delay, int period, Action callback = null) where I: IInterpolator<T>, new()
 		{
 			var pi	=	GetType().GetProperty( property );
-			
-			if ( pi.PropertyType != typeof(T) ) {	
+
+			if ( pi.PropertyType != typeof(T) ) {
 				throw new ArgumentException(string.Format("Bad property and types: {0} is {1}, but values are {2}", property, pi.PropertyType, typeof(T)) );
 			}
 
@@ -1189,7 +1189,7 @@ namespace Fusion.Engine.Frames {
 
 
 		/// <summary>
-		/// 
+		///
 		/// </summary>
 		/// <param name="property"></param>
 		/// <param name="targetValue"></param>
@@ -1203,7 +1203,7 @@ namespace Fusion.Engine.Frames {
 
 
 		/// <summary>
-		/// 
+		///
 		/// </summary>
 		/// <param name="property"></param>
 		/// <param name="targetValue"></param>
@@ -1215,7 +1215,7 @@ namespace Fusion.Engine.Frames {
 		}
 
 	    /// <summary>
-	    /// 
+	    ///
 	    /// </summary>
 	    /// <param name="property"></param>
 	    /// <param name="targetValue"></param>
@@ -1228,7 +1228,7 @@ namespace Fusion.Engine.Frames {
 
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         /// <param name="gameTime"></param>
         void UpdateTransitions ( GameTime gameTime )
@@ -1236,10 +1236,11 @@ namespace Fusion.Engine.Frames {
 			foreach ( var t in transitions ) {
 				t.Update( gameTime );
 			}
-		    var done = transitions.Where(t => t.IsDone);
+		    var done = transitions.Where(t => t.IsDone || t.IsCancelled);
 		    foreach (var t in done.ToList())
 		    {
-		        t.Callback?.Invoke();
+                if(!t.IsCancelled)
+		            t.Callback?.Invoke();
 		    }
             transitions.RemoveAll( t => t.IsDone );
 		}
@@ -1247,9 +1248,9 @@ namespace Fusion.Engine.Frames {
 
 
 		/*-----------------------------------------------------------------------------------------
-		 * 
+		 *
 		 *	Anchors :
-		 * 
+		 *
 		-----------------------------------------------------------------------------------------*/
 
 		/// <summary>
@@ -1284,10 +1285,10 @@ namespace Fusion.Engine.Frames {
 				return	x + dw/2;
 			}
 		}
-        
+
 
 		/// <summary>
-		/// 
+		///
 		/// </summary>
 		/// <param name="oldW"></param>
 		/// <param name="oldH"></param>
@@ -1299,7 +1300,7 @@ namespace Fusion.Engine.Frames {
 			int dh	=	newH - oldH;
 
 			if ( !Anchor.HasFlag( FrameAnchor.Left ) && !Anchor.HasFlag( FrameAnchor.Right ) ) {
-				X	=	SafeHalfOffset( oldW, newW, X );				
+				X	=	SafeHalfOffset( oldW, newW, X );
 			}
 
 			if ( !Anchor.HasFlag( FrameAnchor.Left ) && Anchor.HasFlag( FrameAnchor.Right ) ) {
@@ -1314,9 +1315,9 @@ namespace Fusion.Engine.Frames {
 			}
 
 
-		
+
 			if ( !Anchor.HasFlag( FrameAnchor.Top ) && !Anchor.HasFlag( FrameAnchor.Bottom ) ) {
-				Y	=	SafeHalfOffset( oldH, newH, Y );				
+				Y	=	SafeHalfOffset( oldH, newH, Y );
 			}
 
 			if ( !Anchor.HasFlag( FrameAnchor.Top ) && Anchor.HasFlag( FrameAnchor.Bottom ) ) {
@@ -1333,9 +1334,9 @@ namespace Fusion.Engine.Frames {
 
 
 		/*-----------------------------------------------------------------------------------------
-		 * 
+		 *
 		 *	Layouting :
-		 * 
+		 *
 		-----------------------------------------------------------------------------------------*/
 	}
 }
