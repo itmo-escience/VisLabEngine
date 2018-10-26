@@ -235,7 +235,7 @@ namespace Fusion.Engine.Media
 			if (State != MediaState.Playing) {
 				//We timed out - attempt to stop to fix any bad state
 				Stop();
-				throw new InvalidOperationException("cannot start video");
+				//throw new InvalidOperationException("cannot start video");
 			}
 		}
 
@@ -294,7 +294,7 @@ namespace Fusion.Engine.Media
 			}
 		}
 
-
+	    public Action OnVideoEnded;
 
 		/*-----------------------------------------------------------------------------------------
 		 * 
@@ -338,6 +338,7 @@ namespace Fusion.Engine.Media
 				if (ev.TypeInfo == MediaEventTypes.SessionTopologyStatus && ev.Get(EventAttributeKeys.TopologyStatus) == TopologyStatus.Ended)
 				{
 					Console.WriteLine("Video ended");
+                    _player.OnVideoEnded?.Invoke();
 					if (!_player.SetNewVideo) _player.PlatformPlay();
 					else {
 						_player.SetNewVideo = false;
@@ -554,8 +555,7 @@ namespace Fusion.Engine.Media
 		/// 
 		/// </summary>
 		private void PlatformSetIsLooped()
-		{
-			
+		{			
 			throw new NotImplementedException();
 		}
 

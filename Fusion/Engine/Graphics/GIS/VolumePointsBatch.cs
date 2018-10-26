@@ -41,7 +41,7 @@ namespace Fusion.Engine.Graphics.GIS
 
         SamplerState Sampler = SamplerState.LinearClamp;
         #region FieldData
-        public struct ConstData
+        public struct  ConstData
         {    
             public double Lat;
             public double Lon;
@@ -324,7 +324,7 @@ namespace Fusion.Engine.Graphics.GIS
             
             var cc = 1 << (int) Math.Ceiling(Math.Log(count, 2)); 
 
-  //          var data1 = new float[cc];
+            //var data1 = new float[cc];
             //uint[] indecies = new uint[cc];            
             //for (int i = 0; i < cc; i++)
             //{
@@ -341,7 +341,7 @@ namespace Fusion.Engine.Graphics.GIS
                 Game.GraphicsDevice.PipelineState = factory[(int)FieldFlags.Depth_Calc];
                 Game.GraphicsDevice.Dispatch((int)Math.Ceiling((float)dataFrameSize / BITONIC_BLOCK_SIZE), 1, 1); 
 
-                //float[] dist = new float[cc];
+                float[] dist = new float[cc];
                 //int[] inds = new int[cc];
                 sortCB.SetData(new uint[] { (uint)cc, 0, 0, 0 }); 
                 Game.GraphicsDevice.ComputeShaderConstants[2] = sortCB; 
@@ -374,13 +374,13 @@ namespace Fusion.Engine.Graphics.GIS
                 Game.GraphicsDevice.SetCSRWBuffer(1, null, 0);
                 Game.GraphicsDevice.SetCSRWBuffer(2, null, 0);
 
-                //distBuffer.GetData(dist);
+                distBuffer.GetData(dist);
                 //indBuffer.GetData(inds);
                  
-                //if (float.IsNaN(dist.Aggregate(float.PositiveInfinity, (a, b) => a >= b ? b : float.NaN)))  
-                //{
-                //    Log.Error("No!");
-                //}
+                if (float.IsNaN(dist.Aggregate(float.PositiveInfinity, (a, b) => a >= b ? b : float.NaN)))  
+                { 
+                    Log.Error("No!");
+                } 
                 //else
                 //{
                 //    Log.Message("Yes!");

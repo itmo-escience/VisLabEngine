@@ -70,7 +70,8 @@ namespace Fusion.Engine.Graphics.GIS
 	    public void SetMapSource(MapSource map)
 	    {
 			var oldProj = CurrentMapSource.Projection;
-
+            if (CurrentMapSource == MapSources[(int)map]) return;
+	        
 			CurrentMapSource = MapSources[(int)map];  
 	        CurrentMapSourecEnum = map;            
 
