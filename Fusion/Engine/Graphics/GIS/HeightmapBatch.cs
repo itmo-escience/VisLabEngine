@@ -115,7 +115,7 @@ namespace Fusion.Engine.Graphics.GIS
             if (!isInit) return;           
             cB.SetData(parameters);
             Game.GraphicsDevice.GeometryShaderConstants[0] = constBuffer;
-            Game.GraphicsDevice.VertexShaderConstants[0] = constBuffer;
+            Game.GraphicsDevice.VertexShaderConstants[0] = constBuffer;     
             Game.GraphicsDevice.VertexShaderConstants[1] = cB;
             Game.GraphicsDevice.GeometryShaderConstants[1] = cB;
             Game.GraphicsDevice.PixelShaderConstants[1] = cB;
@@ -130,7 +130,7 @@ namespace Fusion.Engine.Graphics.GIS
 
             Game.GraphicsDevice.SetupVertexInput(null, null);
 
-            Game.GraphicsDevice.Draw(Size * Size, 0);
+            Game.GraphicsDevice.Draw((Size - 1) * (Size - 1), 0);    
             
         }
 

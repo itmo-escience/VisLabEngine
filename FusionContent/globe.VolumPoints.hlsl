@@ -215,12 +215,12 @@ void GSMain ( point VS_OUTPUT inputArray[1], inout TriangleStream<GS_OUTPUT> str
 
 	float minV = FieldDepths[0];
 	float maxV = FieldDepths[Field.Dimension.w - 1];
-	float vz = lerp(minV, maxV, xyz.z/float(Field.Dimension.z));
+	float vz = lerp(0, Field.FieldSize.x, xyz.z/float(Field.Dimension.z));
 	float zLerp = 0;
 	float zInd = 0;
 	
 	[unroll(32)]
-	for (uint i = 0; i < Field.Dimension.w; i++) {
+	for (uint i = 1; i < Field.Dimension.w; i++) {
 		if (FieldDepths[i] > vz) {
 			zLerp = ilerp(FieldDepths[i - 1], FieldDepths[i], vz);			
 			zInd = i - 1;
@@ -337,9 +337,12 @@ void CSMain(uint3 groupID : SV_GroupID, uint groupIndex : SV_GroupIndex)
 	float3 Up = cross(Right, Forward);				
 	float4 position = float4(Right.xyz * (-Field.FieldSize.x * 0.5f + Field.FieldSize.x * xyz.y / (float(Field.Dimension.y)))
 			+ Forward.xyz * (-Field.FieldSize.y * 0.5f + Field.FieldSize.y * xyz.x / (float(Field.Dimension.x)))
-			+ Up.xyz * Field.FieldSize.z * xyz.z / (float(Field.Dimension.z)), 1);
-	//float3 d =  Field.FieldSize.xyz / (float3(Field.Dimension.xyz)) * 0.5f;
-	// position += float4(normalize(random3(position.xyz) * d), 0);
+			+ Up.xyz * Field.FieldSize.z * xyz.z / (float(Field.Dimension.z)), 1);	
+	float3 d =  (Right.xyz * Field.FieldSize.x / Field.Dimension.y
+				  + Forward.xyz * Field.FieldSize.y / Field.Dimension.x
+				  + Up.xyz * Field.FieldSize.z / Field.Dimension.z) / 2;
+	position += float4(normalize(random3(position.xyz) - 0.5f) * d * 2, 0);
+	position += float4(normalize(random3(position.xyz) - 0.5f) * d * 2, 0);
 	position += float4(origin.xyz, 0);
 	float4 localPosition = mul(position , Stage.ViewProj);
 	Positions[vertInd] = localPosition;

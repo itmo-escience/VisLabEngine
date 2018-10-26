@@ -86,6 +86,10 @@ namespace FusionUI.UI.Elements
             ArrowPointerSize = arrowSize;
             DotMarkerSize = markerSize;
             ArrowController.Instance.AddArrow(this);
+            X = 0;
+            Y = 0;
+            Width = 1;
+            Height = 1;
         }
        
         protected override void Update(GameTime gameTime)
