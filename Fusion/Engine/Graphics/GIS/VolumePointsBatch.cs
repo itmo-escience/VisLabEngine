@@ -20,8 +20,9 @@ namespace Fusion.Engine.Graphics.GIS
 
             cB = new ConstantBuffer(Game.GraphicsDevice, typeof(ConstData));    
 
-            confBuffer = new ConstantBuffer(Game.GraphicsDevice, typeof(ConfData));             
-        }
+            confBuffer = new ConstantBuffer(Game.GraphicsDevice, typeof(ConfData));
+			sortCB = new ConstantBuffer(Game.GraphicsDevice, sizeof(uint) * 4);
+		}
          
         Ubershader shader;    
         StateFactory factory;   
@@ -218,7 +219,9 @@ namespace Fusion.Engine.Graphics.GIS
 
         #endregion
         protected ConstData parameters;
-        public ConfData configParameters;
+		protected ConstantBuffer sortCB;
+
+		public ConfData configParameters;
         
         public void SetWholeData(float[] data, int dimX, int dimY, int dimZ)   
         {
@@ -320,7 +323,15 @@ namespace Fusion.Engine.Graphics.GIS
         private const int BITONIC_BLOCK_SIZE = 1024;
         void GPUSort(ConstantBuffer constBuffer)
         {
-            if (!Dirty) return;
+			Game.GraphicsDevice.SetCSRWBuffer(0, distBuffer, 0);
+			Game.GraphicsDevice.SetCSRWBuffer(1, indBuffer, 0);
+			Game.GraphicsDevice.SetCSRWBuffer(2, posBuffer, 0);
+
+			Game.GraphicsDevice.PipelineState = factory[(int)FieldFlags.Depth_Calc];
+			Game.GraphicsDevice.Dispatch((int)Math.Ceiling((float)dataFrameSize / BITONIC_BLOCK_SIZE), 1, 1);
+
+
+			if (!Dirty) return;
             Dirty = false;
             int count = dataFrameSize;
             
@@ -334,15 +345,7 @@ namespace Fusion.Engine.Graphics.GIS
             //}
             //indBuffer.SetData(indecies);
              
-            using (ConstantBuffer sortCB = new ConstantBuffer(Game.GraphicsDevice, sizeof(uint) * 4))
             {         
-                Game.GraphicsDevice.SetCSRWBuffer(0, distBuffer, 0);
-                Game.GraphicsDevice.SetCSRWBuffer(1, indBuffer, 0);
-                Game.GraphicsDevice.SetCSRWBuffer(2, posBuffer, 0);
-
-                Game.GraphicsDevice.PipelineState = factory[(int)FieldFlags.Depth_Calc];
-                Game.GraphicsDevice.Dispatch((int)Math.Ceiling((float)dataFrameSize / BITONIC_BLOCK_SIZE), 1, 1); 
-
                 float[] dist = new float[cc];
                 //int[] inds = new int[cc];
                 sortCB.SetData(new uint[] { (uint)cc, 0, 0, 0 }); 
