@@ -183,32 +183,32 @@ namespace FusionUI.UI.Elements
                 .Where(a => a.outDirection == inDirection)
                 ).OrderBy(a => a.myIndex).Where(a => !(a.ToFrame == FromFrame && a.FromFrame == ToFrame)).ToList();
 
-            float startSpread = DoStraightenFrom ? ((outDirection % 2 == 1) ? FromFrame.Height: FromFrame.Width): ArrowSpread;
-            float endSpread = DoStraightenTo ? ((inDirection % 2 == 1) ? ToFrame.Height: ToFrame.Width) : ArrowSpread;
+            float startSpread = DoStraightenFrom ? ((outDirection % 2 == 1) ? FromFrame.Height: FromFrame.Width) - ArrowPointerSize: ArrowSpread;
+            float endSpread = DoStraightenTo ? ((inDirection % 2 == 1) ? ToFrame.Height: ToFrame.Width) - ArrowPointerSize : ArrowSpread;
             if (startArrows.Count() > 1)
             {
-                if (DoStraightenFrom) startSpread /= startArrows.Count;
+                if (DoStraightenFrom) startSpread /= (startArrows.Count - 1);
                 if (outDirection % 2 == 1)
                 {                    
-                    start.Y = FromFrame.GlobalRectangle.Center.Y - startSpread * ((float)(startArrows.Count - 1) / 2 - startArrows.IndexOf(this));                    
+                    start.Y = FromFrame.GlobalRectangle.Center.Y - ArrowSpread * ((float)(startArrows.Count - 1) / 2 - startArrows.IndexOf(this));                    
 
                 }
                 else
                 {
-                    start.X = FromFrame.GlobalRectangle.Center.X - startSpread * ((float)(startArrows.Count - 1) / 2 - startArrows.IndexOf(this));
+                    start.X = FromFrame.GlobalRectangle.Center.X - ArrowSpread * ((float)(startArrows.Count - 1) / 2 - startArrows.IndexOf(this));
                 }
             }
 
             if (endarrows.Count() > 1)
             {
-                if (DoStraightenTo) endSpread /= endarrows.Count;
+                if (DoStraightenTo) endSpread /= (endarrows.Count - 1);
                 if (inDirection % 2 == 1)
                 {
-                    end.Y = ToFrame.GlobalRectangle.Center.Y - endSpread * ((float)(endarrows.Count - 1) / 2 - endarrows.IndexOf(this));
+                    end.Y = ToFrame.GlobalRectangle.Center.Y - ArrowSpread * ((float)(endarrows.Count - 1) / 2 - endarrows.IndexOf(this));
                 }
                 else
                 {
-                    end.X = ToFrame.GlobalRectangle.Center.X - endSpread * ((float)(endarrows.Count - 1) / 2 - endarrows.IndexOf(this));
+                    end.X = ToFrame.GlobalRectangle.Center.X - ArrowSpread * ((float)(endarrows.Count - 1) / 2 - endarrows.IndexOf(this));
                 }
             }
 
@@ -216,11 +216,11 @@ namespace FusionUI.UI.Elements
             {
                 if (outDirection % 2 == 1)
                 {
-                    start.Y = (int) DMathUtil.Clamp(end.Y, start.Y - startSpread / 2, start.Y + startSpread / 2);
+                    start.Y = (int) DMathUtil.Clamp(end.Y, start.Y - startSpread, start.Y + startSpread);
                 }
                 else
                 {
-                    start.X = (int) DMathUtil.Clamp(end.X, start.X - startSpread / 2, start.X + startSpread / 2);
+                    start.X = (int) DMathUtil.Clamp(end.X, start.X - startSpread, start.X + startSpread);
                 }
             }
 
@@ -229,11 +229,11 @@ namespace FusionUI.UI.Elements
 
                 if (inDirection % 2 == 1)
                 {
-                    end.Y = (int) DMathUtil.Clamp(start.Y, end.Y - endSpread / 2, end.Y + endSpread / 2);
+                    end.Y = (int) DMathUtil.Clamp(start.Y, end.Y - endSpread, end.Y + endSpread);
                 }
                 else
                 {
-                    end.X = (int) DMathUtil.Clamp(start.X, end.X - endSpread / 2, end.X + endSpread / 2);
+                    end.X = (int) DMathUtil.Clamp(start.X, end.X - endSpread, end.X + endSpread);
                 }
             }
 
@@ -245,7 +245,9 @@ namespace FusionUI.UI.Elements
             if (Math.Abs(start.Y - end.Y) <= 10) start.Y = end.Y = (start.Y + end.Y) / 2;
 
             var whiteTex = Game.Content.Load<DiscTexture>("UI/beam");//this.Game.RenderSystem.WhiteTexture);
-            
+
+            bool isContrArrow = ArrowController.Instance.OutArrowsByFrame[ToFrame].Any(a => a.ToFrame == FromFrame);
+
             if ((inDirection + outDirection) % 2 == 1 && !IsStraight)
             {
                 Vector2 center = outDirection % 2 == 0 ? new Vector2(start.X, end.Y) : new Vector2(end.X, start.Y);
@@ -253,7 +255,7 @@ namespace FusionUI.UI.Elements
                 var d2 = end - center;
                 float l1 = d1.Length(), l2 = d2.Length();
                 d1.Normalize(); d2.Normalize();
-                //start += d1 * ArrowPointerSize / 4;
+                if (isContrArrow) start += d1 * ArrowPointerSize / 4;
                 end -= d2 * ArrowPointerSize / 4;
                 DrawLine(spriteLayer, whiteTex, start + d1 * ArrowPointerSize / 4, center, BackColor, ArrowWidth);
                 DrawLine(spriteLayer, whiteTex, center, end - d2 * ArrowPointerSize / 4, BackColor, ArrowWidth);
@@ -313,7 +315,7 @@ namespace FusionUI.UI.Elements
                 var d3 = end - center2;
                 float l1 = d1.Length(), l2 = d2.Length(), l3 = d3.Length();
                 d1.Normalize(); d2.Normalize(); d3.Normalize();
-                //start += d1 * ArrowPointerSize / 4;
+                if (isContrArrow) start += d1 * ArrowPointerSize / 4;
                 end -= d3 * ArrowPointerSize / 4;
                 DrawLine(spriteLayer, whiteTex, start + d1 * ArrowPointerSize / 4, center1, BackColor, ArrowWidth);
                 DrawLine(spriteLayer, whiteTex, center1, center2, BackColor, ArrowWidth);
@@ -386,7 +388,7 @@ namespace FusionUI.UI.Elements
                 var d3 = end - center2;
                 float l1 = d1.Length(), l2 = d2.Length(), l3 = d3.Length();
                 d1.Normalize(); d2.Normalize(); d3.Normalize();
-                //start += d1 * ArrowPointerSize / 4;
+                if (isContrArrow) start += d1 * ArrowPointerSize / 4;
                 end -= d3 * ArrowPointerSize / 4;
                 DrawLine(spriteLayer, whiteTex, start + d1 * ArrowPointerSize / 4, center1, BackColor, ArrowWidth);
                 DrawLine(spriteLayer, whiteTex, center1, center2, BackColor, ArrowWidth);
@@ -438,7 +440,7 @@ namespace FusionUI.UI.Elements
                 var length = d.Length();
                 d.Normalize();
 
-                //start += d * ArrowPointerSize / 4;
+                if (isContrArrow) start += d * ArrowPointerSize / 4;
                 end -= d * ArrowPointerSize / 4;
                 DrawLine(spriteLayer, whiteTex, start + d * ArrowPointerSize / 4, end - d * ArrowPointerSize / 4, BackColor, ArrowWidth);
                 if (IsAnimation)

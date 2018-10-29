@@ -337,7 +337,7 @@ namespace Fusion.Engine.Media
 				// Trigger an "on Video Ended" event here if needed
 				if (ev.TypeInfo == MediaEventTypes.SessionTopologyStatus && ev.Get(EventAttributeKeys.TopologyStatus) == TopologyStatus.Ended)
 				{
-					//Console.WriteLine("Video ended");
+					Console.WriteLine("Video ended");
                     _player.OnVideoEnded?.Invoke();
 					if (!_player.SetNewVideo)
 					{

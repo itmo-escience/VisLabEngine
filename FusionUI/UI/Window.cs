@@ -61,6 +61,7 @@ namespace FusionUI.UI
             bool drawHat = true, bool drawCross = true, bool drawHelp = false, string helpText = "", bool fixedSize = false)
             : base(ui, x, y, w, h, text, backColor)
         {
+            ClickToFront = true;
             DrawHat = drawHat;
             FixedSize = fixedSize;
             ((Frame) this).Ghost = false;            
