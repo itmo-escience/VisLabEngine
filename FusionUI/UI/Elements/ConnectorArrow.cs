@@ -87,7 +87,7 @@ namespace FusionUI.UI.Elements
             DotMarkerSize = markerSize;
             ArrowController.Instance.AddArrow(this);
             X = 0;
-            Y = 0;
+            Y = (int)(4 * ScalableFrame.ScaleMultiplier);
             Width = 1;
             Height = 1;
         }
