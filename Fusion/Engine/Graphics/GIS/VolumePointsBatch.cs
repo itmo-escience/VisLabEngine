@@ -315,11 +315,13 @@ namespace Fusion.Engine.Graphics.GIS
         private StructuredBuffer depthBuffer;                                      
 
 
-        private StructuredBuffer distBuffer, indBuffer, posBuffer;  
-
+        private StructuredBuffer distBuffer, indBuffer, posBuffer;
+        public bool Dirty;
         private const int BITONIC_BLOCK_SIZE = 1024;
         void GPUSort(ConstantBuffer constBuffer)
         {
+            if (!Dirty) return;
+            Dirty = false;
             int count = dataFrameSize;
             
             var cc = 1 << (int) Math.Ceiling(Math.Log(count, 2)); 
@@ -445,10 +447,10 @@ namespace Fusion.Engine.Graphics.GIS
 
             var count = 1 << (int)Math.Ceiling(Math.Log(dataFrameSize, 2));
 
-            
+            GPUSort(constBuffer);
             
 
-            GPUSort(constBuffer);
+            
             Game.GraphicsDevice.GeometryShaderResources[0] = Palette;
             Game.GraphicsDevice.GeometryShaderResources[1] = DataFirstFrameGpu;  
             Game.GraphicsDevice.GeometryShaderResources[2] = DataSecondFrameGpu;
