@@ -149,7 +149,7 @@ struct ConstData {
 
 struct LinesConstData {
 	float	TransparencyMult	;
-	float3 	Dummy				;
+	float3 	Dummy				; // Time, 
 	float4	OverallColor		;
 };
 
@@ -163,7 +163,7 @@ cbuffer LinesCBStage	: register(b1) 	{	LinesConstData	LinesStage;	}
 
 #if 0
 $ubershader DRAW_LINES +ADD_CAPS +PALETTE_COLOR
-$ubershader GEO_LINES +ADD_CAPS +PALETTE_COLOR
+$ubershader GEO_LINES +ADD_CAPS +PALETTE_COLOR|TEXTURED_LINE
 $ubershader ARC_LINE
 $ubershader DRAW_SEGMENTED_LINES +TEXTURED_LINE +ADD_CAPS
 $ubershader THIN_LINE +OVERALL_COLOR
@@ -195,6 +195,7 @@ VS_OUTPUT VSMain ( VS_INPUT v )
 	output.Normal	= normalize(float3(normPos));
 	output.Color	= v.Color;
 	output.Tex		= v.Tex0;
+	output.Tex1		= v.Tex1;
 	
 #ifdef THIN_LINE
 	float3 viewDirection 	= normalize(float3(cameraPos));
@@ -329,28 +330,35 @@ inout TriangleStream<GS_OUTPUT> stream
 	float3 v = normalize(float3(SphericalToDecart(to, 6378.137)));
     float3 w = normalize(cross(cross(u, v), u));
 
-	//float TWO_PI = 6.2831853;
-    float len = DistanceBetweenTwoPoints(from, to, 6378.137) / 6378.137;
-	
+	float d = DistanceBetweenTwoPoints(from, to, 6378.137);
+	float len = d / 6378.137;	
 #endif
 
 #ifdef ARC_LINE	
 	float slicesCount	= 30;
 	float radius 		= length(dis)/2.0f;
 #endif
-	
-	float texMaxX = 1.0f;
+		
+float texMinX = 0.0f;
+float texMaxX = 1.0f;		
 #ifdef TEXTURED_LINE
-	texMaxX = length(dis) * 3.0f;
-	texMaxX = texMaxX - frac(texMaxX);
+	#ifdef GEO_LINES
+		texMinX = p0.Tex1.y;
+		texMaxX = p1.Tex1.y;
+	#else
+		texMaxX = length(dis) * 3.0f;
+		texMaxX = texMaxX - frac(texMaxX);
+	#endif
 #endif
+float texDeltaX = texMaxX - texMinX;
 
 
 	[unroll]
 	for(float i = 0; i < slicesCount; i = i + 1) {
-
-	#ifdef GEO_LINES
 		float f = i / (slicesCount-1);		
+		float texX = texMinX + texDeltaX * f;
+	#ifdef GEO_LINES
+		
 		float t = len * f;
 		float3 p = u * cos(t) + w * sin(t);
 		float2 geoP = DecartToSpherical(p);
@@ -369,20 +377,14 @@ inout TriangleStream<GS_OUTPUT> stream
 		float3 pos			= float3(posX, posY, posZ);
 		float3 sideOffset	= lerp(sideOffset0, sideOffset1, f);
 		float3 normal		= float3(normPos)
-		;//normalize(lerp(p0.Normal, p1.Normal, f));
-		
-		float texX = texMaxX*f;
+		;//normalize(lerp(p0.Normal, p1.Normal, f));	
 		
 		float height = h;
 		output.Color = lerp(p0.Color, p1.Color, f); 
-	#else
-		float f = i / (slicesCount-1);
-
+	#else		
 		float3 pos			= lerp(p0.Position.xyz, p1.Position.xyz, f);
 		float3 sideOffset	= lerp(sideOffset0, sideOffset1, f);
-		float3 normal		= normalize(lerp(p0.Normal, p1.Normal, f));
-
-		float texX = texMaxX*f;
+		float3 normal		= normalize(lerp(p0.Normal, p1.Normal, f));		
 		
 		float height = 0;
 		#ifdef ARC_LINE
@@ -465,7 +467,7 @@ float4 PSMain ( GS_OUTPUT input ) : SV_Target
 {
 	float4 color;
 #ifdef TEXTURED_LINE
-	color = DiffuseMap.Sample(Sampler, input.Tex.xy);
+	color = DiffuseMap.Sample(Sampler, float2(input.Tex.x + (1 - LinesStage.Dummy.x), input.Tex.y));
 #elif OVERALL_COLOR
 	color = LinesStage.OverallColor;
 #else
