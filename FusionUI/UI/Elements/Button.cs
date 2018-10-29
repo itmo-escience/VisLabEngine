@@ -69,8 +69,8 @@ namespace FusionUI.UI.Elements
             
             this.ActionClick += (ControlActionArgs args, ref bool flag) => {
                 if (!args.IsClick) return;
-                ToggleOnOff(toggleState);
-                ButtonAction?.Invoke(toggleState);                
+                ToggleOnOff(toggleState, true);
+                //ButtonAction?.Invoke(toggleState);                
                 if (transitionTime != 0)
                 {                    
                     this.BackColor = ActiveColor;
