@@ -68,7 +68,10 @@ namespace FusionUI.UI
         {
             if (!AllowShrink)
             {
-                Height = Math.Max(Height, oldH);
+				if (!ResizedManually)
+				{
+					Height = Math.Max(Height, oldH); 
+				}
             }
             base.UpdateResize(UpdateChildren);
             bool fr = firstResize;
@@ -95,8 +98,9 @@ namespace FusionUI.UI
         public float ScrollSize = 2;
 
         public bool AllowShrink = true;
+		public bool ResizedManually = false;
 
-        private ScalableFrame scrollHolder;
+		private ScalableFrame scrollHolder;
         public WindowScroll(FrameProcessor ui, float x, float y, float w, float h, string text, Color backColor,
             bool drawHat = true, bool drawCross = true)
             : base(ui, x, y, w, h, text, backColor, drawHat, drawCross)
@@ -205,8 +209,15 @@ namespace FusionUI.UI
             base.Update(gameTime);
             if (AllowShrink)
             {
-                scrollHolder.UnitHeight = Math.Min(HeightLimit, holder.UnitHeight);
-                UnitHeight = (HatPanel?.UnitHeight ?? 0) + (scrollHolder.UnitHeight) + (BasementPanel?.UnitHeight ?? 0) + UnitPaddingTop + UnitPaddingBottom;
+				if (!ResizedManually)
+				{
+					scrollHolder.UnitHeight = Math.Min(HeightLimit, holder.UnitHeight);
+					UnitHeight = (HatPanel?.UnitHeight ?? 0) + (scrollHolder.UnitHeight) + (BasementPanel?.UnitHeight ?? 0) + UnitPaddingTop + UnitPaddingBottom;
+				}
+				else
+				{
+					scrollHolder.UnitHeight = UnitHeight;
+				}
             }                        
             holder.UnitY = MathUtil.Clamp(holder.UnitY, Math.Min(MaxHeight - RealHeight, 0), 0);
         }
