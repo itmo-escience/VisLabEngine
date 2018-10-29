@@ -216,11 +216,11 @@ namespace FusionUI.UI.Elements
             {
                 if (outDirection % 2 == 1)
                 {
-                    start.Y = (int) DMathUtil.Clamp(end.Y, start.Y - startSpread, start.Y + startSpread);
+                    start.Y = (int) DMathUtil.Clamp(end.Y, start.Y - startSpread/2, start.Y + startSpread /2 );
                 }
                 else
                 {
-                    start.X = (int) DMathUtil.Clamp(end.X, start.X - startSpread, start.X + startSpread);
+                    start.X = (int) DMathUtil.Clamp(end.X, start.X - startSpread/2, start.X + startSpread / 2);
                 }
             }
 
@@ -229,11 +229,11 @@ namespace FusionUI.UI.Elements
 
                 if (inDirection % 2 == 1)
                 {
-                    end.Y = (int) DMathUtil.Clamp(start.Y, end.Y - endSpread, end.Y + endSpread);
+                    end.Y = (int) DMathUtil.Clamp(start.Y, end.Y - endSpread/2, end.Y + endSpread / 2);
                 }
                 else
                 {
-                    end.X = (int) DMathUtil.Clamp(start.X, end.X - endSpread, end.X + endSpread);
+                    end.X = (int) DMathUtil.Clamp(start.X, end.X - endSpread/2, end.X + endSpread / 2);
                 }
             }
 
