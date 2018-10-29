@@ -46,7 +46,7 @@ namespace Fusion.Engine.Graphics.GIS
 
             for(var i = 0; i < XLabels.Count; i++)
             {
-                var l = _labels.AddLabel(new TextLabelGisLayer.TextLabel(XAxis[i], XLabels[i], Color.White, Color.Zero));
+                var l = _labels.AddLabel(new TextLabelGisLayer.TextLabel(XAxis[i], XLabels[i], Color.White, Color.Black));
 
                 result.XLabels.Add(l);
             }
@@ -55,7 +55,7 @@ namespace Fusion.Engine.Graphics.GIS
             var padding = (XAxis[0] - XAxis[1]).Normalized() * 3;
             for (var i = 0; i < YLabels.Count; i++)
             {
-                var l = _labels.AddLabel(new TextLabelGisLayer.TextLabel(YAxis[i] + padding, YLabels[i], Color.White, Color.Zero));
+                var l = _labels.AddLabel(new TextLabelGisLayer.TextLabel(YAxis[i] + padding, YLabels[i], Color.White, Color.Black));
 
                 result.YLabels.Add(l);
                 yLineWithTicks.Add(YAxis[i]);
