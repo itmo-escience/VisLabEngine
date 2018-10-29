@@ -346,7 +346,7 @@ namespace Fusion.Engine.Graphics.GIS
             //indBuffer.SetData(indecies);
              
             {         
-                float[] dist = new float[cc];
+                //float[] dist = new float[cc];
                 //int[] inds = new int[cc];
                 sortCB.SetData(new uint[] { (uint)cc, 0, 0, 0 }); 
                 Game.GraphicsDevice.ComputeShaderConstants[2] = sortCB; 
@@ -379,13 +379,13 @@ namespace Fusion.Engine.Graphics.GIS
                 Game.GraphicsDevice.SetCSRWBuffer(1, null, 0);
                 Game.GraphicsDevice.SetCSRWBuffer(2, null, 0);
 
-                distBuffer.GetData(dist);
+                //distBuffer.GetData(dist);
                 //indBuffer.GetData(inds);
                  
-                if (float.IsNaN(dist.Aggregate(float.PositiveInfinity, (a, b) => a >= b ? b : float.NaN)))  
-                { 
-                    Log.Error("No!");
-                } 
+                //if (float.IsNaN(dist.Aggregate(float.PositiveInfinity, (a, b) => a >= b ? b : float.NaN)))  
+                //{ 
+                //    Log.Error("No!");
+                //} 
                 //else
                 //{
                 //    Log.Message("Yes!");
