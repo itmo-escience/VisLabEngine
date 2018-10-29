@@ -11,7 +11,7 @@ namespace FusionUI.UI
 {
     public class ControllableFrame : Frame
     {
-        public bool ClickToFront = true;
+        public bool ClickToFront = false;
 
         public ControllableFrame(FrameProcessor ui) : base(ui)
         {

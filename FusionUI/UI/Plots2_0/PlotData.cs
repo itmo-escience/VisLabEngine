@@ -130,7 +130,7 @@ namespace FusionUI.UI.Plots2_0
         public void UpdateLimits(double depth)
         {
             if (!Data.ContainsKey(depth)) { LimitsByDepth[depth] = new RectangleD(0, 0, 0, 0); return;}            
-            var data = Data[depth].Where(a => !(double.IsNaN(a.X) || double.IsNaN(a.Y))).ToList();
+            var data = Data[depth].Where(a => !(double.IsNaN(a.X) || double.IsNaN(a.Y) || a.Y == 0)).ToList();
             if (!data.Any()) return;
             var ld= new RectangleD() {
                 
@@ -329,12 +329,14 @@ namespace FusionUI.UI.Plots2_0
                     if (ans == null)
                     {
                         if (!LimitsByDepth.ContainsKey(depth)) UpdateLimits(depth);
+                        if (!LimitsByDepth.ContainsKey(depth)) continue;
                         ans = LimitsByDepth[depth];
                     }
                     else
                     {
                         var r = ans.Value;
                         if (!LimitsByDepth.ContainsKey(depth)) UpdateLimits(depth);
+                        if (!LimitsByDepth.ContainsKey(depth)) continue;
                         r.Left = Math.Min(ans.Value.Left, LimitsByDepth[depth].Left);
                         r.Right = Math.Max(ans.Value.Right, LimitsByDepth[depth].Right);
                         r.Top = Math.Min(ans.Value.Top, LimitsByDepth[depth].Top);
