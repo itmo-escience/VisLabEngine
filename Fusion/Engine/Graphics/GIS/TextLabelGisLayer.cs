@@ -49,6 +49,7 @@ namespace Fusion.Engine.Graphics.GIS
 
         public double MaxVisibleDistance = 3500;
 
+        private const int HPadding = 2;
         private readonly SpriteFont _font;
         private readonly SpriteLayer _spriteLayer;
         private readonly GlobeCamera _camera;
@@ -74,7 +75,7 @@ namespace Fusion.Engine.Graphics.GIS
                 _font.DrawString(
                     _spriteLayer,
                     label.Text,
-                    rect.X,
+                    rect.X + HPadding,
                     rect.Y,
                     label.TextColor,
                     useBaseLine: false
@@ -150,32 +151,32 @@ namespace Fusion.Engine.Graphics.GIS
                 case AnchorPoint.TopLeft:
                     break;
                 case AnchorPoint.Top:
-                    x -= textRect.Width / 2;
+                    x -= textRect.Width / 2 + HPadding;
                     break;
                 case AnchorPoint.TopRight:
-                    x -= textRect.Width;
+                    x -= textRect.Width + 2 * HPadding;
                     break;
                 case AnchorPoint.BottomLeft:
                     y -= textRect.Height;
                     break;
                 case AnchorPoint.Bottom:
-                    x -= textRect.Width / 2;
+                    x -= textRect.Width / 2 + HPadding;
                     y -= textRect.Height;
                     break;
                 case AnchorPoint.BottomRight:
-                    x -= textRect.Width;
+                    x -= textRect.Width + 2 * HPadding;
                     y -= textRect.Height;
                     break;
                 case AnchorPoint.Left:
                     y -= textRect.Height / 2;
                     break;
                 case AnchorPoint.Right:
-                    x -= textRect.Width;
+                    x -= textRect.Width + 2 * HPadding;
                     y -= textRect.Height / 2;
                     break;
             }
 
-            return new Rectangle((int) x, (int) y, (int) textRect.Width, (int) textRect.Height);
+            return new Rectangle((int) x, (int) y, (int) textRect.Width + 2 * HPadding, (int) textRect.Height);
         }
     }
 }
