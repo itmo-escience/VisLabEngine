@@ -319,7 +319,8 @@ namespace Fusion.Engine.Graphics.GIS
 
 
         private StructuredBuffer distBuffer, indBuffer, posBuffer;
-        public bool Dirty;
+        public bool Dirty = false;
+        public bool UpdateEachFrame = true;
         private const int BITONIC_BLOCK_SIZE = 1024;
         void GPUSort(ConstantBuffer constBuffer)
         {
@@ -331,7 +332,7 @@ namespace Fusion.Engine.Graphics.GIS
 			Game.GraphicsDevice.Dispatch((int)Math.Ceiling((float)dataFrameSize / BITONIC_BLOCK_SIZE), 1, 1);
 
 
-			if (!Dirty) return;
+			if (!Dirty && !UpdateEachFrame) return;
             Dirty = false;
             int count = dataFrameSize;
             
@@ -374,7 +375,8 @@ namespace Fusion.Engine.Graphics.GIS
                     //{
                     //    Log.Message($"{level}: Yes!");
                     //}
-                }     
+                }
+                Game.GraphicsDevice.DeviceContext.CopyResource(indBuffer.SRV.Resource, indecies.Buffer);
                 Game.GraphicsDevice.SetCSRWBuffer(0, null, 0);
                 Game.GraphicsDevice.SetCSRWBuffer(1, null, 0);
                 Game.GraphicsDevice.SetCSRWBuffer(2, null, 0);
@@ -468,8 +470,7 @@ namespace Fusion.Engine.Graphics.GIS
             {
                 Flags = FieldFlags.Draw_points | FieldFlags.LerpBuffers | FieldFlags.MoveVertices;          
             }                                      
-            Game.GraphicsDevice.PipelineState = factory[(int)Flags];                
-            Game.GraphicsDevice.DeviceContext.CopyResource(indBuffer.SRV.Resource, indecies.Buffer);  
+            Game.GraphicsDevice.PipelineState = factory[(int)Flags];                           
             Game.GraphicsDevice.SetupVertexInput(null, indecies);                
             Game.GraphicsDevice.DrawIndexed(dataFrameSize, 0, 0); 
             //Game.GraphicsDevice.Draw(dataFrameSize, 0);
