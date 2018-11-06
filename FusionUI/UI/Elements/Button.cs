@@ -123,14 +123,14 @@ namespace FusionUI.UI.Elements
             }
         }
 
-        public Button(FrameProcessor ui, float x, float y, float w, float h, string text, Color mainColor, Color transitionColor, int transitionTime, Action action = null, Color? activeFColor = null, Color? inActiveFColor = null) : base(ui, x, y, w, h, text, mainColor)
+        public Button(FrameProcessor ui, float x, float y, float w, float h, string text, Color mainColor, Color transitionColor, int transitionTime, Action action = null, Color? activeFColor = null, Color? inactiveFColor = null) : base(ui, x, y, w, h, text, mainColor)
         {
             ActiveColor = transitionColor;
             InactiveColor = mainColor;
             ActiveFColor = activeFColor ?? ActiveFColor;
-            InactiveFColor = inActiveFColor ?? InactiveFColor;
+            InactiveFColor = inactiveFColor ?? InactiveFColor;
             ActiveImageColor = activeFColor ?? ActiveImageColor;
-            InactiveImageColor = inActiveFColor ?? InactiveImageColor;
+            InactiveImageColor = inactiveFColor ?? InactiveImageColor;
             initClickableButton(transitionTime);
             if (action != null) ButtonAction += b => action();
             ImageMode = FrameImageMode.Fitted;
@@ -227,7 +227,7 @@ namespace FusionUI.UI.Elements
             InitTextBlock();
         }
 
-        public FormatTexstButton(FrameProcessor ui, float x, float y, float w, float h, string text, Color mainColor, Color transitionColor, int transitionTime, Action action = null, Color? activeFColor = null, Color? inActiveFColor = null) : base(ui, x, y, w, h, text, mainColor, transitionColor, transitionTime, action, activeFColor, inActiveFColor)
+        public FormatTexstButton(FrameProcessor ui, float x, float y, float w, float h, string text, Color mainColor, Color transitionColor, int transitionTime, Action action = null, Color? activeFColor = null, Color? inactiveFColor = null) : base(ui, x, y, w, h, text, mainColor, transitionColor, transitionTime, action, activeFColor, inactiveFColor)
         {
             InitTextBlock();
         }

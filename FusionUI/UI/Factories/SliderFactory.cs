@@ -258,7 +258,7 @@ namespace FusionUI.UI.Factories
         }
 
         public static ScalableFrame SliderHorizontalHolderNew(FrameProcessor ui, float OffsetX, float OffsetY,
-            float width, float height,
+            float height,
             ScalableFrame parent, string label, float labelWidth,
             Action<float> changeAction, float min, float max, float initValue, out Slider slider,
             bool minMaxSelector = false, string imageSlider = null,

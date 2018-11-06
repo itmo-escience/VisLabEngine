@@ -259,8 +259,8 @@ namespace Fusion.Engine.Graphics.GIS
             DataFirstFrameGpu = DataSecondFrameGpu;
 
             DataSecondFrameGpu = new Texture3D(Game.GraphicsDevice, dimX, dimY, dimZ, ColorFormat.R32F, false);
-            DataSecondFrameGpu.SetData(data); 
-            dataFrameSize = dimX * dimY * dimX;            
+            DataSecondFrameGpu.SetData(data);
+            dataFrameSize = dimX * dimY * dimX;
         }
 
         private int dataFrameSize;       
@@ -328,73 +328,38 @@ namespace Fusion.Engine.Graphics.GIS
 			Game.GraphicsDevice.SetCSRWBuffer(1, indBuffer, 0);
 			Game.GraphicsDevice.SetCSRWBuffer(2, posBuffer, 0);
 
+
 			Game.GraphicsDevice.PipelineState = factory[(int)FieldFlags.Depth_Calc];
 			Game.GraphicsDevice.Dispatch((int)Math.Ceiling((float)dataFrameSize / BITONIC_BLOCK_SIZE), 1, 1);
 
 
 			if (!Dirty && !UpdateEachFrame) return;
             Dirty = false;
-            int count = dataFrameSize;
-            
-            var cc = 1 << (int) Math.Ceiling(Math.Log(count, 2)); 
 
-            //var data1 = new float[cc];
-            //uint[] indecies = new uint[cc];            
-            //for (int i = 0; i < cc; i++)
-            //{
-            //    indecies[i] = (uint) i;
-            //}
-            //indBuffer.SetData(indecies);
-             
-            {         
-                //float[] dist = new float[cc];
-                //int[] inds = new int[cc];
-                sortCB.SetData(new uint[] { (uint)cc, 0, 0, 0 }); 
-                Game.GraphicsDevice.ComputeShaderConstants[2] = sortCB; 
-                for (uint level = 2; level <= cc; level <<= 1)   
+                    
+            var cc = 1 << (int) Math.Ceiling(Math.Log(dataFrameSize, 2)); 
+                                 
+            sortCB.SetData(new uint[] { (uint)cc, 0, 0, 0 }); 
+            Game.GraphicsDevice.ComputeShaderConstants[2] = sortCB; 
+            for (uint level = 2; level <= cc; level <<= 1)   
+            {
+                sortCB.SetData(new uint[] {(uint) level, 0, 0, 0}); 
+                Game.GraphicsDevice.PipelineState = factory[(int) FieldFlags.Depth_Sort_FirstMerge];
+                Game.GraphicsDevice.Dispatch((int) Math.Ceiling((float) cc / BITONIC_BLOCK_SIZE), 1, 1);
+                if (level > BITONIC_BLOCK_SIZE)
                 {
-                    sortCB.SetData(new uint[] {(uint) level, 0, 0, 0}); 
-                    Game.GraphicsDevice.PipelineState = factory[(int) FieldFlags.Depth_Sort_FirstMerge];
-                    Game.GraphicsDevice.Dispatch((int) Math.Ceiling((float) cc / BITONIC_BLOCK_SIZE), 1, 1);
-                    if (level > BITONIC_BLOCK_SIZE)
+                    for (uint l = level / 2; l >= BITONIC_BLOCK_SIZE; l >>= 1)     
                     {
-                        for (uint l = level / 2; l >= BITONIC_BLOCK_SIZE; l >>= 1)     
-                        {
-                            sortCB.SetData(new uint[] {(uint) level, l, 0, 0}); 
-                            Game.GraphicsDevice.PipelineState = factory[(int) FieldFlags.Depth_Sort_Transpose];
-                            Game.GraphicsDevice.Dispatch((int) Math.Ceiling((float) cc / BITONIC_BLOCK_SIZE), 1, 1);
-                        }    
-                    }  
-
-                    //distBuffer.GetData(dist);
-                    //if (float.IsNaN(dist.Take((int)level).Aggregate(float.PositiveInfinity, (a, b) => a >= b ? b : float.NaN)))
-                    //{
-                    //    Log.Error($"{level}: No!");       
-                    //} 
-                    //else
-                    //{
-                    //    Log.Message($"{level}: Yes!");
-                    //}
-                }
-                Game.GraphicsDevice.DeviceContext.CopyResource(indBuffer.SRV.Resource, indecies.Buffer);
-                Game.GraphicsDevice.SetCSRWBuffer(0, null, 0);
-                Game.GraphicsDevice.SetCSRWBuffer(1, null, 0);
-                Game.GraphicsDevice.SetCSRWBuffer(2, null, 0);
-
-                //distBuffer.GetData(dist);
-                //indBuffer.GetData(inds);
-                 
-                //if (float.IsNaN(dist.Aggregate(float.PositiveInfinity, (a, b) => a >= b ? b : float.NaN)))  
-                //{ 
-                //    Log.Error("No!");
-                //} 
-                //else
-                //{
-                //    Log.Message("Yes!");
-                //}
+                        sortCB.SetData(new uint[] {(uint) level, l, 0, 0}); 
+                        Game.GraphicsDevice.PipelineState = factory[(int) FieldFlags.Depth_Sort_Transpose];
+                        Game.GraphicsDevice.Dispatch((int) Math.Ceiling((float) cc / BITONIC_BLOCK_SIZE), 1, 1);
+                    }    
+                }                      
             }
-            
-          
+            Game.GraphicsDevice.DeviceContext.CopyResource(indBuffer.SRV.Resource, indecies.Buffer);
+            Game.GraphicsDevice.SetCSRWBuffer(0, null, 0);
+            Game.GraphicsDevice.SetCSRWBuffer(1, null, 0);
+            Game.GraphicsDevice.SetCSRWBuffer(2, null, 0);
         }
 
         public override void Dispose()
