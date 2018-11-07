@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using FusionUI.UI;
 
-namespace ForumProject.ScenarioManager.Legenda
+namespace FusionUI.Legenda
 {
     public interface ILegend
     {

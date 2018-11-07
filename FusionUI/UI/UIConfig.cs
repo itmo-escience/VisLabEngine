@@ -218,8 +218,8 @@ namespace FusionUI.UI
 
         public static float UnitTabTextOffsetX = 3;
 
-        public const float UnitLegendWidth = 54;
-        public const float UnitLegendElementHeight = 7;
+        public static float UnitLegendWidth = 54;
+        public static float UnitLegendElementHeight = 7;
 
         public struct FontHolder
         {

@@ -12,7 +12,7 @@ using Fusion.Engine.Graphics;
 using FusionUI;
 using FusionUI.UI;
 
-namespace ForumProject.ScenarioManager.Legenda
+namespace FusionUI.Legenda
 {
 	public class PaletteLegend : ILegend
 	{

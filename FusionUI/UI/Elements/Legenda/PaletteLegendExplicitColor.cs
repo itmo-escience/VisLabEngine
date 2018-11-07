@@ -1,4 +1,4 @@
-﻿using ForumProject.ScenarioManager.Legenda;
+﻿using FusionUI.Legenda;
 using Fusion.Core.Mathematics;
 
 namespace FusionUI.UI.Elements.Legenda

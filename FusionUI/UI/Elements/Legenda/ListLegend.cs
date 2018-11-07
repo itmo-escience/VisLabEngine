@@ -6,10 +6,11 @@ using System.Threading.Tasks;
 using Fusion.Core.Mathematics;
 using Fusion.Engine.Frames;
 using Fusion.Engine.Graphics;
+using Fusion.Engine.Graphics.GIS;
 using FusionUI;
 using FusionUI.UI;
 
-namespace ForumProject.ScenarioManager.Legenda
+namespace FusionUI.Legenda
 {
     public class ListLegend : ILegend
     {
@@ -40,7 +41,7 @@ namespace ForumProject.ScenarioManager.Legenda
                         var Caption = new ScalableFrame(ui, 0, 0, Width,
                             UIConfig.UnitLegendElementHeight, Name, Color.Zero)
                         {
-                            FontHolder = UIConfig.FontBody,
+                            FontHolder = UIConfig.FontSubtitle,
                             UnitPadding = 3,
                         };
                         legendFrame.Add(Caption);
@@ -50,13 +51,13 @@ namespace ForumProject.ScenarioManager.Legenda
                         var entry = new ScalableFrame(ui, 0, 0, Width, UIConfig.UnitLegendElementHeight, pair.Item1, Color.Zero)
                         {
                             Image = ui.Game.Content.Load<DiscTexture>(@"circle"),
-                            UnitTextOffsetX = UIConfig.UnitLegendElementHeight,
+                            UnitTextOffsetX = UIConfig.UnitLegendElementHeight + 2,
                             TextAlignment = Alignment.MiddleLeft,
                             ImageColor = pair.Item2,
                             ImageMode = FrameImageMode.Fitted,
                             ClippingMode = ClippingMode.ClipByPadding,
                             UnitVPadding = 2,
-                            UnitImageOffsetX = -(Width)/2,                            
+                            UnitImageOffsetX = -(Width)/2 + (UIConfig.UnitLegendElementHeight - 2),                            
                         };
                         legendFrame.Add(entry);
                     }
