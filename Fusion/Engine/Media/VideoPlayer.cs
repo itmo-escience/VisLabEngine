@@ -501,7 +501,8 @@ namespace Fusion.Engine.Media
 		/// </summary>
 		private void PlatformResume()
 		{
-			_session.Start(null, null);
+			var varStart = new Variant();
+			_session.Start(null, varStart);
 		}
 
 
