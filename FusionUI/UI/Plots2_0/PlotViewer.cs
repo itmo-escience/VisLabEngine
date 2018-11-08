@@ -140,7 +140,8 @@ namespace FusionUI.UI.Plots2_0
                                             ScaleSettings;
                     scales[name].Dirty = true;
                     scales[name].YLabel = name;
-                    scales[name].Measure = variable.Value.Units;
+                    scales[name].YMeasure = variable.Value.Units;
+                    scales[name].XMeasure = variable.Value.CatUnits;
                     scales[name].XLabel = "Time";
                     scales[name].ZOrder = 1000;
                     scales[name].FontHolder = scaleFont;

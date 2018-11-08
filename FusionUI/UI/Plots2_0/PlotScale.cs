@@ -144,7 +144,8 @@ namespace FusionUI.UI.Plots2_0
 
         public string YLabel = "";
         public string XLabel = "";
-        public string Measure = "";
+        public string YMeasure = "";
+        public string XMeasure = "";
         public bool Dirty = true;        
         public List<double> PredefinedStepsX, predefinedStepsY;
         public UIConfig.FontHolder CaptionsFontHolder = UIConfig.FontBody;
@@ -372,9 +373,9 @@ namespace FusionUI.UI.Plots2_0
             //sb.Draw(whiteTex, new RectangleF(Plot.GlobalRectangle.Left + offset + (int)(r.Height / 2) - r.Height, Plot.GlobalRectangle.Bottom + UIConfig.UnitPlotNumbersHeight + UIConfig.UnitPlotVerticalOffset, r.Height, r.Width), Color.Green);
             var wMax = 0.0f;
 
-            if (Measure != "")
+            if (YMeasure != "")
             {
-                var measure = TryGetText(this.Measure);
+                var measure = TryGetText(this.YMeasure);
                 var r = Font.MeasureStringF(measure);
                 CaptionsFont.DrawString(sb, measure, Plot.GlobalRectangle.Left + offset - (int)(r.Width) * (left ? 0 : 1) + (left ? 8 : -8),
                     Plot.GlobalRectangle.Top, color,
