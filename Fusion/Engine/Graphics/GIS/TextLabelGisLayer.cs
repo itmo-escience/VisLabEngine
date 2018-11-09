@@ -97,18 +97,18 @@ namespace Fusion.Engine.Graphics.GIS
             if(sortedLabels.Count == 0)
                 return;
 
-            var lastDisplayedRect = GetBoundingRect(sortedLabels[0]);
-            Display(sortedLabels[0], lastDisplayedRect, sortedLabels[0].BackgroundColor);
+            var displayedRects = new List<Rectangle> { GetBoundingRect(sortedLabels[0]) };
+            Display(sortedLabels[0], GetBoundingRect(sortedLabels[0]), sortedLabels[0].BackgroundColor);
             for (var i = 1; i < sortedLabels.Count; i++)
             {
                 var label = sortedLabels[i];
                 var rect = GetBoundingRect(label);
 
-                if (!rect.Intersects(lastDisplayedRect))
+                if (!displayedRects.Any(d => rect.Intersects(d)))
                 {
                     Display(label, rect, label.BackgroundColor);
 
-                    lastDisplayedRect = rect;
+                    displayedRects.Add(rect);
                 }
             }
         }

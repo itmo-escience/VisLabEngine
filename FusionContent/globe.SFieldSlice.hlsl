@@ -139,14 +139,20 @@ VS_OUTPUT VSMain ( VS_INPUT v, uint vertInd : SV_VertexID )
 	output.Color = v.Color;
 		
 #ifdef DRAW_SLICE
-	float valRange = ValueBounds.Max - ValueBounds.Min;
-	float valPrev = saturate((ValuesPrev[vertInd] - ValueBounds.Min) / valRange);
-	float valNext = saturate((ValuesNext[vertInd] - ValueBounds.Min) / valRange);
+	if (ValuesPrev[vertInd] < -9999 && ValuesNext[vertInd] < -9999) { // Missing data
+		output.Tex = float4(0, 100, 0, 0);
+	} else if (ValuesPrev[vertInd] == 0 && ValuesNext[vertInd] == 0) { // Loading data
+		output.Tex = float4(0, 50, 0, 0);
+	} else {
+		float valRange = ValueBounds.Max - ValueBounds.Min;
+		float valPrev = saturate((ValuesPrev[vertInd] - ValueBounds.Min) / valRange);
+		float valNext = saturate((ValuesNext[vertInd] - ValueBounds.Min) / valRange);
 
-	float time = saturate(ValueBounds.Time);
-	float lerpVal = lerp(valPrev, valNext, time);
+		float time = saturate(ValueBounds.Time);
+		float lerpVal = lerp(valPrev, valNext, time);
 
-	output.Tex = float4(lerpVal, 0, 0, 0);
+		output.Tex = float4(lerpVal, 0, 0, 0);
+	}
 	
 #else // DRAW_BORDER
 	output.Tex = float4(0, 0, 0, 0);
@@ -157,10 +163,13 @@ VS_OUTPUT VSMain ( VS_INPUT v, uint vertInd : SV_VertexID )
 
 float4 PSMain ( VS_OUTPUT input ) : SV_Target
 {	
-#ifdef DRAW_SLICE
-	float4 color = Palette.Sample(Sampler, float2(input.Tex.x, 0.5f));	
+#ifdef DRAW_SLICE	
+	if (input.Tex.y > 10) { // Missing or loading data
+		return float4(0, 0, 0, 1);
+	}
+
+	return Palette.Sample(Sampler, float2(input.Tex.x, 0.5f));
 #else // DRAW_BORDER
-	float4 color = input.Color;
-#endif	
-	return color;
+	return input.Color;
+#endif		
 }
