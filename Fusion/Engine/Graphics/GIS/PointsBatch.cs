@@ -123,7 +123,7 @@ namespace Fusion.Engine.Graphics.GIS
 		}
 
 
-		public void UpdatePointsBuffer()
+		public virtual void UpdatePointsBuffer()
 		{
 			if (currentBuffer == null) return;
 

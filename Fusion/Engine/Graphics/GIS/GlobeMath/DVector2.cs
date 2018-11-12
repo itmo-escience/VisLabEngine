@@ -1395,7 +1395,7 @@ namespace Fusion.Engine.Graphics.GIS.GlobeMath
             if (format == null)
                 return ToString();
 
-            return string.Format(CultureInfo.CurrentCulture, "X:{0} Y:{1}", X.ToString(format, CultureInfo.CurrentCulture), Y.ToString(format, CultureInfo.CurrentCulture));
+            return string.Format(CultureInfo.CurrentCulture, "{2}:{0} {3}:{1}", X.ToString(format, CultureInfo.CurrentCulture), Y.ToString(format, CultureInfo.CurrentCulture), xLabel, yLabel);
         }
 
         /// <summary>

@@ -24,6 +24,12 @@ namespace FusionUI.UI
             set { holder.UnitSeparateOffset = value; }
         }
 
+        public string Caption
+        {
+            get => HatPanel.Text;
+            set => HatPanel.Text = value;
+        }
+
         public Color HolderColor { get { return holder.BackColor; } set { holder.BackColor = value; } }
         public Color HatColor { get { return HatPanel.BackColor; } set { HatPanel.BackColor = value; } }
         public Color BasementColor { get { return BasementPanel.BackColor; } set { BasementPanel.BackColor = value; } }
