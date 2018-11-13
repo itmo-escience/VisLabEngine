@@ -21,6 +21,7 @@ using System;
 using System.Globalization;
 using System.Runtime.InteropServices;
 using System.ComponentModel;
+using Fusion.Engine.Graphics.GIS.GlobeMath;
 
 
 namespace Fusion.Core.Mathematics
@@ -722,6 +723,34 @@ namespace Fusion.Core.Mathematics
         public static Color FromRgba(int color)
         {
             return new Color(color);
+        }
+
+        /// <summary>
+        /// Converts the color from a hsb values.
+        /// </summary>
+        /// <param name="h">A radian value of hue on color circle</param>
+        /// <param name="s">A value of saturation</param>
+        /// <param name="b">A value of brightness</param>
+        /// <returns>A color.</returns>
+        public static Color FromHSB(float h, float s, float v)
+        {
+            h = MathUtil.RadiansToDegrees(h);
+            h = (h + (float)Math.Ceiling(h / 360) * 360) % 360;
+            int hi = (int)(Math.Floor(h / 60) % 6);
+            float vMin = (1 - s) * v;
+            float a = (v - vMin) * (h % 60) / 60;
+            var vInc = vMin + a;
+            var vDec = v - a;
+            switch (hi)
+            {
+                case 0: return new Color(v, vInc, vDec);
+                case 1: return new Color(vDec, v, vInc);
+                case 2: return new Color(vMin, v, vInc);
+                case 3: return new Color(vMin, vDec, v);
+                case 4: return new Color(vInc, vMin, v);
+                case 5: return new Color(v, vMin, vDec);
+                default: return Color.Zero; //impossible
+            }
         }
 
         /// <summary>

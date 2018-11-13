@@ -388,7 +388,7 @@ namespace Fusion.Engine.Graphics.Graph
             //
 
             param.MaxParticles = ParticlesCpu.Length;
-            ParamsCb.SetData(param);
+            ParamsCb.SetData(param); 
 
 
             device.ComputeShaderConstants[0] = ParamsCb;
