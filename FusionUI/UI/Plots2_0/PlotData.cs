@@ -131,7 +131,7 @@ namespace FusionUI.UI.Plots2_0
         {
             if (!Data.ContainsKey(depth)) { LimitsByDepth[depth] = new RectangleD(0, 0, 0, 0); return;}            
             var data = Data[depth].Where(a => !(double.IsNaN(a.X) || double.IsNaN(a.Y) || a.Y == 0)).ToList();
-            if (!data.Any()) return;
+            if (!data.Any()) { LimitsByDepth[depth] = new RectangleD(0, 0, 0, 0); return; }
             var ld= new RectangleD() {
                 
                 Left = data.Min(a => a.X),
@@ -151,7 +151,7 @@ namespace FusionUI.UI.Plots2_0
             if (FixLimits)
             {
                 ld.Left -= 1;
-                ld.Width += 1;
+                ld.Right += 1;
                 var h = ld.Height;
                 ld.Top -=  h * 0.1f;
                 ld.Bottom += h * 0.1f;
@@ -366,7 +366,7 @@ namespace FusionUI.UI.Plots2_0
         public RectangleD ActiveLimits
         {
             get
-            {
+            {               
                 RectangleD? ans = null;
                 if (ActiveDepths == null) return RectangleD.Empty;
                 foreach (var depth in ActiveDepths)
