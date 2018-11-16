@@ -149,7 +149,7 @@ namespace Fusion.Core.Utils
 			//reader.ReadStartElement("serializableFrame");
 				Frame frame = (Frame)frameSerializer.Deserialize(reader);
 				this.SerializableFrame = frame;
-				reader.ReadEndElement();
+				//reader.ReadEndElement();
 
 			//reader.ReadEndElement();
 

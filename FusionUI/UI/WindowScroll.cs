@@ -90,11 +90,14 @@ namespace FusionUI.UI
 
         public void UpdatePadding()
         {
-            scrollHolder.UnitY = DrawHat ? UIConfig.UnitHatHeight : 0 + UnitPaddingTop;
-            scrollHolder.UnitX = UnitPaddingLeft;
-            scrollHolder.UnitWidth = UnitWidth - UnitPaddingLeft - UnitPaddingRight;
-            scrollHolder.UnitHeight = HeightLimit - UnitPaddingTop - UnitPaddingBottom;
-            holder.UnitWidth = scrollHolder.UnitWidth;
+			if (scrollHolder!=null)
+			{
+				scrollHolder.UnitY = DrawHat ? UIConfig.UnitHatHeight : 0 + UnitPaddingTop;
+				scrollHolder.UnitX = UnitPaddingLeft;
+				scrollHolder.UnitWidth = UnitWidth - UnitPaddingLeft - UnitPaddingRight;
+				scrollHolder.UnitHeight = HeightLimit - UnitPaddingTop - UnitPaddingBottom;
+				holder.UnitWidth = scrollHolder.UnitWidth; 
+			}
         }
 
         public float ScrollSize = 2;

@@ -122,6 +122,7 @@
     <Reference Include="Triangle">
       <HintPath>..\SDKs\Triangle\Triangle.dll</HintPath>
     </Reference>
+    <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Core\Configuration\ConfigSerializer.cs" />

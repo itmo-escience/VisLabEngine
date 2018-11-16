@@ -1,0 +1,30 @@
+﻿<UserControl x:Class="WpfEditorTest.ChildPanels.SelectedFramePanel"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:WpfEditorTest.ChildPanels"
+             mc:Ignorable="d" 
+             d:DesignHeight="100" d:DesignWidth="100" Background="#26FFFFFF" MouseDown="UserControl_MouseDown" HorizontalAlignment="Left" VerticalAlignment="Top" MouseMove="UserControl_MouseMove">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="9"/>
+            <RowDefinition Height="1*"/>
+            <RowDefinition Height="9"/>
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="9"/>
+            <ColumnDefinition Width="1*"/>
+            <ColumnDefinition Width="9"/>
+        </Grid.ColumnDefinitions>
+        <Border Name="BottomDrag" BorderBrush="Black" Background="White" BorderThickness="1" Grid.Column="1" HorizontalAlignment="Center" Height="9" Grid.Row="2" Width="20" MouseDown="Drag_MouseDown"/>
+        <Border Name="TopDrag" BorderBrush="Black" Background="White" BorderThickness="1" Grid.Column="1" HorizontalAlignment="Center" Height="9" Grid.Row="0" Width="20" MouseDown="Drag_MouseDown"/>
+        <Border Name="LeftDrag" BorderBrush="Black" Background="White" BorderThickness="1" Grid.Column="0" Height="20" Grid.Row="1" VerticalAlignment="Center" Width="9" MouseDown="Drag_MouseDown"/>
+        <Border Name="RightDrag" BorderBrush="Black" Background="White" BorderThickness="1" Grid.Column="2" Height="20" Grid.Row="1" VerticalAlignment="Center" Width="9" MouseDown="Drag_MouseDown"/>
+
+        <Border Name="BottomLeftDrag" BorderBrush="Black" Background="White" BorderThickness="1" Grid.Column="0" Height="9" Grid.Row="2" Width="9" MouseDown="Drag_MouseDown"/>
+        <Border Name="BottomRightDrag" BorderBrush="Black" Background="White" BorderThickness="1" Grid.Column="2" Height="9" Grid.Row="2" Width="9" MouseDown="Drag_MouseDown"/>
+        <Border Name="TopLeftDrag" BorderBrush="Black" Background="White" BorderThickness="1" Grid.Column="0" Height="9" Grid.Row="0" Width="9" MouseDown="Drag_MouseDown"/>
+        <Border Name="TopRightDrag" BorderBrush="Black" Background="White" BorderThickness="1" Grid.Column="2" Height="9" Grid.Row="0" Width="9" MouseDown="Drag_MouseDown"/>
+    </Grid>
+</UserControl>

@@ -1,0 +1,50 @@
+﻿<UserControl x:Class="WpfEditorTest.ChildPanels.FramePalette"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:WpfEditorTest.ChildPanels"
+             mc:Ignorable="d" 
+             d:DesignHeight="264" d:DesignWidth="264" MouseUp="UserControl_MouseUp" >
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="32"/>
+            <RowDefinition/>
+        </Grid.RowDefinitions>
+        <Border Width="auto" Height="32" VerticalAlignment="Top" MouseLeftButtonDown="Border_MouseDown" Grid.Row="0">
+            <Border.Background>
+                <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
+                    <GradientStop Color="LightGray" Offset="1"/>
+                    <GradientStop Color="White" Offset="0.5"/>
+                    <GradientStop Color="Gray"/>
+                </LinearGradientBrush>
+            </Border.Background>
+            <TextBlock Text="AvailableFrames" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="14"></TextBlock>
+        </Border>
+        <ScrollViewer Height="auto" Width="auto" Background="LightGray" Grid.Row="1">
+            <StackPanel Height="auto" Width="auto">
+                <ItemsControl Name="AvailableFrames">
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate>
+                            <Border BorderThickness="1" Tag="{Binding}" BorderBrush="Gray" MinHeight="32" Width="auto" MouseDown="Border_MouseDown_1">
+                                <Border.Background>
+                                    <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
+                                        <GradientStop Color="LightGray" Offset="0"/>
+                                        <GradientStop Color="White" Offset="0.5"/>
+                                        <GradientStop Color="LightGray" Offset="1"/>
+                                    </LinearGradientBrush>
+                                </Border.Background>
+                                <TextBlock Text="{Binding Path=Name}"
+                                               TextAlignment ="Center"
+				                               TextWrapping = "Wrap"
+				                               VerticalAlignment = "Center"
+                                               FontFamily="Times New Roman">
+                                </TextBlock>
+                            </Border>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+            </StackPanel>
+        </ScrollViewer>
+    </Grid>
+</UserControl>

@@ -9,7 +9,7 @@ namespace FusionUI.UI.Elements
 {
     public class Button : ScalableFrame
     {
-		protected Button()
+		public Button()
 		{
 		}
 		public Color ActiveColor, InactiveColor;

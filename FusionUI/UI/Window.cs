@@ -24,27 +24,43 @@ namespace FusionUI.UI
         public float UnitSeparateOffset
         {
             get => holder.UnitSeparateOffset;
-            set { holder.UnitSeparateOffset = value; }
+            set { holder.UnitSeparateOffset = value; OnPropertyChanged(); }
         }
 
-        public Color HolderColor { get { return holder.BackColor; } set { holder.BackColor = value; } }
-        public Color HatColor { get { return HatPanel.BackColor; } set { HatPanel.BackColor = value; } }
-        public Color BasementColor { get { return BasementPanel.BackColor; } set { BasementPanel.BackColor = value; } }
+        public Color HolderColor { get { return holder.BackColor; } set { holder.BackColor = value; OnPropertyChanged(); } }
+        public Color HatColor { get { return HatPanel.BackColor; } set { HatPanel.BackColor = value; OnPropertyChanged(); } }
+        public Color BasementColor { get { return BasementPanel.BackColor; } set { BasementPanel.BackColor = value; OnPropertyChanged(); } }
         public Bool FixedSize;
         public ScalableFrame HatPanel, BasementPanel;
 
         public override float UnitPaddingLeft { get { return holder.UnitPaddingLeft; } set { base.UnitPaddingLeft = 0;
-            holder.UnitPaddingLeft = value;
-        } }
+			if (holder!=null)
+			{
+				holder.UnitPaddingLeft = value; 
+			}
+				OnPropertyChanged();
+			} }
         public override float UnitPaddingRight { get { return holder.UnitPaddingRight; } set { base.UnitPaddingRight = 0;
-            holder.UnitPaddingRight = value;
-        } }
+			if (holder != null)
+			{
+				holder.UnitPaddingRight = value; 
+			}
+				OnPropertyChanged();
+			} }
         public override float UnitPaddingTop { get { return holder.UnitPaddingTop; } set { base.UnitPaddingTop = 0;
-            holder.UnitPaddingTop = value;
-        } }
+			if (holder != null)
+			{
+				holder.UnitPaddingTop = value; 
+			}
+				OnPropertyChanged();
+			} }
         public override float UnitPaddingBottom { get { return holder.UnitPaddingBottom; } set { base.UnitPaddingBottom = 0;
-            holder.UnitPaddingBottom = value;
-        } }
+			if (holder != null)
+			{
+				holder.UnitPaddingBottom = value; 
+			}
+				OnPropertyChanged();
+			} }
 
         protected virtual void HolderOnResize(object sender, ResizeEventArgs args)
         {

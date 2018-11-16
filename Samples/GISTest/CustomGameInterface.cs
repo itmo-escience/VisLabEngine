@@ -19,7 +19,10 @@ using Fusion.Engine.Frames;
 using Fusion;
 using Fusion.Core.Shell;
 using System.IO;
-
+using FusionUI;
+using FusionUI.UI;
+using FusionUI.UI.Factories;
+using FusionUI.UI.Elements;
 
 namespace GISTest
 {
@@ -56,7 +59,8 @@ namespace GISTest
 
 
 
-	class CustomGameInterface : Fusion.Engine.Common.UserInterface {
+	public class CustomGameInterface : ApplicationInterface
+	{
 
 		[GameModule("Console", "con", InitOrder.Before)]
 		public GameConsole Console { get { return console; } }
@@ -79,6 +83,7 @@ namespace GISTest
 		Vector2 prevMousePos;
 
 
+		ScalableFrame LocalRoot;
 		/// <summary>
 		/// Ctor
 		/// </summary>
@@ -111,7 +116,7 @@ namespace GISTest
 			textFont = Game.Content.Load<SpriteFont>(@"fonts\textFont");
 
 			Gis.Debug = new DebugGisLayer(Game);
-			Gis.Debug.ZOrder = 0;
+			Gis.Debug.ZOrder = -1;
 			viewLayer.GisLayers.Add(Gis.Debug);
 
 
@@ -151,8 +156,120 @@ namespace GISTest
 
 			viewLayer.SpriteLayers.Add(console.ConsoleSpriteLayer);
 			viewLayer.SpriteLayers.Add(uiLayer);
-        }
 
+			userInterface.RootFrame = this.rootFrame = new MainFrame(FrameProcessor);
+			viewLayer.SpriteLayers.Add(userInterface.FramesSpriteLayer);
+
+			LocalRoot = CreateStartFrame();
+
+			LocalRoot.Visible = true;
+			LocalRoot.Ghost = false;
+			this.rootFrame.Add(LocalRoot);
+		}
+
+		public Window CreateStartFrame()
+		{
+			var rootFrame = this.rootFrame;
+			var ui = this.FrameProcessor.RootFrame.ui;
+
+
+			Window mainFrame = new Window(ui, 50, 5, 200, 250, "TestWindow", Color.Zero)
+			{
+				ImageColor = Color.White,
+				ImageMode = FrameImageMode.Fitted,
+				//Anchor = FrameAnchor.All,
+				HatColor = Color.Coral,
+				BasementColor = Color.Crimson,
+				Border = 5,
+				BorderColor = Color.White
+			};
+
+			ScalableFrame mainLayout = new ScalableFrame(mainFrame.ui, 200, 20, 20, 80, "TestLayout", Color.Zero)
+			{
+
+			};
+
+			mainFrame.Add(mainLayout);
+
+			Color buf = UIConfig.ActiveColor;
+
+			UIConfig.ActiveColor = Color.Red;
+			Window smallWindow = new Window(mainLayout.ui, 0, 10, 256 / ApplicationInterface.gridUnitDefault, 256 / ApplicationInterface.gridUnitDefault,
+				"SomethingNew", Color.SandyBrown, fixedSize: true)
+			{ HatColor = Color.Blue };
+			smallWindow.Anchor = FrameAnchor.Bottom | FrameAnchor.Left | FrameAnchor.Right;
+
+			smallWindow.Click += ( s, e ) =>
+			{
+				//smallWindow.BackColor = new Color3();
+			};
+
+			UIConfig.ActiveColor = buf;
+
+			buf = UIConfig.ButtonColor;
+			UIConfig.ButtonColor = Color.Gray;
+
+			Button next;
+			//    = new Button(smallWindow.ui, 0, 10, 10, 10, "Next", UIConfig.ButtonColor, UIConfig.ActiveColor, 50,
+			//    () =>
+			//    {
+			//        System.Console.WriteLine("You've just performed a button press action: " + next.ToString());
+			//    }, Color.White, Color.White)
+			//{
+			//    Anchor = FrameAnchor.None,
+			//    FontHolder = UIConfig.FontSubtitle,
+			//    TextAlignment = Alignment.MiddleCenter,
+			//};
+
+			UIConfig.ButtonColor = buf;
+
+
+			//next.Visible = true;
+			var holder = ButtonFactory.CenterButtonHolder(mainLayout.ui, 0, 10, mainLayout, 30, "Next_2",
+								() =>
+								{
+									System.Console.WriteLine("You've just performed a button press action: "/* + next.ToString()*/);
+								}, out next);
+			holder.Text = "ButtonHolder";
+			holder.Height = 40;
+			mainLayout.Add(next);
+			smallWindow.Visible = true;
+			mainLayout.Add(smallWindow);
+
+			var t = "testSerialization.xml";
+
+			Frame ser = new Frame(ui, 10, 20, 190, 220, "Fram", Color.Red)
+			{
+				Image = ui.Game.Content.Load<DiscTexture>(@"UI-new\fv-icons_close-window")
+			};
+			ControllableFrame ser2 = new ControllableFrame(ui, 11, 21, 60, 60, "ContrF", Color.Blue)
+			{
+				Image = ui.Game.Content.Load<DiscTexture>(@"UI-new\fv-icons_radio-on")
+			};
+			ScalableFrame ser3 = new ScalableFrame(ui, 20, 6, 25, 15, "Scales", Color.Green)
+			{
+				Image = ui.Game.Content.Load<DiscTexture>(@"UI-new\fv-icons_switcher-on")
+			};
+			FreeFrame ser4 = new FreeFrame(ui, 30, 20, 15, 15, "FreeFr", Color.Gray)
+			{
+				Image = ui.Game.Content.Load<DiscTexture>(@"UI-new\fv-icons_checkbox-big-on")
+			};
+
+			ScalableFrame sHolder = new ScalableFrame(ui, 50, 35, 55, 15, "Scales", Color.Green);
+
+			Slider slider/* = new Slider(ui, 50, 35, 45, 15, "mySlider", Color.Gray)*/;
+			SliderFactory.SliderHorizontalHolderNew(ui, 5, 35, 5, 15, ser3, "mySlider", 10, null, 0, 1, 0.3f, out slider);
+
+
+			ser.Add(ser3);
+			ser.Add(ser4);
+			ser.Add(ser2);
+			ser.Add(slider);
+
+			mainLayout.Add(ser);
+
+			return mainFrame;
+		}
 
 		void LoadContent ()
 		{
@@ -207,8 +324,9 @@ namespace GISTest
 
 			console.Update( gameTime );
 			tiles.Update(gameTime);
+			userInterface.Update(gameTime);
 
-		    DVector2 pos;// = new DVector2();
+			DVector2 pos;// = new DVector2();
             pos = GeoHelper.CartesianToSpherical(new DVector3(10, 10, 0));
 		    //GlobeCamera.Instance.ScreenToSpherical(10, 10, out pos);
             var cartPos = GeoHelper.SphericalToCartesian(pos, GeoHelper.EarthRadius);

@@ -207,7 +207,10 @@ namespace Fusion.Engine.Frames {
 			Frame.DrawNonRecursive( RootFrame, gameTime, spriteLayer );
 		}
 
-
+		public Frame GetHoveredFrameExternally()
+		{
+			return mouseProcessor.GetHoveredFrame();
+		}
 		/*-----------------------------------------------------------------------------------------
 		 * 
 		 *	Input processing :

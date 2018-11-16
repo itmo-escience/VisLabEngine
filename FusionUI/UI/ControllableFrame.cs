@@ -53,7 +53,7 @@ namespace FusionUI.UI
                 }
                 return TooltipText;
             }
-            set { TooltipText = value; }
+            set { TooltipText = value; OnPropertyChanged(); }
         }
 
         private ControlActionArgs currentEventArgs = new ControlActionArgs();
@@ -314,7 +314,7 @@ namespace FusionUI.UI
         public new bool Ghost
         {
             get { return !active; }
-            set { active = !value; }
+            set { active = !value; OnPropertyChanged(); }
         }
         private bool active = true;
 
@@ -352,7 +352,8 @@ namespace FusionUI.UI
                         if (c is ControllableFrame) q.Enqueue((ControllableFrame)c);
                     }
                 }
-            }
+				OnPropertyChanged();
+			}
         }
         
 
@@ -376,7 +377,8 @@ namespace FusionUI.UI
                 base.BackColor = value;
                 if (Active) ActiveBackColor = value;
                 else InactiveBackColor = value;
-            }
+				OnPropertyChanged();
+			}
         }
 
         override public Color BorderColor {
@@ -386,7 +388,8 @@ namespace FusionUI.UI
                 base.BorderColor = value;
                 if (Active) ActiveBorderColor = value;
                 else InactiveBorderColor = value;
-            }
+				OnPropertyChanged();
+			}
         }
 
         override public Color ForeColor {
@@ -396,7 +399,8 @@ namespace FusionUI.UI
                 base.ForeColor = value;
                 if (Active) ActiveForeColor = value;
                 else InactiveForeColor = value;
-            }
+				OnPropertyChanged();
+			}
         }
 
         public virtual void UpdateColor(bool active)
@@ -417,7 +421,7 @@ namespace FusionUI.UI
         }
 
         private bool selected = false;
-        public virtual bool Selected {get { return selected && Visible; } set { selected = value; } }
+        public virtual bool Selected {get { return selected && Visible; } set { selected = value; OnPropertyChanged(); } }
 		
 		public class ControlActionArgs : EventArgs
         {
@@ -471,7 +475,7 @@ namespace FusionUI.UI
             Selected = true;
 			Children.Reverse();
 			var reversedChildren = Children;
-			Children.Reverse();
+			//Children.Reverse();
 			foreach (var frame in reversedChildren)
             {
                 if (flag) return flag;
@@ -490,7 +494,7 @@ namespace FusionUI.UI
                     }
                 }
             }
-			//Children.Reverse();
+			Children.Reverse();
 
 			if (!flag)
             {
@@ -506,7 +510,7 @@ namespace FusionUI.UI
             Selected = false;
 			Children.Reverse();
 			var reversedChildren = Children;
-			Children.Reverse();
+			//Children.Reverse();
 			foreach (var frame in reversedChildren)
             {
                 if (flag) return flag;
@@ -524,7 +528,7 @@ namespace FusionUI.UI
                     }
                 }
             }
-			//Children.Reverse();
+			Children.Reverse();
 
 			if (!flag && wasSelected)
             {
@@ -540,7 +544,7 @@ namespace FusionUI.UI
             bool flag = false;
 			Children.Reverse();
 			var reversedChildren = Children;
-			Children.Reverse();
+			//Children.Reverse();
 			foreach (var frame in reversedChildren)
             {
                 if (flag) return flag;
@@ -558,7 +562,7 @@ namespace FusionUI.UI
                     }
                 }
             }
-			//Children.Reverse();
+			Children.Reverse();
 
 			if (!flag)
             {
@@ -572,7 +576,7 @@ namespace FusionUI.UI
             if (!Active || !Visible || !Selected) return false;
 			Children.Reverse();
 			var reversedChildren = Children;
-			Children.Reverse();
+			//Children.Reverse();
 			foreach (var frame in reversedChildren)
             {
                 if (flag) return flag;
@@ -583,7 +587,7 @@ namespace FusionUI.UI
                         flag |= sFrame.InnerActionDrag(args) || sFrame.SuppressActions;
                 }
             }
-			//Children.Reverse();
+			Children.Reverse();
 
 			if (!flag) ActionDrag?.Invoke(args, ref flag);
             return flag;
@@ -596,7 +600,7 @@ namespace FusionUI.UI
             oldPos = null;
 			Children.Reverse();
 			var reversedChildren = Children;
-			Children.Reverse();
+			//Children.Reverse();
 			foreach (var frame in reversedChildren)
             {
                 if (flag)
@@ -613,7 +617,7 @@ namespace FusionUI.UI
                     }
                 }                
             }
-			//Children.Reverse();
+			Children.Reverse();
 
 			if (!flag)
             {

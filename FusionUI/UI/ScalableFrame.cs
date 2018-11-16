@@ -14,6 +14,7 @@ using System.IO;
 using System.Xml.Serialization;
 using System.Xml.Schema;
 using System.Xml;
+using System.ComponentModel;
 
 namespace FusionUI.UI
 {
@@ -39,8 +40,9 @@ namespace FusionUI.UI
             {
                 if (unitX != value)
                     OnCoordUpdate?.Invoke(value);
-                unitX = value;                
-            }
+                unitX = value;
+				OnPropertyChanged();
+			}
         }
 
         public virtual float UnitY
@@ -50,8 +52,9 @@ namespace FusionUI.UI
             {
                 if (unitY != value)
                     OnCoordUpdate?.Invoke(value);
-                unitY = value;                
-            }
+                unitY = value;
+				OnPropertyChanged();
+			}
         }
 		[XmlIgnore]
 		public Action<float> OnCoordUpdate;
@@ -59,43 +62,52 @@ namespace FusionUI.UI
         public virtual float UnitWidth
         {
             get { return unitWidth; }
-            set { unitWidth = value; }
+            set { unitWidth = value;
+				OnPropertyChanged();
+			}
         }
 
         public virtual float UnitHeight
         {
             get { return unitHeight; }
-            set { unitHeight = value; }
+            set { unitHeight = value;
+				OnPropertyChanged();
+			}
         }
 
         public override int X
         {
-            get { return (int) Math.Round(unitX * ScaleMultiplier); }
+            get { return (int) Math.Round(UnitX * ScaleMultiplier); }
             set
             {
-                unitX = value / ScaleMultiplier;                
-            }
+                UnitX = value / ScaleMultiplier;
+				OnPropertyChanged();
+			}
         }
 
         public override int Y
         {
-            get { return (int) Math.Round(unitY * ScaleMultiplier); }
+            get { return (int) Math.Round(UnitY * ScaleMultiplier); }
             set
             {
-                unitY = value / ScaleMultiplier;
-            }
+                UnitY = value / ScaleMultiplier;
+				OnPropertyChanged();
+			}
         }
 
         public override int Width
         {
-            get { return (int) Math.Round(unitWidth * ScaleMultiplier); }
-            set { unitWidth = value / ScaleMultiplier; }
+            get { return (int) Math.Round(UnitWidth * ScaleMultiplier); }
+            set { UnitWidth = value / ScaleMultiplier;
+				OnPropertyChanged();
+			}
         }
 
         public override int Height
         {
-            get { return (int) Math.Round(unitHeight * ScaleMultiplier); }
-            set { unitHeight = value / ScaleMultiplier; }
+            get { return (int) Math.Round(UnitHeight * ScaleMultiplier); }
+            set { UnitHeight = value / ScaleMultiplier;
+				OnPropertyChanged(); }
         }
 
         public override string Text
@@ -106,7 +118,8 @@ namespace FusionUI.UI
                 text = value;                
                 DefaultText = value.Trim();
                 UpdateLanguage();
-            }
+				OnPropertyChanged();
+			}
         }
 
         private string text;
@@ -156,50 +169,66 @@ namespace FusionUI.UI
 
         public override int PaddingBottom
         {
-            get { return (int) (unitPaddingBottom * ScaleMultiplier); }
-            set { unitPaddingBottom = value / ScaleMultiplier; }
+            get { return (int) (UnitPaddingBottom * ScaleMultiplier); }
+            set { UnitPaddingBottom = value / ScaleMultiplier;
+				OnPropertyChanged();
+			}
         }
 
         public override int PaddingTop
         {
-            get { return (int) (unitPaddingTop * ScaleMultiplier); }
-            set { unitPaddingTop = value / ScaleMultiplier; }
+            get { return (int) (UnitPaddingTop * ScaleMultiplier); }
+            set { UnitPaddingTop = value / ScaleMultiplier;
+				OnPropertyChanged();
+			}
         }
 
         public override int PaddingLeft
         {
             get { return (int) (unitPaddingLeft * ScaleMultiplier); }
-            set { unitPaddingLeft = value / ScaleMultiplier; }
+            set { UnitPaddingLeft = value / ScaleMultiplier;
+				OnPropertyChanged();
+			}
         }
 
         public override int PaddingRight
         {
-            get { return (int) (unitPaddingRight * ScaleMultiplier); }
-            set { unitPaddingRight = value / ScaleMultiplier; }
+            get { return (int) (UnitPaddingRight * ScaleMultiplier); }
+            set { UnitPaddingRight = value / ScaleMultiplier;
+				OnPropertyChanged();
+			}
         }
 
         public virtual float UnitPaddingLeft
         {
             get { return unitPaddingLeft; }
-            set { unitPaddingLeft = value; }
+            set { unitPaddingLeft = value;
+				OnPropertyChanged();
+			}
         }
 
         public virtual float UnitPaddingRight
         {
             get { return unitPaddingRight; }
-            set { unitPaddingRight = value; }
+            set { unitPaddingRight = value;
+				OnPropertyChanged();
+			}
         }
 
         public virtual float UnitPaddingTop
         {
             get { return unitPaddingTop; }
-            set { unitPaddingTop = value; }
+            set { unitPaddingTop = value;
+				OnPropertyChanged();
+			}
         }
 
         public virtual float UnitPaddingBottom
         {
             get { return unitPaddingBottom; }
-            set { unitPaddingBottom = value; }
+            set { unitPaddingBottom = value;
+				OnPropertyChanged();
+			}
         }
 
         public virtual float UnitHPadding
@@ -226,25 +255,33 @@ namespace FusionUI.UI
         public float UnitTextOffsetX
         {
             get { return unitTextOffsetX; }
-            set { unitTextOffsetX = value; }
+            set { unitTextOffsetX = value;
+				OnPropertyChanged();
+			}
         }
 
         public float UnitTextOffsetY
         {
             get { return unitTextOffsetY; }
-            set { unitTextOffsetY = value; }
+            set { unitTextOffsetY = value;
+				OnPropertyChanged();
+			}
         }
 
         public override int TextOffsetX
         {
-            get { return (int) (unitTextOffsetX * ScaleMultiplier); }
-            set { unitTextOffsetX = value / ScaleMultiplier; }
+            get { return (int) (UnitTextOffsetX * ScaleMultiplier); }
+            set { UnitTextOffsetX = value / ScaleMultiplier;
+				OnPropertyChanged();
+			}
         }
 
         public override int TextOffsetY
         {
-            get { return (int) (unitTextOffsetY * ScaleMultiplier); }
-            set { unitTextOffsetY = value / ScaleMultiplier; }
+            get { return (int) (UnitTextOffsetY * ScaleMultiplier); }
+            set { UnitTextOffsetY = value / ScaleMultiplier;
+				OnPropertyChanged();
+			}
         }
 
         #endregion
@@ -256,25 +293,33 @@ namespace FusionUI.UI
         public float UnitImageOffsetX
         {
             get { return unitImageOffsetX; }
-            set { unitImageOffsetX = value; }
+            set { unitImageOffsetX = value;
+				OnPropertyChanged();
+			}
         }
 
         public float UnitImageOffsetY
         {
             get { return unitImageOffsetY; }
-            set { unitImageOffsetY = value; }
+            set { unitImageOffsetY = value;
+				OnPropertyChanged();
+			}
         }
 
         public override int ImageOffsetX
         {
-            get { return (int) (unitImageOffsetX * ScaleMultiplier); }
-            set { unitImageOffsetX = value / ScaleMultiplier; }
+            get { return (int) (UnitImageOffsetX * ScaleMultiplier); }
+            set { UnitImageOffsetX = value / ScaleMultiplier;
+				OnPropertyChanged();
+			}
         }
 
         public override int ImageOffsetY
         {
-            get { return (int) (unitImageOffsetY * ScaleMultiplier); }
-            set { unitImageOffsetY = value / ScaleMultiplier; }
+            get { return (int) (UnitImageOffsetY * ScaleMultiplier); }
+            set { UnitImageOffsetY = value / ScaleMultiplier;
+				OnPropertyChanged();
+			}
         }
 
 

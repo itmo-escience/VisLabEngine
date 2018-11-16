@@ -380,7 +380,7 @@ namespace Fusion.Engine.Frames {
 		/// </summary>
 		/// <param name="root"></param>
 		/// <returns></returns>
-		Frame GetHoveredFrame ()
+		public Frame GetHoveredFrame ()
 		{
 			Frame mouseHoverFrame = null;
 
@@ -389,7 +389,10 @@ namespace Fusion.Engine.Frames {
 			return mouseHoverFrame;
 		}
 
-
+		//public static Frame GetHoveredFrameExternally()
+		//{
+		//	return new MouseProcessor().GetHoveredFrame();
+		//}
 
 		/// <summary>
 		/// Updates current hovered frame
