@@ -43,5 +43,10 @@ namespace WpfEditorTest.ChildPanels
 			_previousMouseLocation = e.MouseDevice.GetPosition(_window);
 			_previousTransform = this.RenderTransform;
 		}
+
+		private void Button_Click( object sender, RoutedEventArgs e )
+		{
+
+		}
 	}
 }

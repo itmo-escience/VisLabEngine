@@ -456,19 +456,9 @@ namespace Fusion.Engine.Frames {
 		/// <summary>
 		/// Parameterless constructor
 		/// </summary>
-		public Frame()
+		protected Frame()
 		{
-			//Game = ui.Game;
-			//this.ui = ui;
-			Init();
 
-			X = 0;
-			Y = 0;
-			Width = 100;
-			Height = 100;
-			Text = "NewFrame";
-			BackColor = Color.Green;
-			//Init();
 		}
 
 
@@ -609,6 +599,15 @@ namespace Fusion.Engine.Frames {
 			foreach (var child in this.Children)
 			{
 				child.UpdateChildrenUI(ui);
+			}
+		}
+
+		internal void RestoreParents()
+		{
+			foreach (var child in Children)
+			{
+				child.parent = this;
+				child.RestoreParents();
 			}
 		}
 

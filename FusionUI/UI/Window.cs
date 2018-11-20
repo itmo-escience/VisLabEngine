@@ -13,6 +13,23 @@ namespace FusionUI.UI
     {
 		protected Window()
 		{
+			holder = new LayoutFrame()
+			{
+				UnitWidth = (int)UnitWidth,
+				AutoHeight = true,
+				Anchor = FrameAnchor.All,
+			};
+			base.Add(holder);
+			BasementPanel = new ScalableFrame()
+			{
+				Y = (int)(holder.UnitY + holder.UnitHeight),
+				UnitWidth = (int)UnitWidth,
+				BackColor = UIConfig.SettingsColor
+
+			};
+			base.Add(BasementPanel);
+
+			holder.Resize += HolderOnResize;
 		}
 		public void UpdateHolder()
         {
@@ -146,7 +163,16 @@ namespace FusionUI.UI
             SuppressActions = true;
         }
 
-        public IEnumerable<Frame> Children { get { return holder.Children; } }
+        public List<Frame> Children { get { return holder.Children; }
+			set
+			{
+				foreach (Frame child in value)
+				{
+					this.Add(child);
+				}
+				OnPropertyChanged();
+			}
+		}
 
         public override void Add(Frame frame)
         {

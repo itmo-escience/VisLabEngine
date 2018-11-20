@@ -75,6 +75,8 @@ namespace Fusion.Core.Utils
 				var holder = (SeralizableObjectHolder)formatter.Deserialize(fs);
 
 				destination = holder.SerializableFrame;
+
+				destination.RestoreParents();
 				//}
 				//else
 				//{

@@ -23,6 +23,7 @@ using FusionUI;
 using FusionUI.UI;
 using FusionUI.UI.Factories;
 using FusionUI.UI.Elements;
+using Fusion.Core.Utils;
 
 namespace GISTest
 {
@@ -261,12 +262,26 @@ namespace GISTest
 			SliderFactory.SliderHorizontalHolderNew(ui, 5, 35, 5, 15, ser3, "mySlider", 10, null, 0, 1, 0.3f, out slider);
 
 
+
+			dynamic frame = new ScalableFrame(ui, 0, 0, 100, 100, "ScalableFrame", Color.Gray);
+			FrameSerializer.Write(frame, "Frames\\" + frame.GetType().Name + ".xml");
+			frame = new ControllableFrame(ui, 0, 0, 100, 100, "ControllableFrame", Color.Gray);
+			FrameSerializer.Write(frame, "Frames\\" + frame.GetType().Name + ".xml");
+			frame = new FreeFrame(ui, 0, 0, 100, 100, "FreeFrame", Color.Gray);
+			FrameSerializer.Write(frame, "Frames\\" + frame.GetType().Name + ".xml");
+
+
+
 			ser.Add(ser3);
 			ser.Add(ser4);
 			ser.Add(ser2);
 			ser.Add(slider);
 
 			mainLayout.Add(ser);
+
+			FrameSerializer.Write(mainFrame, "Frames\\" + "TestWindow" + ".xml");
+
+			FrameSerializer.Write(ser, "Frames\\" + "Fram" + ".xml");
 
 			return mainFrame;
 		}

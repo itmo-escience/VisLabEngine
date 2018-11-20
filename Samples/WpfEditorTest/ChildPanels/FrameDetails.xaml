@@ -239,7 +239,16 @@
                     <GradientStop Color="Gray"/>
                 </LinearGradientBrush>
             </Border.Background>
-            <TextBlock Text="FrameDetails" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="14"></TextBlock>
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition/>
+                    <ColumnDefinition Width="40"/>
+                </Grid.ColumnDefinitions>
+                <TextBlock Text="FrameDetails" HorizontalAlignment="Left" VerticalAlignment="Center" FontSize="14" Grid.Column="0"></TextBlock>
+                <Button Grid.Column="1" Background="Gray" Margin="4,4,4,4" Click="Button_Click">
+                    <TextBlock Text="Save" HorizontalAlignment="Center"></TextBlock>
+                </Button>
+            </Grid>
         </Border>
         <ScrollViewer Height="auto" Width="auto" Background="LightGray" Grid.Row="1">
             <StackPanel Height="auto" Width="auto">

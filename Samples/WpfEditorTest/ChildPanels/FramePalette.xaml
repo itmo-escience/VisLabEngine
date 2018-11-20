@@ -34,11 +34,12 @@
                                         <GradientStop Color="LightGray" Offset="1"/>
                                     </LinearGradientBrush>
                                 </Border.Background>
-                                <TextBlock Text="{Binding Path=Name}"
+                                <TextBlock Text="{Binding}"
                                                TextAlignment ="Center"
 				                               TextWrapping = "Wrap"
 				                               VerticalAlignment = "Center"
-                                               FontFamily="Times New Roman">
+                                               FontFamily="Times New Roman"
+                                               FontSize="14">
                                 </TextBlock>
                             </Border>
                         </DataTemplate>

@@ -325,7 +325,7 @@ namespace FusionUI.UI
 
 		#endregion
 
-		protected ScalableFrame()
+		internal ScalableFrame()
 		{
 		}
 
