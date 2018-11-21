@@ -19,7 +19,9 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
 using System.Windows.Threading;
+using Fusion.Engine.Input;
 using WpfEditorTest.ChildPanels;
+using KeyEventArgs = System.Windows.Input.KeyEventArgs;
 
 namespace WpfEditorTest
 {
@@ -46,6 +48,7 @@ namespace WpfEditorTest
 			InitializeComponent();
 
 			engine = new Game("TestGame");
+            engine.Mouse = new DummyMouse(engine);
 
 			engine.GameServer = new CustomGameServer(engine);
 			engine.GameClient = new CustomGameClient(engine);
@@ -139,7 +142,7 @@ namespace WpfEditorTest
 			if (lastSelectedframe!=null)
 			{
 				lastSelectedframe.Border = lastSelectedframeBorder;
-				lastSelectedframe.BorderColor = lastSelectedframeBorderColor; 
+				lastSelectedframe.BorderColor = lastSelectedframeBorderColor;
 			}
 
 			selectedframe = (Fusion.Engine.Frames.Frame)((sender as TextBlock).Tag);
@@ -375,7 +378,7 @@ namespace WpfEditorTest
 					var val = PropInfo.GetValue(Obj);
 					if (!Prop.Equals(val))
 					{
-						Prop = PropInfo.GetValue(Obj); 
+						Prop = PropInfo.GetValue(Obj);
 					}
 				}
 			};

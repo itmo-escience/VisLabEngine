@@ -33,7 +33,7 @@ using Fusion.Engine.Audio;
 namespace Fusion.Engine.Common {
 
 	/// <summary>
-	/// Provides basic graphics device initialization, game logic, and rendering code. 
+	/// Provides basic graphics device initialization, game logic, and rendering code.
 	/// </summary>
 	public class Game : DisposableBase {
 
@@ -80,7 +80,10 @@ namespace Fusion.Engine.Common {
 		/// Gets mouse.
 		/// </summary>
 		[GameModule("Mouse", "mouse", InitOrder.After)]
-		public Mouse Mouse { get { return mouse; } }
+		public Mouse Mouse {
+		    get => mouse;
+		    set => mouse = value;
+		}
 
 		/// <summary>
 		/// Gets mouse.
@@ -128,10 +131,10 @@ namespace Fusion.Engine.Common {
 		/// <summary>
 		/// Gets and sets game window title.
 		/// </summary>
-		public string GameTitle { 
+		public string GameTitle {
 			get {
 				return gameTitle;
-			} 
+			}
 			set {
 				if (value==null) {
 					throw new ArgumentNullException();
@@ -143,7 +146,7 @@ namespace Fusion.Engine.Common {
 					throw new InvalidOperationException("Can not set GameTitle after game engine initialization");
 				}
 				gameTitle = value;
-			} 
+			}
 		}
 		string gameTitle = Path.GetFileNameWithoutExtension( Process.GetCurrentProcess().ProcessName );
 
@@ -154,7 +157,7 @@ namespace Fusion.Engine.Common {
 		public bool TrackObjects {
 			get {
 				return SharpDX.Configuration.EnableObjectTracking;
-			} 
+			}
 			set {
 				SharpDX.Configuration.EnableObjectTracking = value;
 			}
@@ -234,7 +237,7 @@ namespace Fusion.Engine.Common {
 		/// </summary>
 		[GameModule("Server", "sv", InitOrder.After)]
 		public GameServer GameServer { get { return sv; } set { sv = value; } }
-		
+
 		/// <summary>
 		/// Current game client.
 		/// </summary>
@@ -250,7 +253,7 @@ namespace Fusion.Engine.Common {
 
 
 		/// <summary>
-		/// 
+		///
 		/// </summary>
 		public void Run ()
 		{
@@ -285,13 +288,13 @@ namespace Fusion.Engine.Common {
 		}
 
 		/// <summary>
-		/// 
+		///
 		/// </summary>
 		/// <returns></returns>
 		public string GetReleaseInfo ()
 		{
-			return string.Format("{0} {1} {2} {3}", 
-				Assembly.GetExecutingAssembly().GetName().Name, 
+			return string.Format("{0} {1} {2} {3}",
+				Assembly.GetExecutingAssembly().GetName().Name,
 				Assembly.GetExecutingAssembly().GetName().Version,
 				#if DEBUG
 					"debug",
@@ -314,7 +317,7 @@ namespace Fusion.Engine.Common {
 
 
 		/// <summary>
-		/// Initializes a new instance of this class, which provides 
+		/// Initializes a new instance of this class, which provides
 		/// basic graphics device initialization, game logic, rendering code, and a game loop.
 		/// </summary>
 		public Game (string gameId)
@@ -357,7 +360,7 @@ namespace Fusion.Engine.Common {
 			invoker				=	new Invoker(this, CommandAffinity.Default);
 
 			keyboard			=	new Keyboard(this);
-			mouse				=	new Mouse(this);
+			mouse				=	new ConcreteMouse(this);
 			touch				=	new Touch(this);
 			//leapMotion			=	new LeapMotion(this);
 			gamepads			=	new GamepadCollection(this);
@@ -395,7 +398,7 @@ namespace Fusion.Engine.Common {
 
 
 
-		
+
 		/// <summary>
 		/// Manage game to raise Reloading event.
 		/// </summary>
@@ -490,7 +493,7 @@ namespace Fusion.Engine.Common {
 
 
 		/// <summary>
-		/// Overloaded. Immediately releases the unmanaged resources used by this object. 
+		/// Overloaded. Immediately releases the unmanaged resources used by this object.
 		/// </summary>
 		/// <param name="disposing"></param>
 		protected override void Dispose ( bool disposing )
@@ -502,12 +505,12 @@ namespace Fusion.Engine.Common {
 			Log.Message("");
 			Log.Message("-------- Game Shutting Down --------");
 
-			//	wait for server 
+			//	wait for server
 			//	if it is still running :
 			cl.Wait();
 			sv.Wait();
 
-			
+
 			//	call exit event :
 			if (Exiting!=null) {
 				Exiting(this, EventArgs.Empty);
@@ -575,7 +578,7 @@ namespace Fusion.Engine.Common {
 
 	    public Color BackColor = Color.Zero;
 		/// <summary>
-		/// 
+		///
 		/// </summary>
 		internal void UpdateInternal ()
 		{
@@ -591,9 +594,9 @@ namespace Fusion.Engine.Common {
 			if (isActive!=isActiveLastFrame) {
 				isActiveLastFrame = isActive;
 				if (isActive) {
-					if (Activated!=null) { Activated(this, EventArgs.Empty); } 
+					if (Activated!=null) { Activated(this, EventArgs.Empty); }
 				} else {
-					if (Deactivated!=null) { Deactivated(this, EventArgs.Empty); } 
+					if (Deactivated!=null) { Deactivated(this, EventArgs.Empty); }
 				}
 			}
 
@@ -671,13 +674,13 @@ namespace Fusion.Engine.Common {
 			GraphicsDevice.ResetStates();
 			GraphicsDevice.RestoreBackbuffer();
 		}
-		
 
-		
+
+
 		/// <summary>
 		/// Performs check and does exit
 		/// </summary>
-		private void CheckExitInternal () 
+		private void CheckExitInternal ()
 		{
 			if (requestExit) {
 				GraphicsDevice.Display?.Window?.Close();
@@ -686,9 +689,9 @@ namespace Fusion.Engine.Common {
 
 
 		/*-----------------------------------------------------------------------------------------
-		 * 
+		 *
 		 *	Configuration stuff :
-		 * 
+		 *
 		-----------------------------------------------------------------------------------------*/
 
 
@@ -715,7 +718,7 @@ namespace Fusion.Engine.Common {
 		/// </summary>
 		/// <param name="path"></param>
 		public void SaveConfiguration ( string filename )
-		{	
+		{
 			Log.Message("Saving configuration...");
 
 			UserStorage.DeleteFile(filename);
@@ -726,13 +729,13 @@ namespace Fusion.Engine.Common {
 
 
 		/*-----------------------------------------------------------------------------------------
-		 * 
+		 *
 		 *	Client-server stuff :
-		 * 
+		 *
 		-----------------------------------------------------------------------------------------*/
 
 
-		
+
 		/// <summary>
 		/// Updates game logic and client-server interaction.
 		/// </summary>

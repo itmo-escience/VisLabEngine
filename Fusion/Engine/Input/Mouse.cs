@@ -1,133 +1,169 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Fusion.Core;
-using Fusion.Core.Mathematics;
+﻿using Fusion.Core.Mathematics;
 using Fusion.Drivers.Input;
 using Fusion.Engine.Common;
 
-namespace Fusion.Engine.Input {
+namespace Fusion.Engine.Input
+{
+    public abstract class Mouse : GameModule
+    {
+        internal Mouse(Game game) : base(game) { }
 
-	public class Mouse : GameModule {
-		
+        /// <summary>
+        /// Difference between last and current mouse position.
+        /// Use it for shooters.
+        /// </summary>
+        public abstract Vector2 PositionDelta { get; }
+
+        /// <summary>
+        /// Mouse position relative to top-left corner
+        /// </summary>
+        public abstract Point Position { get; }
+
+        /// <summary>
+        /// Force mouse to main window center on each frame.
+        /// </summary>
+        public abstract bool IsMouseCentered { get; set; }
+
+        /// <summary>
+        /// Clip mouse by main window's client area border.
+        /// </summary>
+        public abstract bool IsMouseClipped { get; set; }
+
+        /// <summary>
+        /// Set and get mouse visibility
+        /// </summary>
+        public abstract bool IsMouseHidden { get; set; }
+
+        /// <summary>
+        /// System value: MouseWheelScrollLines
+        /// </summary>
+        public abstract int MouseWheelScrollLines { get; }
+
+        /// <summary>
+        /// System value: MouseWheelScrollDelta
+        /// </summary>
+        public abstract int MouseWheelScrollDelta { get; }
+
+        public event MouseMoveHandlerDelegate Move;
+        public event MouseScrollEventHandler Scroll;
+
+        protected virtual void OnMove(object sender, MouseMoveEventArgs e)
+        {
+            // Make a temporary copy of the event to avoid possibility of
+            // a race condition if the last subscriber unsubscribes
+            // immediately after the null check and before the event is raised.
+            var handler = Move;
+            handler?.Invoke(sender, e);
+        }
+
+        protected virtual void OnScroll(object sender, MouseScrollEventArgs e)
+        {
+            // Make a temporary copy of the event to avoid possibility of
+            // a race condition if the last subscriber unsubscribes
+            // immediately after the null check and before the event is raised.
+            var handler = Scroll;
+            handler?.Invoke(sender, e);
+        }
+    }
+
+	public class ConcreteMouse : Mouse
+	{
 		InputDevice device;
 
-		public event MouseMoveHandlerDelegate	Move;
-		public event MouseScrollEventHandler	Scroll;
-
 		/// <summary>
-		/// 
+		///
 		/// </summary>
 		/// <param name="Game"></param>
-		internal Mouse ( Game Game ) : base(Game)
+		internal ConcreteMouse ( Game Game ) : base(Game)
 		{
-			this.device	=	Game.InputDevice;
+			this.device	= Game.InputDevice;
 
-			device.MouseScroll += device_MouseScroll;
-			device.MouseMove += device_MouseMove;
+			device.MouseScroll += DeviceMouseScroll;
+			device.MouseMove += DeviceMouseMove;
 		}
 
+	    /// <inheritdoc cref="GameModule.Initialize"/>
+        public override void Initialize() { }
 
-
-		/// <summary>
-		/// 
-		/// </summary>
-		public override void Initialize ()
-		{
-		}
-
-
-
-		/// <summary>
-		/// 
-		/// </summary>
-		/// <param name="disposing"></param>
-		protected override void Dispose ( bool disposing )
+		/// <inheritdoc cref="GameModule.Dispose"/>
+		protected override void Dispose(bool disposing)
 		{
 			if (disposing) {
-				device.MouseScroll -= device_MouseScroll;
-				device.MouseMove -= device_MouseMove;
+				device.MouseScroll -= DeviceMouseScroll;
+				device.MouseMove -= DeviceMouseMove;
 			}
 
-			base.Dispose( disposing );
+			base.Dispose(disposing);
 		}
 
+	    /// <inheritdoc cref="Mouse.PositionDelta"/>
+        public override Vector2 PositionDelta => device.RelativeMouseOffset;
 
+		/// <inheritdoc cref="Mouse.Position"/>
+		public override Point Position => new Point( (int)device.GlobalMouseOffset.X, (int)device.GlobalMouseOffset.Y );
 
-		/// <summary>
-		/// Difference between last and current mouse position.
-		/// Use it for shooters.
-		/// </summary>
-		public Vector2 PositionDelta { 
-			get { return device.RelativeMouseOffset; } 
-		}
-
-
-
-		/// <summary>
-		/// Mouse position relative to top-left corner
-		/// </summary>
-		public Point Position { 
-			get { return new Point( (int)device.GlobalMouseOffset.X, (int)device.GlobalMouseOffset.Y ); }
-		}
-
-		/// <summary>
-		/// Force mouse to main window center on each frame.
-		/// </summary>
-		public	bool IsMouseCentered { 
+        /// <inheritdoc cref="Mouse.IsMouseCentered"/>
+        public override	bool IsMouseCentered {
 			get { return device.IsMouseCentered; }
 			set { device.IsMouseCentered = value; }
 		}
-		
-		/// <summary>
-		/// Clip mouse by main window's client area border.
-		/// </summary>
-		public	bool IsMouseClipped { 
+
+        /// <inheritdoc cref="Mouse.IsMouseClipped"/>
+        public override bool IsMouseClipped {
 			get { return device.IsMouseClipped; }
 			set { device.IsMouseClipped = value; }
 		}
-		
-		/// <summary>
-		/// Set and get mouse visibility
-		/// </summary>
-		public	bool IsMouseHidden { 
+
+        /// <inheritdoc cref="Mouse.IsMouseHidden"/>
+        public override bool IsMouseHidden {
 			get { return device.IsMouseHidden; }
 			set { device.IsMouseHidden = value; }
 		}
 
-		/// <summary>
-		/// System value: MouseWheelScrollLines
-		/// </summary>
-		public	int	MouseWheelScrollLines	{ get { return device.MouseWheelScrollLines; } }
+        /// <inheritdoc cref="Mouse.MouseWheelScrollLines"/>
+        public override int MouseWheelScrollLines => device.MouseWheelScrollLines;
 
-		/// <summary>
-		/// System value: MouseWheelScrollDelta
-		/// </summary>
-		public	int	MouseWheelScrollDelta	{ get { return device.MouseWheelScrollDelta; } }
+        /// <inheritdoc cref="Mouse.MouseWheelScrollDelta"/>
+        public override int MouseWheelScrollDelta => device.MouseWheelScrollDelta;
 
-
-
-		void device_MouseMove ( object sender, InputDevice.MouseMoveEventArgs e )
+		private void DeviceMouseMove(object sender, InputDevice.MouseMoveEventArgs e)
 		{
-			var handler = Move;
-			if (handler!=null) {
-				handler( sender, new MouseMoveEventArgs{ Position = e.Position, Offset = e.Offset } );	
-			}
+            OnMove(sender, new MouseMoveEventArgs { Position = e.Position, Offset = e.Offset });
 		}
 
-
-		void device_MouseScroll ( object sender, InputDevice.MouseScrollEventArgs e )
+		private void DeviceMouseScroll(object sender, InputDevice.MouseScrollEventArgs e)
 		{
-			var handler = Scroll;
-			if (handler!=null) {
-				handler( sender, new MouseScrollEventArgs(){ WheelDelta = e.WheelDelta } );	
-			}
+            OnScroll(sender, new MouseScrollEventArgs { WheelDelta = e.WheelDelta });
 		}
-
-
-
-
 	}
+
+    public class DummyMouse : Mouse
+    {
+        public DummyMouse(Game game) : base(game) { }
+
+        public override void Initialize() { }
+
+        public override Vector2 PositionDelta => new Vector2();
+        public override Point Position => new Point();
+        public override bool IsMouseCentered
+        {
+            get => false;
+            set { }
+        }
+
+        public override bool IsMouseClipped
+        {
+            get => false;
+            set { }
+        }
+
+        public override bool IsMouseHidden
+        {
+            get => false;
+            set { }
+        }
+
+        public override int MouseWheelScrollLines => 0;
+        public override int MouseWheelScrollDelta => 0;
+    }
 }
