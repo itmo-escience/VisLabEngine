@@ -1,105 +1,112 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Fusion.Core.Mathematics;
-using Fusion.Drivers.Input;
+﻿using Fusion.Drivers.Input;
 using Fusion.Engine.Common;
 
 namespace Fusion.Engine.Input
 {
-	public class Touch : GameModule		
-	{
-		InputDevice device;
+    public abstract class Touch : GameModule
+    {
+        protected Touch(Game game) : base(game) { }
 
-		public event TouchTapEventHandler	Tap;
-		public event TouchTapEventHandler	DoubleTap;
-		public event TouchTapEventHandler	SecondaryTap;
-		public event TouchTapEventHandler	Manipulate;
-        public event TouchTapEventHandler   Hold;
+        public bool IsTouchSupported => true;
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="Game"></param>
-        internal Touch ( Game game ) : base(game)
-		{
-			this.device = Game.InputDevice;
+        public event TouchTapEventHandler Tap;
+        public event TouchTapEventHandler DoubleTap;
+        public event TouchTapEventHandler SecondaryTap;
+        public event TouchTapEventHandler Manipulate;
+        public event TouchTapEventHandler Hold;
 
-			device.TouchGestureTap			+= DeviceOnTouchGestureTap;
-			device.TouchGestureDoubleTap	+= DeviceOnTouchGestureDoubleTap;
-			device.TouchGestureSecondaryTap += DeviceOnTouchGestureSecondaryTap;
-			device.TouchGestureManipulate	+= DeviceOnTouchGestureManipulate;
-            device.TouchHold                += DeviceOnTouchHold;
-		}
-
-		private void DeviceOnTouchGestureManipulate(TouchEventArgs args)
-		{
-			if (Manipulate != null)
-				Manipulate(args);
-		}
-
-		private void DeviceOnTouchGestureSecondaryTap(TouchEventArgs args)
-		{
-			if (SecondaryTap != null)
-				SecondaryTap(args);
-		}
-
-		private void DeviceOnTouchGestureDoubleTap(TouchEventArgs args)
-		{
-			if (DoubleTap != null)
-				DoubleTap(args);
-		}
-
-		private void DeviceOnTouchGestureTap(TouchEventArgs args)
-		{
-			if (Tap != null)
-				Tap(args);
-		}
-
-        private void DeviceOnTouchHold(TouchEventArgs args)
+        protected virtual void OnTap(TouchEventArgs args)
         {
-            if (Hold != null)
-                Hold(args);
+            // Make a temporary copy of the event to avoid possibility of
+            // a race condition if the last subscriber unsubscribes
+            // immediately after the null check and before the event is raised.
+            var handler = Tap;
+            handler?.Invoke(args);
         }
 
+        protected virtual void OnDoubleTap(TouchEventArgs args)
+        {
+            // Make a temporary copy of the event to avoid possibility of
+            // a race condition if the last subscriber unsubscribes
+            // immediately after the null check and before the event is raised.
+            var handler = DoubleTap;
+            handler?.Invoke(args);
+        }
+
+        protected virtual void OnSecondaryTap(TouchEventArgs args)
+        {
+            // Make a temporary copy of the event to avoid possibility of
+            // a race condition if the last subscriber unsubscribes
+            // immediately after the null check and before the event is raised.
+            var handler = SecondaryTap;
+            handler?.Invoke(args);
+        }
+
+        protected virtual void OnManipulate(TouchEventArgs args)
+        {
+            // Make a temporary copy of the event to avoid possibility of
+            // a race condition if the last subscriber unsubscribes
+            // immediately after the null check and before the event is raised.
+            var handler = Manipulate;
+            handler?.Invoke(args);
+        }
+
+        protected virtual void OnHold(TouchEventArgs args)
+        {
+            // Make a temporary copy of the event to avoid possibility of
+            // a race condition if the last subscriber unsubscribes
+            // immediately after the null check and before the event is raised.
+            var handler = Hold;
+            handler?.Invoke(args);
+        }
+    }
+
+	public class ConcreteTouch : Touch
+	{
+		private readonly InputDevice _device;
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
-        public override void Initialize ()
+        /// <param name="game"></param>
+        internal ConcreteTouch (Game game) : base(game)
 		{
+			_device = Game.InputDevice;
+
+			_device.TouchGestureTap	         += OnTap;
+			_device.TouchGestureDoubleTap    += OnDoubleTap;
+			_device.TouchGestureSecondaryTap += OnSecondaryTap;
+			_device.TouchGestureManipulate   += OnManipulate;
+            _device.TouchHold                += OnHold;
 		}
 
-
+        /// <summary>
+        ///
+        /// </summary>
+        public override void Initialize () { }
 
 		/// <summary>
-		/// 
+		///
 		/// </summary>
 		/// <param name="disposing"></param>
 		protected override void Dispose ( bool disposing )
 		{
 			if (disposing) {
-				device.TouchGestureTap			-= DeviceOnTouchGestureTap;
-				device.TouchGestureDoubleTap	-= DeviceOnTouchGestureDoubleTap;
-				device.TouchGestureSecondaryTap -= DeviceOnTouchGestureSecondaryTap;
-				device.TouchGestureManipulate	-= DeviceOnTouchGestureManipulate;
+				_device.TouchGestureTap			-= OnTap;
+				_device.TouchGestureDoubleTap	-= OnDoubleTap;
+				_device.TouchGestureSecondaryTap -= OnSecondaryTap;
+				_device.TouchGestureManipulate	-= OnManipulate;
+				_device.TouchHold	            -= OnHold;
 			}
 
 			base.Dispose( disposing );
 		}
-
-
-
-		/// <summary>
-		/// 
-		/// </summary>
-		public bool IsTouchSupported
-		{
-			get { return true; }
-			set { }
-		}
-
 	}
+
+    public class DummyTouch : Touch
+    {
+        public DummyTouch(Game game) : base(game) { }
+
+        public override void Initialize() { }
+    }
 }

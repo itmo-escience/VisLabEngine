@@ -49,6 +49,8 @@ namespace WpfEditorTest
 
 			engine = new Game("TestGame");
             engine.Mouse = new DummyMouse(engine);
+            engine.Keyboard = new DummyKeyboard(engine);
+		    engine.Touch = new DummyTouch(engine);
 
 			engine.GameServer = new CustomGameServer(engine);
 			engine.GameClient = new CustomGameClient(engine);

@@ -1,122 +1,175 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Fusion.Core;
-using Fusion.Core.Mathematics;
 using Fusion.Drivers.Input;
 using Fusion.Engine.Common;
-using Fusion.Core.Shell;
 using Fusion.Core.IniParser.Model;
 
 
-namespace Fusion.Engine.Input {
-	public class Keyboard : GameModule {
+namespace Fusion.Engine.Input
+{
+    public abstract class Keyboard : GameModule
+    {
+        internal Keyboard(Game game) : base(game) { }
 
-		InputDevice device;
+        /// <summary>
+        /// Indicates whether keyboard should be scanned.
+        /// If ScanKeyboard equals false methods IsKeyDown and IsKeyUp indicate that all keys are unpressed.
+        /// All events like FormKeyPress, FormKeyDown, FormKeyUp will work.
+        /// </summary>
+        public abstract bool ScanKeyboard { get; set; }
+
+        /// <summary>
+        /// Gets keyboard bindings.
+        /// </summary>
+        public abstract IEnumerable<KeyBind> Bindings { get; }
+
+        /// <summary>
+        /// Binds command to key.
+        /// </summary>
+        /// <param name="key"></param>
+        /// <param name="keyDownCommand"></param>
+        /// <param name="keyUpCommand"></param>
+        public abstract void Bind(Keys key, string keyDownCommand, string keyUpCommand);
+
+        /// <summary>
+        /// Unbind commands from key.
+        /// </summary>
+        /// <param name="key"></param>
+        public abstract void Unbind(Keys key);
 
 
-		/// <summary>
-		/// Gets keyboard bindings.
-		/// </summary>
-		public IEnumerable<KeyBind> Bindings {
-			get {
-				return bindings
-					.Select( keyvalue => keyvalue.Value )
-					.ToArray();
-			}
-		}
+        /// <summary>
+        /// Indicates that given key is already bound.
+        /// </summary>
+        /// <param name="key"></param>
+        /// <returns></returns>
+        public abstract bool IsBound(Keys key);
 
 
-		Dictionary<Keys, KeyBind> bindings = new Dictionary<Keys,KeyBind>();
+        /// <summary>
+        /// Returns whether a specified key is currently being pressed.
+        /// </summary>
+        /// <param name="key"></param>
+        /// <returns></returns>
+        public abstract bool IsKeyDown(Keys key);
 
+        /// <summary>
+        /// Returns whether a specified key is currently not pressed.
+        /// </summary>
+        /// <param name="key"></param>
+        /// <returns></returns>
+        public abstract bool IsKeyUp(Keys key);
+
+        public event KeyDownEventHandler KeyDown;
+        public event KeyUpEventHandler KeyUp;
+        public event KeyDownEventHandler FormKeyDown;
+        public event KeyUpEventHandler FormKeyUp;
+        public event KeyPressEventHandler FormKeyPress;
+
+        protected void OnKeyDown(object sender, Fusion.Engine.Input.KeyEventArgs args)
+        {
+            var handler = KeyDown;
+            handler?.Invoke(sender, args);
+        }
+
+        protected void OnKeyUp(object sender, Fusion.Engine.Input.KeyEventArgs args)
+        {
+            var handler = KeyUp;
+            handler?.Invoke(sender, args);
+        }
+
+        protected void OnFormKeyDown(object sender, Fusion.Engine.Input.KeyEventArgs args)
+        {
+            var handler = FormKeyDown;
+            handler?.Invoke(sender, args);
+        }
+
+        protected void OnFormKeyUp(object sender, Fusion.Engine.Input.KeyEventArgs args)
+        {
+            var handler = FormKeyUp;
+            handler?.Invoke(sender, args);
+        }
+
+        protected void OnFormKeyPress(object sender, Fusion.Engine.Input.KeyPressArgs args)
+        {
+            var handler = FormKeyPress;
+            handler?.Invoke(sender, args);
+        }
+    }
+
+	public class ConcreteKeyboard : Keyboard
+	{
+		private readonly InputDevice _device;
+	    private readonly Dictionary<Keys, KeyBind> _bindings = new Dictionary<Keys, KeyBind>();
 
 		/// <summary>
 		/// ctor
 		/// </summary>
 		/// <param name="Game"></param>
-		internal Keyboard ( Game Game ) : base(Game)
+		internal ConcreteKeyboard ( Game Game ) : base(Game)
 		{
-			this.device	=	Game.InputDevice;
+			_device	=	Game.InputDevice;
 
-			device.KeyDown += device_KeyDown;
-			device.KeyUp += device_KeyUp;
+			_device.KeyDown += DeviceKeyDown;
+			_device.KeyUp += DeviceKeyUp;
 
-			device.FormKeyDown += device_FormKeyDown;
-			device.FormKeyUp += device_FormKeyUp;
-			device.FormKeyPress += device_FormKeyPress;
+			_device.FormKeyDown += DeviceFormKeyDown;
+			_device.FormKeyUp += DeviceFormKeyUp;
+			_device.FormKeyPress += DeviceFormKeyPress;
 		}
 
-
-
 		/// <summary>
-		/// 
+		///
 		/// </summary>
-		public override void Initialize ()
-		{
-		}
+		public override void Initialize () { }
 
-
-
-		/// <summary>
-		/// Indicates whether keyboard should be scanned.
-		/// If ScanKeyboard equals false methods IsKeyDown and IsKeyUp indicate that all keys are unpressed.
-		/// All events like FormKeyPress, FormKeyDown, FormKeyUp will work.
-		/// </summary>
-		public bool ScanKeyboard {
+	    /// <inheritdoc />
+		public override bool ScanKeyboard {
 			get {
-				return scanKeyboard;
+				return _scanKeyboard;
 			}
 			set {
-				if (value!=scanKeyboard) {
+				if (value!=_scanKeyboard) {
 					if (value) {
-						scanKeyboard = true;
+						_scanKeyboard = true;
 					} else {
-						scanKeyboard = false;
-						device.RemoveAllPressedKeys();
+						_scanKeyboard = false;
+						_device.RemoveAllPressedKeys();
 					}
 				}
 			}
 		}
+	    private bool _scanKeyboard = true;
 
-		bool scanKeyboard = true;
+	    /// <inheritdoc />
+        public override IEnumerable<KeyBind> Bindings
+	    {
+	        get
+	        {
+	            return _bindings
+	                .Select(keyvalue => keyvalue.Value)
+	                .ToArray();
+	        }
+	    }
 
-
-
-		/// <summary>
-		/// Binds command to key.
-		/// </summary>
-		/// <param name="key"></param>
-		/// <param name="keyDownCommand"></param>
-		/// <param name="keyUpCommand"></param>
-		public void Bind ( Keys key, string keyDownCommand, string keyUpCommand )
+	    /// <inheritdoc />
+        public override void Bind ( Keys key, string keyDownCommand, string keyUpCommand )
 		{
-			bindings.Add( key, new KeyBind(key, keyDownCommand, keyUpCommand ) );
+			_bindings.Add( key, new KeyBind(key, keyDownCommand, keyUpCommand ) );
 		}
 
-
-
-		/// <summary>
-		/// Unbind commands from key.
-		/// </summary>
-		/// <param name="key"></param>
-		public void Unbind ( Keys key )
+	    /// <inheritdoc />
+        public override void Unbind ( Keys key )
 		{
-			bindings.Remove(key);
+			_bindings.Remove(key);
 		}
 
-
-		/// <summary>
-		/// Indicates that given key is already bound.
-		/// </summary>
-		/// <param name="key"></param>
-		/// <returns></returns>
-		public bool IsBound ( Keys key )
+	    /// <inheritdoc />
+        public override bool IsBound ( Keys key )
 		{
-			return bindings.ContainsKey( key );
+			return _bindings.ContainsKey( key );
 		}
-
 
 		/// <summary>
 		/// Gets keyboard configuration.
@@ -127,15 +180,13 @@ namespace Fusion.Engine.Input {
 			return Bindings.Select( bind => new KeyData( bind.Key.ToString(), bind.KeyDownCommand + " | " + bind.KeyUpCommand ) );
 		}
 
-
-
 		/// <summary>
-		/// 
+		/// Sets keyboard configuration
 		/// </summary>
 		/// <param name="configuration"></param>
 		public override void SetConfiguration ( IEnumerable<KeyData> configuration )
 		{
-			bindings.Clear();
+			_bindings.Clear();
 
 			foreach ( var keyData in configuration ) {
 
@@ -158,67 +209,44 @@ namespace Fusion.Engine.Input {
 			}
 		}
 
-
-
 		/// <summary>
-		/// 
+		///
 		/// </summary>
 		/// <param name="disposing"></param>
 		protected override void Dispose ( bool disposing )
 		{
 			if (disposing) {
-				device.KeyDown -= device_KeyDown;
-				device.KeyUp -= device_KeyUp;
+				_device.KeyDown -= DeviceKeyDown;
+				_device.KeyUp -= DeviceKeyUp;
 
-				device.FormKeyDown -= device_FormKeyDown;
-				device.FormKeyUp -= device_FormKeyUp;
-				device.FormKeyPress -= device_FormKeyPress;
+				_device.FormKeyDown -= DeviceFormKeyDown;
+				_device.FormKeyUp -= DeviceFormKeyUp;
+				_device.FormKeyPress -= DeviceFormKeyPress;
 			}
 
 			base.Dispose( disposing );
 		}
 
-
-
-		/// <summary>
-		/// Returns whether a specified key is currently being pressed. 
-		/// </summary>
-		/// <param name="key"></param>
-		/// <returns></returns>
-		public bool IsKeyDown ( Keys key )
+	    /// <inheritdoc />
+        public override bool IsKeyDown ( Keys key )
 		{
-			return ( scanKeyboard && device.IsKeyDown( (Fusion.Drivers.Input.Keys)key ) );
-		}
-		
-
-		/// <summary>
-		/// Returns whether a specified key is currently not pressed. 
-		/// </summary>
-		/// <param name="key"></param>
-		/// <returns></returns>
-		public bool IsKeyUp ( Keys key )
-		{
-			return ( !scanKeyboard || device.IsKeyUp( (Fusion.Drivers.Input.Keys)key ) );
+			return ( _scanKeyboard && _device.IsKeyDown( (Fusion.Drivers.Input.Keys)key ) );
 		}
 
 
-		public event KeyDownEventHandler		KeyDown;
-		public event KeyUpEventHandler			KeyUp;
-		public event KeyDownEventHandler		FormKeyDown;
-		public event KeyUpEventHandler			FormKeyUp;
-		public event KeyPressEventHandler		FormKeyPress;
-
-
-
-		void device_KeyDown ( object sender, InputDevice.KeyEventArgs e )
+		/// <inheritdoc />
+		public override bool IsKeyUp ( Keys key )
 		{
-			if (!scanKeyboard) {
+			return ( !_scanKeyboard || _device.IsKeyUp( (Fusion.Drivers.Input.Keys)key ) );
+		}
+
+		private void DeviceKeyDown ( object sender, InputDevice.KeyEventArgs e )
+		{
+			if (!_scanKeyboard) {
 				return;
 			}
 
-
-			KeyBind bind;
-			if (bindings.TryGetValue( (Keys)e.Key, out bind )) {
+		    if (_bindings.TryGetValue( (Keys)e.Key, out var bind )) {
 				try {
 					if (!string.IsNullOrWhiteSpace(bind.KeyDownCommand)) {
 						Game.Invoker.Push( bind.KeyDownCommand );
@@ -228,17 +256,12 @@ namespace Fusion.Engine.Input {
 				}
 			}
 
-			var handler = KeyDown;
-			if (handler!=null) {
-				handler( sender, new KeyEventArgs(){ Key = (Keys)e.Key } );
-			}
+            OnKeyDown( sender, new KeyEventArgs(){ Key = (Keys)e.Key } );
 		}
 
-
-		void device_KeyUp ( object sender, InputDevice.KeyEventArgs e )
+		private void DeviceKeyUp ( object sender, InputDevice.KeyEventArgs e )
 		{
-			KeyBind bind;
-			if (bindings.TryGetValue( (Keys)e.Key, out bind )) {
+		    if (_bindings.TryGetValue( (Keys)e.Key, out var bind )) {
 				try {
 					if (!string.IsNullOrWhiteSpace(bind.KeyUpCommand)) {
 						Game.Invoker.Push( bind.KeyUpCommand );
@@ -248,39 +271,42 @@ namespace Fusion.Engine.Input {
 				}
 			}
 
-			var handler = KeyUp;
-			if (handler!=null) {
-				handler( sender, new KeyEventArgs(){ Key = (Keys)e.Key } );
-			}
+            OnKeyUp(sender, new KeyEventArgs(){ Key = (Keys)e.Key });
 		}
 
-
-		void device_FormKeyDown ( object sender, InputDevice.KeyEventArgs e )
+		private void DeviceFormKeyDown(object sender, InputDevice.KeyEventArgs e)
 		{
-			var handler = FormKeyDown;
-			if (handler!=null) {
-				handler( sender, new KeyEventArgs(){ Key = (Keys)e.Key } );
-			}
+            OnFormKeyDown(sender, new KeyEventArgs(){ Key = (Keys)e.Key } );
 		}
 
-		void device_FormKeyUp ( object sender, InputDevice.KeyEventArgs e )
+		private void DeviceFormKeyUp(object sender, InputDevice.KeyEventArgs e)
 		{
-			var handler = FormKeyUp;
-			if (handler!=null) {
-				handler( sender, new KeyEventArgs(){ Key = (Keys)e.Key } );
-			}
+            OnFormKeyUp(sender, new KeyEventArgs(){ Key = (Keys)e.Key } );
 		}
 
-		void device_FormKeyPress ( object sender, InputDevice.KeyPressArgs e )
+		private void DeviceFormKeyPress(object sender, InputDevice.KeyPressArgs e)
 		{
-			var handler = FormKeyPress;
-			if (handler!=null) {
-				handler( sender, new KeyPressArgs(){ KeyChar = e.KeyChar } );
-			}
+            OnFormKeyPress(sender, new KeyPressArgs(){ KeyChar = e.KeyChar });
 		}
-		
-
-
-
 	}
+
+    public class DummyKeyboard : Keyboard
+    {
+        public DummyKeyboard(Game game) : base(game) { }
+
+        public override void Initialize() { }
+
+        public override bool ScanKeyboard {
+            get => false;
+            set { }
+        }
+        public override IEnumerable<KeyBind> Bindings => new List<KeyBind>();
+
+        public override void Bind(Keys key, string keyDownCommand, string keyUpCommand) { }
+        public override void Unbind(Keys key) { }
+        public override bool IsBound(Keys key) => false;
+
+        public override bool IsKeyDown(Keys key) => false;
+        public override bool IsKeyUp(Keys key) => true;
+    }
 }

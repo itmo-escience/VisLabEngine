@@ -70,26 +70,35 @@ namespace Fusion.Engine.Common {
 		/// </summary>
 		public ContentManager Content { get { return content; } }
 
-		/// <summary>
-		/// Gets keyboard.
-		/// </summary>
-		[GameModule("Keyboard", "kb", InitOrder.After)]
-		public Keyboard Keyboard { get { return keyboard; } }
+	    /// <summary>
+	    /// Gets keyboard.
+	    /// </summary>
+	    [GameModule("Keyboard", "kb", InitOrder.After)]
+	    public Keyboard Keyboard
+	    {
+	        get => keyboard;
+	        set => keyboard = value;
+	    }
 
 		/// <summary>
 		/// Gets mouse.
 		/// </summary>
 		[GameModule("Mouse", "mouse", InitOrder.After)]
-		public Mouse Mouse {
+		public Mouse Mouse
+		{
 		    get => mouse;
 		    set => mouse = value;
 		}
 
-		/// <summary>
-		/// Gets mouse.
-		/// </summary>
-		[GameModule("Touch", "touch", InitOrder.After)]
-		public Touch Touch { get { return touch; } }
+	    /// <summary>
+	    /// Gets mouse.
+	    /// </summary>
+	    [GameModule("Touch", "touch", InitOrder.After)]
+	    public Touch Touch
+	    {
+	        get => touch;
+	        set => touch = value;
+	    }
 
 
 		//[GameModule("LeapMotion", "leapMotion", InitOrder.After)]
@@ -359,9 +368,9 @@ namespace Fusion.Engine.Common {
 			gameTimeInternal	=	new GameTime();
 			invoker				=	new Invoker(this, CommandAffinity.Default);
 
-			keyboard			=	new Keyboard(this);
+			keyboard			=	new ConcreteKeyboard(this);
 			mouse				=	new ConcreteMouse(this);
-			touch				=	new Touch(this);
+			touch				=	new ConcreteTouch(this);
 			//leapMotion			=	new LeapMotion(this);
 			gamepads			=	new GamepadCollection(this);
 
