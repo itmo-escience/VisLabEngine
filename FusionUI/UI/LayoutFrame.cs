@@ -14,7 +14,7 @@ namespace FusionUI.UI
 
     public class LayoutFrame : FreeFrame
     {
-		protected LayoutFrame()
+		internal LayoutFrame()
 		{
 		}
 		protected LayoutType type;

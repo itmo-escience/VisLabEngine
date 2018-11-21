@@ -20,7 +20,7 @@ namespace WpfEditorTest.ChildPanels
 	/// </summary>
 	public partial class FramePalette : UserControl, IDraggablePanel
 	{
-		public Type _selectedFrameTemplate;
+		public string _selectedFrameTemplate;
 
 		public Point _previousMouseLocation { get; set; }
 		public Transform _previousTransform { get; set; }
@@ -48,7 +48,7 @@ namespace WpfEditorTest.ChildPanels
 
 		private void Border_MouseDown_1( object sender, MouseButtonEventArgs e )
 		{
-			this._selectedFrameTemplate = (Type)(sender as Border).Tag;
+			this._selectedFrameTemplate = (string)(sender as Border).Tag;
 			_window.Cursor = Cursors.Hand;
 		}
 

@@ -41,6 +41,8 @@ namespace WpfEditorTest
 		int lastSelectedframeBorder;
 		Fusion.Core.Mathematics.Color lastSelectedframeBorderColor;
 
+		string templatesPath = System.IO.Path.GetFullPath(System.IO.Path.Combine(Directory.GetParent(Assembly.GetEntryAssembly().Location).FullName, "..\\..\\..\\FramesXML"));
+
 		Game engine;
 
 		public InterfaceEditor()
@@ -91,7 +93,9 @@ namespace WpfEditorTest
 				frameHoverPanel.selectedframe = treeView.Selectedframe;
 			};
 
-			palette.AvailableFrames.ItemsSource = StaticData.availableFrameElements;
+			var templates = Directory.GetFiles(templatesPath, "*.xml").ToList();
+			palette.AvailableFrames.ItemsSource = templates.Select(t=>t.Split('\\').Last().Split('.').First());
+				//StaticData.availableFrameElements;
 
 			Binding b = new Binding("Children")
 			{
@@ -297,11 +301,15 @@ namespace WpfEditorTest
 
 			if (palette._selectedFrameTemplate!=null)
 			{
-				var createdFrame = (Fusion.Engine.Frames.Frame)Activator.CreateInstance(palette._selectedFrameTemplate);
+				var createdFrame = (Fusion.Engine.Frames.Frame)null;
+					Fusion.Core.Utils.FrameSerializer.Read(System.IO.Path.Combine(templatesPath, palette._selectedFrameTemplate)+".xml", out createdFrame);
 				//Activator.CreateInstance(palette._selectedFrameTemplate, (engine.GameInterface as ApplicationInterface).rootFrame.ui);
-				createdFrame.X = (int)e.MouseDevice.GetPosition(this).X - createdFrame.Width/2;
-				createdFrame.Y = (int)e.MouseDevice.GetPosition(this).Y - createdFrame.Height/2;
-				(engine.GameInterface as ApplicationInterface).rootFrame.Add(createdFrame);
+				if (createdFrame!=null)
+				{
+					createdFrame.X = (int)e.MouseDevice.GetPosition(this).X - createdFrame.Width / 2;
+					createdFrame.Y = (int)e.MouseDevice.GetPosition(this).Y - createdFrame.Height / 2;
+					(engine.GameInterface as ApplicationInterface).rootFrame.Add(createdFrame); 
+				}
 				palette._selectedFrameTemplate = null;
 				this.Cursor = Cursors.Arrow;
 			}
