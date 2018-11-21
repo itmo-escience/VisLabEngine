@@ -263,12 +263,12 @@ namespace GISTest
 
 
 
-			dynamic frame = new ScalableFrame(ui, 0, 0, 100, 100, "ScalableFrame", Color.Gray);
-			FrameSerializer.Write(frame, "Frames\\" + frame.GetType().Name + ".xml");
-			frame = new ControllableFrame(ui, 0, 0, 100, 100, "ControllableFrame", Color.Gray);
-			FrameSerializer.Write(frame, "Frames\\" + frame.GetType().Name + ".xml");
-			frame = new FreeFrame(ui, 0, 0, 100, 100, "FreeFrame", Color.Gray);
-			FrameSerializer.Write(frame, "Frames\\" + frame.GetType().Name + ".xml");
+			//dynamic frame = new ScalableFrame(ui, 0, 0, 100, 100, "ScalableFrame", Color.Gray);
+			//FrameSerializer.Write(frame, "Frames\\" + frame.GetType().Name + ".xml");
+			//frame = new ControllableFrame(ui, 0, 0, 100, 100, "ControllableFrame", Color.Gray);
+			//FrameSerializer.Write(frame, "Frames\\" + frame.GetType().Name + ".xml");
+			//frame = new FreeFrame(ui, 0, 0, 100, 100, "FreeFrame", Color.Gray);
+			//FrameSerializer.Write(frame, "Frames\\" + frame.GetType().Name + ".xml");
 
 
 
@@ -279,9 +279,9 @@ namespace GISTest
 
 			mainLayout.Add(ser);
 
-			FrameSerializer.Write(mainFrame, "Frames\\" + "TestWindow" + ".xml");
+			//FrameSerializer.Write(mainFrame, "Frames\\" + "TestWindow" + ".xml");
 
-			FrameSerializer.Write(ser, "Frames\\" + "Fram" + ".xml");
+			//FrameSerializer.Write(ser, "Frames\\" + "Fram" + ".xml");
 
 			return mainFrame;
 		}
