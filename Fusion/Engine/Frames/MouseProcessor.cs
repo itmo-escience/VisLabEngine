@@ -389,6 +389,15 @@ namespace Fusion.Engine.Frames {
 			return mouseHoverFrame;
 		}
 
+		public Frame GetHoveredFrame( Frame frame )
+		{
+			Frame mouseHoverFrame = null;
+
+			UpdateHoverRecursive(frame, Game.InputDevice.MousePosition, ref mouseHoverFrame);
+
+			return mouseHoverFrame;
+		}
+
 		//public static Frame GetHoveredFrameExternally()
 		//{
 		//	return new MouseProcessor().GetHoveredFrame();

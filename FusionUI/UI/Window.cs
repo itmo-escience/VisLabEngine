@@ -163,7 +163,7 @@ namespace FusionUI.UI
             SuppressActions = true;
         }
 
-        public List<Frame> Children { get { return holder.Children; }
+        public new List<Frame> Children { get { return holder.Children; }
 			set
 			{
 				foreach (Frame child in value)

@@ -27,7 +27,7 @@ namespace WpfEditorTest.ChildPanels
 		public Point _previousMouseLocation { get; set; }
 		public Transform _previousTransform { get; set; }
 		public bool _mousePressed { get; set; }
-		public Window _window { get; set; }
+		public InterfaceEditor _window { get; set; }
 		public Fusion.Engine.Frames.Frame Selectedframe {
 			get => selectedframe;
 			set { selectedframe = value;
