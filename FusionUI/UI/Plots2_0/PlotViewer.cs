@@ -153,8 +153,7 @@ namespace FusionUI.UI.Plots2_0
                     if (variable.Value.Depths.Count == 1)
                     {
                         Plot.DataContainer.RepairColors();
-                        scales[name].LineColor = variable.Value.Data.Values.First().Values.First().ColorsByDepth.First()
-                            .Value;
+                        scales[name].LineColor = variable.Value.Data.Values.First().Values.First().BaseColor;
                     }
 
                     if (IsTime) scales[name].PredefinedStepsX = predefinedTimeSteps;

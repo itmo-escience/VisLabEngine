@@ -94,7 +94,12 @@ namespace FusionUI.UI.Plots2_0
                 {
                     DragRect.Right = ((float) args.X - GlobalRectangle.Left) / GlobalRectangle.Width;
                     DragRect.Bottom = ((float) args.Y - GlobalRectangle.Top) / GlobalRectangle.Height;
-                }              
+                }
+                if (args.IsClick)
+                {
+                    ScaleRect.X = (float)DMathUtil.Clamp(ScaleRect.X - args.DX * ScaleRect.Width / GlobalRectangle.Width, 0, 1 - ScaleRect.Width);
+                    ScaleRect.Y = (float)DMathUtil.Clamp(ScaleRect.Y - args.DY * ScaleRect.Height/ GlobalRectangle.Height, 0, 1 - ScaleRect.Height);
+                }
             };
         }
 
@@ -358,6 +363,7 @@ namespace FusionUI.UI.Plots2_0
                 var leftLim = limits.Left + ScaleRect.Left * limits.Width;
                 var left = pointsX.BinarySearch(leftLim);
                 left = left >= 0 ? left : ~left;
+                if (left > 0) left -= 1;
                 if (left >= pointsX.Count) continue;
                 var prev = points[left];
                 var prevPlot = (prev - limits.TopLeft) / limits.Size;

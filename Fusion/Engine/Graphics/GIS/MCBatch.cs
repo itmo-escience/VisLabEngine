@@ -121,7 +121,7 @@ namespace Fusion.Engine.Graphics.GIS
             //ps.DepthStencilState = flags.HasFlag(FieldFlags.NO_DEPTH) ? DepthStencilState.None : DepthStencilState.Default;
             //ps.RasterizerState = flags.HasFlag(FieldFlags.CULL_NONE) ? RasterizerState.CullNone : RasterizerState.CullCW;
              
-            ps.BlendState = BlendState.AlphaAdditive;      
+            ps.BlendState = BlendState.Additive;      
             ps.DepthStencilState = DepthStencilState.Readonly;             
             ps.RasterizerState = RasterizerState.CullNone;  
 

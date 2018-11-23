@@ -104,6 +104,7 @@ namespace FusionUI.UI.Plots2_0
         public virtual void UpdateColors(ColorConfig cc)
         {
             if (Data == null) return;
+            BaseColor = cc.NextColor();
             foreach (var k in Data.Keys)
             {
                 ColorsByDepth[k] = cc.NextColor();
@@ -112,7 +113,7 @@ namespace FusionUI.UI.Plots2_0
 
         public virtual void RepairColors(ColorConfig cc)
         {
-            BaseColor = cc.NextColor();
+            //BaseColor = cc.NextColor();
             foreach (var k in Depths)
             {
                 if (!ColorsByDepth.ContainsKey(k)) ColorsByDepth[k] = cc.NextColor();                
