@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Xml.Serialization;
 using Fusion.Core.Mathematics;
+using Fusion.Engine.Common;
 using Fusion.Engine.Frames;
 using Fusion.Engine.Graphics;
 using FusionUI.UI.Elements;
@@ -53,28 +54,28 @@ namespace FusionUI.UI
         public override float UnitPaddingLeft { get { return holder.UnitPaddingLeft; } set { base.UnitPaddingLeft = 0;
 			if (holder!=null)
 			{
-				holder.UnitPaddingLeft = value; 
+				holder.UnitPaddingLeft = value;
 			}
 				OnPropertyChanged();
 			} }
         public override float UnitPaddingRight { get { return holder.UnitPaddingRight; } set { base.UnitPaddingRight = 0;
 			if (holder != null)
 			{
-				holder.UnitPaddingRight = value; 
+				holder.UnitPaddingRight = value;
 			}
 				OnPropertyChanged();
 			} }
         public override float UnitPaddingTop { get { return holder.UnitPaddingTop; } set { base.UnitPaddingTop = 0;
 			if (holder != null)
 			{
-				holder.UnitPaddingTop = value; 
+				holder.UnitPaddingTop = value;
 			}
 				OnPropertyChanged();
 			} }
         public override float UnitPaddingBottom { get { return holder.UnitPaddingBottom; } set { base.UnitPaddingBottom = 0;
 			if (holder != null)
 			{
-				holder.UnitPaddingBottom = value; 
+				holder.UnitPaddingBottom = value;
 			}
 				OnPropertyChanged();
 			} }
@@ -82,9 +83,9 @@ namespace FusionUI.UI
         protected virtual void HolderOnResize(object sender, ResizeEventArgs args)
         {
             if (!FixedSize)
-            {    
+            {
 
-                
+
             }
             BasementPanel.UnitY = holder.UnitY + holder.UnitHeight;
             holder.UpdateLayout();
@@ -94,19 +95,27 @@ namespace FusionUI.UI
 		[XmlIgnore]
 		public Action ActionCross;
 
+        [Obsolete("Please use constructor without FrameProcessor")]
         public Window(FrameProcessor ui, float x, float y, float w, float h, string text, Color backColor,
+            bool drawHat = true, bool drawCross = true, bool drawHelp = false, string helpText = "",
+            bool fixedSize = false)
+            : this(x, y, w, h, text, backColor, drawHat, drawCross, drawHelp, helpText, fixedSize)
+        {
+        }
+
+        public Window(float x, float y, float w, float h, string text, Color backColor,
             bool drawHat = true, bool drawCross = true, bool drawHelp = false, string helpText = "", bool fixedSize = false)
-            : base(ui, x, y, w, h, text, backColor)
+            : base(x, y, w, h, text, backColor)
         {
             DrawHat = drawHat;
             FixedSize = fixedSize;
-            ((Frame) this).Ghost = false;            
+            ((Frame) this).Ghost = false;
             AutoHeight = !FixedSize;
             ForeColor = Color.Zero;
             Name = text;
             if (drawHat)
             {
-                HatPanel = new ScalableFrame(ui, 0, 0, (int) UnitWidth, UIConfig.UnitHatHeight, Name, UIConfig.HatColor)
+                HatPanel = new ScalableFrame(0, 0, (int) UnitWidth, UIConfig.UnitHatHeight, Name, UIConfig.HatColor)
                 {
                     TextAlignment = Alignment.MiddleLeft,
                     UnitTextOffsetX = UIConfig.UnitHatTextOffset,
@@ -115,14 +124,14 @@ namespace FusionUI.UI
                 if (drawCross)
                 {
                     ActionCross += () => this.Visible = false;
-                    var cross = new Button(ui, UnitWidth - UIConfig.UnitHatCrossSize - UIConfig.UnitHatTextOffset, 0,
+                    var cross = new Button(UnitWidth - UIConfig.UnitHatCrossSize - UIConfig.UnitHatTextOffset, 0,
                         UIConfig.UnitHatCrossSize, UIConfig.UnitHatHeight, "", Color.Zero, UIConfig.ActiveColor, 0,
                         () =>
-                        {                            
+                        {
                             ActionCross?.Invoke();
                         })
                     {
-                        Image = ui.Game.Content.Load<DiscTexture>(@"UI-new\fv-icons_close-window"),
+                        Image = Game.Instance.Content.Load<DiscTexture>(@"UI-new\fv-icons_close-window"),
                         ImageMode = FrameImageMode.Cropped,
                         ActiveImageColor = Color.White,
                         InactiveImageColor = Color.White,
@@ -133,15 +142,15 @@ namespace FusionUI.UI
 
                 if (drawHelp)
                 {
-                    ScalableFrame helpPopup = PopupFactory.NotificationPopupWindow(ui,
-                        (ui.RootFrame.Width / ScaleMultiplier - UIConfig.UnitPopupWindowWidth) / 2, 100, "Help",
+                    ScalableFrame helpPopup = PopupFactory.NotificationPopupWindow(
+                        (ApplicationInterface.Instance.rootFrame.Width / ScaleMultiplier - UIConfig.UnitPopupWindowWidth) / 2, 100, "Help",
                         helpText, "Got it",
                         () => { });
-                    var help = new Button(ui, UnitWidth - 2 * UIConfig.UnitHatCrossSize - UIConfig.UnitHatTextOffset, 0,
+                    var help = new Button(UnitWidth - 2 * UIConfig.UnitHatCrossSize - UIConfig.UnitHatTextOffset, 0,
                         UIConfig.UnitHatCrossSize, UIConfig.UnitHatHeight, "", Color.Zero, Color.Zero, 0,
                         () => helpPopup.Visible = true)
                     {
-                        Image = ui.Game.Content.Load<DiscTexture>(@"UI-new\fv-icons_help-window"),
+                        Image = Game.Instance.Content.Load<DiscTexture>(@"UI-new\fv-icons_help-window"),
                         ImageMode = FrameImageMode.Cropped,
                     };
                     HatPanel.Add(help);
@@ -149,13 +158,13 @@ namespace FusionUI.UI
 
                 base.Add(HatPanel);
             }
-            holder = new LayoutFrame(ui, 0, drawHat ? UIConfig.UnitHatHeight : 0, (int)UnitWidth, 0, Color.Zero)
+            holder = new LayoutFrame(0, drawHat ? UIConfig.UnitHatHeight : 0, (int)UnitWidth, 0, Color.Zero)
             {
                 AutoHeight = true,
                 Anchor = FrameAnchor.All,
             };
             base.Add(holder);
-            BasementPanel = new ScalableFrame(ui, 0, (int)(holder.UnitY + holder.UnitHeight), (int)UnitWidth, 0, "", UIConfig.SettingsColor);
+            BasementPanel = new ScalableFrame(0, (int)(holder.UnitY + holder.UnitHeight), (int)UnitWidth, 0, "", UIConfig.SettingsColor);
             base.Add(BasementPanel);
 
             holder.Resize += HolderOnResize;
@@ -176,7 +185,7 @@ namespace FusionUI.UI
 
         public override void Add(Frame frame)
         {
-            holder.Add(frame);            
+            holder.Add(frame);
         }
 
         public void AddBase(Frame frame)
@@ -185,7 +194,7 @@ namespace FusionUI.UI
         }
 
         public void Remove(Frame frame)
-        {            
+        {
             holder.Remove(frame);
         }
 

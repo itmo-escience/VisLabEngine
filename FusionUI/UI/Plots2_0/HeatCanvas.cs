@@ -1,30 +1,28 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Fusion.Core.Mathematics;
+using Fusion.Engine.Common;
 using Fusion.Engine.Frames;
 using Fusion.Engine.Graphics;
-using Fusion.Engine.Graphics.GIS.GlobeMath;
 
 namespace FusionUI.UI.Plots2_0
 {
     public class HeatCanvas : PlotCanvas
     {
-        public HeatCanvas(FrameProcessor ui, float x, float y, float w, float h, Color backColor) : base(ui, x, y, w, h, backColor)
-        {
-        }
+        [Obsolete("Please use constructor without FrameProcessor")]
+        public HeatCanvas(FrameProcessor ui, float x, float y, float w, float h, Color backColor)
+            : this(x, y, w, h, backColor) { }
+
+        public HeatCanvas(float x, float y, float w, float h, Color backColor) : base(x, y, w, h, backColor) { }
 
         public double[,] points;
         public double MinValue = -1, MaxValue = 1;
 
         public bool Average;
-        public bool MinMaxFromData; 
+        public bool MinMaxFromData;
         public Rectangle dataRange = new Rectangle(0, 0, 5, 5);
         public void UpdatePoints(PlotData pd)
         {
-            points = new double[dataRange.Width, dataRange.Height];            
+            points = new double[dataRange.Width, dataRange.Height];
             var counts = new int[dataRange.Width, dataRange.Height];
             foreach (var pl in pd.Data)
             {
@@ -70,7 +68,7 @@ namespace FusionUI.UI.Plots2_0
         public override void DrawPlot(SpriteLayer sb, PlotData pd, int clipRectIndex)
         {
             UpdatePoints(pd);
-            var paletteTex = Game.Content.Load<DiscTexture>(Palette);
+            var paletteTex = Game.Instance.Content.Load<DiscTexture>(Palette);
 
             float dw = (float) Width / points.GetLength(0);
             float dh = (float)Height / points.GetLength(1);

@@ -23,8 +23,12 @@ namespace FusionUI.UI.Elements
 
         private ScalableFrame blueHolder;
 
-        public TimeSelectorScroll (FrameProcessor ui, float x, float y, float w, float h, string text, Color backColor) : base (ui, x, y, w, h, text, backColor) {
-            blueHolder = new ScalableFrame(ui, 0, (Capacity - 1)/2 * UIConfig.UnitSelectorRowHeight, this.UnitWidth, UIConfig.UnitSelectorRowHeight, "", UIConfig.ActiveColor);
+        [Obsolete("Please use constructor without FrameProcessor")]
+        public TimeSelectorScroll(FrameProcessor ui, float x, float y, float w, float h, string text, Color backColor) :
+            this(x, y, w, h, text, backColor) { }
+
+        public TimeSelectorScroll (float x, float y, float w, float h, string text, Color backColor) : base (x, y, w, h, text, backColor) {
+            blueHolder = new ScalableFrame(0, (Capacity - 1)/2 * UIConfig.UnitSelectorRowHeight, UnitWidth, UIConfig.UnitSelectorRowHeight, "", UIConfig.ActiveColor);
             Add(blueHolder);
             InitActions();
         }
@@ -66,7 +70,7 @@ namespace FusionUI.UI.Elements
                 Offset = i;
                 updateOffsets();
                 updateByOffset();
-            }            
+            }
         }
 
         public int Offset
@@ -92,15 +96,15 @@ namespace FusionUI.UI.Elements
                     foreach (var row in rows) {
                         row.Value.UnitY += dy;
                     }
-                    if (delta > UIConfig.UnitSelectorRowHeight / 2) {                        
-                        Offset -= 1;                                                
+                    if (delta > UIConfig.UnitSelectorRowHeight / 2) {
+                        Offset -= 1;
                         UpdateFunction?.Invoke (Current);
                         delta -= UIConfig.UnitSelectorRowHeight;
                         updateByOffset();
                         updateOffsets();
                     }
-                    if (delta < -UIConfig.UnitSelectorRowHeight / 2) {                        
-                        Offset += 1;                          
+                    if (delta < -UIConfig.UnitSelectorRowHeight / 2) {
+                        Offset += 1;
                         UpdateFunction?.Invoke (Current);
                         delta += UIConfig.UnitSelectorRowHeight;
                         updateByOffset();
@@ -115,7 +119,7 @@ namespace FusionUI.UI.Elements
             ActionLost += (ControlActionArgs args, ref bool flag) => {
                 delta = 0;
                 updateOffsets ();
-                updateByOffset();               
+                updateByOffset();
             };
 
             ActionDown += (ControlActionArgs args, ref bool flag) => {
@@ -125,7 +129,7 @@ namespace FusionUI.UI.Elements
         }
 
         private void updateCycling()
-        {            
+        {
             for (int i = 0; i < values.Count; i++) {
                 var yearRow = rows[values[i]];
                 if (yearRow.UnitY + yearRow.UnitHeight < 0) {
@@ -168,12 +172,12 @@ namespace FusionUI.UI.Elements
             foreach (var row in rows.Values)
             {
                 row.Clean();
-                row.Clear(this);  
+                row.Clear(this);
                 this.Remove(row);
             }
             this.values.Clear();
             rows.Clear();
-            if (values.Count == 0) return;            
+            if (values.Count == 0) return;
             for (int i = 0; this.values.Count < (Capacity / 2 * 2 + 1); i++)
             {
                 this.values.AddRange(values.Select(s => i == 0? s : s + $"_{i}"));
@@ -185,23 +189,23 @@ namespace FusionUI.UI.Elements
             }
 
             Current = cur;
-                        
+
             updateOffsets();
-            updateByOffset();            
+            updateByOffset();
         }
 
         private void AddRow(string value, int index)
         {
-            ScalableFrame valueRow = new ScalableFrame(ui, 0, 0, UnitWidth,
+            ScalableFrame valueRow = new ScalableFrame(0, 0, UnitWidth,
                     UIConfig.UnitSelectorRowHeight, value.Split('_')[0], Color.Zero)
             {
                 UnitTextOffsetX = 2,
                 TextAlignment = Alignment.MiddleCenter,
-                Name = $"row_{index}",                
+                Name = $"row_{index}",
             };
             rows.Add (value, valueRow);
             Add (valueRow);
         }
-            
+
     }
 }

@@ -1,10 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Runtime.InteropServices;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows.Forms;
 using Fusion.Core.Mathematics;
 using Fusion.Engine.Frames;
 
@@ -23,8 +19,8 @@ namespace FusionUI.UI.Elements.TextFormatting
         AllowUncompleteTags = 1,
         AllowUnsupportedTags = 2,
         AllowEmptyImages = 4,
-        AllowUnsupportedParams = 8,                
-        
+        AllowUnsupportedParams = 8,
+
     }
 
     public enum ValidationInvokeType
@@ -52,7 +48,7 @@ namespace FusionUI.UI.Elements.TextFormatting
 
             public Tag Peek()
             {
-                
+
                 return stack.Any() ? stack[stack.Count - 1] : null;
             }
 
@@ -86,11 +82,17 @@ namespace FusionUI.UI.Elements.TextFormatting
                 n.lastTags = lastTags
                         .Select(a => new KeyValuePair<Tag.TagType, Stack<Tag>>(a.Key, new Stack<Tag>(a.Value)))
                         .ToDictionary(a => a.Key, a => a.Value);
-                return n;                
+                return n;
             }
         }
 
-        public FormatTextBlock(FrameProcessor ui, float x, float y, float w, float h, string text, Color backColor, UIConfig.FontHolder font, float offsetLine = 0, float minHeight = 0, bool isShortText = false, int maxWidth = 0) : base(ui, x, y, w, h, text, backColor, font, offsetLine, minHeight, isShortText, maxWidth)
+        [Obsolete("Please use constructor without FrameProcessor")]
+        public FormatTextBlock(FrameProcessor ui, float x, float y, float w, float h, string text, Color backColor, UIConfig.FontHolder font, float offsetLine = 0, float minHeight = 0, bool isShortText = false, int maxWidth = 0)
+            : this(x, y, w, h, text, backColor, font, offsetLine, minHeight, isShortText, maxWidth) { }
+
+
+        public FormatTextBlock(float x, float y, float w, float h, string text, Color backColor, UIConfig.FontHolder font, float offsetLine = 0, float minHeight = 0, bool isShortText = false, int maxWidth = 0)
+            : base(x, y, w, h, text, backColor, font, offsetLine, minHeight, isShortText, maxWidth)
         {
             BaseFont = font;
             ItalicFont = font;
@@ -101,10 +103,7 @@ namespace FusionUI.UI.Elements.TextFormatting
             Resize += (sender, args) => init();
         }
 
-        public static class ValidationControls
-        {
-            
-        }
+        public static class ValidationControls { }
 
         public ValidationInvokeType ValidationInvokeType = ValidationInvokeType.OnSet;
         public ValidationResponceType ValidationResponceType = ValidationResponceType.LogWarning;
@@ -119,8 +118,8 @@ namespace FusionUI.UI.Elements.TextFormatting
                 Italic, //[i];[italic];[em] [/i];[/italic];[/em]
                 Underline, //[u];[underline] [/u][/underline]
                 Striketrough, //[s][striketrough] [/s][/striketrough]
-                Size, //[size=###] [/size] 
-                Color, //[color=###] [/color]              
+                Size, //[size=###] [/size]
+                Color, //[color=###] [/color]
                 Alignment, //[align=###][center][left][right][justify] [/align][/center][/left][/right][/justify]
                 Image, //[img=###] [/img]
                 Resource, //[r] [/r]
@@ -273,7 +272,7 @@ namespace FusionUI.UI.Elements.TextFormatting
         //}
 
         //private bool CheckString(string stringToCheck, bool passOpen, out Stack<Tag> tagStack)
-        //{   
+        //{
         //    tagStack = new Stack<Tag>();
         //    int last = 0;
         //    for (int i = 0; i < stringToCheck.Length; i = stringToCheck.IndexOf("[", i))
@@ -327,7 +326,7 @@ namespace FusionUI.UI.Elements.TextFormatting
         //}
 
         public override void init()
-        {            
+        {
             BaseHeight = this.Height;
             //UpdateGlobalRect(0, 0);
             splitByString();

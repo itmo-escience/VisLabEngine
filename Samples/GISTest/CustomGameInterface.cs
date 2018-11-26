@@ -28,10 +28,10 @@ using Fusion.Core.Utils;
 namespace GISTest
 {
 
-	
+
 	[Command("refreshServers", CommandAffinity.Default)]
 	public class RefreshServerList : NoRollbackCommand {
-		
+
 		public RefreshServerList( Invoker invoker ) : base(invoker)
 		{
 		}
@@ -42,10 +42,10 @@ namespace GISTest
 		}
 
 	}
-	
+
 	[Command("stopRefresh", CommandAffinity.Default)]
 	public class StopRefreshServerList : NoRollbackCommand {
-		
+
 		public StopRefreshServerList( Invoker invoker ) : base(invoker)
 		{
 		}
@@ -97,7 +97,7 @@ namespace GISTest
 
 
 		/// <summary>
-		/// 
+		///
 		/// </summary>
 		public override void Initialize ()
 		{
@@ -171,10 +171,9 @@ namespace GISTest
 		public Window CreateStartFrame()
 		{
 			var rootFrame = this.rootFrame;
-			var ui = this.FrameProcessor.RootFrame.ui;
 
 
-			Window mainFrame = new Window(ui, 50, 5, 200, 250, "TestWindow", Color.Zero)
+			Window mainFrame = new Window(50, 5, 200, 250, "TestWindow", Color.Zero)
 			{
 				ImageColor = Color.White,
 				ImageMode = FrameImageMode.Fitted,
@@ -185,7 +184,7 @@ namespace GISTest
 				BorderColor = Color.White
 			};
 
-			ScalableFrame mainLayout = new ScalableFrame(mainFrame.ui, 200, 20, 20, 80, "TestLayout", Color.Zero)
+			ScalableFrame mainLayout = new ScalableFrame(200, 20, 20, 80, "TestLayout", Color.Zero)
 			{
 
 			};
@@ -195,7 +194,7 @@ namespace GISTest
 			Color buf = UIConfig.ActiveColor;
 
 			UIConfig.ActiveColor = Color.Red;
-			Window smallWindow = new Window(mainLayout.ui, 0, 10, 256 / ApplicationInterface.gridUnitDefault, 256 / ApplicationInterface.gridUnitDefault,
+			Window smallWindow = new Window(0, 10, 256 / ApplicationInterface.gridUnitDefault, 256 / ApplicationInterface.gridUnitDefault,
 				"SomethingNew", Color.SandyBrown, fixedSize: true)
 			{ HatColor = Color.Blue };
 			smallWindow.Anchor = FrameAnchor.Bottom | FrameAnchor.Left | FrameAnchor.Right;
@@ -226,7 +225,7 @@ namespace GISTest
 
 
 			//next.Visible = true;
-			var holder = ButtonFactory.CenterButtonHolder(mainLayout.ui, 0, 10, mainLayout, 30, "Next_2",
+			var holder = ButtonFactory.CenterButtonHolder(0, 10, mainLayout, 30, "Next_2",
 								() =>
 								{
 									System.Console.WriteLine("You've just performed a button press action: "/* + next.ToString()*/);
@@ -239,27 +238,26 @@ namespace GISTest
 
 			var t = "testSerialization.xml";
 
-			Frame ser = new Frame(ui, 10, 20, 190, 220, "Fram", Color.Red)
+			Frame ser = new Frame(10, 20, 190, 220, "Fram", Color.Red)
 			{
-				Image = ui.Game.Content.Load<DiscTexture>(@"UI-new\fv-icons_close-window")
+				Image = Game.Content.Load<DiscTexture>(@"UI-new\fv-icons_close-window")
 			};
-			ControllableFrame ser2 = new ControllableFrame(ui, 11, 21, 60, 60, "ContrF", Color.Blue)
+			ControllableFrame ser2 = new ControllableFrame(11, 21, 60, 60, "ContrF", Color.Blue)
 			{
-				Image = ui.Game.Content.Load<DiscTexture>(@"UI-new\fv-icons_radio-on")
+				Image = Game.Content.Load<DiscTexture>(@"UI-new\fv-icons_radio-on")
 			};
-			ScalableFrame ser3 = new ScalableFrame(ui, 20, 6, 25, 15, "Scales", Color.Green)
+			ScalableFrame ser3 = new ScalableFrame(20, 6, 25, 15, "Scales", Color.Green)
 			{
-				Image = ui.Game.Content.Load<DiscTexture>(@"UI-new\fv-icons_switcher-on")
+				Image = Game.Content.Load<DiscTexture>(@"UI-new\fv-icons_switcher-on")
 			};
-			FreeFrame ser4 = new FreeFrame(ui, 30, 20, 15, 15, "FreeFr", Color.Gray)
+			FreeFrame ser4 = new FreeFrame(30, 20, 15, 15, "FreeFr", Color.Gray)
 			{
-				Image = ui.Game.Content.Load<DiscTexture>(@"UI-new\fv-icons_checkbox-big-on")
+				Image = Game.Content.Load<DiscTexture>(@"UI-new\fv-icons_checkbox-big-on")
 			};
 
-			ScalableFrame sHolder = new ScalableFrame(ui, 50, 35, 55, 15, "Scales", Color.Green);
+			ScalableFrame sHolder = new ScalableFrame(50, 35, 55, 15, "Scales", Color.Green);
 
-			Slider slider/* = new Slider(ui, 50, 35, 45, 15, "mySlider", Color.Gray)*/;
-			SliderFactory.SliderHorizontalHolderNew(ui, 5, 35, 5, 15, ser3, "mySlider", 10, null, 0, 1, 0.3f, out slider);
+		    SliderFactory.SliderHorizontalHolderNew(5, 35, 5, 15, ser3, "mySlider", 10, null, 0, 1, 0.3f, out var slider);
 
 
 
@@ -288,7 +286,7 @@ namespace GISTest
 
 		void LoadContent ()
 		{
-			
+
 		}
 
 
@@ -299,7 +297,7 @@ namespace GISTest
 				Builder.SafeBuild();
 				Game.Reload();
 			}
-			
+
 			if (e.Key == Keys.LeftShift) {
 				viewLayer.GlobeCamera.ToggleViewToPointCamera();
 			}
@@ -367,7 +365,7 @@ namespace GISTest
 
 
 		/// <summary>
-		/// 
+		///
 		/// </summary>
 		/// <param name="endPoint"></param>
 		/// <param name="serverInfo"></param>

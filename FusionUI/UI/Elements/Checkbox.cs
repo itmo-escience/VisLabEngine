@@ -8,10 +8,6 @@ namespace FusionUI.UI
 {
     public class Checkbox : ScalableFrame
     {
-
-		protected Checkbox()
-		{
-		}
 		[XmlIgnore]
 		public Texture Checked;
 		[XmlIgnore]
@@ -26,18 +22,18 @@ namespace FusionUI.UI
             get { return _isChecked; }
             set {
                 if (_isChecked != value)
-                {                    
-                    _isChecked = value;                    
+                {
+                    _isChecked = value;
                     Changed?.Invoke(value);
                 }
                 ChangeValue();
             }
         }
 
-        public Checkbox(FrameProcessor ui) : base(ui)
+        public Checkbox()
         {
             Text = "";
-            init(ui);
+            init();
             this.ActionClick += (ControlActionArgs args, ref bool flag) =>
             {
                 if (!args.IsClick) return;
@@ -46,9 +42,9 @@ namespace FusionUI.UI
             };
         }
 
-        public Checkbox(FrameProcessor ui, float x, float y, float w, float h, string text, Color backColor) : base(ui, x, y, w, h, text, backColor)
+        public Checkbox(float x, float y, float w, float h, string text, Color backColor) : base(x, y, w, h, text, backColor)
         {
-            init(ui);
+            init();
             this.ActionClick += (ControlActionArgs args, ref bool flag) =>
             {
                 if (!args.IsClick) return;
@@ -57,7 +53,13 @@ namespace FusionUI.UI
             };
         }
 
-        void init(FrameProcessor ui)
+        [Obsolete("Please use constructor without FrameProcessor")]
+        public Checkbox(FrameProcessor ui) : this() { }
+
+        [Obsolete("Please use constructor without FrameProcessor")]
+        public Checkbox(FrameProcessor ui, float x, float y, float w, float h, string text, Color backColor) : this(x, y, w, h, text, backColor) { }
+
+        void init()
         {
 //            Checked = ui.Game.Content.Load<DiscTexture>(@"UI-new\fv-icons_checkbox-on");
 //            None = ui.Game.Content.Load<DiscTexture>(@"UI-new\fv-icons_checkbox-off");

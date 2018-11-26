@@ -32,9 +32,12 @@ namespace FusionUI.UI.Elements
             ;
 
         public int extendedSize = 0;
-             
-        public Scroll(FrameProcessor ui, float x, float y, float w, float h, string text, Color backColor) : base(ui, x, y, w, h, text, backColor)
-        {            
+
+        [Obsolete("Please use constructor without FrameProcessor")]
+        public Scroll(FrameProcessor ui, float x, float y, float w, float h, string text, Color backColor) : this(x, y, w, h, text, backColor) { }
+
+        public Scroll(float x, float y, float w, float h, string text, Color backColor) : base(x, y, w, h, text, backColor)
+        {
             initAllEvent();
         }
 
@@ -44,7 +47,7 @@ namespace FusionUI.UI.Elements
             ActionDrag += Scroll_MouseMove;
             ActionDown += Scroll_MouseDown;
             ActionClick += Scroll_Click;
-            ActionLost += Scroll_MouseUp;                        
+            ActionLost += Scroll_MouseUp;
         }
 
         void Scroll_MouseDown(ControlActionArgs args, ref bool flag)
@@ -66,8 +69,8 @@ namespace FusionUI.UI.Elements
         void Scroll_MouseUp(ControlActionArgs args, ref bool flag)
         {
             IsDrag = false;
-            PrevPosition = null;            
-        }        
+            PrevPosition = null;
+        }
 
         void Scroll_MouseMove(ControlActionArgs args, ref bool flag)
         {
@@ -91,7 +94,7 @@ namespace FusionUI.UI.Elements
         {
             XVal = (this.Parent.PaddingLeft - extendedSize / 2 +
                     x * (this.parent.GetPaddedRectangle().Width - extendedSize - Width));
-            X = (int)XVal;            
+            X = (int)XVal;
             UpdatePosition();
         }
 
@@ -147,7 +150,7 @@ namespace FusionUI.UI.Elements
             var parent = this.Parent.GetPaddedRectangle(true);
             var scrollRectangle = this.GlobalRectangle;
             if (!IsFixedX)
-            {                
+            {
                 var newX = XVal + (int)p.X - (int)PrevPosition.Value.X - this.Parent.PaddingLeft;
 //                Log.Message($"{newX};{this.X}");
                 XVal = this.Parent.PaddingLeft + MathUtil.Clamp(newX, 0 - extendedSize, parent.Width - scrollRectangle.Width + extendedSize);
@@ -158,13 +161,13 @@ namespace FusionUI.UI.Elements
             if (!IsFixedY)
             {
                 var newY = YVal + (int)p.Y - (int)PrevPosition.Value.Y - this.Parent.PaddingTop;
-                
+
                 YVal = this.Parent.PaddingTop + MathUtil.Clamp(newY, 0, parent.Height - scrollRectangle.Height);
                 this.Y = (int)YVal;
             }
 //            this.X = Math.Min(this.Width, this.X);
             //&& parent.Y < scrollRectangle.Y + (int)p.Y - (int)PrevPosition.Value.Y && parent.Height + parent.Y > scrollRectangle.Height + scrollRectangle.Y + (int)p.Y - (int)PrevPosition.Value.Y)
-            //this.Y += (int)p.Y - (int)PrevPosition.Value.Y;            
+            //this.Y += (int)p.Y - (int)PrevPosition.Value.Y;
             PrevPosition = p;
         }
 

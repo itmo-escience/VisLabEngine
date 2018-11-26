@@ -9,7 +9,7 @@ using Fusion.Engine.Graphics;
 
 namespace FusionUI.UI.Plots2_0
 {
-    public class PlotLegend: ScalableFrame 
+    public class PlotLegend: ScalableFrame
     {
 		protected PlotLegend()
 		{
@@ -46,10 +46,13 @@ namespace FusionUI.UI.Plots2_0
 
         private static int ClipRectId;
 
-        public PlotLegend(FrameProcessor ui, float x, float y, float w, float h, string text, Color backColor) : base(ui, x, y, w, h, text, backColor)
+        [Obsolete("Please use version without FrameProcessor")]
+        public PlotLegend(FrameProcessor ui, float x, float y, float w, float h, string text, Color backColor) : this(x, y, w, h, text, backColor) { }
+
+        public PlotLegend(float x, float y, float w, float h, string text, Color backColor) : base(x, y, w, h, text, backColor)
         {
             ActionDrag += (ControlActionArgs args, ref bool flag) =>
-            {                
+            {
                 var oldDelta = delta;
                 delta = oldDelta + args.DY;
                 flag = true;
@@ -62,16 +65,16 @@ namespace FusionUI.UI.Plots2_0
                 {
                     delta = ElementHeight * ScaleMultiplier * (MaxRowCount - rowCount - 1);
                     flag = false;
-                }                
+                }
                 args.MoveDelta.Y = args.MoveDelta.Y - (delta - oldDelta);
             };
 
             this.MouseWheel += (sender, args) =>
             {
-                delta = delta + args.Wheel * 0.05f;                
+                delta = delta + args.Wheel * 0.05f;
                 if (delta > 0)
                 {
-                    delta = 0;                    
+                    delta = 0;
                 }
                 if (delta < ElementHeight * ScaleMultiplier * (MaxRowCount - rowCount - 1))
                 {
@@ -89,12 +92,12 @@ namespace FusionUI.UI.Plots2_0
             currentPlots = new List<Tuple<Color, string, bool>>();
             foreach (var variable in PlotData.Data)
             {
-                if (!variable.Value.IsPresent) continue;                
+                if (!variable.Value.IsPresent) continue;
                 foreach (var data in variable.Value.Data)
                 {
                     if (!data.Value.Any(a => a.Value.IsPresent)) continue;
                     foreach (var kv in data.Value)
-                    {                        
+                    {
                         foreach (var depth in kv.Value.ActiveDepths)
                         {
                             if (kv.Value.ColorsByDepth.ContainsKey(depth))
@@ -103,7 +106,7 @@ namespace FusionUI.UI.Plots2_0
                         }
                     }
                 }
-            }         
+            }
         }
 
         private float delta = 0;
@@ -112,12 +115,12 @@ namespace FusionUI.UI.Plots2_0
         protected override void DrawFrame(GameTime gameTime, SpriteLayer spriteLayer, int clipRectIndex)
         {
             delta = MathUtil.Clamp(delta, ElementHeight * ScaleMultiplier * (MaxRowCount - rowCount - 1), 0);
-            base.DrawFrame(gameTime, spriteLayer, clipRectIndex);            
+            base.DrawFrame(gameTime, spriteLayer, clipRectIndex);
             var delta1 = delta + ElementHeight / 2 * ScaleMultiplier;
             if (rowCount <= MaxRowCount) delta1 = 0;
             DeterminePlots();
 
-            var whiteTex = this.Game.RenderSystem.WhiteTexture;
+            var whiteTex = Game.Instance.RenderSystem.WhiteTexture;
             var rect = GetBorderedRectangle();
             int hCount = Math.Max(1, Math.Min((int)Math.Floor((UnitWidth + MinXOffset) / (ElementWidth + MinXOffset)), currentPlots.Count));
             int i = 0;
@@ -194,7 +197,7 @@ namespace FusionUI.UI.Plots2_0
         {
             get
             {
-                var pos = Game.Mouse.Position - (Vector2)this.GlobalRectangle.TopLeft;
+                var pos = Game.Instance.Mouse.Position - (Vector2)this.GlobalRectangle.TopLeft;
                 int hCount = Math.Max(1, (int)Math.Floor((UnitWidth + MinXOffset) / (ElementWidth + MinXOffset)));
                 float ew = Width / hCount;
                 float eh = ElementHeight * ScaleMultiplier;

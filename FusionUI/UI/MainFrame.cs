@@ -35,9 +35,9 @@ namespace FusionUI.UI
         {
             get { return Height/ ApplicationInterface.ScaleMod; }
             set { Height = (int)(value * ApplicationInterface.ScaleMod); }
-        } 
+        }
 
-        public MainFrame(FrameProcessor ui) : base(ui)
+        public MainFrame(FrameProcessor ui)
         {
             ApplicationInterface.Instance.rootFrame = this;
             ui.RootFrame = this;
@@ -59,13 +59,14 @@ namespace FusionUI.UI
         protected virtual void init()
         {
         }
+
 		[XmlIgnore]
 		public Action ActionResize;
 
         public override void UpdateResize(bool updateChildren = true)
         {
             base.UpdateResize();
-            ActionResize?.Invoke();            
+            ActionResize?.Invoke();
         }
 
         public static Frame GetHoveredFrame (Frame root, Point position) {

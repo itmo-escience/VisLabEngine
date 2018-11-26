@@ -19,7 +19,7 @@ namespace FusionUI.UI.Elements
         public static ArrowController Instance
         {
             get { return instance ?? (instance = new ArrowController()); }
-        }        
+        }
 
         public SerializableDictionary<ScalableFrame, List<ConnectorArrow>> ArrowsByFrame
         {
@@ -35,15 +35,15 @@ namespace FusionUI.UI.Elements
 
 
         public void AddArrow(ConnectorArrow arrow)
-        {            
+        {
             if (!OutArrowsByFrame.ContainsKey(arrow.FromFrame)) OutArrowsByFrame.Add(arrow.FromFrame, new List<ConnectorArrow>());
             if (!OutArrowsByFrame.ContainsKey(arrow.ToFrame)) OutArrowsByFrame.Add(arrow.ToFrame, new List<ConnectorArrow>());
             OutArrowsByFrame[arrow.FromFrame].Add(arrow);
             if (!InArrowsByFrame.ContainsKey(arrow.ToFrame)) InArrowsByFrame.Add(arrow.ToFrame, new List<ConnectorArrow>());
             if (!InArrowsByFrame.ContainsKey(arrow.FromFrame)) InArrowsByFrame.Add(arrow.FromFrame, new List<ConnectorArrow>());
-            InArrowsByFrame[arrow.ToFrame].Add(arrow);            
+            InArrowsByFrame[arrow.ToFrame].Add(arrow);
         }
-        
+
     }
 
     public class ConnectorArrow : ScalableFrame
@@ -71,7 +71,12 @@ namespace FusionUI.UI.Elements
         public bool IsDottedLine = false;
         public float LineDotSizeGU = 1;
         public float LineSpaceSizeGU = 1;
-        public ConnectorArrow(FrameProcessor ui, ScalableFrame from, ScalableFrame to, float width, float arrowSize) : base(ui)
+
+        [Obsolete("Please use constructor without FrameProcessor")]
+        public ConnectorArrow(FrameProcessor ui, ScalableFrame from, ScalableFrame to, float width, float arrowSize)
+            : this(from, to, width, arrowSize) { }
+
+        public ConnectorArrow(ScalableFrame from, ScalableFrame to, float width, float arrowSize)
         {
             FromFrame = from;
             ToFrame = to;
@@ -80,7 +85,7 @@ namespace FusionUI.UI.Elements
 
             ArrowController.Instance.AddArrow(this);
         }
-       
+
         protected override void Update(GameTime gameTime)
         {
             animProgress += gameTime.ElapsedSec * AnimVelocityMult;
@@ -202,8 +207,8 @@ namespace FusionUI.UI.Elements
             if (Math.Abs(start.X - end.X) <= 10) start.X = end.X = (start.X + end.X) / 2;
             if (Math.Abs(start.Y - end.Y) <= 10) start.Y = end.Y = (start.Y + end.Y) / 2;
 
-            var whiteTex = Game.Content.Load<DiscTexture>("UI/beam");//this.Game.RenderSystem.WhiteTexture);
-            
+            var whiteTex = Game.Instance.Content.Load<DiscTexture>("UI/beam");
+
             if ((inDirection + outDirection) % 2 == 1 && !IsStraight)
             {
                 Vector2 center = outDirection % 2 == 0 ? new Vector2(start.X, end.Y) : new Vector2(end.X, start.Y);
@@ -216,7 +221,7 @@ namespace FusionUI.UI.Elements
                 if (IsAnimation)
                 {
                     float length = l1 + l2;
-                    var circleTex = Game.Content.Load<DiscTexture>("UI/icons_lord-of-time-without-wand");
+                    var circleTex = Game.Instance.Content.Load<DiscTexture>("UI/icons_lord-of-time-without-wand");
                     for (int i = 0; i < (int) (length / GlobalAnimvelocity) + 1; i++)
                     {
                         float l = GlobalAnimvelocity * (i + animProgress);
@@ -225,18 +230,18 @@ namespace FusionUI.UI.Elements
                         {
                             var p = center + d2 * (l-l1);
                             spriteLayer.Draw(circleTex, p.X - ArrowPointerSize, p.Y - ArrowPointerSize, ArrowPointerSize * 2, ArrowPointerSize * 2, BackColor);
-                        }                                                                                                
-                        else                                                                                             
-                        {                                                                                                
-                            var p = start + d1 * l;                                                                       
+                        }
+                        else
+                        {
+                            var p = start + d1 * l;
                             spriteLayer.Draw(circleTex, p.X - ArrowPointerSize, p.Y - ArrowPointerSize, ArrowPointerSize * 2, ArrowPointerSize * 2, BackColor);
                         }
                     }
-                }                             
+                }
             }
             else if (inDirection == outDirection && !IsStraight)
             {
-                Vector2 center1 = new Vector2(), center2 = new Vector2();                    
+                Vector2 center1 = new Vector2(), center2 = new Vector2();
                 switch (outDirection)
                 {
                     case 1: center1 = new Vector2((start.X + end.X)/2 + 4 * ArrowPointerSize, start.Y);
@@ -254,7 +259,7 @@ namespace FusionUI.UI.Elements
                         center1 = new Vector2(start.X, (start.Y + end.Y) / 2 - 4 * ArrowPointerSize);
                         center2 = new Vector2(end.X, (start.Y + end.Y) / 2 - 4 * ArrowPointerSize);
                         break;
-                }                               
+                }
 
                 var d1 = center1 - start;
                 var d2 = center2 - center1;
@@ -265,7 +270,7 @@ namespace FusionUI.UI.Elements
                 if (IsAnimation)
                 {
                     float length = l1 + l2 + l3;
-                    var circleTex = Game.Content.Load<DiscTexture>("UI/icons_lord-of-time-without-wand");
+                    var circleTex = Game.Instance.Content.Load<DiscTexture>("UI/icons_lord-of-time-without-wand");
                     for (int i = 0; i < (int)(length / GlobalAnimvelocity) + 1; i++)
                     {
                         float l = GlobalAnimvelocity * (i + animProgress);
@@ -293,7 +298,7 @@ namespace FusionUI.UI.Elements
             }
             else if (!IsStraight)
             {
-                
+
                 Vector2 center1 = new Vector2(), center2 = new Vector2();
                 switch (outDirection)
                 {
@@ -314,7 +319,7 @@ namespace FusionUI.UI.Elements
                         center2 = new Vector2(end.X, (start.Y + end.Y) / 2 );
                         break;
                 }
-                                
+
                 var d1 = center1 - start;
                 var d2 = center2 - center1;
                 var d3 = end - center2;
@@ -324,7 +329,7 @@ namespace FusionUI.UI.Elements
                 if (IsAnimation)
                 {
                     float length = l1 + l2 + l3;
-                    var circleTex = Game.Content.Load<DiscTexture>("UI/icons_lord-of-time-without-wand");
+                    var circleTex = Game.Instance.Content.Load<DiscTexture>("UI/icons_lord-of-time-without-wand");
                     for (int i = 0; i < (int)(length / GlobalAnimvelocity) + 1; i++)
                     {
                         float l = GlobalAnimvelocity * (i + animProgress);
@@ -355,17 +360,17 @@ namespace FusionUI.UI.Elements
             {
                 var d = end - start;
                 var length = d.Length();
-                d.Normalize();                
+                d.Normalize();
                 if (IsAnimation)
                 {
-                    
-                    var circleTex = Game.Content.Load<DiscTexture>("UI/icons_lord-of-time-without-wand");
+
+                    var circleTex = Game.Instance.Content.Load<DiscTexture>("UI/icons_lord-of-time-without-wand");
                     for (int i = 0; i < (int)(length / GlobalAnimvelocity) + 1; i++)
                     {
                         float l = GlobalAnimvelocity * (i + animProgress);
                         if (l > length - ArrowPointerSize || l < ArrowPointerSize) continue;
                         var p = start + d * l;
-                        spriteLayer.Draw(circleTex, p.X - ArrowPointerSize, p.Y - ArrowPointerSize, ArrowPointerSize * 2, ArrowPointerSize * 2, BackColor);                        
+                        spriteLayer.Draw(circleTex, p.X - ArrowPointerSize, p.Y - ArrowPointerSize, ArrowPointerSize * 2, ArrowPointerSize * 2, BackColor);
                     }
                 }
 
@@ -378,9 +383,9 @@ namespace FusionUI.UI.Elements
                 //}
                 DrawLine(spriteLayer,whiteTex, start + d * ArrowPointerSize / 2, end - d * ArrowPointerSize / 2, BackColor, ArrowWidth);
             }
-                        
 
-            var arrowTex = Game.Content.Load<DiscTexture>("UIArrow");
+
+            var arrowTex = Game.Instance.Content.Load<DiscTexture>("UIArrow");
             if (IsStraight)
             {
                 var forward = end - start;
@@ -392,11 +397,11 @@ namespace FusionUI.UI.Elements
                     end + right/2 * ArrowPointerSize,
                     end - right/2 * ArrowPointerSize - forward * ArrowPointerSize,
                     end + right/2 * ArrowPointerSize - forward * ArrowPointerSize, BackColor,
-                    new Vector2(1, 0), new Vector2(1, 1), new Vector2(0, 0), new Vector2(0, 1));                
+                    new Vector2(1, 0), new Vector2(1, 1), new Vector2(0, 0), new Vector2(0, 1));
             } else switch (inDirection)
-            {                
+            {
 
-                case 2: spriteLayer.DrawFreeUV(arrowTex, 
+                case 2: spriteLayer.DrawFreeUV(arrowTex,
                     end + new Vector2(-ArrowPointerSize/2, 0),
                     end + new Vector2(ArrowPointerSize / 2, 0),
                     end + new Vector2(-ArrowPointerSize / 2, ArrowPointerSize),
@@ -404,7 +409,7 @@ namespace FusionUI.UI.Elements
                     new Vector2(1, 0), new Vector2(1, 1), new Vector2(0, 0), new Vector2(0, 1));
                     break;
                 case 4:
-                    spriteLayer.DrawFreeUV(arrowTex,                        
+                    spriteLayer.DrawFreeUV(arrowTex,
                         end + new Vector2(-ArrowPointerSize / 2, 0),
                         end + new Vector2(ArrowPointerSize / 2, 0),
                         end + new Vector2(-ArrowPointerSize / 2, -ArrowPointerSize),
@@ -423,7 +428,7 @@ namespace FusionUI.UI.Elements
                         spriteLayer.DrawFreeUV(arrowTex,
 
                             end + new Vector2(0, -ArrowPointerSize / 2),
-                            end + new Vector2(0, ArrowPointerSize / 2), 
+                            end + new Vector2(0, ArrowPointerSize / 2),
                             end + new Vector2(-ArrowPointerSize, -ArrowPointerSize / 2),
                             end + new Vector2(-ArrowPointerSize, ArrowPointerSize / 2), BackColor,
                             new Vector2(1, 0), new Vector2(1, 1), new Vector2(0, 0), new Vector2(0, 1));
@@ -475,5 +480,5 @@ namespace FusionUI.UI.Elements
         }
     }
 
-    
+
 }

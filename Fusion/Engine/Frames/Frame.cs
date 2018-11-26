@@ -18,17 +18,6 @@ using System.ComponentModel;
 namespace Fusion.Engine.Frames {
 	public partial class Frame : INotifyPropertyChanged
 	{
-
-		[XmlIgnore]
-		public Game Game;
-		//
-		[XmlIgnore]
-		public FrameProcessor ui { protected set; get; }
-
-		/// <summary>
-		/// 
-		/// </summary>
-
 		public string Name { get => _name; set { _name = value; OnPropertyChanged(); } }
 
 		/// <summary>
@@ -38,17 +27,17 @@ namespace Fusion.Engine.Frames {
 		public bool Visible { get => _visible; set { _visible = value; OnPropertyChanged(); } }
 
 		/// <summary>
-		/// 
+		///
 		/// </summary>
 		internal bool CanAcceptControl { get { return Visible && OverallColor.A != 0 && !Ghost; } }
 
 		/// <summary>
-		/// 
+		///
 		/// </summary>
 		internal bool IsDrawable { get { return Visible && OverallColor.A != 0; } }
 
 		/// <summary>
-		/// Frame visible but does not receive input 
+		/// Frame visible but does not receive input
 		/// </summary>
 
 		public bool Ghost { get => _ghost; set { _ghost = value; OnPropertyChanged(); } }
@@ -82,12 +71,12 @@ namespace Fusion.Engine.Frames {
 		//      public	object		Tag;
 
 		/// <summary>
-		/// 
+		///
 		/// </summary>
 
 		public ClippingMode ClippingMode { get => _clippingMode; set { _clippingMode = value; OnPropertyChanged(); } }
 		/// <summary>
-		/// Overall color that used as multiplier 
+		/// Overall color that used as multiplier
 		/// for all children elements
 		/// </summary>
 
@@ -187,65 +176,65 @@ namespace Fusion.Engine.Frames {
 		public virtual int Padding { set { VPadding = HPadding = value; } }
 
 		/// <summary>
-		/// 
+		///
 		/// </summary>
 
 		public virtual int BorderTop { get => _borderTop; set { _borderTop = value; OnPropertyChanged(); } }
 
 		/// <summary>
-		/// 
+		///
 		/// </summary>
 
 		public virtual int BorderBottom { get => _borderBottom; set { _borderBottom = value; OnPropertyChanged(); } }
 
 		/// <summary>
-		/// 
+		///
 		/// </summary>
 
 		public virtual int BorderLeft { get => _borderLeft; set { _borderLeft = value; OnPropertyChanged(); } }
 
 		/// <summary>
-		/// 
+		///
 		/// </summary>
 
 		public virtual int BorderRight { get => _borderRight; set { _borderRight = value; OnPropertyChanged(); } }
 
 		/// <summary>
-		/// 
+		///
 		/// </summary>
 		public virtual int Border { set { BorderTop = BorderBottom = BorderLeft = BorderRight = value; } }
 
 		/// <summary>
-		/// 
+		///
 		/// </summary>
 
 		public virtual string Text { get => _text; set { _text = value; OnPropertyChanged(); } }
 		/// <summary>
-		/// 
+		///
 		/// </summary>
 
 		public Alignment TextAlignment { get => _textAlignment; set { _textAlignment = value; OnPropertyChanged(); } }
 
 		/// <summary>
-		/// 
+		///
 		/// </summary>
 
 		public virtual int TextOffsetX { get => _textOffsetX; set { _textOffsetX = value; OnPropertyChanged(); } }
 
 		/// <summary>
-		/// 
+		///
 		/// </summary>
 
 		public virtual int TextOffsetY { get => _textOffsetY; set { _textOffsetY = value; OnPropertyChanged(); } }
 
 		/// <summary>
-		/// 
+		///
 		/// </summary>
 
 		public TextEffect TextEffect { get => _textEffect; set { _textEffect = value; OnPropertyChanged(); } }
 
 		/// <summary>
-		/// 
+		///
 		/// </summary>
 
 		public FrameAnchor Anchor { get => _anchor; set { _anchor = value; OnPropertyChanged(); } }
@@ -272,7 +261,7 @@ namespace Fusion.Engine.Frames {
 				}
 				else if (!String.IsNullOrEmpty(imageName))
 				{
-					image = ui.Game.Content.Load<DiscTexture>(imageName);
+					image = Game.Instance.Content.Load<DiscTexture>(imageName);
 					return image;
 				}
 				else
@@ -311,10 +300,10 @@ namespace Fusion.Engine.Frames {
 
 
 		///// <summary>
-		///// 
+		/////
 		///// </summary>
 
-		//public LayoutEngine	Layout	{ 
+		//public LayoutEngine	Layout	{
 		//	get { return layout; }
 		//	set { layout = value; if (LayoutChanged!=null) LayoutChanged(this, EventArgs.Empty); }
 		//}
@@ -434,100 +423,63 @@ namespace Fusion.Engine.Frames {
 		public Frame Parent { get { return parent; } /*internal set { } */}
 
 		/// <summary>
-		/// Global frame rectangle made 
+		/// Global frame rectangle made
 		/// after all layouting and transitioning operation
 		/// </summary>
 		[XmlIgnore]
 		public Rectangle GlobalRectangle { get; private set; }
 
 
+        /// <summary>
+        /// Constructs basic frame
+        /// </summary>
+        public Frame() : this(0, 0, 1, 1, "", Color.Black) { }
 
-		/// <summary>
-		/// Constructor
-		/// </summary>
-		/// <param name="id"></param>
-		public Frame( FrameProcessor ui )
-		{
-			Game = ui.Game;
-			this.ui = ui;
-			Init();
-		}
+	    /// <summary>
+	    /// Constructs basic frame
+	    /// </summary>
+	    /// <param name="x"></param>
+	    /// <param name="y"></param>
+	    /// <param name="w"></param>
+	    /// <param name="h"></param>
+	    /// <param name="text"></param>
+	    /// <param name="backColor"></param>
+	    public Frame(int x, int y, int w, int h, string text, Color backColor)
+	    {
+	        Init();
 
-		/// <summary>
-		/// Parameterless constructor
-		/// </summary>
-		protected Frame()
-		{
+	        X = x;
+	        Y = y;
+	        Width = w;
+	        Height = h;
+	        Text = text;
+	        BackColor = backColor;
+	    }
 
-		}
+	    #region Obsolete Constructors
+        /// <inheritdoc />
+        /// <param name="ui">Not used anymore</param>
+        [Obsolete("Please use parameter-less constructor instead")]
+	    public Frame(FrameProcessor ui) : this() { }
 
+        /// <inheritdoc />
+        /// <param name="ui">Not used anymore</param>
+        [Obsolete("Please use version without FrameProcessor")]
+	    public Frame(FrameProcessor ui, int x, int y, int w, int h, string text, Color backColor) : this(x, y, w, h, text, backColor) { }
+	    #endregion
 
-
-		/// <summary>
-		/// 
-		/// </summary>
-		/// <param name="game"></param>
-		/// <param name="x"></param>
-		/// <param name="y"></param>
-		/// <param name="w"></param>
-		/// <param name="h"></param>
-		/// <param name="text"></param>
-		/// <param name="backColor"></param>
-		/// <returns></returns>
-		public static Frame Create( FrameProcessor ui, int x, int y, int w, int h, string text, Color backColor )
-		{
-			return new Frame(ui)
-			{
-				X = x,
-				Y = y,
-				Width = w,
-				Height = h,
-				Text = text,
-				BackColor = backColor,
-			};
-		}
-
-
-
-		/// <summary>
-		/// Constructor
-		/// </summary>
-		/// <param name="game"></param>
-		/// <param name="x"></param>
-		/// <param name="y"></param>
-		/// <param name="w"></param>
-		/// <param name="h"></param>
-		/// <param name="text"></param>
-		/// <param name="backColor"></param>
-		public Frame( FrameProcessor ui, int x, int y, int w, int h, string text, Color backColor )
-		{
-			Game = ui.Game;
-			this.ui = ui;
-			Init();
-
-			X = x;
-			Y = y;
-			Width = w;
-			Height = h;
-			Text = text;
-			BackColor = backColor;
-		}
-
-
-
-		/// <summary>
-		/// Common init 
-		/// </summary>
-		/// <param name="game"></param>
-		void Init()
+        /// <summary>
+        /// Common init
+        /// </summary>
+        private void Init()
 		{
 			Padding = 0;
 			Visible = true;
 			Enabled = true;
 			AutoWidth = false;
 			AutoHeight = false;
-			Font = ui?.DefaultFont;
-			ForeColor = Color.White;
+			Font = Game.Instance.Content.Load<SpriteFont>(@"Fonts\textFont");
+            ForeColor = Color.White;
 			Border = 0;
 			BorderColor = Color.White;
 			ShadowColor = Color.Zero;
@@ -545,9 +497,9 @@ namespace Fusion.Engine.Frames {
 
 
 		/*-----------------------------------------------------------------------------------------
-		 * 
+		 *
 		 *	Hierarchy stuff
-		 * 
+		 *
 		-----------------------------------------------------------------------------------------*/
 
 		private List<Frame> children = new List<Frame>();
@@ -575,7 +527,7 @@ namespace Fusion.Engine.Frames {
 			if (!children.Contains(frame))
 			{
 				children.Add(frame);
-				frame.UpdateChildrenUI(this.ui);
+				// frame.UpdateChildrenUI(this.ui);
 				if (frame.ZOrder == 0)
 				{
 					frame.ZOrder = children.Count;
@@ -590,12 +542,8 @@ namespace Fusion.Engine.Frames {
 
 		public void UpdateChildrenUI( FrameProcessor ui )
 		{
-			if (this.ui != ui)
-			{
-				this.ui = ui;//
-				this.Game = ui.Game;// 
-				this.Font = ui.DefaultFont;//
-			}
+		    // this.Font = ui.DefaultFont;
+
 			foreach (var child in this.Children)
 			{
 				child.UpdateChildrenUI(ui);
@@ -614,7 +562,7 @@ namespace Fusion.Engine.Frames {
 		/// <summary>
 		/// Reordering children
 		/// </summary>
-		/// 
+		///
 		public void ReorderChildren()
 		{
 			children = children.OrderBy(f => f.ZOrder).ToList();
@@ -625,7 +573,7 @@ namespace Fusion.Engine.Frames {
 			}
 		}
 		/// <summary>
-		/// 
+		///
 		/// </summary>
 		/// <param name="frame"></param>
 		public virtual void Clear( Frame frame )
@@ -658,7 +606,7 @@ namespace Fusion.Engine.Frames {
 
 
 		/// <summary>
-		/// 
+		///
 		/// </summary>
 		/// <param name="frame"></param>
 		public void Remove( Frame frame )
@@ -674,7 +622,7 @@ namespace Fusion.Engine.Frames {
 
 
 		/// <summary>
-		/// 
+		///
 		/// </summary>
 		/// <returns></returns>
 		public List<Frame> GetAncestorList()
@@ -694,7 +642,7 @@ namespace Fusion.Engine.Frames {
 
 
 		/// <summary>
-		/// 
+		///
 		/// </summary>
 		/// <param name="action"></param>
 		public void ForEachAncestor( Action<Frame> action )
@@ -704,7 +652,7 @@ namespace Fusion.Engine.Frames {
 
 
 		/// <summary>
-		/// 
+		///
 		/// </summary>
 		/// <param name="action"></param>
 		public void ForEachChildren( Action<Frame> action )
@@ -714,9 +662,9 @@ namespace Fusion.Engine.Frames {
 
 
 		/*-----------------------------------------------------------------------------------------
-		 * 
+		 *
 		 *	Input stuff :
-		 * 
+		 *
 		-----------------------------------------------------------------------------------------*/
 
 		FrameStatus oldStatus = FrameStatus.None;
@@ -754,8 +702,8 @@ namespace Fusion.Engine.Frames {
 
 		public virtual void OnMouseIn()
 		{
-			int x = Game.InputDevice.MousePosition.X - GlobalRectangle.X;
-			int y = Game.InputDevice.MousePosition.Y - GlobalRectangle.Y;
+			int x = Game.Instance.InputDevice.MousePosition.X - GlobalRectangle.X;
+			int y = Game.Instance.InputDevice.MousePosition.Y - GlobalRectangle.Y;
 
 			if (MouseIn != null)
 			{
@@ -767,8 +715,8 @@ namespace Fusion.Engine.Frames {
 
 		public virtual void OnMouseMove( int dx, int dy )
 		{
-			int x = Game.InputDevice.MousePosition.X - GlobalRectangle.X;
-			int y = Game.InputDevice.MousePosition.Y - GlobalRectangle.Y;
+			int x = Game.Instance.InputDevice.MousePosition.X - GlobalRectangle.X;
+			int y = Game.Instance.InputDevice.MousePosition.Y - GlobalRectangle.Y;
 
 			if (MouseMove != null)
 			{
@@ -778,8 +726,8 @@ namespace Fusion.Engine.Frames {
 
 		public virtual void OnDrag( int dx, int dy )
 		{
-			int x = Game.InputDevice.MousePosition.X - GlobalRectangle.X;
-			int y = Game.InputDevice.MousePosition.Y - GlobalRectangle.Y;
+			int x = Game.Instance.InputDevice.MousePosition.X - GlobalRectangle.X;
+			int y = Game.Instance.InputDevice.MousePosition.Y - GlobalRectangle.Y;
 
 			if (MouseDrag != null)
 			{
@@ -790,8 +738,8 @@ namespace Fusion.Engine.Frames {
 
 		public virtual void OnMouseOut()
 		{
-			int x = Game.InputDevice.MousePosition.X - GlobalRectangle.X;
-			int y = Game.InputDevice.MousePosition.Y - GlobalRectangle.Y;
+			int x = Game.Instance.InputDevice.MousePosition.X - GlobalRectangle.X;
+			int y = Game.Instance.InputDevice.MousePosition.Y - GlobalRectangle.Y;
 
 			if (MouseOut != null)
 			{
@@ -802,8 +750,8 @@ namespace Fusion.Engine.Frames {
 
 		public virtual void OnMouseDown( Keys key )
 		{
-			int x = Game.InputDevice.MousePosition.X - GlobalRectangle.X;
-			int y = Game.InputDevice.MousePosition.Y - GlobalRectangle.Y;
+			int x = Game.Instance.InputDevice.MousePosition.X - GlobalRectangle.X;
+			int y = Game.Instance.InputDevice.MousePosition.Y - GlobalRectangle.Y;
 
 			if (MouseDown != null)
 			{
@@ -814,8 +762,8 @@ namespace Fusion.Engine.Frames {
 
 		public virtual void OnMouseUp( Keys key )
 		{
-			int x = Game.InputDevice.MousePosition.X - GlobalRectangle.X;
-			int y = Game.InputDevice.MousePosition.Y - GlobalRectangle.Y;
+			int x = Game.Instance.InputDevice.MousePosition.X - GlobalRectangle.X;
+			int y = Game.Instance.InputDevice.MousePosition.Y - GlobalRectangle.Y;
 			if (MouseUp != null)
 			{
 				MouseUp(this, new MouseEventArgs() { Key = key, X = x, Y = y });
@@ -861,9 +809,9 @@ namespace Fusion.Engine.Frames {
 		}
 
 		/*-----------------------------------------------------------------------------------------
-		 * 
+		 *
 		 *	Update and draw stuff :
-		 * 
+		 *
 		-----------------------------------------------------------------------------------------*/
 
 		public static List<Frame> BFSList( Frame v )
@@ -898,7 +846,7 @@ namespace Fusion.Engine.Frames {
 
 
 		/// <summary>
-		/// 
+		///
 		/// </summary>
 		/// <param name="gameTime"></param>
 		/// <param name="parentX"></param>
@@ -917,11 +865,6 @@ namespace Fusion.Engine.Frames {
 
 			UpdateGlobalRect(0, 0);
 
-			if (ui.ForceLayout)
-			{
-				//bfsList.ForEach( f => f.RunLayout(true) );
-			}
-
 			bfsList.ForEach(f => f.UpdateMove());
 			bfsList.ForEach(f => f.UpdateResize());
 
@@ -931,33 +874,31 @@ namespace Fusion.Engine.Frames {
 			bfsList.ForEach(f => f.Update(gameTime));
 		}
 
-
-
-		class DrawFrameItem
+		private class DrawFrameItem
 		{
 			public DrawFrameItem( Frame frame, Color color, Rectangle outerClip, Rectangle innerClip, string text )
 			{
-				this.Frame = frame;
-				this.OuterClip = outerClip;
-				this.InnerClip = innerClip;
-				this.Color = color;
-				this.Text = text;
+				Frame = frame;
+				OuterClip = outerClip;
+				InnerClip = innerClip;
+				Color = color;
+				Text = text;
 			}
-			public Frame Frame;
-			public Color Color;
-			public Rectangle OuterClip;
-			public Rectangle InnerClip;
-			public string Text;
+
+			public readonly Frame Frame;
+			public readonly Color Color;
+			public readonly Rectangle OuterClip;
+			public readonly Rectangle InnerClip;
+			public readonly string Text;
 		}
 
-
-
-		/// <summary>
-		/// 
-		/// </summary>
-		/// <param name="gameTime"></param>
-		/// <param name="sb"></param>
-		static internal void DrawNonRecursive( Frame rootFrame, GameTime gameTime, SpriteLayer spriteLayer )
+        /// <summary>
+        /// Draws frame and all it's descendants in non-recursive manner.
+        /// </summary>
+        /// <param name="rootFrame">Frame to start with</param>
+        /// <param name="gameTime">World time</param>
+        /// <param name="spriteLayer">Target sprite layer to draw into</param>
+        internal static void DrawNonRecursive( Frame rootFrame, GameTime gameTime, SpriteLayer spriteLayer )
 		{
 			if (rootFrame == null)
 			{
@@ -982,7 +923,7 @@ namespace Fusion.Engine.Frames {
 
 				list.Add(currentDrawFrame);
 				currentDrawFrame.Frame.Children.Reverse();
-				var reversedChildren = currentDrawFrame.Frame.Children;				
+				var reversedChildren = currentDrawFrame.Frame.Children;
 				foreach (var child in reversedChildren)
 				{
 
@@ -998,9 +939,7 @@ namespace Fusion.Engine.Frames {
 				currentDrawFrame.Frame.Children.Reverse();
 			}
 
-
-
-			for (int i = 0; i < list.Count; i++)
+			for (var i = 0; i < list.Count; i++)
 			{
 				var drawFrame = list[i];
 
@@ -1059,7 +998,7 @@ namespace Fusion.Engine.Frames {
 			int br = BorderRight;
 			int bl = BorderLeft;
 
-			var whiteTex = Game.RenderSystem.WhiteTexture;
+			var whiteTex = Game.Instance.RenderSystem.WhiteTexture;
 
 			var clr = BorderColor;
 
@@ -1072,12 +1011,13 @@ namespace Fusion.Engine.Frames {
 		}
 
 
-
-		/// <summary>
-		/// Draws frame stuff.
-		/// </summary>
-		/// <param name="gameTime"></param>
-		protected virtual void DrawFrame( GameTime gameTime, SpriteLayer spriteLayer, int clipRectIndex )
+	    /// <summary>
+	    /// Draws frame stuff.
+	    /// </summary>
+	    /// <param name="gameTime"></param>
+	    /// <param name="spriteLayer">Target layer to draw</param>
+	    /// <param name="clipRectIndex"></param>
+	    protected virtual void DrawFrame( GameTime gameTime, SpriteLayer spriteLayer, int clipRectIndex )
 		{
 			DrawFrameImage(spriteLayer, clipRectIndex);
 			DrawFrameText(spriteLayer, clipRectIndex);
@@ -1098,9 +1038,9 @@ namespace Fusion.Engine.Frames {
 
 
 		/*-----------------------------------------------------------------------------------------
-		 * 
+		 *
 		 *	Utils :
-		 * 
+		 *
 		-----------------------------------------------------------------------------------------*/
 
 		int oldX = int.MinValue;
@@ -1129,7 +1069,7 @@ namespace Fusion.Engine.Frames {
 
 
 		/// <summary>
-		/// 
+		///
 		/// </summary>
 		public virtual void UpdateResize( bool UpdateChildren = true )
 		{
@@ -1187,7 +1127,7 @@ namespace Fusion.Engine.Frames {
 
 
 		///// <summary>
-		///// 
+		/////
 		///// </summary>
 		///// <param name="forceTransitions"></param>
 		//      public void RunLayout (bool forceTransitions)
@@ -1233,7 +1173,7 @@ namespace Fusion.Engine.Frames {
 
 
 		/// <summary>
-		/// 
+		///
 		/// </summary>
 		protected virtual void DrawFrameImage( SpriteLayer spriteLayer, int clipRectIndex )
 		{
@@ -1323,9 +1263,8 @@ namespace Fusion.Engine.Frames {
 				return;
 			}
 
-			//clipRectIndex = ClippingMode == ClippingMode.None ? 0 : clipRectIndex;
-
-			var r = Font.MeasureStringF(Text);
+            //clipRectIndex = ClippingMode == ClippingMode.None ? 0 : clipRectIndex;
+            var r = Font.MeasureStringF(Text);
 			int x = 0;
 			int y = 0;
 			var gp = GetPaddedRectangle();
@@ -1388,9 +1327,9 @@ namespace Fusion.Engine.Frames {
 
 
 		/*-----------------------------------------------------------------------------------------
-		 * 
+		 *
 		 *	Animation stuff :
-		 * 
+		 *
 		-----------------------------------------------------------------------------------------*/
 
 		List<ITransition> transitions = new List<ITransition>();
@@ -1463,7 +1402,7 @@ namespace Fusion.Engine.Frames {
 
 
 		/// <summary>
-		/// 
+		///
 		/// </summary>
 		/// <param name="property"></param>
 		/// <param name="targetValue"></param>
@@ -1477,7 +1416,7 @@ namespace Fusion.Engine.Frames {
 
 
 		/// <summary>
-		/// 
+		///
 		/// </summary>
 		/// <param name="property"></param>
 		/// <param name="targetValue"></param>
@@ -1489,7 +1428,7 @@ namespace Fusion.Engine.Frames {
 		}
 
 		/// <summary>
-		/// 
+		///
 		/// </summary>
 		/// <param name="property"></param>
 		/// <param name="targetValue"></param>
@@ -1502,7 +1441,7 @@ namespace Fusion.Engine.Frames {
 
 
 		/// <summary>
-		/// 
+		///
 		/// </summary>
 		/// <param name="gameTime"></param>
 		void UpdateTransitions( GameTime gameTime )
@@ -1522,9 +1461,9 @@ namespace Fusion.Engine.Frames {
 
 
 		/*-----------------------------------------------------------------------------------------
-		 * 
+		 *
 		 *	Anchors :
-		 * 
+		 *
 		-----------------------------------------------------------------------------------------*/
 
 		/// <summary>
@@ -1570,7 +1509,7 @@ namespace Fusion.Engine.Frames {
 
 
 		/// <summary>
-		/// 
+		///
 		/// </summary>
 		/// <param name="oldW"></param>
 		/// <param name="oldH"></param>
@@ -1624,16 +1563,16 @@ namespace Fusion.Engine.Frames {
 
 
 		/*-----------------------------------------------------------------------------------------
-		 * 
+		 *
 		 *	Layouting :
-		 * 
+		 *
 		-----------------------------------------------------------------------------------------*/
 
 		#region Serialization
 		/*-----------------------------------------------------------------------------------------
-         * 
+         *
          *	Serialization :
-         * 
+         *
         -----------------------------------------------------------------------------------------*/
 
 		/// <summary>
@@ -1710,7 +1649,7 @@ namespace Fusion.Engine.Frames {
 				var assembly = Assembly.Load(assemblyName);
 				var childType = assembly.GetType(childTypeName);
 				//child = FormatterServices.GetUninitializedObject(childType);
-				child = Activator.CreateInstance(childType, this.ui);
+				child = Activator.CreateInstance(childType, null);
 
 				childType.GetMethod("Deserialize").Invoke(child, new object[] { reader });
 				this.Children.Add(child as Frame);
@@ -1755,7 +1694,7 @@ namespace Fusion.Engine.Frames {
 			this.ImageName = reader.ReadString();
 			if (!String.IsNullOrEmpty(ImageName))
 			{
-				Image = ui.Game.Content.Load<DiscTexture>(ImageName);
+				Image = Game.Instance.Content.Load<DiscTexture>(ImageName);
 			}
 			this.ZOrder = reader.ReadInt32();
 			this.GlobalRectangle = reader.Read<Rectangle>();

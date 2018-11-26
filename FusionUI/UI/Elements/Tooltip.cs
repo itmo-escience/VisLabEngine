@@ -19,14 +19,14 @@ namespace FusionUI.UI.Elements
         {
             base.Update(gameTime);
             var root = ApplicationInterface.Instance.rootFrame;
-            var hover = ((ControllableFrame) MainFrame.GetHoveredFrame(root, Game.Mouse.Position));
-            if (hover == null) return;            
+            var hover = ((ControllableFrame) MainFrame.GetHoveredFrame(root, Game.Instance.Mouse.Position));
+            if (hover == null) return;
             var s = hover.Tooltip;
             if (!String.IsNullOrWhiteSpace(s))
             {
                 this.Visible = true;
-                this.X = Game.Mouse.Position.X + 5;
-                this.Y = Game.Mouse.Position.Y + 5;                
+                this.X = Game.Instance.Mouse.Position.X + 5;
+                this.Y = Game.Instance.Mouse.Position.Y + 5;
 
                 this.Font = hover.Font;
                 var srect = Font.MeasureString(s);

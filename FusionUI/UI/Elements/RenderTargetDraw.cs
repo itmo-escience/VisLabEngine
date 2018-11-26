@@ -18,7 +18,12 @@ namespace FusionUI.UI.Elements
 		}
 		public RenderTarget2D Target;
         private TargetTexture rtTexture;
-        public RenderTargetDraw(FrameProcessor ui, float x, float y, float w, float h, string text, Color backColor, RenderTarget2D target = null) : base(ui, x, y, w, h, text, backColor)
+
+        [Obsolete("Please use constructor without FrameProcessor")]
+        public RenderTargetDraw(FrameProcessor ui, float x, float y, float w, float h, string text, Color backColor, RenderTarget2D target = null)
+            : this(x, y, w, h, text, backColor, target) { }
+
+        public RenderTargetDraw(float x, float y, float w, float h, string text, Color backColor, RenderTarget2D target = null) : base(x, y, w, h, text, backColor)
         {
             Target = target;
         }
@@ -27,7 +32,7 @@ namespace FusionUI.UI.Elements
         {
             base.initialize();
 
-            Target = Target ?? new RenderTarget2D(Game.GraphicsDevice, ColorFormat.Rgba8, 512, 512);
+            Target = Target ?? new RenderTarget2D(Game.Instance.GraphicsDevice, ColorFormat.Rgba8, 512, 512);
             rtTexture = new TargetTexture(Target);
         }
 

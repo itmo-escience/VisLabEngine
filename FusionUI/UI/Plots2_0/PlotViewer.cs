@@ -20,23 +20,31 @@ namespace FusionUI.UI.Plots2_0
 		protected PlotViewer()
 		{
 		}
-		public PlotCanvas Plot;        
+		public PlotCanvas Plot;
 
         public List<PlotScale> Scales = new List<PlotScale>();
 
         public PlotLegend Legend;
 
         public bool ShowScaleX = true, ShowScaleY = true;
+
 		[XmlIgnore]
-		public Func<FrameProcessor, PlotCanvas, PlotScale> scaleConstruct;        
+		private Func<PlotCanvas, PlotScale> _scaleConstruct;
+
+        [Obsolete("Please use constructor without FrameProcessor")]
         public PlotViewer(FrameProcessor ui, float x, float y, float w, float h, Color backColor,
-            AbstractTimeManager tm = null, TP plot = null, Func<FrameProcessor, TP> plotConstruct = null, Func<FrameProcessor, PlotCanvas, PlotScale> scaleConstruct = null) : base(ui, x, y, w, h, "", backColor)
+            AbstractTimeManager tm = null, TP plot = null, Func<TP> plotConstruct = null, Func<PlotCanvas, PlotScale> scaleConstruct = null)
+            : this(x, y, w, h, backColor, tm, plot, plotConstruct, scaleConstruct)
+        { }
+
+        public PlotViewer(float x, float y, float w, float h, Color backColor,
+            AbstractTimeManager tm = null, TP plot = null, Func<TP> plotConstruct = null, Func<PlotCanvas, PlotScale> scaleConstruct = null) : base(x, y, w, h, "", backColor)
         {
             if (plot == null)
-                Plot = plotConstruct != null ? plotConstruct(ui) : new PlotCanvas(ui, 0, 0, 100, 100, Color.Zero);            
+                Plot = plotConstruct != null ? plotConstruct() : new PlotCanvas(0, 0, 100, 100, Color.Zero);
             else Plot = plot;
 
-            this.scaleConstruct = scaleConstruct ?? new Func<FrameProcessor, PlotCanvas, PlotScale>((ui1, pc) => new PlotScale(ui1, pc));
+            this._scaleConstruct = scaleConstruct ?? (pc => new PlotScale(pc));
 
             this.Add(Plot);
             Plot.DataContainer = new PlotContainer();
@@ -46,10 +54,10 @@ namespace FusionUI.UI.Plots2_0
 
         public virtual void AddLegend()
         {
-            Legend = new PlotLegend(ui, 0, 0, 0, 0, "", Color.Zero)
+            Legend = new PlotLegend(0, 0, 0, 0, "", Color.Zero)
             {
                 PlotData = this.Plot.DataContainer,
-                textFunc = a => a,               
+                textFunc = a => a,
             };
             this.Add(Legend);
         }
@@ -60,7 +68,7 @@ namespace FusionUI.UI.Plots2_0
 
         public ScaleParams ScaleSettings = ScaleParams.DrawMeasure;
         private UIConfig.FontHolder scaleFont = UIConfig.FontBody;
-		
+
 		public UIConfig.FontHolder ScaleFont
         {
             get { return scaleFont; }
@@ -105,7 +113,7 @@ namespace FusionUI.UI.Plots2_0
                 Dirty = true;
             }
         }
-        
+
 
         public virtual void GenerateScales()
         {
@@ -124,7 +132,7 @@ namespace FusionUI.UI.Plots2_0
                 if (!scales.ContainsKey(name))
                 {
 
-                    scales[name] = scaleConstruct(ui, Plot); //new PlotScale(ui, Plot)
+                    scales[name] = _scaleConstruct(Plot); //new PlotScale(ui, Plot)
                     //{
                     scales[name].Settings = (ShowScaleY
                                                 ? ScaleParams.DrawScaleY | ScaleParams.UseFixedStepY
@@ -178,13 +186,13 @@ namespace FusionUI.UI.Plots2_0
             Legend.PlotData = Plot.DataContainer;
             base.Update(gameTime);
             UpdateScales();
-            UpdateRect();            
+            UpdateRect();
         }
 
-        private float OldWidthPlot, OldHeightPlot; 
+        private float OldWidthPlot, OldHeightPlot;
         public virtual void UpdateRect()
         {
-            //float oldPlotWidth = Plot.UnitWidth, oldPlotHeight = Plot.UnitHeight;            
+            //float oldPlotWidth = Plot.UnitWidth, oldPlotHeight = Plot.UnitHeight;
             Plot.UnitX = this.UnitPaddingLeft + UIConfig.UnitPlotScaleWidth * (float)Math.Ceiling(LegendsNum * 0.5f);
             Plot.UnitWidth = this.UnitWidth - UIConfig.UnitPlotScaleWidth * LegendsNum - this.UnitPaddingLeft - this.UnitPaddingRight;
             Legend.UnitX = this.UnitPaddingLeft + UIConfig.UnitPlotScaleWidth * ((float)Math.Ceiling(LegendsNum * 0.5f)+0.5f);
@@ -195,7 +203,7 @@ namespace FusionUI.UI.Plots2_0
         }
 
         public virtual Size2F MinSize => new Size2F(UIConfig.PlotWindowMinPlotWidth + UnitPaddingLeft + UnitPaddingRight + UIConfig.UnitPlotScaleWidth * LegendsNum,
-            Math.Min(UIConfig.PlotWindowMinPlotHeight + Legend.UnitHeight + UnitPaddingTop + UnitPaddingBottom, ui.RootFrame.Height * ScaleMultiplier));
+            Math.Min(UIConfig.PlotWindowMinPlotHeight + Legend.UnitHeight + UnitPaddingTop + UnitPaddingBottom, ApplicationInterface.Instance.rootFrame.Height * ScaleMultiplier));
 
         public virtual void UpdateScales()
         {
@@ -226,8 +234,8 @@ namespace FusionUI.UI.Plots2_0
                                              : 0) |
                                          ScaleSettings;
                     }
-                }   
-                scale.UpdateScaleSteps();             
+                }
+                scale.UpdateScaleSteps();
             }
             LegendsNum = i;
         }

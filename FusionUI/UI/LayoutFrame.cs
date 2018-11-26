@@ -29,8 +29,12 @@ namespace FusionUI.UI
 
         public bool ControlChildrenSize = true;
 
+        [Obsolete("Please use constructor without FrameProcessor")]
         public LayoutFrame(FrameProcessor ui, float x, float y, float w, float h, Color backColor, LayoutType layoutType = LayoutType.Vertical)
-            : base(ui, x, y, w, h, "", backColor)
+            : this(x, y, w, h, backColor, layoutType) { }
+
+        public LayoutFrame(float x, float y, float w, float h, Color backColor, LayoutType layoutType = LayoutType.Vertical)
+            : base(x, y, w, h, "", backColor)
         {
             type = layoutType;
             if (layoutType == LayoutType.Vertical) AutoHeight = true;
@@ -79,7 +83,7 @@ namespace FusionUI.UI
         public override void Add(Frame frame)
         {
             if (frame is ScalableFrame)
-                Add((ScalableFrame) frame);            
+                Add((ScalableFrame) frame);
         }
 
         public new void Remove(Frame frame)
@@ -100,7 +104,7 @@ namespace FusionUI.UI
             //        frame.UnitY = max;
             //        frame.UnitX = UnitPaddingLeft;
             //        frame.UnitWidth = UnitWidth - UnitPaddingLeft - UnitPaddingRight;
-            //        max = max + frame.UnitHeight;                    
+            //        max = max + frame.UnitHeight;
             //        UnitHeight = max;
             //        Parent.Height = this.Y + this.Height;
             //        nodes.Add(frame);
@@ -112,7 +116,7 @@ namespace FusionUI.UI
             //        frame.UnitX = max;
             //        frame.UnitY = UnitPaddingTop;
             //        frame.UnitHeight = UnitHeight - UnitPaddingTop - UnitPaddingBottom;
-            //        max = max + frame.UnitWidth;                    
+            //        max = max + frame.UnitWidth;
             //        UnitWidth = max;
             //        Parent.Width = this.X + this.Width;
             //        nodes.Add(frame);
@@ -138,12 +142,12 @@ namespace FusionUI.UI
             base.Clear(frame);
             nodes.Clear();
             Height = 0;
-            UpdateLayout();            
+            UpdateLayout();
         }
 
         public float UnitSeparateOffset = 0;
         public void UpdateLayout()
-        {            
+        {
             switch (type)
             {
                 case LayoutType.Vertical:
@@ -159,7 +163,7 @@ namespace FusionUI.UI
                         frame.UnitX = UnitPaddingLeft;
                         if (ControlChildrenSize) frame.UnitWidth = UnitWidth - UnitPaddingLeft - UnitPaddingRight;
                         else UnitWidth = Math.Max(UnitHeight, UnitPaddingLeft + frame.UnitWidth+ UnitPaddingRight);
-                        max = max + frame.UnitHeight + UnitSeparateOffset;                        
+                        max = max + frame.UnitHeight + UnitSeparateOffset;
                     }
                     UnitHeight = max;
                     UnitHeight += UnitPaddingBottom;
@@ -182,18 +186,18 @@ namespace FusionUI.UI
                         frame.UnitY = UnitPaddingTop;
                         if (ControlChildrenSize) frame.UnitHeight = UnitHeight - UnitPaddingTop - UnitPaddingBottom;
                         else UnitHeight = Math.Max(UnitHeight, UnitPaddingTop + frame.UnitHeight + UnitPaddingBottom);
-                        max = max + frame.UnitWidth + UnitSeparateOffset;                                              
+                        max = max + frame.UnitWidth + UnitSeparateOffset;
                     }
                     UnitWidth = max;
                     UnitWidth += UnitPaddingRight;
                     if (UpdateParent && Parent != null)
                     {
                         if (!(Parent is LayoutFrame)) Parent.Width += this.Width - lastW;
-                        Parent.UpdateResize();                        
+                        Parent.UpdateResize();
                         (Parent as LayoutFrame)?.UpdateLayout();
                     }
                     break;
-            }            
+            }
         }
 
         private int oldW = -1, oldH = -1;
@@ -216,7 +220,7 @@ namespace FusionUI.UI
             else if (ControlChildrenSize)
             {
                 UpdateLayout();
-            }            
+            }
         }
     }
 }

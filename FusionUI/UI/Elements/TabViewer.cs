@@ -5,6 +5,7 @@ using FusionUI.UI.Factories;
 using Fusion.Core.Mathematics;
 using Fusion.Engine.Frames;
 using System.Xml.Serialization;
+using Fusion.Engine.Common;
 
 namespace FusionUI.UI.Elements
 {
@@ -13,7 +14,6 @@ namespace FusionUI.UI.Elements
 		protected TabViewer()
 		{
 		}
-		protected FrameProcessor ui;
 
         public float WidthTapLabel = UIConfig.UnitDefaultTapWidth;
         public float HeightTapLabel = UIConfig.UnitDefaultTapHeight;
@@ -45,16 +45,18 @@ namespace FusionUI.UI.Elements
 
         protected Dictionary<string, TabElement> listTab;
 
+        [Obsolete("Please use constructor without FrameProcessor")]
+        public TabViewer(FrameProcessor ui, float x, float y, float w, float h, string text, Color backColor)
+            : this(x, y, w, h, text, backColor) { }
 
-        public  TabViewer(FrameProcessor ui, float x, float y, float w, float h, string text, Color backColor) : base(ui, x, y, w, h, text, backColor)
+        public TabViewer(float x, float y, float w, float h, string text, Color backColor) : base(x, y, w, h, text, backColor)
         {
-            this.ui = ui;
             listTab = new Dictionary<string, TabElement>();
         }
 
         public void addAdderTabButton(float size)
         {
-            addTabButton = new Button(ui, 0, 0, size, size, "+", Color.Zero, Color.Zero)
+            addTabButton = new Button(0, 0, size, size, "+", Color.Zero, Color.Zero)
             {
 //                Border = 1,
                 TextAlignment = Alignment.MiddleCenter
@@ -76,8 +78,8 @@ namespace FusionUI.UI.Elements
                 xPosition = addTabButton.UnitX;
                 addTabButton.UnitX += WidthTapLabel;
             }
-            
-            var newTabLabel = new ScalableFrame(ui, xPosition, 0, WidthTapLabel, HeightTapLabel, name, Color.Zero)
+
+            var newTabLabel = new ScalableFrame(xPosition, 0, WidthTapLabel, HeightTapLabel, name, Color.Zero)
             {
                 BackColor = PassiveColor,
                 ForeColor = PassiveColorText,
@@ -88,48 +90,49 @@ namespace FusionUI.UI.Elements
             };
             newTabLabel.ActionClick += (ControlActionArgs args, ref bool flag) =>
             {
-//                if (!args.IsClick) return;
                 if (args.IsAltClick)
                 {
+                    var rootFrame = ApplicationInterface.Instance.rootFrame;
+
                     ScalableFrame popup = null;
                     if (name == "Sensors") return;
                     ScalableFrame menu = null;
                     List<Button> buttons = null;
-                    ui.RootFrame.Add(menu = ContextMenuFactory.ContextMenu(ui,
-                        Game.Mouse.Position.X / ApplicationInterface.ScaleMod,
-                        Game.Mouse.Position.Y / ApplicationInterface.ScaleMod,
+                    rootFrame.Add(menu = ContextMenuFactory.ContextMenu(
+                        Game.Instance.Mouse.Position.X / ApplicationInterface.ScaleMod,
+                        Game.Instance.Mouse.Position.Y / ApplicationInterface.ScaleMod,
                         40, UIConfig.UnitMenuButtonHeight, new List<Tuple<string, Action>>()
                         {
                             new Tuple<string, Action>("Rename", () =>
                             {
-                                ui.RootFrame.Add(popup = PopupFactory.RenamePopupWindow(ui, RenameWindowCaption,
+                                rootFrame.Add(popup = PopupFactory.RenamePopupWindow(RenameWindowCaption,
                                     RenameWindowText, "Yes", "No", (s) =>
                                     {
                                         renameTab(newTabLabel.Text, s);
                                         popup.Clear(popup);
                                         popup.Clean();
-                                        ui.RootFrame.Remove(popup);
+                                        rootFrame.Remove(popup);
                                     }, () =>
                                     {
                                         popup.Clear(popup);
                                         popup.Clean();
-                                        ui.RootFrame.Remove(popup);
+                                        rootFrame.Remove(popup);
                                     }));
                             }),
                             new Tuple<string, Action>("Delete", () =>
                             {
-                                ui.RootFrame.Add(popup = PopupFactory.ConfirmationPopupWindow(ui, RemoveWindowCaption,
+                                rootFrame.Add(popup = PopupFactory.ConfirmationPopupWindow(RemoveWindowCaption,
                                     RemoveWindowText, "Yes", "No", () =>
                                     {
                                         removeTab(newTabLabel.Text);
                                         popup.Clear(popup);
                                         popup.Clean();
-                                        ui.RootFrame.Remove(popup);
+                                        rootFrame.Remove(popup);
                                     }, () =>
                                     {
                                         popup.Clear(popup);
                                         popup.Clean();
-                                        ui.RootFrame.Remove(popup);
+                                        rootFrame.Remove(popup);
                                     }));
                             })
                         }, out buttons));
@@ -159,7 +162,7 @@ namespace FusionUI.UI.Elements
 
         public void removeTab(string name)
         {
-            // TODO: need shift another tabs            
+            // TODO: need shift another tabs
             var tabInfo = listTab[name];
             if (ActiveLabel == tabInfo.Label)
             {
@@ -202,7 +205,7 @@ namespace FusionUI.UI.Elements
             ActiveFrame = frame;
             // action
             OnChangeTab?.Invoke(label.Text);
-            
+
         }
 
 

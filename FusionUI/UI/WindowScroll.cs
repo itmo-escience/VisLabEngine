@@ -64,7 +64,7 @@ namespace FusionUI.UI
             {
                 HeightLimit += (newH - oldH) / ScaleMultiplier;
             }
-            base.UpdateAnchors(oldW, oldH, newW, newH);   
+            base.UpdateAnchors(oldW, oldH, newW, newH);
             UpdateResize();
             //holder.UpdateAnchors(oldW, oldH, newW, newH);
         }
@@ -80,11 +80,11 @@ namespace FusionUI.UI
             var ow = oldW;
             var oh = oldH;
             AutoResize(true);
-            if (oldW != Width || oldH != Height ) {                
+            if (oldW != Width || oldH != Height ) {
                 if (!fr && UpdateChildren)
                 {
                     holder.UpdateAnchors(ow, oh, Width, Height);
-                }                                                
+                }
             }
         }
 
@@ -96,7 +96,7 @@ namespace FusionUI.UI
 				scrollHolder.UnitX = UnitPaddingLeft;
 				scrollHolder.UnitWidth = UnitWidth - UnitPaddingLeft - UnitPaddingRight;
 				scrollHolder.UnitHeight = HeightLimit - UnitPaddingTop - UnitPaddingBottom;
-				holder.UnitWidth = scrollHolder.UnitWidth; 
+				holder.UnitWidth = scrollHolder.UnitWidth;
 			}
         }
 
@@ -105,23 +105,25 @@ namespace FusionUI.UI
         public bool AllowShrink = true;
 
         private ScalableFrame scrollHolder;
-        public WindowScroll(FrameProcessor ui, float x, float y, float w, float h, string text, Color backColor,
-            bool drawHat = true, bool drawCross = true)
-            : base(ui, x, y, w, h, text, backColor, drawHat, drawCross)
+
+        [Obsolete("Please use constructor without FrameProcessor")]
+        public WindowScroll(FrameProcessor ui, float x, float y, float w, float h, string text, Color backColor, bool drawHat = true, bool drawCross = true)
+            : this(x, y, w, h, text, backColor, drawHat, drawCross) { }
+
+        public WindowScroll(float x, float y, float w, float h, string text, Color backColor, bool drawHat = true, bool drawCross = true)
+            : base(x, y, w, h, text, backColor, drawHat, drawCross)
         {
             ClampPos = false;
             AutoHeight = false;
             UnitWidth = w;
-            UnitHeight = h;            
+            UnitHeight = h;
             UpdateResize();
             SuppressActions = true;
             HeightLimit = h - (HatPanel?.UnitHeight ?? 0) - (BasementPanel?.UnitHeight ?? 0) ;
-            scrollHolder = new ScalableFrame(ui, holder.UnitX, holder.UnitY, holder.UnitWidth, HeightLimit - UnitPaddingTop - UnitPaddingBottom, "", Color.Zero)
-            {   
-                //Border = 1,
-                //BorderColor = Color.Violet,
+            scrollHolder = new ScalableFrame(holder.UnitX, holder.UnitY, holder.UnitWidth, HeightLimit - UnitPaddingTop - UnitPaddingBottom, "", Color.Zero)
+            {
                 Anchor = FrameAnchor.Left | FrameAnchor.Right | FrameAnchor.Top,
-            };            
+            };
             if (BasementPanel != null)
             {
                 BasementPanel.UnitY = h - BasementPanel.UnitHeight;
@@ -143,7 +145,7 @@ namespace FusionUI.UI
             };
             holder.MouseWheel += (sender, args) =>
             {
-                if (MainFrame.IsChildOf(ui.RootFrame, MainFrame.GetHoveredFrame(ui.RootFrame, Game.Mouse.Position), holder))
+                if (MainFrame.IsChildOf(ApplicationInterface.Instance.rootFrame, MainFrame.GetHoveredFrame(ApplicationInterface.Instance.rootFrame, Game.Instance.Mouse.Position), holder))
                 {
                     holder.UnitY += args.Wheel / ScaleMultiplier;
                     holder.UnitY = MathUtil.Clamp(holder.UnitY, Math.Min(MaxHeight - RealHeight, 0), 0);
@@ -187,7 +189,7 @@ namespace FusionUI.UI
                 if (Selected && args.X > GlobalRectangle.Right - ScrollSize * ScaleMultiplier)
                 {
                     var relativeSize = MaxHeight / RealHeight;
-                    //var relativePos = (1 - relativeSize) * (-ScrollDelta / (RealHeight - MaxHeight));                    
+                    //var relativePos = (1 - relativeSize) * (-ScrollDelta / (RealHeight - MaxHeight));
 
                     float rp = (float) (args.Y - GlobalRectangle.Top) / GlobalRectangle.Height - clickPos * relativeSize;
                     var p = rp / (1 - relativeSize) * (RealHeight - MaxHeight);
@@ -200,10 +202,10 @@ namespace FusionUI.UI
 
         public void SetScroll(float value)
         {
-            var relativeSize = MaxHeight / RealHeight;  
-            if (relativeSize >= 1 || float.IsNaN(relativeSize)) return;            
+            var relativeSize = MaxHeight / RealHeight;
+            if (relativeSize >= 1 || float.IsNaN(relativeSize)) return;
             float rp = value;
-            var p = rp / (1 - relativeSize) * (RealHeight - MaxHeight);            
+            var p = rp / (1 - relativeSize) * (RealHeight - MaxHeight);
             holder.UnitY = -p;
             holder.UnitY = MathUtil.Clamp (holder.UnitY, Math.Min (MaxHeight - RealHeight, 0), 0);
         }
@@ -215,7 +217,7 @@ namespace FusionUI.UI
             {
                 scrollHolder.UnitHeight = Math.Min(HeightLimit, holder.UnitHeight);
                 UnitHeight = (HatPanel?.UnitHeight ?? 0) + (scrollHolder.UnitHeight) + (BasementPanel?.UnitHeight ?? 0);
-            }                        
+            }
             holder.UnitY = MathUtil.Clamp(holder.UnitY, Math.Min(MaxHeight - RealHeight, 0), 0);
         }
 
@@ -224,7 +226,7 @@ namespace FusionUI.UI
         private float ScrollDelta => holder.UnitY;
         protected virtual void DrawScrollLine(GameTime gameTime, SpriteLayer spriteLayer, int clipRectIndex)
         {
-            var whiteTex = this.Game.RenderSystem.WhiteTexture;
+            var whiteTex = Game.Instance.RenderSystem.WhiteTexture;
             if (RealHeight > MaxHeight)
             {
                 var Rectangle = new RectangleF(GlobalRectangle.Left, scrollHolder.GlobalRectangle.Top,

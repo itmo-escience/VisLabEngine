@@ -76,10 +76,10 @@ namespace FusionUI.UI.Elements.TextFormatting
                                     var img = block.ImageCache[tagStack.Peek().Param];
                                     Rect = new Rectangle(0, 0, block.Width, block.Width * img.Height / img.Width);
                                     return;
-                                }                                
+                                }
                             }
 
-                        } else 
+                        } else
                         {
                             tagStack.Push(new Tag(word));
                         }
@@ -112,9 +112,9 @@ namespace FusionUI.UI.Elements.TextFormatting
                                 r = currentFont.MeasureString(word);
                             }
                         }
-                       
+
                         textWidth += r.Width;
-                        height = Math.Max(height, r.Height);                                                     
+                        height = Math.Max(height, r.Height);
                     }
                 }
 
@@ -162,7 +162,7 @@ namespace FusionUI.UI.Elements.TextFormatting
             SpriteFont currentFont = GetFont(tagStack);
             Tag lastTag;
             float Width = this.Width - PaddingLeft - PaddingRight;
-            //string align = DefaultAlignment;            
+            //string align = DefaultAlignment;
             for (int i = 0; i < Text.Length; i++)
             {
                 if (Text[i] == '[')
@@ -205,7 +205,7 @@ namespace FusionUI.UI.Elements.TextFormatting
                             tag.Type == Tag.TagType.Alignment)
                         {
                             currentString.AddWord("\n");
-                            strings.Add(currentString);                            
+                            strings.Add(currentString);
                             //tagStack.Push(tag);
                             width = 0;
                             currentString.Prepare();
@@ -227,7 +227,7 @@ namespace FusionUI.UI.Elements.TextFormatting
                         else
                         {
 
-                            
+
                             currentWord = "";
                             if (tag.Type == Tag.TagType.Alignment)
                             {
@@ -252,11 +252,11 @@ namespace FusionUI.UI.Elements.TextFormatting
                             }
                             else if (tag.Type == Tag.TagType.Image)
                             {
-                                
+
                                 var ei = Text.IndexOf("[/image]", i, StringComparison.OrdinalIgnoreCase);
                                 tag.Param = Text.Substring(i + 7,
                                     ei - i - 7);
-                                i = ei;                                
+                                i = ei;
                                 tagStack.Push(tag);
                                 Gis.ResourceWorker.Post(r =>
                                 {
@@ -273,10 +273,10 @@ namespace FusionUI.UI.Elements.TextFormatting
                                                     {
                                                         using (var stream = File.OpenRead(tag.Param))
                                                         {
-                                                            Texture Image = new UserTexture(Game.Instance.RenderSystem, stream, false);                                                            
+                                                            Texture Image = new UserTexture(Game.Instance.RenderSystem, stream, false);
                                                             ImageCache.Add(tag.Param, Image);
                                                         }
-                                                    }                                                   
+                                                    }
                                                 }, null);
 
                                             }
@@ -295,7 +295,7 @@ namespace FusionUI.UI.Elements.TextFormatting
                                         }
                                         catch (Exception e)
                                         {
-                                            Log.Warning($"{e.Message}Url: {tag.Param}");                                            
+                                            Log.Warning($"{e.Message}Url: {tag.Param}");
                                         }
                                     }, null);
                                 }, null);
@@ -486,13 +486,13 @@ namespace FusionUI.UI.Elements.TextFormatting
         private bool IsUnderline(TagStack stack)
         {
             return stack.LastByType(Tag.TagType.Underline) != null;
-        }        
+        }
 
         protected override void DrawFrame(GameTime gameTime, SpriteLayer sb, int clipRectIndex)
         {
             splitByString();
             float th = 0;
-            var textOffset = IsShortText ?  (BaseHeight - strings.TakeWhile(a => (th += a.Rect.Height) < BaseHeight).Sum(a => a.Rect.Height)) * 0.5f: 
+            var textOffset = IsShortText ?  (BaseHeight - strings.TakeWhile(a => (th += a.Rect.Height) < BaseHeight).Sum(a => a.Rect.Height)) * 0.5f:
                 TextAlignment == Alignment.MiddleLeft || TextAlignment == Alignment.MiddleCenter || TextAlignment == Alignment.MiddleRight ? (Height - TextHeight)/2  :
                 TextAlignment == Alignment.BottomLeft || TextAlignment == Alignment.BottomCenter || TextAlignment == Alignment.BottomRight ? Height - TextHeight : PaddingTop;
             DefaultAlignment = TextAlignment == Alignment.MiddleLeft || TextAlignment == Alignment.BottomLeft ||
@@ -503,17 +503,17 @@ namespace FusionUI.UI.Elements.TextFormatting
             var rect = GlobalRectangle;
             Frame frame = this.parent;
             while (frame != null)
-            {                
+            {
                 rect = Rectangle.Intersect(rect, frame.GlobalRectangle);
                 frame = frame.Parent;
-            }            
+            }
             foreach (var str in strings)
             {
                  if (textOffset > GlobalRectangle.Height) continue;
                  TagStack tagStack = (TagStack)str.InTags?.Clone() ?? new TagStack();
                 string alignment = tagStack.LastByType(Tag.TagType.Alignment)?.Param.ToLower() ?? DefaultAlignment;
                 if (IsShortText)
-                {                    
+                {
                     if (!str.Words.Any()) continue;
                     if (!str.TextWords.Any())
                     {
@@ -562,7 +562,7 @@ namespace FusionUI.UI.Elements.TextFormatting
                     }
                     tagStack = (TagStack)str.InTags?.Clone() ?? new TagStack();
                 }
-                
+
                 float wsw = 0;
                 var textWidth = 0;
                 var xOffset = 0;
@@ -620,7 +620,7 @@ namespace FusionUI.UI.Elements.TextFormatting
                                         //textOffset += h;
                                     }
                                     else
-                                    {                                        
+                                    {
                                         var currentFont = GetFont(tagStack);
                                         var currentColor = GetColor(tagStack);
                                         var r = currentFont.MeasureString(tag.Param);
@@ -646,7 +646,7 @@ namespace FusionUI.UI.Elements.TextFormatting
                             if (word == "\n") continue;
                             if (alignment == "justify")
                             {
-                                stp += !string.IsNullOrWhiteSpace(w) ? w : "";                                
+                                stp += !string.IsNullOrWhiteSpace(w) ? w : "";
                             }
                             else
                             {
@@ -661,7 +661,7 @@ namespace FusionUI.UI.Elements.TextFormatting
                             {
 
                                 //if (currentColor != lastColor || currentFont != lastFont || word == str.Words.Last())
-                                //{                            
+                                //{
                                 var r = currentFont.MeasureString(stp);
                                 var h = this.GlobalRectangle.Y + textOffset - r.Bottom + height;
                                 //if (h + r.Height > GlobalRectangle.Top && h < GlobalRectangle.Bottom)
@@ -671,7 +671,7 @@ namespace FusionUI.UI.Elements.TextFormatting
                                         clipRectIndex, 0, false);
                                 //}
 
-                                var whiteTex = Game.RenderSystem.WhiteTexture;
+                                var whiteTex = Game.Instance.RenderSystem.WhiteTexture;
                                 if (IsUnderline(tagStack))
                                 {
                                     sb.DrawBeam(whiteTex,
@@ -691,8 +691,8 @@ namespace FusionUI.UI.Elements.TextFormatting
 
                                 xOffset += r.Width;
                                 height = Math.Max(height, r.Height);
-                                
-                                stp = "";                                
+
+                                stp = "";
                             }
 
                             lastFont = currentFont;

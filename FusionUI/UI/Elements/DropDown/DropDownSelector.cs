@@ -5,6 +5,7 @@ using System.Xml.Serialization;
 using Fusion;
 using Fusion.Core.Mathematics;
 using Fusion.Core.Utils;
+using Fusion.Engine.Common;
 using Fusion.Engine.Frames;
 using Fusion.Engine.Graphics;
 
@@ -65,8 +66,15 @@ namespace FusionUI.UI.Elements.DropDown
         public int Capacity = 4;
 
 	    private EventHandler<MouseEventArgs> mouseScrollAction;
-        public DropDownSelector(FrameProcessor ui, float x, float y, float w, float h, Color backColor, List<string> values,
-            Action<string> selectAction, Color borderColor, bool drawButton = true, UIConfig.FontHolder? font = null, Color? dropColor = null) : base(ui, x, y, w, h, "", backColor)
+
+        [Obsolete("Please use constructor without FrameProcessor")]
+        public DropDownSelector(FrameProcessor ui, float x, float y, float w, float h, Color backColor,
+            List<string> values, Action<string> selectAction, Color borderColor, bool drawButton = true,
+            UIConfig.FontHolder? font = null, Color? dropColor = null)
+            : this(x, y, w, h, backColor, values, selectAction, borderColor, drawButton, font, dropColor) { }
+
+        public DropDownSelector(float x, float y, float w, float h, Color backColor, List<string> values,
+            Action<string> selectAction, Color borderColor, bool drawButton = true, UIConfig.FontHolder? font = null, Color? dropColor = null) : base(x, y, w, h, "", backColor)
         {
             DropColor = dropColor ?? DropColor;
             FontHolder = font ?? UIConfig.FontBase;
@@ -76,7 +84,7 @@ namespace FusionUI.UI.Elements.DropDown
 
 
 			OnClicked = selectAction;
-            current = values.Any() ? values[0] : "";            
+            current = values.Any() ? values[0] : "";
             UpdateLabel();
             if (!drawButton) ArrowButton.Visible = false;
         }
@@ -99,16 +107,16 @@ namespace FusionUI.UI.Elements.DropDown
             MainRow.FontHolder = FontHolder;
             this.Add(MainRow);
 
-            ArrowButton = new ScalableFrame(ui, UnitWidth - UIConfig.UnitSelectorArrowButtonWidth, 0, UIConfig.UnitSelectorArrowButtonWidth, UIConfig.UnitSelectorHeight, "", Color.Zero)
+            ArrowButton = new ScalableFrame(null, UnitWidth - UIConfig.UnitSelectorArrowButtonWidth, 0, UIConfig.UnitSelectorArrowButtonWidth, UIConfig.UnitSelectorHeight, "", Color.Zero)
             {
-                Image = ui.Game.Content.Load<DiscTexture>(@"UI-new\fv-icons_open-list"),
+                Image = Game.Instance.Content.Load<DiscTexture>(@"UI-new\fv-icons_open-list"),
                 Name = $"arrow",
                 ImageMode = FrameImageMode.Fitted,
             };
-            
+
             MainRow.Add(ArrowButton);
 
-            initList();            
+            initList();
 
             this.ActionClick += (ControlActionArgs args, ref bool flag) =>
             {
@@ -117,9 +125,9 @@ namespace FusionUI.UI.Elements.DropDown
                     if (!IsOpen && Values.Count > 0) OpenList();
                     else CloseList();
                 }
-                flag |= true;                
-            };   
-            
+                flag |= true;
+            };
+
         }
 
         public void UpdateList(List<string> values)
@@ -128,7 +136,7 @@ namespace FusionUI.UI.Elements.DropDown
             initList();
             if (values.Count > 0)
                 current = values[0];
-            else 
+            else
                 current = "Nothing to select";
             UpdateLabel();
         }
@@ -149,7 +157,7 @@ namespace FusionUI.UI.Elements.DropDown
             //foreach (var r in rows.Values)
             //{
             //    w = Math.Max(w, SelectorHolder.Font.MeasureString(r.Text).Width + r.TextOffsetX * 2);
-            //}            
+            //}
             SelectorHolder.Width = w;
 
             foreach (var r in rows.Values)
@@ -170,20 +178,20 @@ namespace FusionUI.UI.Elements.DropDown
 			if(FullScreenHolder != null) {
 				ApplicationInterface.Instance.rootFrame.Remove(FullScreenHolder);
 			}
-            FullScreenHolder = new FullScreenFrame(ui) {
+            FullScreenHolder = new FullScreenFrame(null) {
                 Visible			= false,
-                ZOrder			= 1000,  
+                ZOrder			= 1000,
                 SuppressActions = true,
             };
             ApplicationInterface.Instance.rootFrame.Add(FullScreenHolder);
 
-            SelectorHolder = new ScalableFrame(ui, -BorderLeft / ScaleMultiplier, -BorderTop / ScaleMultiplier, UnitWidth + BorderLeft + BorderRight, 0, "", DropColor)
+            SelectorHolder = new ScalableFrame(-BorderLeft / ScaleMultiplier, -BorderTop / ScaleMultiplier, UnitWidth + BorderLeft + BorderRight, 0, "", DropColor)
             {
                 Border = 1,
                 BorderColor = BorderColor,
                 Visible = true,
                 Name = $"holder",
-                Active = true,     
+                Active = true,
                 ZOrder           = 1000,
                 SuppressActions = true,
             };
@@ -230,7 +238,7 @@ namespace FusionUI.UI.Elements.DropDown
             mouseScrollAction = (s, e) =>
             {
                 var rootFrame = ApplicationInterface.Instance.rootFrame;
-                if (MainFrame.IsChildOf(rootFrame, MainFrame.GetHoveredFrame(rootFrame, Game.Mouse.Position), SelectorHolder))
+                if (MainFrame.IsChildOf(rootFrame, MainFrame.GetHoveredFrame(rootFrame, Game.Instance.Mouse.Position), SelectorHolder))
                 {
                     float delta = -(int)(e.Wheel) / ScaleMultiplier / 10;
                     float min = float.MaxValue, max = float.MinValue;
@@ -280,7 +288,7 @@ namespace FusionUI.UI.Elements.DropDown
                 flag = true;
             };
             rows.Add(Values[index], valueRow);
-            SelectorHolder.Add(valueRow);  
+            SelectorHolder.Add(valueRow);
         }
 
         public void UpdateLabel()
@@ -291,7 +299,7 @@ namespace FusionUI.UI.Elements.DropDown
 
         public void UpdateScroller()
         {
-            float maxHeight = Capacity*UIConfig.UnitSelectorRowHeight+ 2 * UIConfig.UnitSelectorRowOffset;            
+            float maxHeight = Capacity*UIConfig.UnitSelectorRowHeight+ 2 * UIConfig.UnitSelectorRowOffset;
             float possibleHeight = rows.Count * UIConfig.UnitSelectorRowHeight + 2 * UIConfig.UnitSelectorRowOffset;
             float realHeight = Math.Min(maxHeight, possibleHeight);
             SelectorHolder.UnitHeight = realHeight;
@@ -304,7 +312,7 @@ namespace FusionUI.UI.Elements.DropDown
             UpdateScroller();
             FullScreenHolder.ZOrder = this.ZOrder + 1000;
             SelectorHolder.ZOrder = FullScreenHolder.ZOrder + 1000;
-            
+
             foreach (var name in rows.Keys)
             {
                 var row = rows[name];
@@ -324,7 +332,7 @@ namespace FusionUI.UI.Elements.DropDown
             }
 
             SelectorHolder.Selected = true;
-                     
+
             SelectorHolder.X = this.GlobalRectangle.X - ApplicationInterface.Instance.rootFrame.GlobalRectangle.X + XOffset;
             SelectorHolder.Y = this.GlobalRectangle.Y - ApplicationInterface.Instance.rootFrame.GlobalRectangle.Y + YOffset;
             FullScreenHolder.Visible = true;

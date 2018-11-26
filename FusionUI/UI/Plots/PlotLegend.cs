@@ -26,7 +26,7 @@ namespace FusionUI.UI.Plots
         public enum LegendSettings
         {
             DrawStaticLines = 1,
-            DrawAnimLines = 2,            
+            DrawAnimLines = 2,
         }
 
         public LegendSettings Settings;
@@ -37,7 +37,7 @@ namespace FusionUI.UI.Plots
             if (t1 != t)
             {
                 t = t1;
-                return true;            
+                return true;
             }
             return false;
         }
@@ -74,9 +74,9 @@ namespace FusionUI.UI.Plots
                 }
             }
 
-            var whiteTex = this.Game.RenderSystem.WhiteTexture;
+            var whiteTex = Game.Instance.RenderSystem.WhiteTexture;
             var rect = GetBorderedRectangle();
-            int hCount = Math.Max(1, Math.Min((int) Math.Floor((UnitWidth + MinXOffset )/ (ElementWidth + MinXOffset)), currentPlots.Count));        
+            int hCount = Math.Max(1, Math.Min((int) Math.Floor((UnitWidth + MinXOffset )/ (ElementWidth + MinXOffset)), currentPlots.Count));
             int i = 0;
             if (IsNewFrame(gameTime)) ClipRectId = 800;
             int selected = -1;
@@ -133,7 +133,7 @@ namespace FusionUI.UI.Plots
         {
             get
             {
-                var pos = Game.Mouse.Position - (Vector2)this.GlobalRectangle.TopLeft;
+                var pos = Game.Instance.Mouse.Position - (Vector2)this.GlobalRectangle.TopLeft;
                 int hCount = Math.Max(1, (int)Math.Floor((UnitWidth + MinXOffset) / (ElementWidth + MinXOffset)));
                 float ew = Width / hCount;
                 float eh = ElementHeight * ScaleMultiplier;

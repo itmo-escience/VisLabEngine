@@ -21,7 +21,7 @@ namespace FusionUI.UI.Plots2_0
         {
             TreePanel = new ScalableFrame(ui, 0, 0, w, h - UIConfig.UnitMenuButtonHeight, "",
                 Color.Zero)
-            {                
+            {
             };
             BottomPanel = new ScalableFrame(ui, 0, h - UIConfig.UnitMenuButtonHeight, w,
                 UIConfig.UnitMenuButtonHeight, "", UIConfig.SettingsColor)
@@ -39,7 +39,7 @@ namespace FusionUI.UI.Plots2_0
             Add(BottomPanel);
 
             Root = new TreeNode(ui, 0, 0, 0, 0, "", Color.Zero)
-            {                
+            {
                 IsExpand = true,
             };
 
@@ -57,7 +57,7 @@ namespace FusionUI.UI.Plots2_0
                 }
             };
 
-            TreePanel.Add(Root);            
+            TreePanel.Add(Root);
         }
 
         protected List<Button> buttons = new List<Button>();
@@ -69,7 +69,7 @@ namespace FusionUI.UI.Plots2_0
             Button ret;
             if (toggleable)
             {
-                ret = new Button(ui, unitSize * BottomPanel.Children.Count, 0, unitSize, unitSize, text,
+                ret = new Button(unitSize * BottomPanel.Children.Count, 0, unitSize, unitSize, text,
                     UIConfig.ActiveColor,
                     Color.Zero, pic, pic, action, active)
                 {
@@ -79,7 +79,7 @@ namespace FusionUI.UI.Plots2_0
             }
             else
             {
-                ret = new Button(ui, unitSize * BottomPanel.Children.Count, 0, unitSize, unitSize, text, Color.Zero,
+                ret = new Button(unitSize * BottomPanel.Children.Count, 0, unitSize, unitSize, text, Color.Zero,
                     UIConfig.ActiveColor, 200)
                 {
                     Image = pic,
@@ -107,8 +107,8 @@ namespace FusionUI.UI.Plots2_0
 
         public void AddPoint(PlotPoint point, bool expand = false)
         {
-            var name = point.Name;            
-            CheckboxNode pointNode = new CheckboxNode(ui, 0, 0, this.UnitWidth, UIConfig.UnitScenarioConfigLayersHeight, name, UIConfig.SettingsColor,
+            var name = point.Name;
+            CheckboxNode pointNode = new CheckboxNode(0, 0, this.UnitWidth, UIConfig.UnitScenarioConfigLayersHeight, name, UIConfig.SettingsColor,
                 b =>
                 {
                     point.IsActive = b;
@@ -117,12 +117,12 @@ namespace FusionUI.UI.Plots2_0
             {
                 Name = name,
                 UnitSizeExpandButton = 12,
-                ExpandedPicture = ui.Game.Content.Load<DiscTexture>(@"UI-new\fv-icons_close-list"),
-                CollapsedPicture = ui.Game.Content.Load<DiscTexture>(@"UI-new\fv-icons_open-list"),
+                ExpandedPicture = Game.Instance.Content.Load<DiscTexture>(@"UI-new\fv-icons_close-list"),
+                CollapsedPicture = Game.Instance.Content.Load<DiscTexture>(@"UI-new\fv-icons_open-list"),
                 UnitImageOffsetX = this.UnitWidth - UIConfig.UnitSettingsPanelSizeCheckbox,
                 backColorMainNode = UIConfig.BackColorLayer,
                 TextAlignment = Alignment.BaselineLeft,
-                OffsetChild = 12,                                
+                OffsetChild = 12,
                 Tooltip = name,
             };
             pointNodes.Add(point, pointNode);
@@ -145,7 +145,7 @@ namespace FusionUI.UI.Plots2_0
         public virtual CheckboxNode AddLayer(PlotPoint point, PlotData data)
         {
             bool selected = false;
-            var LayerNode = new CheckboxNode(ui, 0, 0, this.UnitWidth - 3, UIConfig.UnitScenarioConfigLayersHeight, data.Variable.NiceName, Color.Zero,
+            var LayerNode = new CheckboxNode(0, 0, this.UnitWidth - 3, UIConfig.UnitScenarioConfigLayersHeight, data.Variable.NiceName, Color.Zero,
                 b =>
                 {
                     data.IsActive = b;
@@ -154,8 +154,8 @@ namespace FusionUI.UI.Plots2_0
             {
                 Name = data.Variable.NiceName,
                 UnitSizeExpandButton = 12,
-                ExpandedPicture = data.Depths.Count > 1 ? ui.Game.Content.Load<DiscTexture>(@"UI-new\fv-icons_close-list") : null,
-                CollapsedPicture = data.Depths.Count > 1 ? ui.Game.Content.Load<DiscTexture>(@"UI-new\fv-icons_open-list") : null,
+                ExpandedPicture = data.Depths.Count > 1 ? Game.Instance.Content.Load<DiscTexture>(@"UI-new\fv-icons_close-list") : null,
+                CollapsedPicture = data.Depths.Count > 1 ? Game.Instance.Content.Load<DiscTexture>(@"UI-new\fv-icons_open-list") : null,
                 UnitImageOffsetX = this.UnitWidth - UIConfig.UnitSettingsPanelSizeCheckbox - 3,
                 backColorMainNode = UIConfig.BackColorLayer,
                 TextAlignment = Alignment.BaselineLeft,
@@ -172,7 +172,7 @@ namespace FusionUI.UI.Plots2_0
                 foreach (var depth in data.Depths)
                 {
                     double d = depth;
-                    CheckboxNode depthNode = new CheckboxNode(ui, 0, 0, this.UnitWidth, UIConfig.UnitScenarioConfigLayersHeight, depth.ToString("0.##") + data.DepthUnits, Color.Zero,
+                    CheckboxNode depthNode = new CheckboxNode(0, 0, this.UnitWidth, UIConfig.UnitScenarioConfigLayersHeight, depth.ToString("0.##") + data.DepthUnits, Color.Zero,
                         b =>
                         {
                             if (b) data.ActiveDepths.Add(d);
@@ -191,7 +191,7 @@ namespace FusionUI.UI.Plots2_0
                         depthNode.Checkbox.IsChecked = data.ActiveDepths.Contains(d);
                     };
                     LayerNode.addNode(depthNode);
-                }                                
+                }
             }
             return LayerNode;
         }
@@ -217,7 +217,7 @@ namespace FusionUI.UI.Plots2_0
         public void UpdatePoint(PlotPoint point)
         {
             RemovePoint(point);
-            AddPoint(point);            
+            AddPoint(point);
         }
 
         public void UpdateAll()
@@ -255,7 +255,7 @@ namespace FusionUI.UI.Plots2_0
             {
                 if (selected == newLayer)
                 {
-                    //int pos = 
+                    //int pos =
                     selected.Y = (int)(selected.Y + args.Position.Y - nodeLastPosition);
                     nodeLastPosition = args.Position.Y;
                     int i = rootNode.listNode.FindIndex(n => n == selected);

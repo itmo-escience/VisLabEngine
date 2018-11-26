@@ -236,7 +236,7 @@ namespace FusionUI.UI.Plots
         private void DrawVertical (GameTime gameTime, SpriteLayer sb, int clipRectIndex) {
             if (stepY == 0) UpdateMinMaxComplete(false);
             if (stepY == 0) return;
-            var whiteTex = this.Game.RenderSystem.WhiteTexture;
+            var whiteTex = Game.Instance.RenderSystem.WhiteTexture;
             bool left = Index % 2 == 0;
             int offset = (int)(Index / 2 * (UIConfig.UnitPlotScaleWidth * ScaleMultiplier * (left ? -1 : 1)) + (left ? 0 : Plot.Width));
 
@@ -281,7 +281,7 @@ namespace FusionUI.UI.Plots
         private void DrawHorizontal (GameTime gameTime, SpriteLayer sb, int clipRectIndex) {
             if (stepX == 0) UpdateMinMaxComplete(false);
             if (stepX == 0) return;
-            var whiteTex = this.Game.RenderSystem.WhiteTexture;            
+            var whiteTex = Game.Instance.RenderSystem.WhiteTexture;            
             int zeroH = (Settings & ScaleParams.DrawAtZero) != 0 ? MathUtil.Clamp((int) ((0 - MinY) / (MaxY - MinY) * Plot.GlobalRectangle.Height), 0, Plot.GlobalRectangle.Height) : 0;
             sb.Draw(whiteTex,
                 new RectangleF(Plot.GlobalRectangle.Left, Plot.GlobalRectangle.Bottom - zeroH + Index * UIConfig.UnitPlotScaleHeight * ScaleMultiplier,

@@ -8,11 +8,10 @@ namespace FusionUI.UI.Factories
 {
     public class ContextMenuFactory
     {
-
-        public static ScalableFrame ContextMenu(FrameProcessor ui, float x, float y, float width, float buttonHeight,
+        public static ScalableFrame ContextMenu(float x, float y, float width, float buttonHeight,
             List<Tuple<string, Action>> buttonData, out List<Button> buttons)
         {
-            ScalableFrame holder = new ScalableFrame(ui, x, y, width, buttonHeight * buttonData.Count, "", UIConfig.PopupColor)
+            var holder = new ScalableFrame(x, y, width, buttonHeight * buttonData.Count, "", UIConfig.PopupColor)
             {
                 ZOrder =  1000,
                 Selected = true,
@@ -29,9 +28,9 @@ namespace FusionUI.UI.Factories
             };
             int i = 0;
             buttons = new List<Button>();
-            foreach (var bd in buttonData) 
+            foreach (var bd in buttonData)
             {
-                var button = new Button(ui, 0, buttonHeight * i, width, buttonHeight, bd.Item1, Color.Zero, UIConfig.ActiveColor, 200, bd.Item2)
+                var button = new Button(0, buttonHeight * i, width, buttonHeight, bd.Item1, Color.Zero, UIConfig.ActiveColor, 200, bd.Item2)
                 {
                     Border = 1,
                     TextAlignment = Alignment.MiddleLeft,
@@ -51,5 +50,10 @@ namespace FusionUI.UI.Factories
             return holder;
         }
 
+        public static ScalableFrame ContextMenu(FrameProcessor ui, float x, float y, float width, float buttonHeight,
+            List<Tuple<string, Action>> buttonData, out List<Button> buttons)
+        {
+            return ContextMenu(x, y, width, buttonHeight, buttonData, out buttons);
+        }
     }
 }

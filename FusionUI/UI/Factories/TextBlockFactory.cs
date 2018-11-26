@@ -1,4 +1,5 @@
-﻿using Fusion.Core.Mathematics;
+﻿using System;
+using Fusion.Core.Mathematics;
 using Fusion.Engine.Frames;
 using FusionUI.UI.Elements.TextFormatting;
 
@@ -6,22 +7,21 @@ namespace FusionUI.UI.Factories
 {
     public class TextBlockFactory
     {
-        public static UIContainer<RichTextBlock> TextBlockHolder(FrameProcessor ui, float OffsetX, float OffsetY,
+        public static UIContainer<RichTextBlock> TextBlockHolder(float OffsetX, float OffsetY,
             ScalableFrame parent, UIConfig.FontHolder font, float minHeight, string text,
             bool capSize = false)
         {
-            RichTextBlock tb;
-            return TextBlockHolder(ui, OffsetX, OffsetY, parent, font, minHeight, text, out tb, capSize);
+            return TextBlockHolder(OffsetX, OffsetY, parent, font, minHeight, text, out _, capSize);
         }
 
-        public static UIContainer<RichTextBlock> TextBlockHolder(FrameProcessor ui, float OffsetX, float OffsetY,
+        public static UIContainer<RichTextBlock> TextBlockHolder(float OffsetX, float OffsetY,
             ScalableFrame parent, UIConfig.FontHolder font, float minHeight, string text, out RichTextBlock textBlock, bool capSize = false)
         {
-            UIContainer<RichTextBlock> holder = new UIContainer<RichTextBlock>(ui, parent.UnitPaddingLeft, 0, parent.UnitWidth - parent.UnitPaddingLeft - parent.UnitPaddingRight, minHeight + OffsetY, "", Color.Zero)
+            UIContainer<RichTextBlock> holder = new UIContainer<RichTextBlock>(parent.UnitPaddingLeft, 0, parent.UnitWidth - parent.UnitPaddingLeft - parent.UnitPaddingRight, minHeight + OffsetY, "", Color.Zero)
             {
             };
 
-            textBlock = new RichTextBlock(ui, OffsetX, OffsetY, holder.UnitWidth - 2 * OffsetX,
+            textBlock = new RichTextBlock(OffsetX, OffsetY, holder.UnitWidth - 2 * OffsetX,
                 minHeight, text, Color.Zero, font, 0, minHeight:minHeight, isShortText:capSize)
             {
             };
@@ -37,14 +37,14 @@ namespace FusionUI.UI.Factories
             return holder;
         }
 
-        public static UIContainer<RichTextBlock> TextBlockHolderWithOffset(FrameProcessor ui, float OffsetX, float OffsetYTop, float OffsetYBottom,
+        public static UIContainer<RichTextBlock> TextBlockHolderWithOffset(float OffsetX, float OffsetYTop, float OffsetYBottom,
             ScalableFrame parent, UIConfig.FontHolder font, float minHeight, string text, out RichTextBlock textBlock, bool capSize = false)
         {
-            UIContainer<RichTextBlock> holder = new UIContainer<RichTextBlock>(ui, parent.UnitPaddingLeft, 0, parent.UnitWidth - parent.UnitPaddingLeft - parent.UnitPaddingRight, minHeight + OffsetYTop, "", Color.Zero)
+            var holder = new UIContainer<RichTextBlock>(parent.UnitPaddingLeft, 0, parent.UnitWidth - parent.UnitPaddingLeft - parent.UnitPaddingRight, minHeight + OffsetYTop, "", Color.Zero)
             {
             };
 
-            textBlock = new RichTextBlock(ui, OffsetX, OffsetYTop, holder.UnitWidth - 2 * OffsetX,
+            textBlock = new RichTextBlock(OffsetX, OffsetYTop, holder.UnitWidth - 2 * OffsetX,
                 minHeight, text, Color.Zero, font, 0, minHeight: minHeight, isShortText: capSize)
             {
             };
@@ -60,22 +60,22 @@ namespace FusionUI.UI.Factories
             return holder;
         }
 
-        public static UIContainer<FormatTextBlock> FormatTextBlockHolder(FrameProcessor ui, float OffsetX, float OffsetY,
+        public static UIContainer<FormatTextBlock> FormatTextBlockHolder(float OffsetX, float OffsetY,
             ScalableFrame parent, UIConfig.FontHolder font, float minHeight, string text,
             bool capSize = false)
         {
             FormatTextBlock tb;
-            return FormatTextBlockHolder(ui, OffsetX, OffsetY, parent, font, minHeight, text, out tb, capSize);
+            return FormatTextBlockHolder(OffsetX, OffsetY, parent, font, minHeight, text, out tb, capSize);
         }
 
-        public static UIContainer<FormatTextBlock> FormatTextBlockHolder(FrameProcessor ui, float OffsetX, float OffsetY,
+        public static UIContainer<FormatTextBlock> FormatTextBlockHolder(float OffsetX, float OffsetY,
             ScalableFrame parent, UIConfig.FontHolder font, float minHeight, string text, out FormatTextBlock textBlock, bool capSize = false)
         {
-            UIContainer<FormatTextBlock> holder = new UIContainer<FormatTextBlock>(ui, parent.UnitPaddingLeft, 0, parent.UnitWidth - parent.UnitPaddingLeft - parent.UnitPaddingRight, minHeight + OffsetY, "", Color.Zero)
+            UIContainer<FormatTextBlock> holder = new UIContainer<FormatTextBlock>(parent.UnitPaddingLeft, 0, parent.UnitWidth - parent.UnitPaddingLeft - parent.UnitPaddingRight, minHeight + OffsetY, "", Color.Zero)
             {
             };
 
-            textBlock = new FormatTextBlock(ui, OffsetX, OffsetY, holder.UnitWidth - 2 * OffsetX,
+            textBlock = new FormatTextBlock(OffsetX, OffsetY, holder.UnitWidth - 2 * OffsetX,
                 minHeight, text, Color.Zero, font, 0, minHeight: minHeight, isShortText: capSize)
             {
             };
@@ -91,14 +91,14 @@ namespace FusionUI.UI.Factories
             return holder;
         }
 
-        public static UIContainer<FormatTextBlock> FormatTextBlockHolderWithOffset(FrameProcessor ui, float OffsetX, float OffsetYTop, float OffsetYBottom,
+        public static UIContainer<FormatTextBlock> FormatTextBlockHolderWithOffset(float OffsetX, float OffsetYTop, float OffsetYBottom,
             ScalableFrame parent, UIConfig.FontHolder font, float minHeight, string text, out FormatTextBlock textBlock, bool capSize = false)
         {
-            UIContainer<FormatTextBlock> holder = new UIContainer<FormatTextBlock>(ui, parent.UnitPaddingLeft, 0, parent.UnitWidth - parent.UnitPaddingLeft - parent.UnitPaddingRight, minHeight + OffsetYTop, "", Color.Zero)
+            UIContainer<FormatTextBlock> holder = new UIContainer<FormatTextBlock>(parent.UnitPaddingLeft, 0, parent.UnitWidth - parent.UnitPaddingLeft - parent.UnitPaddingRight, minHeight + OffsetYTop, "", Color.Zero)
             {
             };
 
-            textBlock = new FormatTextBlock(ui, OffsetX, OffsetYTop, holder.UnitWidth - 2 * OffsetX,
+            textBlock = new FormatTextBlock(OffsetX, OffsetYTop, holder.UnitWidth - 2 * OffsetX,
                 minHeight, text, Color.Zero, font, 0, minHeight: minHeight, isShortText: capSize)
             {
             };
@@ -113,5 +113,52 @@ namespace FusionUI.UI.Factories
             holder.Item = textBlock;
             return holder;
         }
+
+        #region Obsoletes
+        [Obsolete("Please use factory without FrameProcessor")]
+        public static UIContainer<RichTextBlock> TextBlockHolder(FrameProcessor ui, float OffsetX, float OffsetY,
+            ScalableFrame parent, UIConfig.FontHolder font, float minHeight, string text,
+            bool capSize = false)
+        {
+            return TextBlockHolder(OffsetX, OffsetY, parent, font, minHeight, text, capSize);
+        }
+
+        [Obsolete("Please use factory without FrameProcessor")]
+        public static UIContainer<RichTextBlock> TextBlockHolder(FrameProcessor ui, float OffsetX, float OffsetY,
+            ScalableFrame parent, UIConfig.FontHolder font, float minHeight, string text, out RichTextBlock textBlock, bool capSize = false)
+        {
+            return TextBlockHolder(OffsetX, OffsetY, parent, font, minHeight, text, out textBlock, capSize);
+        }
+
+        [Obsolete("Please use factory without FrameProcessor")]
+        public static UIContainer<RichTextBlock> TextBlockHolderWithOffset(FrameProcessor ui, float OffsetX, float OffsetYTop, float OffsetYBottom,
+            ScalableFrame parent, UIConfig.FontHolder font, float minHeight, string text, out RichTextBlock textBlock, bool capSize = false)
+        {
+            return TextBlockHolderWithOffset(OffsetX, OffsetYTop, OffsetYBottom, parent, font, minHeight, text, out textBlock, capSize);
+        }
+
+        [Obsolete("Please use factory without FrameProcessor")]
+        public static UIContainer<FormatTextBlock> FormatTextBlockHolder(FrameProcessor ui, float OffsetX, float OffsetY,
+            ScalableFrame parent, UIConfig.FontHolder font, float minHeight, string text,
+            bool capSize = false)
+        {
+            return FormatTextBlockHolder(OffsetX, OffsetY, parent, font, minHeight, text, capSize);
+        }
+
+        [Obsolete("Please use factory without FrameProcessor")]
+        public static UIContainer<FormatTextBlock> FormatTextBlockHolder(FrameProcessor ui, float OffsetX, float OffsetY,
+            ScalableFrame parent, UIConfig.FontHolder font, float minHeight, string text, out FormatTextBlock textBlock, bool capSize = false)
+        {
+            return FormatTextBlockHolder(OffsetX, OffsetY, parent, font, minHeight, text, out textBlock, capSize);
+        }
+
+        [Obsolete("Please use factory without FrameProcessor")]
+        public static UIContainer<FormatTextBlock> FormatTextBlockHolderWithOffset(FrameProcessor ui, float OffsetX, float OffsetYTop, float OffsetYBottom,
+            ScalableFrame parent, UIConfig.FontHolder font, float minHeight, string text, out FormatTextBlock textBlock, bool capSize = false)
+        {
+            return FormatTextBlockHolderWithOffset(OffsetX, OffsetYTop, OffsetYBottom, parent, font, minHeight, text, out textBlock, capSize);
+        }
+
+        #endregion
     }
 }
