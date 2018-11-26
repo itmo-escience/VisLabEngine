@@ -3,22 +3,15 @@ using FusionUI;
 using GISTest;
 using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.IO;
 using System.Linq;
 using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
-using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Shapes;
-using System.Windows.Threading;
 using Fusion.Engine.Input;
 using WpfEditorTest.ChildPanels;
 using KeyEventArgs = System.Windows.Input.KeyEventArgs;
@@ -69,7 +62,6 @@ namespace WpfEditorTest
 			engine.RenderSystem.Height = 1080;
 			engine.RenderSystem.VSyncInterval = 1;
 
-			//var t = Directory.GetCurrentDirectory();
 			Directory.SetCurrentDirectory(@"..\..\..\..\GISTest\bin\x64\Debug");
 			engine.InitExternal();
 
@@ -99,21 +91,19 @@ namespace WpfEditorTest
 
 			var templates = Directory.GetFiles(templatesPath, "*.xml").ToList();
 			palette.AvailableFrames.ItemsSource = templates.Select(t=>t.Split('\\').Last().Split('.').First());
-			//StaticData.availableFrameElements;
 
-			rootFrame = (engine.GameInterface as ApplicationInterface).rootFrame;
+			rootFrame = ApplicationInterface.Instance.rootFrame;
 			SceneFrame = (FusionUI.UI.ScalableFrame)rootFrame.Children.FirstOrDefault();
-			DragFieldFrame = new FusionUI.UI.ScalableFrame(this.rootFrame.ui, 0, 0, this.rootFrame.UnitWidth, this.rootFrame.UnitHeight, "DragFieldFrame", Fusion.Core.Mathematics.Color.Zero)
+			DragFieldFrame = new FusionUI.UI.ScalableFrame(0, 0, rootFrame.UnitWidth, rootFrame.UnitHeight, "DragFieldFrame", Fusion.Core.Mathematics.Color.Zero)
 			{ Anchor = Fusion.Engine.Frames.FrameAnchor.All };
 			rootFrame.Add(DragFieldFrame);
 			Binding b = new Binding("Children")
 			{
-				Source = SceneFrame,//(engine.GameInterface as ApplicationInterface).rootFrame,
+				Source = SceneFrame,
 				UpdateSourceTrigger = UpdateSourceTrigger.PropertyChanged,
 				Mode = BindingMode.OneWay
 			};
 			treeView.ElementHierarcyView.SetBinding(TreeView.ItemsSourceProperty,b);
-			//treeView.ElementHierarcyView.ItemsSource = (engine.GameInterface as ApplicationInterface).rootFrame.Children;
 			SceneFrame.PropertyChanged += ( s, e ) => { };
 
 			SceneFrame.ForEachChildren(
@@ -122,11 +112,6 @@ namespace WpfEditorTest
 					DisableChildrenFree(c);
 				}
 				);
-
-			//StaticData.availableFrameElements[0].Name;
-
-			//this.Dispatcher.BeginInvoke(new Action(() => SetMouseLook()), DispatcherPriority.ApplicationIdle);
-
 		}
 
 		private void DisableChildrenFree(Fusion.Engine.Frames.Frame frame)
@@ -306,7 +291,9 @@ namespace WpfEditorTest
 			{
 				if (panel.GetType() == typeof(SelectedFramePanel) && frameHoverPanel._mousePressed && frameHoverPanel.selectedframe != null)
 				{
-					var hoveredframe = SceneFrame.ui.GetHoveredFrameExternally(SceneFrame);
+				    var fp = ((CustomGameInterface) ApplicationInterface.Instance).FrameProcessor;
+
+					var hoveredframe = fp.GetHoveredFrameExternally(SceneFrame);
 					if (frameHoverPanel.selectedframe.Parent != null)
 					{
 						//treeView.ElementHierarcyView.SetSelectedItem(frameHoverPanel.selectedframe.Parent);
@@ -342,7 +329,7 @@ namespace WpfEditorTest
 				{
 					createdFrame.X = (int)e.MouseDevice.GetPosition(this).X - createdFrame.Width / 2;
 					createdFrame.Y = (int)e.MouseDevice.GetPosition(this).Y - createdFrame.Height / 2;
-					SceneFrame.Add(createdFrame); 
+					SceneFrame.Add(createdFrame);
 				}
 				palette._selectedFrameTemplate = null;
 				this.Cursor = Cursors.Arrow;
@@ -376,7 +363,8 @@ namespace WpfEditorTest
 
 		public void GetHoveredFrame()
 		{
-			var hoveredframe = SceneFrame.ui.GetHoveredFrameExternally(SceneFrame);
+		    var fp = ((CustomGameInterface)ApplicationInterface.Instance).FrameProcessor;
+            var hoveredframe = fp.GetHoveredFrameExternally(SceneFrame);
 			if (hoveredframe != null && hoveredframe != rootFrame
 				&& hoveredframe != SceneFrame)
 			{
