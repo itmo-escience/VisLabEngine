@@ -45,6 +45,10 @@ namespace WpfEditorTest
 
 		Game engine;
 
+		public FusionUI.UI.ScalableFrame DragFieldFrame;
+		public FusionUI.UI.ScalableFrame SceneFrame;
+		public FusionUI.UI.MainFrame rootFrame;
+
 		public InterfaceEditor()
 		{
 			InitializeComponent();
@@ -95,17 +99,24 @@ namespace WpfEditorTest
 
 			var templates = Directory.GetFiles(templatesPath, "*.xml").ToList();
 			palette.AvailableFrames.ItemsSource = templates.Select(t=>t.Split('\\').Last().Split('.').First());
-				//StaticData.availableFrameElements;
+			//StaticData.availableFrameElements;
 
+			rootFrame = (engine.GameInterface as ApplicationInterface).rootFrame;
+			SceneFrame = (FusionUI.UI.ScalableFrame)rootFrame.Children.FirstOrDefault();
+			DragFieldFrame = new FusionUI.UI.ScalableFrame(this.rootFrame.ui, 0, 0, this.rootFrame.UnitWidth, this.rootFrame.UnitHeight, "DragFieldFrame", Fusion.Core.Mathematics.Color.Zero)
+			{ Anchor = Fusion.Engine.Frames.FrameAnchor.All };
+			rootFrame.Add(DragFieldFrame);
 			Binding b = new Binding("Children")
 			{
-				Source = (engine.GameInterface as ApplicationInterface).rootFrame,
+				Source = SceneFrame,//(engine.GameInterface as ApplicationInterface).rootFrame,
+				UpdateSourceTrigger = UpdateSourceTrigger.PropertyChanged,
+				Mode = BindingMode.OneWay
 			};
 			treeView.ElementHierarcyView.SetBinding(TreeView.ItemsSourceProperty,b);
 			//treeView.ElementHierarcyView.ItemsSource = (engine.GameInterface as ApplicationInterface).rootFrame.Children;
-			(engine.GameInterface as ApplicationInterface).rootFrame.PropertyChanged += ( s, e ) => { };
+			SceneFrame.PropertyChanged += ( s, e ) => { };
 
-			(engine.GameInterface as ApplicationInterface).rootFrame.ForEachChildren(
+			SceneFrame.ForEachChildren(
 				c =>
 				{
 					DisableChildrenFree(c);
@@ -293,8 +304,31 @@ namespace WpfEditorTest
 		{
 			foreach (var panel in panels)
 			{
+				if (panel.GetType() == typeof(SelectedFramePanel) && frameHoverPanel._mousePressed && frameHoverPanel.selectedframe != null)
+				{
+					var hoveredframe = SceneFrame.ui.GetHoveredFrameExternally(SceneFrame);
+					if (frameHoverPanel.selectedframe.Parent != null)
+					{
+						//treeView.ElementHierarcyView.SetSelectedItem(frameHoverPanel.selectedframe.Parent);
+						//TreeViewExtension.SetSelected(details.FrameDetailsControls, selected.Parent);
+					}
+					frameHoverPanel.selectedframe.Parent.Remove(frameHoverPanel.selectedframe);
+
+					hoveredframe.Add(frameHoverPanel.selectedframe);
+					frameHoverPanel.UpdateSelectedFramePosition();
+				}
+
 				panel._mousePressed = false;
 			}
+
+			//if (!frameHoverPanel._dragMousePressed && palette._selectedFrameTemplate == null)
+			//{
+			//	var hoveredframe = (engine.GameInterface as ApplicationInterface).rootFrame.ui.GetHoveredFrameExternally();
+			//	if (hoveredframe != null && hoveredframe != (engine.GameInterface as ApplicationInterface).rootFrame)
+			//	{
+			//		treeView.SetSelectedFrame(hoveredframe);
+			//	}
+			//}
 
 			frameHoverPanel._dragMousePressed = false;
 			frameHoverPanel.CurrentDrag = null;
@@ -308,7 +342,7 @@ namespace WpfEditorTest
 				{
 					createdFrame.X = (int)e.MouseDevice.GetPosition(this).X - createdFrame.Width / 2;
 					createdFrame.Y = (int)e.MouseDevice.GetPosition(this).Y - createdFrame.Height / 2;
-					(engine.GameInterface as ApplicationInterface).rootFrame.Add(createdFrame); 
+					SceneFrame.Add(createdFrame); 
 				}
 				palette._selectedFrameTemplate = null;
 				this.Cursor = Cursors.Arrow;
@@ -323,10 +357,9 @@ namespace WpfEditorTest
 				details.FrameDetailsControls.ItemsSource = null;
 				if (selected.Parent!=null)
 				{
-					treeView.ElementHierarcyView.SetSelectedItem(selected.Parent);
+					//treeView.ElementHierarcyView.SetSelectedItem(selected.Parent);
 					//TreeViewExtension.SetSelected(details.FrameDetailsControls, selected.Parent);
 				}
-
 
 				selected.Parent.Remove(selected);
 
@@ -337,11 +370,31 @@ namespace WpfEditorTest
 
 		private void DxElem_MouseDown( object sender, MouseButtonEventArgs e )
 		{
-			var hoveredframe = (engine.GameInterface as ApplicationInterface).rootFrame.ui.GetHoveredFrameExternally();
-			if (hoveredframe!=null)
+			GetHoveredFrame();
+		}
+
+
+		public void GetHoveredFrame()
+		{
+			var hoveredframe = SceneFrame.ui.GetHoveredFrameExternally(SceneFrame);
+			if (hoveredframe != null && hoveredframe != rootFrame
+				&& hoveredframe != SceneFrame)
 			{
 				treeView.SetSelectedFrame(hoveredframe);
 			}
+		}
+
+		public void MoveFrameToDragField(Fusion.Engine.Frames.Frame frame)
+		{
+			if (frame.Parent != null)
+			{
+				//treeView.ElementHierarcyView.SetSelectedItem(frame.Parent);
+				//TreeViewExtension.SetSelected(details.FrameDetailsControls, selected.Parent);
+			}
+			frame.Parent.Remove(frame);
+
+			DragFieldFrame.Add(frame);
+			frameHoverPanel.UpdateSelectedFramePosition();
 		}
 
 		//PropertyValueConverter

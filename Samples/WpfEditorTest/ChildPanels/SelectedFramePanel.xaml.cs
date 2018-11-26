@@ -172,7 +172,7 @@ namespace WpfEditorTest.ChildPanels
 		public bool _mousePressed { get; set; }
 		public Border CurrentDrag { get; set; }
 		public bool _dragMousePressed { get; set; }
-		public Window _window { get; set; }
+		public InterfaceEditor _window { get; set; }
 		public List<Border> drags { get; private set; }
 		public List<Border> visualAnchors { get; private set; }
 
@@ -240,19 +240,10 @@ namespace WpfEditorTest.ChildPanels
 			{
 				if (this._selectedframe != null && this.PositionChanged())
 				{
-					this.locked = true;
-					var sumX = 0;
-					var sumY = 0;
-					this._selectedframe.ForEachAncestor(a => { sumX += a.X; sumY += a.Y; });
-					this._selectedframe.X = (int)this.RenderTransform.Value.OffsetX - (sumX - this._selectedframe.X);
-					this._selectedframe.Y = (int)this.RenderTransform.Value.OffsetY - (sumY - this._selectedframe.Y);
-
-					_oldX = this.RenderTransform.Value.OffsetX;
-					_oldY = this.RenderTransform.Value.OffsetY;
-					//this._selectedframe.Width = (int)(this.Width + Math.Min(0,WidthBuffer));
-					//this._selectedframe.Height = (int)(this.Height + Math.Min(0, HeightBuffer));
-					this.locked = false;
+					UpdateSelectedFramePosition();
 				}
+
+				//Fusion.Core.Mathematics.MathUtil.IsRectInsideRect(this._selectedframe.GlobalRectangle, currentDrawFrame.InnerClip);
 				this.UpdateAnchorLines();
 			};
 
@@ -287,6 +278,22 @@ namespace WpfEditorTest.ChildPanels
 			//			}
 			//	}
 			//};
+		}
+
+		public void UpdateSelectedFramePosition()
+		{
+			this.locked = true;
+			var sumX = 0;
+			var sumY = 0;
+			this._selectedframe.ForEachAncestor(a => { sumX += a.X; sumY += a.Y; });
+			this._selectedframe.X = (int)this.RenderTransform.Value.OffsetX - (sumX - this._selectedframe.X);
+			this._selectedframe.Y = (int)this.RenderTransform.Value.OffsetY - (sumY - this._selectedframe.Y);
+
+			_oldX = this.RenderTransform.Value.OffsetX;
+			_oldY = this.RenderTransform.Value.OffsetY;
+			//this._selectedframe.Width = (int)(this.Width + Math.Min(0,WidthBuffer));
+			//this._selectedframe.Height = (int)(this.Height + Math.Min(0, HeightBuffer));
+			this.locked = false;
 		}
 
 		private void UpdateAnchorLines()
@@ -334,9 +341,15 @@ namespace WpfEditorTest.ChildPanels
 
 		private void UserControl_MouseDown( object sender, MouseButtonEventArgs e )
 		{
+			e.Handled = false;
 			this._mousePressed = true;
 			_previousMouseLocation = e.MouseDevice.GetPosition(_window);
 			_previousTransform = this.RenderTransform;
+
+			_window.GetHoveredFrame();
+
+			_window.MoveFrameToDragField(this._selectedframe);
+
 		}
 
 		private void UserControl_MouseMove( object sender, MouseEventArgs e )
@@ -358,6 +371,7 @@ namespace WpfEditorTest.ChildPanels
 
 		private void Drag_MouseDown( object sender, MouseButtonEventArgs e )
 		{
+			e.Handled = true;
 			Border drag = sender as Border;
 
 			this.CurrentDrag = drag;

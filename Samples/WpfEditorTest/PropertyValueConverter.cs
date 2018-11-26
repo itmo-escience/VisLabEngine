@@ -28,6 +28,11 @@ namespace WpfEditorTest
 			//	var t = 0;
 			//	return null;
 			//}
+			if (value==null)
+			{
+				return targetType.ToString();
+			}
+
 
 			if (value.GetType() == typeof(Fusion.Core.Mathematics.Color))
 			{

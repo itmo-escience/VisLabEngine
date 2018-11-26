@@ -84,7 +84,8 @@ namespace GISTest
 		Vector2 prevMousePos;
 
 
-		ScalableFrame LocalRoot;
+		ScalableFrame Scene;
+		ScalableFrame DragFieldFrame;
 		/// <summary>
 		/// Ctor
 		/// </summary>
@@ -161,11 +162,14 @@ namespace GISTest
 			userInterface.RootFrame = this.rootFrame = new MainFrame(FrameProcessor);
 			viewLayer.SpriteLayers.Add(userInterface.FramesSpriteLayer);
 
-			LocalRoot = CreateStartFrame();
-
-			LocalRoot.Visible = true;
-			LocalRoot.Ghost = false;
-			this.rootFrame.Add(LocalRoot);
+			var testWindow = CreateStartFrame();
+			Scene = new ScalableFrame(this.rootFrame.ui, 0, 0, this.rootFrame.UnitWidth, this.rootFrame.UnitHeight, "Scene", Color.Zero) { Anchor= FrameAnchor.All };
+			//DragFieldFrame = new ScalableFrame(this.rootFrame.ui, 0, 0, this.rootFrame.UnitWidth, this.rootFrame.UnitHeight, "DragFieldFrame", Color.Zero) { Anchor = FrameAnchor.All };
+			Scene.Add(testWindow);
+			Scene.Visible = true;
+			Scene.Ghost = false;
+			//this.rootFrame.Add(DragFieldFrame);
+			this.rootFrame.Add(Scene);
 		}
 
 		public Window CreateStartFrame()
@@ -259,7 +263,7 @@ namespace GISTest
 
 		    SliderFactory.SliderHorizontalHolderNew(5, 35, 5, 15, ser3, "mySlider", 10, null, 0, 1, 0.3f, out var slider);
 
-
+			slider.Text = slider.Name = "Sliderser";
 
 			//dynamic frame = new ScalableFrame(ui, 0, 0, 100, 100, "ScalableFrame", Color.Gray);
 			//FrameSerializer.Write(frame, "Frames\\" + frame.GetType().Name + ".xml");

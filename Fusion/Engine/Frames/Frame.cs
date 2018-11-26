@@ -614,7 +614,7 @@ namespace Fusion.Engine.Frames {
 			if (this.children.Contains(frame))
 			{
 				this.children.Remove(frame);
-				frame.parent = this;
+				frame.parent = null;
 				OnPropertyChanged("Children");
 			}
 		}
@@ -1710,6 +1710,11 @@ namespace Fusion.Engine.Frames {
 			{
 				this.parent?.OnPropertyChanged("Children");
 			}
+		}
+
+		public override string ToString()
+		{
+			return this.Text;
 		}
 	}
 }

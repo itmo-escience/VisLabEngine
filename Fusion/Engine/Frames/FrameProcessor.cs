@@ -201,9 +201,9 @@ namespace Fusion.Engine.Frames {
 			Frame.DrawNonRecursive( RootFrame, gameTime, spriteLayer );
 		}
 
-		public Frame GetHoveredFrameExternally()
+		public Frame GetHoveredFrameExternally( Frame frame )
 		{
-			return mouseProcessor.GetHoveredFrame();
+			return mouseProcessor.GetHoveredFrame(frame);
 		}
 		/*-----------------------------------------------------------------------------------------
 		 *
