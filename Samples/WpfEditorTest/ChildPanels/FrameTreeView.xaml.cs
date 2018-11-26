@@ -65,11 +65,11 @@ namespace WpfEditorTest.ChildPanels
 
 		public void SetSelectedFrame( Fusion.Engine.Frames.Frame frame )
 		{
-			if (lastSelectedframe != null)
-			{
-				lastSelectedframe.Border = lastSelectedframeBorder;
-				lastSelectedframe.BorderColor = lastSelectedframeBorderColor;
-			}
+			//if (lastSelectedframe != null)
+			//{
+			//	lastSelectedframe.Border = lastSelectedframeBorder;
+			//	lastSelectedframe.BorderColor = lastSelectedframeBorderColor;
+			//}
 
 			Selectedframe = frame; 
 
@@ -101,6 +101,16 @@ namespace WpfEditorTest.ChildPanels
 			this._mousePressed = true;
 			_previousMouseLocation = e.MouseDevice.GetPosition(_window);
 			_previousTransform = this.RenderTransform;
+		}
+
+		private void SaveScene_Click(object sender, RoutedEventArgs e )
+		{
+			_window.TrySaveSceneAsTemplate();
+		}
+
+		private void LoadScene_Click( object sender, RoutedEventArgs e )
+		{
+			_window.TryLoadSceneAsTemplate();
 		}
 	}
 }

@@ -413,7 +413,7 @@ namespace Fusion.Engine.Frames {
 
 
 		//ILIst
-		public List<Frame> Children
+		public ObservableCollection<Frame> Children
 		{
 			get { return children; }
 			set
@@ -550,7 +550,7 @@ namespace Fusion.Engine.Frames {
 		 * 
 		-----------------------------------------------------------------------------------------*/
 
-		private List<Frame> children = new List<Frame>();
+		private ObservableCollection<Frame> children = new ObservableCollection<Frame>();
 		protected Frame parent = null;
 		private int zOrder = 0;
 
@@ -617,7 +617,7 @@ namespace Fusion.Engine.Frames {
 		/// 
 		public void ReorderChildren()
 		{
-			children = children.OrderBy(f => f.ZOrder).ToList();
+			children = new ObservableCollection<Frame>(children.OrderBy(f => f.ZOrder));
 			int j = 0;
 			for (int i = 0; i < children.Count; i++)
 			{

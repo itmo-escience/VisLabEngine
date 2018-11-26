@@ -39,7 +39,7 @@
         <string>Fusion.Engine.Frames.Frame</string>
       </key>
       <value>
-        <string>Fusion, Version=0.2.6897.34900, Culture=neutral, PublicKeyToken=null</string>
+        <string>Fusion, Version=0.2.6904.32674, Culture=neutral, PublicKeyToken=null</string>
       </value>
     </item>
     <item>
@@ -502,7 +502,7 @@
             <UnitTextOffsetY>0</UnitTextOffsetY>
             <UnitImageOffsetX>0</UnitImageOffsetX>
             <UnitImageOffsetY>0</UnitImageOffsetY>
-            <DisableFree>false</DisableFree>
+            <DisableFree>true</DisableFree>
             <CanChangeSize>false</CanChangeSize>
             <ClampPos>true</ClampPos>
             <FixedSize />
@@ -1299,7 +1299,7 @@
                 <UnitTextOffsetY>0</UnitTextOffsetY>
                 <UnitImageOffsetX>0</UnitImageOffsetX>
                 <UnitImageOffsetY>0</UnitImageOffsetY>
-                <DisableFree>false</DisableFree>
+                <DisableFree>true</DisableFree>
                 <CanChangeSize>false</CanChangeSize>
                 <ClampPos>true</ClampPos>
               </Frame>
@@ -1425,6 +1425,7 @@
                 <Selected>false</Selected>
               </Frame>
               <Frame xsi:type="Slider">
+                <Name>Sliderser</Name>
                 <Visible>true</Visible>
                 <Ghost>false</Ghost>
                 <Enabled>true</Enabled>
@@ -1478,7 +1479,7 @@
                 <BorderBottom>0</BorderBottom>
                 <BorderLeft>0</BorderLeft>
                 <BorderRight>0</BorderRight>
-                <Text />
+                <Text>Sliderser</Text>
                 <TextAlignment>TopLeft</TextAlignment>
                 <TextOffsetX>0</TextOffsetX>
                 <TextOffsetY>0</TextOffsetY>
@@ -1546,7 +1547,7 @@
                 <Selected>false</Selected>
                 <order>0</order>
                 <TryLoadResource>true</TryLoadResource>
-                <DefaultText />
+                <DefaultText>Sliderser</DefaultText>
                 <UnitX>13</UnitX>
                 <UnitY>35</UnitY>
                 <UnitWidth>15</UnitWidth>
@@ -1722,7 +1723,7 @@
     <UnitTextOffsetY>0</UnitTextOffsetY>
     <UnitImageOffsetX>0</UnitImageOffsetX>
     <UnitImageOffsetY>0</UnitImageOffsetY>
-    <DisableFree>false</DisableFree>
+    <DisableFree>true</DisableFree>
     <CanChangeSize>false</CanChangeSize>
     <ClampPos>true</ClampPos>
     <FixedSize />

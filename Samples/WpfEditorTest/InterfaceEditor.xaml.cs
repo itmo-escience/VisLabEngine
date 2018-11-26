@@ -22,6 +22,7 @@ using System.Windows.Threading;
 using Fusion.Engine.Input;
 using WpfEditorTest.ChildPanels;
 using KeyEventArgs = System.Windows.Input.KeyEventArgs;
+using Fusion.Engine.Frames;
 
 namespace WpfEditorTest
 {
@@ -30,7 +31,7 @@ namespace WpfEditorTest
 	/// </summary>
 	public partial class InterfaceEditor : Window
 	{
-		FrameDetails details;
+		public FrameDetails details;
 		FramePalette palette;
 		FrameTreeView treeView;
 		SelectedFramePanel frameHoverPanel;
@@ -42,6 +43,7 @@ namespace WpfEditorTest
 		Fusion.Core.Mathematics.Color lastSelectedframeBorderColor;
 
 		string templatesPath = System.IO.Path.GetFullPath(System.IO.Path.Combine(Directory.GetParent(Assembly.GetEntryAssembly().Location).FullName, "..\\..\\..\\FramesXML"));
+		Binding childrenBinding;
 
 		Game engine;
 
@@ -97,24 +99,25 @@ namespace WpfEditorTest
 				frameHoverPanel.selectedframe = treeView.Selectedframe;
 			};
 
-			var templates = Directory.GetFiles(templatesPath, "*.xml").ToList();
-			palette.AvailableFrames.ItemsSource = templates.Select(t=>t.Split('\\').Last().Split('.').First());
-			//StaticData.availableFrameElements;
+			this.LoadPalettes();
+
+			//var templates = Directory.GetFiles(templatesPath, "*.xml").ToList();
+			//palette.AvailableFrames.ItemsSource = templates.Select(t=>t.Split('\\').Last().Split('.').First());
 
 			rootFrame = (engine.GameInterface as ApplicationInterface).rootFrame;
 			SceneFrame = (FusionUI.UI.ScalableFrame)rootFrame.Children.FirstOrDefault();
 			DragFieldFrame = new FusionUI.UI.ScalableFrame(this.rootFrame.ui, 0, 0, this.rootFrame.UnitWidth, this.rootFrame.UnitHeight, "DragFieldFrame", Fusion.Core.Mathematics.Color.Zero)
 			{ Anchor = Fusion.Engine.Frames.FrameAnchor.All };
 			rootFrame.Add(DragFieldFrame);
-			Binding b = new Binding("Children")
+			DragFieldFrame.ZOrder = 100000;
+
+			childrenBinding = new Binding("Children")
 			{
 				Source = SceneFrame,//(engine.GameInterface as ApplicationInterface).rootFrame,
-				UpdateSourceTrigger = UpdateSourceTrigger.PropertyChanged,
-				Mode = BindingMode.OneWay
 			};
-			treeView.ElementHierarcyView.SetBinding(TreeView.ItemsSourceProperty,b);
+			treeView.ElementHierarcyView.SetBinding(TreeView.ItemsSourceProperty,childrenBinding);
 			//treeView.ElementHierarcyView.ItemsSource = (engine.GameInterface as ApplicationInterface).rootFrame.Children;
-			SceneFrame.PropertyChanged += ( s, e ) => { };
+			//SceneFrame.PropertyChanged += ( s, e ) => { };
 
 			SceneFrame.ForEachChildren(
 				c =>
@@ -127,6 +130,65 @@ namespace WpfEditorTest
 
 			//this.Dispatcher.BeginInvoke(new Action(() => SetMouseLook()), DispatcherPriority.ApplicationIdle);
 
+		}
+
+		internal void TryLoadSceneAsTemplate()
+		{
+			var startPath = System.IO.Path.GetFullPath(System.IO.Path.Combine(templatesPath, ".."));
+			var filter = "XML files(*.xml)| *.xml";
+			using (var dialog = new System.Windows.Forms.OpenFileDialog() { InitialDirectory = startPath, Multiselect = false, Filter = filter })
+			{
+				if (dialog.ShowDialog() == System.Windows.Forms.DialogResult.OK)
+				{
+					Fusion.Engine.Frames.Frame createdFrame = this.CreateFrameFromFile(dialog.FileName);
+					if (createdFrame!=null)
+					{
+						rootFrame.Remove(this.SceneFrame);
+						this.SceneFrame = (FusionUI.UI.ScalableFrame)createdFrame;
+						rootFrame.Add(this.SceneFrame);
+						childrenBinding = new Binding("Children")
+						{
+							Source = SceneFrame,//(engine.GameInterface as ApplicationInterface).rootFrame,
+						};
+						treeView.ElementHierarcyView.SetBinding(TreeView.ItemsSourceProperty, childrenBinding);
+					}
+				}
+			}
+		}
+
+		internal void TrySaveSceneAsTemplate()
+		{
+			var startPath = System.IO.Path.GetFullPath(System.IO.Path.Combine(templatesPath, ".."));
+			var filter = "XML files(*.xml)| *.xml";
+			using (var dialog = new System.Windows.Forms.SaveFileDialog() { InitialDirectory = startPath, Filter = filter })
+			{
+				if (dialog.ShowDialog() == System.Windows.Forms.DialogResult.OK)
+				{
+					Fusion.Core.Utils.FrameSerializer.Write(SceneFrame, dialog.FileName);
+				}
+			}
+		}
+
+		internal void TrySaveFrameAsTemplate()
+		{
+			if (frameHoverPanel.selectedframe!=null)
+			{
+				if (!Directory.Exists(templatesPath))
+				{
+					Directory.CreateDirectory(templatesPath);
+				}
+				Fusion.Core.Utils.FrameSerializer.Write(frameHoverPanel.selectedframe, templatesPath + "\\" + (frameHoverPanel.selectedframe.Text?? frameHoverPanel.selectedframe.GetType().ToString()) + ".xml");
+				this.LoadPalettes();
+			}
+		}
+
+		public void LoadPalettes()
+		{
+			if (Directory.Exists(templatesPath))
+			{
+				var templates = Directory.GetFiles(templatesPath, "*.xml").ToList();
+				palette.AvailableFrames.ItemsSource = templates.Select(t => t.Split('\\').Last().Split('.').First()); 
+			}
 		}
 
 		private void DisableChildrenFree(Fusion.Engine.Frames.Frame frame)
@@ -335,8 +397,8 @@ namespace WpfEditorTest
 
 			if (palette._selectedFrameTemplate!=null)
 			{
-				var createdFrame = (Fusion.Engine.Frames.Frame)null;
-					Fusion.Core.Utils.FrameSerializer.Read(System.IO.Path.Combine(templatesPath, palette._selectedFrameTemplate)+".xml", out createdFrame);
+
+				Fusion.Engine.Frames.Frame createdFrame = this.CreateFrameFromFile(System.IO.Path.Combine(templatesPath, palette._selectedFrameTemplate) + ".xml");
 				//Activator.CreateInstance(palette._selectedFrameTemplate, (engine.GameInterface as ApplicationInterface).rootFrame.ui);
 				if (createdFrame!=null)
 				{
@@ -347,6 +409,13 @@ namespace WpfEditorTest
 				palette._selectedFrameTemplate = null;
 				this.Cursor = Cursors.Arrow;
 			}
+		}
+
+		private Fusion.Engine.Frames.Frame CreateFrameFromFile( string filePath )
+		{
+			var createdFrame = (Fusion.Engine.Frames.Frame)null;
+			Fusion.Core.Utils.FrameSerializer.Read(filePath, out createdFrame);
+			return createdFrame;
 		}
 
 		private void Window_KeyDown( object sender, KeyEventArgs e )
