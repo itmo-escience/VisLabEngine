@@ -13,10 +13,6 @@ namespace FusionUI.UI.Elements
 {
     public class Editbox : ScalableFrame
     {
-
-		protected Editbox()
-		{
-		}
 		public string Label;
 
         private bool isFixWidth = true;
@@ -36,14 +32,20 @@ namespace FusionUI.UI.Elements
         const float carretBlinkTime = 0.4f;
         private bool inBound = true;
 
+        [Obsolete("Please use constructor without FrameProcessor")]
+        public Editbox(FrameProcessor ui) : this() { }
 
-        public Editbox(FrameProcessor ui) : base(ui)
+        [Obsolete("Please use constructor without FrameProcessor")]
+        public Editbox(FrameProcessor ui, float x, float y, float w, float h, string text, Color backColor)
+            : this(x, y, w, h, text, backColor) { }
+
+        public Editbox()
         {
             Text = "";
             init();
         }
 
-        public Editbox(FrameProcessor ui, float x, float y, float w, float h, string text, Color backColor) : base(ui, x, y, w, h, text, backColor)
+        public Editbox(float x, float y, float w, float h, string text, Color backColor) : base(x, y, w, h, text, backColor)
         {
             init();
         }
@@ -53,15 +55,15 @@ namespace FusionUI.UI.Elements
         /// </summary>
         public void init()
         {
-            this.Game.GameInterface.Game.Keyboard.FormKeyPress += EditBox_KeyPress;
-            this.Game.GameInterface.Game.Keyboard.KeyDown += EditBox_KeyDown;
+            Game.Instance.Keyboard.FormKeyPress += EditBox_KeyPress;
+            Game.Instance.Keyboard.KeyDown += EditBox_KeyDown;
 
 			this.StatusChanged += (s, e) =>
             {
                 isHovered = e.Status == FrameStatus.Hovered;
             };
 
-            this.ActionClick += (ControlActionArgs args, ref bool flag) => 
+            this.ActionClick += (ControlActionArgs args, ref bool flag) =>
             {
                 if (args.IsClick)
                 {
@@ -92,12 +94,12 @@ namespace FusionUI.UI.Elements
                                     l = l;
                                     r = i;
                                     i = (l + i) / 2;
-                                    
+
                                 }
                                 if (r - l <= 1)
                                 {
                                     carretPos = i;
-                                    break;                                    
+                                    break;
                                 }
                             }
                         }
@@ -112,7 +114,7 @@ namespace FusionUI.UI.Elements
             if (isActive && !forceValue)
                 OnPropertyChanged("Text");
             if (forceValue) Selected = true;
-            isActive = forceValue;            
+            isActive = forceValue;
         }
 
         private void changeActiveStatus()
@@ -155,7 +157,7 @@ namespace FusionUI.UI.Elements
                 Text = Text.Remove(carretPos, 1);
             }
 
-			if (e.Key == Keys.V && this.Game.GameInterface.Game.Keyboard.IsKeyDown(Keys.LeftControl)) {
+			if (e.Key == Keys.V && Game.Instance.Keyboard.IsKeyDown(Keys.LeftControl)) {
 				IDataObject iData = System.Windows.Forms.Clipboard.GetDataObject();
 
 				if (iData.GetDataPresent(DataFormats.Text) || iData.GetDataPresent(DataFormats.Text)) {
@@ -175,7 +177,7 @@ namespace FusionUI.UI.Elements
         /// <param name="e"></param>
         void EditBox_KeyPress(object sender, KeyPressArgs e)
         {
-            if (!IsActive || Game.GameInterface.Game.Keyboard.IsKeyDown(Keys.LeftControl))
+            if (!IsActive || Game.Instance.Keyboard.IsKeyDown(Keys.LeftControl))
                 return;
             counter = carretBlinkTime / 2;
 
@@ -256,7 +258,7 @@ namespace FusionUI.UI.Elements
 
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         /// <param name="parentOpacity"></param>
         protected override void DrawFrame(GameTime gameTime, SpriteLayer sb, int clipRectIndex)
@@ -288,7 +290,7 @@ namespace FusionUI.UI.Elements
             }
 
 
-            var texWhite = this.Game.RenderSystem.WhiteTexture;
+            var texWhite = Game.Instance.RenderSystem.WhiteTexture;
 
 
             if (IsActive)
@@ -299,7 +301,7 @@ namespace FusionUI.UI.Elements
                     sb.Draw(texWhite, gr.X + PaddingLeft + carretOffs, gr.Y + PaddingBottom + labelHeight, 2, sizeText.Height, Color.Black, clipRectIndex);
                 }
             }
-            
+
             this.Font.DrawString(sb, value, gr.X + PaddingLeft, gr.Y + PaddingBottom + labelHeight, showAltText ? Color.Gray : IsActive ? Color.Black : Color.White, clipRectIndex, 0, false);
 
             sb.Draw(texWhite, (float)gr.X, (float)gr.Y + labelHeight, (float)gr.Width, (float)BorderTop, BorderActive, clipRectIndex);

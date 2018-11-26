@@ -47,15 +47,24 @@ namespace FusionUI.UI
         public bool EnableClip = false;
         public override string Tooltip { get; set; } = "";
 
+        [Obsolete("Please use constructor without FrameProcessor")]
         public RichTextBlock(
-            FrameProcessor ui, 
-            float x, float y, 
-            float w, float h, 
-            string text, Color backColor, UIConfig.FontHolder font, 
-            float offsetLine, float minHeight = 0, 
+            FrameProcessor ui,
+            float x, float y,
+            float w, float h,
+            string text, Color backColor, UIConfig.FontHolder font,
+            float offsetLine, float minHeight = 0,
             bool isShortText = false, int maxWidth = 200000 // Wider than any screen
-        ) : base(ui, x, y, w, h, text, backColor)
-        {            
+        ) : this(x, y, w, h, text, backColor, font, offsetLine, minHeight, isShortText, maxWidth) { }
+
+        public RichTextBlock(
+            float x, float y,
+            float w, float h,
+            string text, Color backColor, UIConfig.FontHolder font,
+            float offsetLine, float minHeight = 0,
+            bool isShortText = false, int maxWidth = 200000 // Wider than any screen
+        ) : base(x, y, w, h, text, backColor)
+        {
             IsShortText    = isShortText;
             UnitOffsetLine = offsetLine;
             FontHolder     = font;
@@ -79,7 +88,7 @@ namespace FusionUI.UI
         public virtual void init()
         {
             BaseHeight = Height;
-            
+
             splitByString();
 
             var textOffset = _linesToDraw.Count * (Font.LineHeight + OffsetLine);
@@ -91,7 +100,7 @@ namespace FusionUI.UI
                 Height = BaseHeight;
             }
             Height = !IsShortText ? textOffset : BaseHeight;
-        }              
+        }
 
         protected override void Update(GameTime gameTime)
         {
@@ -142,7 +151,7 @@ namespace FusionUI.UI
                 // Forced line break found
                 if (word.Equals("\n"))
                 {
-                    _linesToDraw.Add(new TextLine { Text = currentLine, Width = currentLineWidth });                    
+                    _linesToDraw.Add(new TextLine { Text = currentLine, Width = currentLineWidth });
 
                     currentLineWidth = 0;
                     currentLine = "";
@@ -167,7 +176,7 @@ namespace FusionUI.UI
                     _linesToDraw.Add(new TextLine { Text = currentLine, Width = currentLineWidth });
                     currentLine = "";
                     currentLineWidth = 0;
-                }                
+                }
             }
             _linesToDraw.Add(new TextLine { Text = currentLine, Width = currentLineWidth });
 
@@ -176,7 +185,7 @@ namespace FusionUI.UI
             if (EnableClip)
             {
                 X += (Width - MaxLineWidth)/2;
-                Width = MaxLineWidth;                
+                Width = MaxLineWidth;
             }
         }
 
@@ -194,8 +203,8 @@ namespace FusionUI.UI
                 if (IsShortText && textOffset > BaseHeight - OffsetLine * 2 - Font.CapHeight * 2)
                 {
                     // TODO: WTF is that
-                    Font.DrawString(sb, 
-                        line.Text.Length > 3 ? line.Text.Remove(line.Text.Length - 3) + "..." : "...", 
+                    Font.DrawString(sb,
+                        line.Text.Length > 3 ? line.Text.Remove(line.Text.Length - 3) + "..." : "...",
                         GlobalRectangle.X, GlobalRectangle.Y + textOffset,
                         ForeColor, 0, 0, false);
                     break;
@@ -208,7 +217,7 @@ namespace FusionUI.UI
 
                 Font.DrawString(sb, line.Text,
                     GlobalRectangle.X + offsetX, GlobalRectangle.Y + textOffset,
-                    ForeColor, clipRectIndex, 
+                    ForeColor, clipRectIndex,
                     0, false
                 );
 

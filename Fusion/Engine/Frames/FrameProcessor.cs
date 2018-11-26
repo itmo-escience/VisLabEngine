@@ -35,18 +35,14 @@ namespace Fusion.Engine.Frames {
 			}
 			set {
 				rootFrame = value;
-				if (rootFrame.ui == null)
-				{
-					rootFrame.UpdateChildrenUI(this);
-				}
 			}
 		}
 
 		/// <summary>
 		/// Gets and sets current target frame.
 		/// </summary>
-		public	Frame TargetFrame { 
-			get { 
+		public	Frame TargetFrame {
+			get {
 				return targetFrame;
 			}
 			internal set {
@@ -95,8 +91,6 @@ namespace Fusion.Engine.Frames {
 			mouseProcessor		=	new MouseProcessor( Game, this );
 		}
 
-
-
 		/// <summary>
 		/// Inits view
 		/// </summary>
@@ -115,7 +109,7 @@ namespace Fusion.Engine.Frames {
 
 
 		/// <summary>
-		/// 
+		///
 		/// </summary>
 		/// <param name="disposing"></param>
 		protected override void Dispose ( bool disposing )
@@ -136,7 +130,7 @@ namespace Fusion.Engine.Frames {
 		/// <summary>
 		/// Call this method after UI setup to make things right
 		/// </summary>
-		public void SettleControls () 
+		public void SettleControls ()
 		{
 			UpdateUI( new GameTime(), true, false );
 			UpdateUI( new GameTime(), false, true );
@@ -144,7 +138,7 @@ namespace Fusion.Engine.Frames {
 
 
 		/// <summary>
-		/// 
+		///
 		/// </summary>
 		/// <param name="gameTime"></param>
 		/// <param name="suppressLayout"></param>
@@ -212,9 +206,9 @@ namespace Fusion.Engine.Frames {
 			return mouseProcessor.GetHoveredFrame(frame);
 		}
 		/*-----------------------------------------------------------------------------------------
-		 * 
+		 *
 		 *	Input processing :
-		 * 
+		 *
 		-----------------------------------------------------------------------------------------*/
 
 	}

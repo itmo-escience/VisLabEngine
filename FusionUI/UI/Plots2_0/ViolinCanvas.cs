@@ -1,10 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Fusion;
+﻿using Fusion;
 using Fusion.Core.Mathematics;
+using Fusion.Engine.Common;
 using Fusion.Engine.Frames;
 using Fusion.Engine.Graphics;
 using Fusion.Engine.Graphics.GIS.GlobeMath;
@@ -17,7 +13,7 @@ namespace FusionUI.UI.Plots2_0
             h, backColor)
         {
         }
-        
+
 
         public override void DrawPlot(SpriteLayer sb, PlotData pd, int clipRectIndex)
         {
@@ -25,8 +21,7 @@ namespace FusionUI.UI.Plots2_0
             float d = (float)Width / (pd.ActiveDepths.Count);
 
             if (!pd.IsLoaded || !pd.IsPresent) return;
-            var beamTex = Game.Content.Load<DiscTexture>(@"UI/beam");
-            var whiteTex = Game.RenderSystem.WhiteTexture;
+            var whiteTex = Game.Instance.RenderSystem.WhiteTexture;
             int cat = 0;
             foreach (var depth in pd.ActiveDepths)
             {
@@ -34,7 +29,7 @@ namespace FusionUI.UI.Plots2_0
                 var limits = pd.Variable.LimitsAligned;
 
                 var prev = points[0];
-                var prevPlot = (prev - limits.TopLeft) / limits.Size;                
+                var prevPlot = (prev - limits.TopLeft) / limits.Size;
                 //prevPlot.X = 0.1 + 0.8 * (1 - prevPlot.X);
                 prevPlot = new DVector2(prevPlot.Y, prevPlot.X);
                 var prevScreen = new DVector2(prevPlot.X * d * 0.8f, prevPlot.Y * Height);
@@ -91,7 +86,7 @@ namespace FusionUI.UI.Plots2_0
                             br,
                             pd.ColorsByDepth[depth],
                             new Vector2(0, 0), new Vector2(0, 0), new Vector2(0, 0), new Vector2(0, 0), clipRectIndex);
-                        
+
                         //sb.DrawBeam(beamTex,
 
                         //     pd.ColorsByDepth[depth],

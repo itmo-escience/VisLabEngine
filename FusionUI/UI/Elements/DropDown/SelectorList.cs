@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Fusion.Core.Mathematics;
+using Fusion.Engine.Common;
 using Fusion.Engine.Frames;
 using Fusion.Engine.Input;
 
@@ -62,7 +63,7 @@ namespace FusionUI.UI.Elements.DropDown
                             valueRow.ForeColor = UIConfig.ActiveTextColor;
                             valueRow.BackColor = Color.Zero;
                             SelectedList.Remove(valueRow.Value);
-                            if ((Game.Keyboard.IsKeyDown(Keys.LeftShift) || Game.Keyboard.IsKeyDown(Keys.RightShift)) &&
+                            if ((Game.Instance.Keyboard.IsKeyDown(Keys.LeftShift) || Game.Instance.Keyboard.IsKeyDown(Keys.RightShift)) &&
                                 lastSelectIndex != -1)
                             {
                                 for (int i = lastSelectIndex; i != index; i = index > lastSelectIndex ? ++i : --i)
@@ -79,7 +80,7 @@ namespace FusionUI.UI.Elements.DropDown
                             valueRow.ForeColor = UIConfig.ActiveTextColor;
                             valueRow.BackColor = UIConfig.ActiveColor;
                             SelectedList.Add(valueRow.Value);
-                            if ((Game.Keyboard.IsKeyDown(Keys.LeftShift) || Game.Keyboard.IsKeyDown(Keys.RightShift)) &&
+                            if ((Game.Instance.Keyboard.IsKeyDown(Keys.LeftShift) || Game.Instance.Keyboard.IsKeyDown(Keys.RightShift)) &&
                                 lastSelectIndex != -1)
                             {
                                 for (int i = lastSelectIndex; i != index; i = index > lastSelectIndex ? ++i : --i)

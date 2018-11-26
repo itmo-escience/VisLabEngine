@@ -2,6 +2,7 @@
 using System.IO;
 using Fusion.Core.Mathematics;
 using Fusion.Drivers.Graphics;
+using Fusion.Engine.Common;
 using Fusion.Engine.Frames;
 using Fusion.Engine.Graphics;
 using FusionUI.UI.Factories;
@@ -17,8 +18,8 @@ namespace FusionUI.UI.Elements.DropDown
         {
             if (s == "<s>Add")
             {
-                return ApplicationInterface.Instance.Game.Content.Load<DiscTexture>(@"UI-new\fv-icons_add");
-            } 
+                return Game.Instance.Content.Load<DiscTexture>(@"UI-new\fv-icons_add");
+            }
             else if (s.StartsWith("<u>"))
             {
                 string name = s.Substring(3);
@@ -26,28 +27,27 @@ namespace FusionUI.UI.Elements.DropDown
                 {
                     using (var stream = File.OpenRead(name))
                     {
-                        PaletteFactory.CachedPalettes[name] = new UserTexture(ApplicationInterface.Instance.Game.RenderSystem, stream, false);
+                        PaletteFactory.CachedPalettes[name] = new UserTexture(Game.Instance.RenderSystem, stream, false);
                     }
                 }
                 return PaletteFactory.CachedPalettes[name];
             }
 
-            return new DiscTexture(Fusion.Engine.Common.Game.Instance.RenderSystem,
-                ApplicationInterface.Instance.Game.Content.Load<Texture2D>(s));
+            return new DiscTexture(Game.Instance.RenderSystem, Game.Instance.Content.Load<Texture2D>(s));
             //return ApplicationInterface.Instance.Game.Content.Load<DiscTexture>(s);
         };
 
         public override void Initialize(float x, float y, float w, float h, string text, Color backColor)
-        {            
+        {
             ImageMode = FrameImageMode.Tiled;
-            Image = new DiscTexture(Fusion.Engine.Common.Game.Instance.RenderSystem, ui.Game.Content.Load<Texture2D>(@"ui-new\fv_palette_bg.png"));
+            Image = new DiscTexture(Game.Instance.RenderSystem, Game.Instance.Content.Load<Texture2D>(@"ui-new\fv_palette_bg.png"));
 
-            front = new ScalableFrame(ui, 0, 0, w, h, "", Color.Zero)
+            front = new ScalableFrame(0, 0, w, h, "", Color.Zero)
             {
                 ImageMode = FrameImageMode.Stretched,
             };
             Add(front);
-            base.Initialize (x, y, w, h, text, backColor);            
+            base.Initialize (x, y, w, h, text, backColor);
         }
 
         public override string Value {

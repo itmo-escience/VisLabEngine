@@ -18,21 +18,18 @@ using Fusion.Drivers.Graphics;
 namespace FusionUI.UI.Factories
 {
     public class HorizontalPaletteRender : ScalableFrame
-    {        
-        private FrameProcessor ui;
-
+    {
         public float maxPosition;
         public float minPosition;
 
         public Texture PaletteImage;
 
-        public HorizontalPaletteRender(FrameProcessor ui, float x, float y, float w, float h, string textureName) : base(ui, x, y, w, h, "", Color.Zero)
+        public HorizontalPaletteRender(float x, float y, float w, float h, string textureName) : base(x, y, w, h, "", Color.Zero)
         {
-            this.ui = ui;
             maxPosition = 1;
             minPosition = 0;
-            PaletteImage = new DiscTexture(ui.Game.RenderSystem, ui.Game.Content.Load<Texture2D> (textureName));
-            Image = new DiscTexture(Game.RenderSystem, ui.Game.Content.Load<Texture2D>(@"ui-new/fv_palette_bg.png"));
+            PaletteImage = new DiscTexture(Game.Instance.RenderSystem, Game.Instance.Content.Load<Texture2D> (textureName));
+            Image = new DiscTexture(Game.Instance.RenderSystem, Game.Instance.Content.Load<Texture2D>(@"ui-new/fv_palette_bg.png"));
             ImageMode = FrameImageMode.Tiled;
         }
 
@@ -47,7 +44,7 @@ namespace FusionUI.UI.Factories
 
             sb.DrawUV(PaletteImage, GlobalRectangle.X + maxPosition * Width, GlobalRectangle.Y, Width - maxPosition * Width, Height, Color.White, 1 - 0.5f / PaletteImage.Width, 1, 0, 0);
         }
-    }    
+    }
 
     public class HorizontalPaletteHolder : ScalableFrame
     {
@@ -62,7 +59,6 @@ namespace FusionUI.UI.Factories
 
         public void SetPalette(string paletteFileName)
         {
-            //palette.PaletteImage = ui.Game.Content.Load<DiscTexture>(paletteFileName);
             var th = this;
             PaletteFactory.GetTextureByString(paletteFileName, ref th);
             selector.Current = paletteFileName;
@@ -75,7 +71,7 @@ namespace FusionUI.UI.Factories
             selector.AddValue(textureName);
         }
 
-        public HorizontalPaletteHolder(FrameProcessor ui, float x, float y, float w, float h, string text, Color backColor) : base(ui, x, y, w, h, text, backColor)
+        public HorizontalPaletteHolder(float x, float y, float w, float h, string text, Color backColor) : base(x, y, w, h, text, backColor)
         {
         }
 
@@ -100,7 +96,7 @@ namespace FusionUI.UI.Factories
         }
 
         public void Init()
-        {            
+        {
             minScroll.actionForMove += (x, y) =>
             {
                 if (minScroll.UnitX + minScroll.UnitWidth > scrollHolder.UnitWidth - maxScroll.UnitWidth)
@@ -168,7 +164,7 @@ namespace FusionUI.UI.Factories
         {
             minPosition = MathUtil.Clamp(minPosition, 0, 1);
             maxPosition = MathUtil.Clamp(maxPosition, 0, 1);
-            minScroll.UnitX = minPosition * (this.palette.UnitWidth - maxScroll.UnitWidth);            
+            minScroll.UnitX = minPosition * (this.palette.UnitWidth - maxScroll.UnitWidth);
             maxScroll.UnitX = maxPosition * (this.palette.UnitWidth - minScroll.UnitWidth);
             minScroll.actionForMove(minScroll.X, minScroll.Y);
             maxScroll.actionForMove(maxScroll.X, maxScroll.Y);
@@ -248,8 +244,8 @@ namespace FusionUI.UI.Factories
                             holder.PaletteChangeAction(holder.selector.Current);
                             holder.CurrentTextureName = "<u>" + file;
                         }
-                    }                                                           
-                }                
+                    }
+                }
             }
             else if (!s.StartsWith("<u>"))
             {
@@ -274,69 +270,69 @@ namespace FusionUI.UI.Factories
             }
         }
 
-        public static HorizontalPaletteHolder HorizontalPaletteHolder(FrameProcessor ui, float OffsetX, float OffsetY,
+        public static HorizontalPaletteHolder HorizontalPaletteHolder(float OffsetX, float OffsetY,
             ScalableFrame parent, string label, List<string> textureNames, float minValue, float maxValue, Action<float, float> changeAction, Action<string> paletteChangeAction, Action<float, float> minmaxChangeAction, out HorizontalPaletteRender paletteRender, bool minMaxSelector = true)
         {
 
             textureNames = new List<string>(textureNames);
             textureNames.Add("<s>Add");
 
-            HorizontalPaletteHolder holder = new HorizontalPaletteHolder(ui, parent.UnitPaddingLeft, 0, parent.UnitWidth - parent.UnitPaddingLeft - parent.UnitPaddingRight,OffsetY + UIConfig.UnitPalette2LabelHeight + UIConfig.UnitPalette2ElementOffset + UIConfig.UnitPalette2ElementHeight, "", Color.Zero);
+            var holder = new HorizontalPaletteHolder(parent.UnitPaddingLeft, 0, parent.UnitWidth - parent.UnitPaddingLeft - parent.UnitPaddingRight,OffsetY + UIConfig.UnitPalette2LabelHeight + UIConfig.UnitPalette2ElementOffset + UIConfig.UnitPalette2ElementHeight, "", Color.Zero);
             holder.ChangeAction = changeAction;
             holder.MinMaxUpadteAction = minmaxChangeAction;
             holder.PaletteChangeAction = paletteChangeAction;
             holder.minValue = minValue;
             holder.maxValue = maxValue;
-            ScalableFrame labelFrame = new ScalableFrame(ui, OffsetX, OffsetY, holder.UnitWidth, UIConfig.UnitPalette2LabelHeight, label, Color.Zero)
+            ScalableFrame labelFrame = new ScalableFrame(OffsetX, OffsetY, holder.UnitWidth, UIConfig.UnitPalette2LabelHeight, label, Color.Zero)
             {
                 TextAlignment = Alignment.BaselineLeft,
                 UnitTextOffsetY = 4,
                 FontHolder = UIConfig.FontBody,
             };
-            holder.Add(labelFrame);            
-            holder.palette = new HorizontalPaletteRender(ui, OffsetX,
+            holder.Add(labelFrame);
+            holder.palette = new HorizontalPaletteRender(OffsetX,
                 OffsetY + UIConfig.UnitPalette2LabelHeight + UIConfig.UnitPalette2ElementOffset,
                 holder.UnitWidth - OffsetX*2 - UIConfig.UnitPalette2ButtonWidth, UIConfig.UnitPalette2ElementHeight, textureNames[0]);
             holder.Add(holder.palette);
 
-            ScalableFrame scrollHolder = new ScalableFrame(ui, OffsetX,
+            ScalableFrame scrollHolder = new ScalableFrame(OffsetX,
                 OffsetY + UIConfig.UnitPalette2LabelHeight,
                 holder.UnitWidth - OffsetX * 2 - UIConfig.UnitPalette2ButtonWidth, UIConfig.UnitPalette2ElementHeight + 2 * UIConfig.UnitPalette2ElementOffset, "", Color.Zero)
             {
             };
             holder.scrollHolder = scrollHolder;
 
-            Scroll minScroll = new Scroll(ui, 0, 0, UIConfig.UnitPalette2ScrollWidth, UIConfig.UnitPalette2ScrollHeight, "", Color.Zero)
+            Scroll minScroll = new Scroll(0, 0, UIConfig.UnitPalette2ScrollWidth, UIConfig.UnitPalette2ScrollHeight, "", Color.Zero)
             {
                 ImageMode = FrameImageMode.Stretched,
                 IsFixedY = true,
-                
+
             };
             holder.minScroll = minScroll;
             ScalableFrame minScrollFrame, maxScrollFrame;
-            minScroll.Add(minScrollFrame = new ScalableFrame(ui, 1, 2, 2, 8, "", Color.Blue) {Border = 1, BorderColor = Color.White});
+            minScroll.Add(minScrollFrame = new ScalableFrame(1, 2, 2, 8, "", Color.Blue) {Border = 1, BorderColor = Color.White});
             holder.minScrollFrame = minScrollFrame;
-            Scroll maxScroll = new Scroll(ui, scrollHolder.UnitWidth - UIConfig.UnitPalette2ScrollWidth, 0, UIConfig.UnitPalette2ScrollWidth, UIConfig.UnitPalette2ScrollHeight, "", Color.Zero)
+            Scroll maxScroll = new Scroll(scrollHolder.UnitWidth - UIConfig.UnitPalette2ScrollWidth, 0, UIConfig.UnitPalette2ScrollWidth, UIConfig.UnitPalette2ScrollHeight, "", Color.Zero)
             {
                 ImageMode = FrameImageMode.Stretched,
                 IsFixedY = true,
             };
             holder.maxScroll = maxScroll;
-            maxScroll.Add(maxScrollFrame = new ScalableFrame(ui, 1, 2, 2, 8, "", Color.Red) { Border = 1, BorderColor = Color.White });
+            maxScroll.Add(maxScrollFrame = new ScalableFrame(1, 2, 2, 8, "", Color.Red) { Border = 1, BorderColor = Color.White });
             holder.maxScrollFrame = maxScrollFrame;
             scrollHolder.Add(minScroll);
             scrollHolder.Add(maxScroll);
 
             holder.Add(scrollHolder);
 
-            var minValueLabel = new ScalableFrame(ui, minScroll.UnitX + minScroll.UnitWidth, 0, scrollHolder.UnitWidth/2,
+            var minValueLabel = new ScalableFrame(minScroll.UnitX + minScroll.UnitWidth, 0, scrollHolder.UnitWidth/2,
                 scrollHolder.UnitHeight, $"{minValue}", Color.Zero)
             {
                 TextAlignment = Alignment.MiddleLeft,
                 FontHolder = UIConfig.FontBody,
             };
             holder.minValueLabel = minValueLabel;
-            var maxValueLabel = new ScalableFrame(ui, maxScroll.UnitX - scrollHolder.UnitWidth / 2, 0, scrollHolder.UnitWidth/2,
+            var maxValueLabel = new ScalableFrame(maxScroll.UnitX - scrollHolder.UnitWidth / 2, 0, scrollHolder.UnitWidth/2,
                 scrollHolder.UnitHeight, $"{maxValue}", Color.Zero)
             {
                 TextAlignment = Alignment.MiddleRight,
@@ -346,28 +342,28 @@ namespace FusionUI.UI.Factories
             scrollHolder.Add(maxValueLabel);
             scrollHolder.Add(minValueLabel);
 
-            
+
 
             holder.selector = new DropDownSelector<DropDownSelectorTextureRow>(
-                ui, OffsetX,
+                OffsetX,
                 OffsetY + UIConfig.UnitPalette2LabelHeight + UIConfig.UnitPalette2ElementOffset + UIConfig.UnitPalette2ElementHeight,
                 holder.UnitWidth - OffsetX * 2 - UIConfig.UnitPalette2ButtonWidth, UIConfig.UnitPalette2ElementHeight,
                 Color.Zero, textureNames, s =>
                 {
-                    GetTextureByString(s, ref holder);                    
+                    GetTextureByString(s, ref holder);
                 }, Color.Zero, false)
             {
-                Visible = false,                
+                Visible = false,
             };
             holder.Add(holder.selector);
 
-            Button button = new Button(ui, holder.UnitWidth - OffsetX - UIConfig.UnitPalette2ButtonWidth, OffsetY + UIConfig.UnitPalette2LabelHeight, UIConfig.UnitPalette2ButtonWidth, UIConfig.UnitPalette2ButtonHeight, "", Color.Zero, UIConfig.ActiveColor, 200,
+            Button button = new Button(holder.UnitWidth - OffsetX - UIConfig.UnitPalette2ButtonWidth, OffsetY + UIConfig.UnitPalette2LabelHeight, UIConfig.UnitPalette2ButtonWidth, UIConfig.UnitPalette2ButtonHeight, "", Color.Zero, UIConfig.ActiveColor, 200,
                 () =>
                 {
-                    if (!holder.selector.IsOpen) holder.selector.OpenList();                    
+                    if (!holder.selector.IsOpen) holder.selector.OpenList();
                 })
             {
-                Image = ui.Game.Content.Load<DiscTexture>(@"UI-new\fv-icons_palette"),
+                Image = Game.Instance.Content.Load<DiscTexture>(@"UI-new\fv-icons_palette"),
                 ImageMode = FrameImageMode.Fitted,
             };
             holder.PaletteChangeButton = button;
@@ -380,7 +376,7 @@ namespace FusionUI.UI.Factories
             {
                 holder.UnitHeight += OffsetY + UIConfig.UnitPalette2LabelHeight + UIConfig.UnitPalette2ElementOffset;
                 float EditboxWidth = 25;
-                Editbox minEdit = holder.minEdit = new Editbox(ui, OffsetX,
+                Editbox minEdit = holder.minEdit = new Editbox(OffsetX,
                     2 * OffsetY + UIConfig.UnitPalette2LabelHeight + UIConfig.UnitPalette2ButtonHeight, EditboxWidth,
                     UIConfig.UnitPalette2LabelHeight, $"{minValue}", Color.Black)
                 {
@@ -396,7 +392,7 @@ namespace FusionUI.UI.Factories
                 {
                     if (args.IsClick) minEdit.SetActiveStatus(false);
                 };
-                Editbox maxEdit = holder.maxEdit = new Editbox(ui, holder.UnitWidth - OffsetX - EditboxWidth,
+                Editbox maxEdit = holder.maxEdit = new Editbox(holder.UnitWidth - OffsetX - EditboxWidth,
                     2 * OffsetY + UIConfig.UnitPalette2LabelHeight + UIConfig.UnitPalette2ButtonHeight, EditboxWidth,
                     UIConfig.UnitPalette2LabelHeight, $"{maxValue}", Color.Black)
                 {
@@ -412,7 +408,7 @@ namespace FusionUI.UI.Factories
                 {
                     if (args.IsClick) maxEdit.SetActiveStatus(false);
                 };
-                Button setMinMaxButton = new Button(ui, OffsetX + EditboxWidth,
+                Button setMinMaxButton = new Button(OffsetX + EditboxWidth,
                     2 * OffsetY + UIConfig.UnitPalette2LabelHeight + UIConfig.UnitPalette2ButtonHeight,
                     holder.UnitWidth - 2 * (OffsetX + EditboxWidth), UIConfig.UnitPalette2LabelHeight, "Set",
                     UIConfig.ButtonColor, UIConfig.ActiveColor, 200,
@@ -427,7 +423,7 @@ namespace FusionUI.UI.Factories
                         minValueLabel.Text = $"{min:0.##}";
                         maxValueLabel.Text = $"{max:0.##}";
                         holder.minValue = minValue;
-                        holder.maxValue = maxValue;                
+                        holder.maxValue = maxValue;
                         holder.ChangeAction(holder.palette.minPosition, holder.palette.maxPosition);
                     })
                 {
@@ -444,7 +440,7 @@ namespace FusionUI.UI.Factories
 
         public static Dictionary<string, Texture> CachedPalettes = new Dictionary<string, Texture>();
 
-        public static HorizontalPaletteHolder HorizontalPaletteHolderSimple(FrameProcessor ui, float OffsetX,
+        public static HorizontalPaletteHolder HorizontalPaletteHolderSimple(float OffsetX,
             float OffsetY, float height,
             ScalableFrame parent, List<string> textureNames, float minValue, float maxValue,
             Action<float, float> changeAction, Action<string> paletteChangeAction,
@@ -456,27 +452,27 @@ namespace FusionUI.UI.Factories
                 textureNames.Add("<s>Add");
             }
 
-            HorizontalPaletteHolder holder = new HorizontalPaletteHolder(ui, parent.UnitPaddingLeft, 0,
+            var holder = new HorizontalPaletteHolder(parent.UnitPaddingLeft, 0,
                 parent.UnitWidth - parent.UnitPaddingLeft - parent.UnitPaddingRight,
                 height, "", Color.Zero);
             holder.ChangeAction = changeAction;
             holder.MinMaxUpadteAction = minmaxChangeAction;
             holder.PaletteChangeAction = paletteChangeAction;
-    
-            holder.palette = new HorizontalPaletteRender(ui, OffsetX,
+
+            holder.palette = new HorizontalPaletteRender(OffsetX,
                 holder.UnitHeight/2 - UIConfig.UnitPalette2ElementHeight/2,
                 holder.UnitWidth - OffsetX * 2 - UIConfig.UnitPalette2ButtonWidth, UIConfig.UnitPalette2ElementHeight,
                 textureNames[0]);
             holder.Add(holder.palette);
 
-            ScalableFrame scrollHolder = new ScalableFrame(ui, OffsetX,
+            ScalableFrame scrollHolder = new ScalableFrame(OffsetX,
                 holder.UnitHeight / 2 - UIConfig.UnitPalette2ElementHeight /2 - UIConfig.UnitPalette2ElementOffset, holder.UnitWidth - OffsetX * 2 - UIConfig.UnitPalette2ButtonWidth,
                 UIConfig.UnitPalette2ElementHeight + 2 * UIConfig.UnitPalette2ElementOffset, "", Color.Zero)
             {
             };
             holder.scrollHolder = scrollHolder;
 
-            Scroll minScroll = new Scroll(ui, 0, 0, UIConfig.UnitPalette2ScrollWidth, UIConfig.UnitPalette2ScrollHeight,
+            Scroll minScroll = new Scroll(0, 0, UIConfig.UnitPalette2ScrollWidth, UIConfig.UnitPalette2ScrollHeight,
                 "", Color.Zero)
             {
                 ImageMode = FrameImageMode.Stretched,
@@ -486,9 +482,9 @@ namespace FusionUI.UI.Factories
             holder.minScroll = minScroll;
             ScalableFrame minScrollFrame, maxScrollFrame;
             minScroll.Add(minScrollFrame =
-                new ScalableFrame(ui, 1, 2, 2, 8, "", Color.Blue) {Border = 1, BorderColor = Color.White});
+                new ScalableFrame(1, 2, 2, 8, "", Color.Blue) {Border = 1, BorderColor = Color.White});
             holder.minScrollFrame = minScrollFrame;
-            Scroll maxScroll = new Scroll(ui, scrollHolder.UnitWidth - UIConfig.UnitPalette2ScrollWidth, 0,
+            Scroll maxScroll = new Scroll(scrollHolder.UnitWidth - UIConfig.UnitPalette2ScrollWidth, 0,
                 UIConfig.UnitPalette2ScrollWidth, UIConfig.UnitPalette2ScrollHeight, "", Color.Zero)
             {
                 ImageMode = FrameImageMode.Stretched,
@@ -496,14 +492,14 @@ namespace FusionUI.UI.Factories
             };
             holder.maxScroll = maxScroll;
             maxScroll.Add(maxScrollFrame =
-                new ScalableFrame(ui, 1, 2, 2, 8, "", Color.Red) {Border = 1, BorderColor = Color.White});
+                new ScalableFrame(1, 2, 2, 8, "", Color.Red) {Border = 1, BorderColor = Color.White});
             holder.maxScrollFrame = maxScrollFrame;
             scrollHolder.Add(minScroll);
             scrollHolder.Add(maxScroll);
 
             holder.Add(scrollHolder);
 
-            var minValueLabel = new ScalableFrame(ui, minScroll.UnitX + minScroll.UnitWidth, 0,
+            var minValueLabel = new ScalableFrame(minScroll.UnitX + minScroll.UnitWidth, 0,
                 scrollHolder.UnitWidth / 2,
                 scrollHolder.UnitHeight, $"{minValue}", Color.Zero)
             {
@@ -511,7 +507,7 @@ namespace FusionUI.UI.Factories
                 FontHolder = UIConfig.FontBody,
             };
             holder.minValueLabel = minValueLabel;
-            var maxValueLabel = new ScalableFrame(ui, maxScroll.UnitX - scrollHolder.UnitWidth / 2, 0,
+            var maxValueLabel = new ScalableFrame(maxScroll.UnitX - scrollHolder.UnitWidth / 2, 0,
                 scrollHolder.UnitWidth / 2,
                 scrollHolder.UnitHeight, $"{maxValue}", Color.Zero)
             {
@@ -521,25 +517,25 @@ namespace FusionUI.UI.Factories
             holder.maxValueLabel = maxValueLabel;
             scrollHolder.Add(maxValueLabel);
             scrollHolder.Add(minValueLabel);
-            
+
             if (textureNames.Count > 1)
             {
                 holder.selector = new DropDownSelector<DropDownSelectorTextureRow>(
-                    ui, OffsetX,
+                    OffsetX,
                     OffsetY + UIConfig.UnitPalette2LabelHeight + UIConfig.UnitPalette2ElementOffset +
                     UIConfig.UnitPalette2ElementHeight,
                     holder.UnitWidth - OffsetX * 2 - UIConfig.UnitPalette2ButtonWidth,
                     UIConfig.UnitPalette2ElementHeight,
                     Color.Zero, textureNames, s =>
                     {
-                        GetTextureByString (s, ref holder);                                               
+                        GetTextureByString (s, ref holder);
                     }, Color.Zero, false)
                 {
                     Visible = false,
                 };
                 holder.Add(holder.selector);
 
-                Button button = new Button(ui, holder.UnitWidth - OffsetX - UIConfig.UnitPalette2ButtonWidth,
+                Button button = new Button(holder.UnitWidth - OffsetX - UIConfig.UnitPalette2ButtonWidth,
                     OffsetY + holder.UnitHeight / 2 - UIConfig.UnitPalette2ButtonHeight / 2,
                     UIConfig.UnitPalette2ButtonWidth,
                     UIConfig.UnitPalette2ButtonHeight, "", Color.Zero, UIConfig.ActiveColor, 200,
@@ -548,17 +544,40 @@ namespace FusionUI.UI.Factories
                         if (!holder.selector.IsOpen) holder.selector.OpenList();
                     })
                 {
-                    Image = ui.Game.Content.Load<DiscTexture>(@"UI-new\fv-icons_palette"),
+                    Image = Game.Instance.Content.Load<DiscTexture>(@"UI-new\fv-icons_palette"),
                     ImageMode = FrameImageMode.Fitted,
                 };
                 holder.PaletteChangeButton = button;
                 holder.Add(button);
             }
-            paletteRender = holder.palette;            
+            paletteRender = holder.palette;
             holder.minValue = minValue;
             holder.maxValue = maxValue;
             holder.Init();
             return holder;
+        }
+
+        [Obsolete("Please use factory without FrameProcessor")]
+        public static HorizontalPaletteHolder HorizontalPaletteHolder(FrameProcessor ui, float OffsetX, float OffsetY,
+            ScalableFrame parent, string label, List<string> textureNames, float minValue, float maxValue,
+            Action<float, float> changeAction, Action<string> paletteChangeAction,
+            Action<float, float> minmaxChangeAction, out HorizontalPaletteRender paletteRender,
+            bool minMaxSelector = true)
+        {
+            return HorizontalPaletteHolder(OffsetX, OffsetY, parent, label, textureNames, minValue, maxValue,
+                changeAction, paletteChangeAction, minmaxChangeAction, out paletteRender, minMaxSelector);
+        }
+
+
+        [Obsolete("Please use factory without FrameProcessor")]
+        public static HorizontalPaletteHolder HorizontalPaletteHolderSimple(FrameProcessor ui, float OffsetX,
+            float OffsetY, float height,
+            ScalableFrame parent, List<string> textureNames, float minValue, float maxValue,
+            Action<float, float> changeAction, Action<string> paletteChangeAction,
+            Action<float, float> minmaxChangeAction, out HorizontalPaletteRender paletteRender, bool addAdder = true)
+        {
+            return HorizontalPaletteHolderSimple(OffsetX, OffsetY, height, parent, textureNames, minValue, maxValue,
+                changeAction, paletteChangeAction, minmaxChangeAction, out paletteRender, addAdder);
         }
     }
 }

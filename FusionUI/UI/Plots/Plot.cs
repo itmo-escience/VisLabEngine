@@ -120,7 +120,7 @@ namespace FusionUI.UI.Plots
                 plotData.MaxYAnim = AnimMaxY;
                 plotData.MinYAnim = AnimMinY;
             }
-            var whiteTex = this.Game.RenderSystem.WhiteTexture;
+            var whiteTex = Game.Instance.RenderSystem.WhiteTexture;
             var rect = GetBorderedRectangle();
 
             List<float> depths = plotData.ValueList.Keys.ToList();
@@ -174,7 +174,7 @@ namespace FusionUI.UI.Plots
             if (!IsAnimated && plotData.Ready && plotData.Active && (plotData.Dirty || plotData.BakedPlot == null || IsDynamic))
             {
                 plotData.Dirty = false;                
-                var whiteTex = this.Game.RenderSystem.WhiteTexture;
+                var whiteTex = Game.Instance.RenderSystem.WhiteTexture;
                 var rect = GetBorderedRectangle();
                 if (Dirty || !points.ContainsKey(plotData))
                 {                    
@@ -257,7 +257,7 @@ namespace FusionUI.UI.Plots
         {
             float stripLength = 6;
             float blankLength = 4;
-            var whiteTex = this.Game.RenderSystem.WhiteTexture;
+            var whiteTex = Game.Instance.RenderSystem.WhiteTexture;
             var rect = GetBorderedRectangle();            
             float xPos = (float)((TimeManager.CurrentTime - startTime).TotalSeconds /
                                   (endTime - startTime).TotalSeconds * rect.Width);

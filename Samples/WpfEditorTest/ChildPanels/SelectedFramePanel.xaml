@@ -5,7 +5,7 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:WpfEditorTest.ChildPanels"
              mc:Ignorable="d" 
-             d:DesignHeight="100" d:DesignWidth="100" Background="#26FFFFFF" MouseDown="UserControl_MouseDown" HorizontalAlignment="Left" VerticalAlignment="Top" MouseMove="UserControl_MouseMove">
+             d:DesignHeight="100" d:DesignWidth="100" Background="#26FFFFFF" MouseDown="UserControl_MouseDown" HorizontalAlignment="Left" VerticalAlignment="Top" MouseMove="UserControl_MouseMove" Visibility="Collapsed">
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="9"/>

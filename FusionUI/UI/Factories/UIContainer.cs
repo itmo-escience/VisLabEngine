@@ -1,4 +1,5 @@
-﻿using Fusion.Core.Mathematics;
+﻿using System;
+using Fusion.Core.Mathematics;
 using Fusion.Engine.Frames;
 
 namespace FusionUI.UI.Factories
@@ -10,17 +11,15 @@ namespace FusionUI.UI.Factories
     /// <typeparam name="T">Active item type</typeparam>
     public class UIContainer<T> : ScalableFrame where T : ScalableFrame
     {
-		public UIContainer()
-		{
-		}
+		public UIContainer() {}
 
-		public UIContainer(FrameProcessor ui) : base(ui)
-        {
-        }
+        public UIContainer(float x, float y, float w, float h, string text, Color backColor) : base(x, y, w, h, text, backColor) { }
 
-        public UIContainer(FrameProcessor ui, float x, float y, float w, float h, string text, Color backColor) : base(ui, x, y, w, h, text, backColor)
-        {
-        }
+        [Obsolete("Please use constructor without FrameProcessor")]
+        public UIContainer(FrameProcessor ui) : this() { }
+
+        [Obsolete("Please use constructor without FrameProcessor")]
+        public UIContainer(FrameProcessor ui, float x, float y, float w, float h, string text, Color backColor) : this(x, y, w, h, text, backColor) { }
 
         public virtual T Item { get; set; }
     }
@@ -32,17 +31,15 @@ namespace FusionUI.UI.Factories
     /// <typeparam name="T2">Active item 2 type</typeparam>
     public class UIContainer<T1, T2> : ScalableFrame where T1 : ScalableFrame where T2 : ScalableFrame
     {
-		public UIContainer()
-		{
-		}
+		public UIContainer() { }
 
-		public UIContainer(FrameProcessor ui) : base(ui)
-        {
-        }
+        public UIContainer(float x, float y, float w, float h, string text, Color backColor) : base(x, y, w, h, text, backColor) { }
 
-        public UIContainer(FrameProcessor ui, float x, float y, float w, float h, string text, Color backColor) : base(ui, x, y, w, h, text, backColor)
-        {
-        }
+        [Obsolete("Please use constructor without FrameProcessor")]
+        public UIContainer(FrameProcessor ui) : this() { }
+
+        [Obsolete("Please use constructor without FrameProcessor")]
+        public UIContainer(FrameProcessor ui, float x, float y, float w, float h, string text, Color backColor) : base(ui, x, y, w, h, text, backColor) { }
 
         public virtual T1 Item1 { get; set; }
         public virtual T2 Item2 { get; set; }
@@ -56,16 +53,15 @@ namespace FusionUI.UI.Factories
     /// <typeparam name="T3">Active item 3 type</typeparam>
     public class UIContainer<T1, T2, T3> : ScalableFrame where T1 : ScalableFrame where T2 : ScalableFrame where T3 : ScalableFrame
     {
-		public UIContainer()
-		{
-		}
-		public UIContainer(FrameProcessor ui) : base(ui)
-        {
-        }
+		public UIContainer() { }
 
-        public UIContainer(FrameProcessor ui, float x, float y, float w, float h, string text, Color backColor) : base(ui, x, y, w, h, text, backColor)
-        {
-        }
+        public UIContainer(float x, float y, float w, float h, string text, Color backColor) : base(x, y, w, h, text, backColor) { }
+
+        [Obsolete("Please use constructor without FrameProcessor")]
+        public UIContainer(FrameProcessor ui) : this() {}
+
+        [Obsolete("Please use constructor without FrameProcessor")]
+        public UIContainer(FrameProcessor ui, float x, float y, float w, float h, string text, Color backColor) : this(x, y, w, h, text, backColor) { }
 
         public virtual T1 Item1 { get; set; }
         public virtual T2 Item2 { get; set; }

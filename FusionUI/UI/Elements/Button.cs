@@ -25,7 +25,7 @@ namespace FusionUI.UI.Elements
 
         public bool IsToggled => toggleState;
 
-        public Button(FrameProcessor ui, float x, float y, float w, float h, string text, Color activeColor, Color inactiveColor, Texture activeImage = null, Texture passiveImage = null, Action<bool> action = null, bool active = false, int timeTransition=0, Color? activeFColor = null, Color? inactiveFColor = null) : base(ui, x, y, w, h, text, inactiveColor)
+        public Button(float x, float y, float w, float h, string text, Color activeColor, Color inactiveColor, Texture activeImage = null, Texture passiveImage = null, Action<bool> action = null, bool active = false, int timeTransition=0, Color? activeFColor = null, Color? inactiveFColor = null) : base(x, y, w, h, text, inactiveColor)
         {
             ActiveColor = activeColor;
             InactiveColor = inactiveColor;
@@ -37,6 +37,28 @@ namespace FusionUI.UI.Elements
             ButtonAction += action;
             ImageMode = FrameImageMode.Fitted;
         }
+
+        public Button(float x, float y, float w, float h, string text, Color mainColor, Color transitionColor, int transitionTime, Action action = null, Color? activeFColor = null, Color? inActiveFColor = null) : base(x, y, w, h, text, mainColor)
+        {
+            ActiveColor = transitionColor;
+            InactiveColor = mainColor;
+            ActiveFColor = activeFColor ?? ActiveFColor;
+            InactiveFColor = inActiveFColor ?? InactiveFColor;
+            ActiveImageColor = activeFColor ?? ActiveImageColor;
+            InactiveImageColor = inActiveFColor ?? InactiveImageColor;
+            initClickableButton(transitionTime);
+            if (action != null) ButtonAction += b => action();
+            ImageMode = FrameImageMode.Fitted;
+        }
+
+        [Obsolete("Please use constructor without FrameProcessor")]
+        public Button(FrameProcessor ui, float x, float y, float w, float h, string text, Color activeColor, Color inactiveColor, Texture activeImage = null, Texture passiveImage = null, Action<bool> action = null, bool active = false, int timeTransition = 0, Color? activeFColor = null, Color? inactiveFColor = null) :
+            this(x, y, w, h, text, activeColor, inactiveColor, activeImage, passiveImage, action, active, timeTransition, activeFColor, inactiveFColor)
+        { }
+
+        [Obsolete("Please use constructor without FrameProcessor")]
+        public Button(FrameProcessor ui, float x, float y, float w, float h, string text, Color mainColor, Color transitionColor, int transitionTime, Action action = null, Color? activeFColor = null, Color? inActiveFColor = null)
+            : this(x, y, w, h, text, mainColor, transitionColor, transitionTime, action, activeFColor, inActiveFColor) { }
 
         void initToggableButton(bool active, int transitionTime = 0)
         {
@@ -70,13 +92,13 @@ namespace FusionUI.UI.Elements
                     flag = true;
                 };
             }
-            
+
             this.ActionClick += (ControlActionArgs args, ref bool flag) => {
                 if (!args.IsClick) return;
                 ToggleOnOff(toggleState);
-                ButtonAction?.Invoke(toggleState);                
+                ButtonAction?.Invoke(toggleState);
                 if (transitionTime != 0)
-                {                    
+                {
                     this.BackColor = ActiveColor;
                     this.ForeColor = ActiveFColor;
                     this.ImageColor = ActiveFColor;
@@ -85,7 +107,7 @@ namespace FusionUI.UI.Elements
                     this.RunTransition("ImageColor", InactiveFColor, 0, transitionTime);
                 }
             };
-            ToggleOnOff(!toggleState);            
+            ToggleOnOff(!toggleState);
         }
 
         public void ToggleOn(bool invoke = true)
@@ -121,23 +143,10 @@ namespace FusionUI.UI.Elements
             {
                 ToggleOff(invoke);
             }
-            else 
+            else
             {
                 ToggleOn(invoke);
             }
-        }
-
-        public Button(FrameProcessor ui, float x, float y, float w, float h, string text, Color mainColor, Color transitionColor, int transitionTime, Action action = null, Color? activeFColor = null, Color? inActiveFColor = null) : base(ui, x, y, w, h, text, mainColor)
-        {
-            ActiveColor = transitionColor;
-            InactiveColor = mainColor;
-            ActiveFColor = activeFColor ?? ActiveFColor;
-            InactiveFColor = inActiveFColor ?? InactiveFColor;
-            ActiveImageColor = activeFColor ?? ActiveImageColor;
-            InactiveImageColor = inActiveFColor ?? InactiveImageColor;
-            initClickableButton(transitionTime);
-            if (action != null) ButtonAction += b => action();
-            ImageMode = FrameImageMode.Fitted;
         }
 
         void initClickableButton(int transitionTime)
@@ -174,7 +183,7 @@ namespace FusionUI.UI.Elements
                 this.BackColor = ActiveColor;
                 this.ForeColor = ActiveFColor;
                 this.ImageColor = ActiveFColor;
-                this.RunTransition("BackColor", InactiveColor, 0, transitionTime);                
+                this.RunTransition("BackColor", InactiveColor, 0, transitionTime);
                 ButtonAction?.Invoke(true);
             };
             this.BackColor = InactiveColor;

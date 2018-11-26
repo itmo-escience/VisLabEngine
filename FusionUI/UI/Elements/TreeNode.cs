@@ -13,9 +13,6 @@ namespace FusionUI.UI
 {
     public class TreeNode : ScalableFrame
     {
-		protected TreeNode()
-		{
-		}
 		public bool IsExpand = false;
 
         public int OffsetChild
@@ -42,7 +39,7 @@ namespace FusionUI.UI
         private int HeightExpand
         {
             get { return (int)(UnitHeightExpand * ScaleMultiplier); }
-            set { UnitHeightExpand = value / ScaleMultiplier; }            
+            set { UnitHeightExpand = value / ScaleMultiplier; }
         }
 
         public Color backColorMainNode;
@@ -50,19 +47,24 @@ namespace FusionUI.UI
 
         public int UnitSizeExpandButton = 5;
 
-        public TreeNode(FrameProcessor ui) : base(ui)
+        public TreeNode()
         {
-            //            initDropDownNode(ui);
             listNode = new List<Frame>();
             ClippingMode = ClippingMode.ClipByFrame;
         }
 
-        public TreeNode(FrameProcessor ui, float x, float y, float w, float h, string text, Color backColor) : base(ui, x, y, w, h, text, backColor)
+        public TreeNode(float x, float y, float w, float h, string text, Color backColor) : base(x, y, w, h, text, backColor)
         {
-            init(ui);
+            init();
         }
 
-        private void init(FrameProcessor ui)
+        [Obsolete("Please use constructor without FrameProcessor")]
+        public TreeNode(FrameProcessor ui) : this() { }
+
+        [Obsolete("Please use constructor without FrameProcessor")]
+        public TreeNode(FrameProcessor ui, float x, float y, float w, float h, string text, Color backColor) : this(x, y, w, h, text, backColor) { }
+
+        private void init()
         {
 
             // for resize
@@ -72,7 +74,7 @@ namespace FusionUI.UI
             // for expand/collaps
             if (Text != "")
             {
-                this.ActionClick += (ControlActionArgs args, ref bool flag) => {                    
+                this.ActionClick += (ControlActionArgs args, ref bool flag) => {
                     if (!args.IsClick || args.IsAltClick) return;
                     if (args.Position.Y - this.GlobalRectangle.Y > HeightCollaps) return;
                     if (listNode?.Count > 0)
@@ -94,25 +96,25 @@ namespace FusionUI.UI
 
             var xText = this.GlobalRectangle.X + PaddingLeft + TextOffsetX;
             var yText = this.GlobalRectangle.Y + this.HeightCollaps / 2 + this.Font.CapHeight / 2;
-            var whiteTexture = this.Game.RenderSystem.WhiteTexture;
+            var whiteTexture = Game.Instance.RenderSystem.WhiteTexture;
 
             sb.Draw(whiteTexture,
                     new Rectangle(this.GlobalRectangle.X, this.GlobalRectangle.Y, this.Width, this.HeightCollaps),
                     backColorMainNode, clipRectIndex);
-            
+
 
             var w = this.Width - (!(ExpandedPicture == null || CollapsedPicture == null) ? (int) (UnitSizeExpandButton * ScaleMultiplier) : 0) - PaddingLeft - TextOffsetX;
             var tw = Font.MeasureString(Text).Width;
             var dw = (float) w / tw;
             var text2 = (dw < 1) ? Text.Substring(0, (int) (dw * Text.Length) - 3).TrimEnd(' ') + "..." : Text;
 
-            Font.DrawString(sb, text2, xText, yText, ForeColor, clipRectIndex, 0, true);                
+            Font.DrawString(sb, text2, xText, yText, ForeColor, clipRectIndex, 0, true);
             if (!(ExpandedPicture == null || CollapsedPicture == null))
                 sb.Draw(IsExpand ? ExpandedPicture : CollapsedPicture,
                     new Rectangle(xButton, yButton, (int) (UnitSizeExpandButton * ScaleMultiplier),
-                        (int) (UnitSizeExpandButton * ScaleMultiplier)), UIConfig.ActiveTextColor, clipRectIndex);            
+                        (int) (UnitSizeExpandButton * ScaleMultiplier)), UIConfig.ActiveTextColor, clipRectIndex);
 
-        }        
+        }
 
         public void addNode(Frame node)
         {
@@ -163,7 +165,7 @@ namespace FusionUI.UI
             }
             else
             {
-                node.Y = this.Height;                
+                node.Y = this.Height;
             }
             this.HeightExpand += node.Height;
         }
@@ -171,7 +173,7 @@ namespace FusionUI.UI
         public void ExpandNodes(bool isExpand)
         {
             foreach (var node in listNode)
-            {                
+            {
                 if (isExpand)
                 {
                     node.Y = this.Height;
@@ -213,7 +215,7 @@ namespace FusionUI.UI
                 var treeNode = (TreeNode)this.Parent;
                 treeNode.ResizeTree();
             }
-            
+
         }
 
         public override string Tooltip
@@ -238,12 +240,17 @@ namespace FusionUI.UI
 		[XmlIgnore]
 		public Action<GameTime> UpdateFunc;
         public Checkbox Checkbox;
-        public CheckboxNode(FrameProcessor ui, float x, float y, float w, float h, string text, Color backColor, Action<bool> checkboxAction, bool isChecked = false) : base(ui, x, y, w, h, text, backColor)
-        {            
-            this.Add(Checkbox = new Checkbox(ui, 0, 0, h, h, "", Color.Zero)
+
+        [Obsolete("Please use constructor without FrameProcessor")]
+        public CheckboxNode(FrameProcessor ui, float x, float y, float w, float h, string text, Color backColor, Action<bool> checkboxAction, bool isChecked = false)
+            : this(x, y, w, h, text, backColor, checkboxAction, isChecked) { }
+
+        public CheckboxNode(float x, float y, float w, float h, string text, Color backColor, Action<bool> checkboxAction, bool isChecked = false) : base(x, y, w, h, text, backColor)
+        {
+            this.Add(Checkbox = new Checkbox(0, 0, h, h, "", Color.Zero)
             {
-                Checked = ui.Game.Content.Load<DiscTexture>(@"UI-new\fv-icons_checkbox-big-on"),
-                None = ui.Game.Content.Load<DiscTexture>(@"UI-new\fv-icons_checkbox-big-off"),
+                Checked = Game.Instance.Content.Load<DiscTexture>(@"UI-new\fv-icons_checkbox-big-on"),
+                None = Game.Instance.Content.Load<DiscTexture>(@"UI-new\fv-icons_checkbox-big-off"),
                 ClippingMode = ClippingMode.ClipByFrame
             });
             Checkbox.IsChecked = isChecked;
@@ -251,7 +258,7 @@ namespace FusionUI.UI
             UnitTextOffsetX = Checkbox.UnitWidth;
         }
 
-        
+
 
         protected override void Update(GameTime gameTime)
         {
@@ -265,12 +272,18 @@ namespace FusionUI.UI
 		protected RadiobuttonNode()
 		{
 		}
+
 		[XmlIgnore]
 		public Action<GameTime> UpdateFunc;
         public RadioButton Checkbox;
-        public RadiobuttonNode(FrameProcessor ui, float x, float y, float w, float h, string text, Color backColor, Action<bool> checkboxAction, bool selected) : base(ui, x, y, w, h, text, backColor)
+
+        [Obsolete("Please use constructor without FrameProcessor")]
+        public RadiobuttonNode(FrameProcessor ui, float x, float y, float w, float h, string text, Color backColor, Action<bool> checkboxAction, bool selected)
+            : this(x, y, w, h, text, backColor, checkboxAction, selected) { }
+
+        public RadiobuttonNode(float x, float y, float w, float h, string text, Color backColor, Action<bool> checkboxAction, bool selected) : base(x, y, w, h, text, backColor)
         {
-            this.Add(Checkbox = new RadioButton(ui, 0, 0, h, h, "", Color.Zero));
+            this.Add(Checkbox = new RadioButton(0, 0, h, h, "", Color.Zero));
 
             Checkbox.Changed += (b) =>
             {
@@ -279,7 +292,7 @@ namespace FusionUI.UI
                     if (parent == null) return;
                     foreach (var frame in parent.Children)
                     {
-                        if (!(frame is RadiobuttonNode) || frame == this) continue;                                                
+                        if (!(frame is RadiobuttonNode) || frame == this) continue;
                         ((RadiobuttonNode)frame).Checkbox.IsChecked = false;
                     }
                 }

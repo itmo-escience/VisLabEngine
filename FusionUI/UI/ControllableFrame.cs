@@ -2,13 +2,11 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Runtime.Serialization;
 using Fusion.Core.Mathematics;
 using Fusion.Engine.Common;
 using Fusion.Engine.Frames;
 using Fusion.Engine.Graphics;
 using Fusion.Engine.Input;
-using Fusion;
 using System.Xml.Serialization;
 
 namespace FusionUI.UI
@@ -17,30 +15,29 @@ namespace FusionUI.UI
     {
         public bool ClickToFront = true;
 
-        public ControllableFrame(FrameProcessor ui) : base(ui)
-        {
-            ActionClick += (ControlActionArgs args, ref bool flag) =>
-            {
-                if (ClickToFront) this.ZOrder = 100000;
-            };
-        }
-
-		protected ControllableFrame()
+		public ControllableFrame()
 		{
-		}
+		    ActionClick += (ControlActionArgs args, ref bool flag) =>
+		    {
+		        if (ClickToFront) ZOrder = 100000;
+		    };
+        }
 
-		public ControllableFrame(FrameProcessor ui, int x, int y, int w, int h, string text, Color backColor) : base(ui, x, y, w, h, text, backColor)
+        public ControllableFrame(int x, int y, int w, int h, string text, Color backColor) : base(x, y, w, h, text, backColor)
         {
             ActionClick += (ControlActionArgs args, ref bool flag) =>
             {
-                if (ClickToFront) this.ZOrder = 100000;
+                if (ClickToFront) ZOrder = 100000;
             };
         }
 
-        protected virtual void initialize()
-        {
-            
-        }
+        [Obsolete("Please use constructor without FrameProcessor")]
+        public ControllableFrame(FrameProcessor ui) : this() { }
+
+        [Obsolete("Please use constructor without frame processor")]
+        public ControllableFrame(FrameProcessor ui, int x, int y, int w, int h, string text, Color backColor) : this(x, y, w, h, text, backColor) { }
+
+        protected virtual void initialize() { }
 
         private string TooltipText = "";
         public virtual string Tooltip
@@ -63,29 +60,32 @@ namespace FusionUI.UI
 
         public void AddMouseActions()
         {
-            Game.Mouse.Move += MoueMoveAction = (sender, args) =>
+            var mouse = Game.Instance.Mouse;
+            var keyboard = Game.Instance.Keyboard;
+            var touch = Game.Instance.Touch;
+            mouse.Move += MoueMoveAction = (sender, args) =>
             {
                 currentEventArgs.IsTouch = false;
-                currentEventArgs.Position = (Point)args.Position;                
-                currentEventArgs.MoveDelta = (Game.Mouse.Position - lastMousePos) ?? Vector2.Zero;
-                lastMousePos = Game.Mouse.Position;
+                currentEventArgs.Position = (Point)args.Position;
+                currentEventArgs.MoveDelta = (mouse.Position - lastMousePos) ?? Vector2.Zero;
+                lastMousePos = mouse.Position;
                 if (!this.Active) return;
                 if (oldPos != null && (currentEventArgs.Position - oldPos.Value).Length() > 2)
                     this.InnerActionDrag(currentEventArgs);
             };
             DateTime? lastClickTime = null;
             Keys lastClickKey = Keys.None;
-            Game.Keyboard.KeyDown += KeyDownAction = (sender, args) =>
+            keyboard.KeyDown += KeyDownAction = (sender, args) =>
             {
-                lastMousePos = Game.Mouse.Position;
+                lastMousePos = mouse.Position;
                 currentEventArgs.IsTouch = false;
                 currentEventArgs.Key = args.Key;
-                currentEventArgs.Position = Game.Mouse.Position;
+                currentEventArgs.Position = mouse.Position;
                 currentEventArgs.MoveDelta = Vector2.Zero;
                 currentEventArgs.IsClick = args.Key == Keys.LeftButton;
                 currentEventArgs.IsAltClick = args.Key == Keys.RightButton;
                 currentEventArgs.ActionType = ControlActionArgs.ClickActionType.ActionDown;
-                         
+
                 if (base.Ghost || !Active) return;
                 var rootFrame = ApplicationInterface.Instance.rootFrame;
                 var hoveredFrame = MainFrame.GetHoveredFrame(rootFrame, (Point)currentEventArgs.Position);
@@ -101,16 +101,16 @@ namespace FusionUI.UI
                     currentEventArgs.IsAltClick = false;
                     currentEventArgs.IsDoubleClick = false;
                 }
-            };            
-            Game.Keyboard.KeyUp += KeyUpAction = (sender, args) =>
+            };
+            keyboard.KeyUp += KeyUpAction = (sender, args) =>
             {
-                lastMousePos = Game.Mouse.Position;
+                lastMousePos = mouse.Position;
                 currentEventArgs.IsTouch = false;
                 currentEventArgs.Key = args.Key;
-                currentEventArgs.Position = Game.Mouse.Position;
-                currentEventArgs.MoveDelta = Game.Mouse.PositionDelta;
+                currentEventArgs.Position = mouse.Position;
+                currentEventArgs.MoveDelta = mouse.PositionDelta;
                 currentEventArgs.IsClick = args.Key == Keys.LeftButton;
-                currentEventArgs.IsAltClick = args.Key == Keys.RightButton;                
+                currentEventArgs.IsAltClick = args.Key == Keys.RightButton;
                 currentEventArgs.ActionType = ControlActionArgs.ClickActionType.ActionUp;
                 if (base.Ghost || !Active) return;
                 var rootFrame = ApplicationInterface.Instance.rootFrame;
@@ -146,7 +146,7 @@ namespace FusionUI.UI
                 oldPos = null;
             };
 
-            Game.Touch.Tap += TouchTapAction = (args) =>
+            touch.Tap += TouchTapAction = (args) =>
             {
                 //currentEventArgs.Key = Game.Keyboard.IsKeyDown;
                 currentEventArgs.IsTouch = true;
@@ -172,7 +172,7 @@ namespace FusionUI.UI
                 }
             };
 
-            Game.Touch.SecondaryTap += TouchSecondaryTapAction = (args) =>
+            touch.SecondaryTap += TouchSecondaryTapAction = (args) =>
             {
                 //currentEventArgs.Key = Game.Keyboard.IsKeyDown;
                 currentEventArgs.IsTouch = true;
@@ -198,12 +198,12 @@ namespace FusionUI.UI
                 }
             };
 
-            Game.Touch.DoubleTap += TouchDoubleTapAction = (args) =>
+            touch.DoubleTap += TouchDoubleTapAction = (args) =>
             {
                 //currentEventArgs.Key = Game.Keyboard.IsKeyDown;
                 currentEventArgs.IsTouch = true;
                 currentEventArgs.Position = args.Position;
-                currentEventArgs.IsClick = true;                
+                currentEventArgs.IsClick = true;
                 currentEventArgs.IsDoubleClick = true;
                 currentEventArgs.ActionType = ControlActionArgs.ClickActionType.ActionDown | ControlActionArgs.ClickActionType.ActionUp | ControlActionArgs.ClickActionType.ActionClick;
                 if (base.Ghost || !Active) return;
@@ -225,7 +225,7 @@ namespace FusionUI.UI
                 }
             };
 
-            Game.Touch.Hold += TouchHoldAction = (args) =>
+            touch.Hold += TouchHoldAction = (args) =>
             {
                 currentEventArgs.IsTouch = true;
                 currentEventArgs.Position = args.Position;
@@ -251,7 +251,7 @@ namespace FusionUI.UI
                 }
             };
 
-            Game.Touch.Manipulate += args =>
+            touch.Manipulate += args =>
             {
                 if (!args.IsEventBegin) currentEventArgs.MoveDelta = args.Position - (Vector2)currentEventArgs.Position;
                 else currentEventArgs.MoveDelta = Vector2.Zero;
@@ -282,7 +282,7 @@ namespace FusionUI.UI
 
                 if (args.IsEventEnd)
                 {
-                    if (base.Ghost || !Active) return;                    
+                    if (base.Ghost || !Active) return;
                     var rootFrame = ApplicationInterface.Instance.rootFrame;
                     var hoveredFrame = MainFrame.GetHoveredFrame(rootFrame, (Point)currentEventArgs.Position);
                     currentEventArgs.ActionType = ControlActionArgs.ClickActionType.ActionUp;
@@ -355,7 +355,7 @@ namespace FusionUI.UI
 				OnPropertyChanged();
 			}
         }
-        
+
 
         public Color? ActiveForeColor = UIConfig.ActiveTextColor,
             InactiveForeColor = UIConfig.InactiveTextColor,
@@ -422,15 +422,15 @@ namespace FusionUI.UI
 
         private bool selected = false;
         public virtual bool Selected {get { return selected && Visible; } set { selected = value; OnPropertyChanged(); } }
-		
+
 		public class ControlActionArgs : EventArgs
         {
             public bool IsTouch;
 
             public Keys Key = Keys.None;
-            public int X  => Position.X;            
+            public int X  => Position.X;
 
-            public int Y => Position.Y;            
+            public int Y => Position.Y;
             public Point Position = Point.Zero;
 
             public int DX {get { return (int)MoveDelta.X; } }
@@ -594,9 +594,9 @@ namespace FusionUI.UI
         }
 
         bool InnerActionOut(ControlActionArgs args)
-        {            
+        {
             bool flag = false;
-            if (!Active || !Visible) return false;            
+            if (!Active || !Visible) return false;
             oldPos = null;
 			Children.Reverse();
 			var reversedChildren = Children;
@@ -615,7 +615,7 @@ namespace FusionUI.UI
                     {
                         flag |= sFrame.InnerActionOut(args);
                     }
-                }                
+                }
             }
 			Children.Reverse();
 
@@ -624,7 +624,7 @@ namespace FusionUI.UI
                 ActionOut?.Invoke(args, ref flag);
                 if (Selected) ActionLost?.Invoke(args, ref flag);
             }
-            
+
 
             Selected = false;
             return flag;
@@ -633,18 +633,18 @@ namespace FusionUI.UI
         private KeyUpEventHandler KeyUpAction;
         private KeyDownEventHandler KeyDownAction;
         private MouseMoveHandlerDelegate MoueMoveAction;
-        private TouchTapEventHandler TouchTapAction, TouchManipulateAction, TouchSecondaryTapAction, TouchHoldAction, TouchDoubleTapAction;       
+        private TouchTapEventHandler TouchTapAction, TouchManipulateAction, TouchSecondaryTapAction, TouchHoldAction, TouchDoubleTapAction;
 
         public void Clean()
         {
-            Game.Keyboard.KeyUp -= KeyUpAction;
-            Game.Keyboard.KeyDown -= KeyDownAction;
-            Game.Mouse.Move -= MoueMoveAction;
-            Game.Touch.Tap -= TouchTapAction;
-            Game.Touch.DoubleTap -= TouchDoubleTapAction;
-            Game.Touch.SecondaryTap -= TouchSecondaryTapAction;
-            Game.Touch.Hold -= TouchHoldAction;
-            Game.Touch.Manipulate -= TouchManipulateAction;
+            Game.Instance.Keyboard.KeyUp -= KeyUpAction;
+            Game.Instance.Keyboard.KeyDown -= KeyDownAction;
+            Game.Instance.Mouse.Move -= MoueMoveAction;
+            Game.Instance.Touch.Tap -= TouchTapAction;
+            Game.Instance.Touch.DoubleTap -= TouchDoubleTapAction;
+            Game.Instance.Touch.SecondaryTap -= TouchSecondaryTapAction;
+            Game.Instance.Touch.Hold -= TouchHoldAction;
+            Game.Instance.Touch.Manipulate -= TouchManipulateAction;
             foreach (var child in Children)
             {
                 if (child is ControllableFrame) ((ControllableFrame)child).Clean();
@@ -659,7 +659,7 @@ namespace FusionUI.UI
                 initialize();
                 firstUpdate = false;
             }
-            
+
             base.Update(gameTime);
             ActionUpdate?.Invoke(gameTime);
         }
@@ -680,9 +680,9 @@ namespace FusionUI.UI
 
 		#region Serialization
 		/*-----------------------------------------------------------------------------------------
-         * 
+         *
          *	Serialization :
-         * 
+         *
         -----------------------------------------------------------------------------------------*/
 
 		/// <summary>

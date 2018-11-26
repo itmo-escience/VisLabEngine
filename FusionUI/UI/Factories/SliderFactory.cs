@@ -1,5 +1,6 @@
 ﻿using System;
 using Fusion.Core.Mathematics;
+using Fusion.Engine.Common;
 using Fusion.Engine.Frames;
 using Fusion.Engine.Graphics;
 using Fusion.Engine.Graphics.Graph;
@@ -10,30 +11,30 @@ namespace FusionUI.UI.Factories
 {
     public class SliderFactory
     {
-        public static UIContainer<Slider> SliderVerticalHolder(FrameProcessor ui, float OffsetX, float OffsetY,
+        public static UIContainer<Slider> SliderVerticalHolder(float OffsetX, float OffsetY,
             ScalableFrame parent, string label,
             Action<float> changeAction, float min, float max, float initValue, out Slider slider, bool minMaxSelector = false, string imageSlider = null, bool IsVertical=false, bool percent = false)
         {
-            UIContainer<Slider> holder = new UIContainer<Slider>(ui, parent.UnitPaddingLeft, 0, parent.UnitWidth - parent.UnitPaddingLeft - parent.UnitPaddingRight, UIConfig.UnitSliderLabelHeight + UIConfig.UnitSliderObjectHeight + OffsetY, "", Color.Zero)
-            {                
+            UIContainer<Slider> holder = new UIContainer<Slider>(parent.UnitPaddingLeft, 0, parent.UnitWidth - parent.UnitPaddingLeft - parent.UnitPaddingRight, UIConfig.UnitSliderLabelHeight + UIConfig.UnitSliderObjectHeight + OffsetY, "", Color.Zero)
+            {
             };
 
-            ScalableFrame labelFrame = new ScalableFrame(ui, OffsetX, OffsetY, holder.UnitWidth, UIConfig.UnitCheckboxLabelHeight, label, Color.Zero)
+            ScalableFrame labelFrame = new ScalableFrame(OffsetX, OffsetY, holder.UnitWidth, UIConfig.UnitCheckboxLabelHeight, label, Color.Zero)
             {
                 TextAlignment = Alignment.BaselineLeft,
                 UnitTextOffsetY = 4,
                 FontHolder = UIConfig.FontBody,
             };
 
-            ScalableFrame valueFrame = new ScalableFrame(ui, OffsetX, OffsetY, holder.UnitWidth - 2 * OffsetX,
+            ScalableFrame valueFrame = new ScalableFrame(OffsetX, OffsetY, holder.UnitWidth - 2 * OffsetX,
                 UIConfig.UnitCheckboxLabelHeight, percent ? $"{initValue * 100:0.##}%" : $"{initValue:0.##}", Color.Zero)
             {
                 TextAlignment = Alignment.BaselineRight,
                 UnitTextOffsetY = 4,
-                FontHolder = UIConfig.FontBody,                
+                FontHolder = UIConfig.FontBody,
             };
 
-            slider = new Slider(ui, OffsetX, OffsetY + UIConfig.UnitSliderLabelHeight, holder.UnitWidth - 2 * OffsetX, UIConfig.UnitSliderObjectHeight, "", Color.Zero)
+            slider = new Slider(OffsetX, OffsetY + UIConfig.UnitSliderLabelHeight, holder.UnitWidth - 2 * OffsetX, UIConfig.UnitSliderObjectHeight, "", Color.Zero)
             {
                 backColorForSlider = ColorConstant.BackColorForSlider,
                 ForeColor = ColorConstant.ForeColor,
@@ -45,7 +46,7 @@ namespace FusionUI.UI.Factories
                 UnitSliderWidth = 0.5f,
                 UnitWidthControlElement = 4,
                 UnitHeightControlElement = UIConfig.UnitSliderObjectHeight,
-                Image = ui.Game.Content.Load<DiscTexture>(imageSlider ?? @"UI-new\fv-icons_slider"),     
+                Image = Game.Instance.Content.Load<DiscTexture>(imageSlider ?? @"UI-new\fv-icons_slider"),
                 IsVertical           = IsVertical
             };
 
@@ -69,7 +70,7 @@ namespace FusionUI.UI.Factories
             {
                 holder.UnitHeight += OffsetY + UIConfig.UnitPalette2LabelHeight + UIConfig.UnitPalette2ElementOffset;
                 float EditboxWidth = 25;
-                Editbox minEdit = new Editbox(ui, OffsetX,
+                Editbox minEdit = new Editbox(OffsetX,
                     2 * OffsetY + UIConfig.UnitPalette2LabelHeight + UIConfig.UnitPalette2ButtonHeight, EditboxWidth,
                     UIConfig.UnitPalette2LabelHeight, $"{slider.MinValue}", Color.Black)
                 {
@@ -85,7 +86,7 @@ namespace FusionUI.UI.Factories
                 {
                     if (args.IsClick) minEdit.SetActiveStatus(false);
                 };
-                Editbox maxEdit = new Editbox(ui, holder.UnitWidth - OffsetX - EditboxWidth,
+                Editbox maxEdit = new Editbox(holder.UnitWidth - OffsetX - EditboxWidth,
                     2 * OffsetY + UIConfig.UnitPalette2LabelHeight + UIConfig.UnitPalette2ButtonHeight, EditboxWidth,
                     UIConfig.UnitPalette2LabelHeight, $"{slider.MaxValue}", Color.Black)
                 {
@@ -102,17 +103,17 @@ namespace FusionUI.UI.Factories
                     if (args.IsClick) maxEdit.SetActiveStatus(false);
                 };
                 var s = slider;
-                Button setMinMaxButton = new Button(ui, OffsetX + EditboxWidth,
+                Button setMinMaxButton = new Button(OffsetX + EditboxWidth,
                     2 * OffsetY + UIConfig.UnitPalette2LabelHeight + UIConfig.UnitPalette2ButtonHeight,
                     holder.UnitWidth - 2 * (OffsetX + EditboxWidth), UIConfig.UnitPalette2LabelHeight, "Set",
                     UIConfig.ButtonColor, UIConfig.ActiveColor, 200,
                     () =>
                     {
-                        float newMin = float.Parse(minEdit.Text), newMax = float.Parse(maxEdit.Text);                        
+                        float newMin = float.Parse(minEdit.Text), newMax = float.Parse(maxEdit.Text);
                         s.MinValue = newMin;
                         s.MaxValue = newMax;
                         s.CurrentValue = MathUtil.Clamp(s.MinValue, s.MaxValue, s.CurrentValue);
-                        s.OnChange.Invoke(s.CurrentValue);                                                
+                        s.OnChange.Invoke(s.CurrentValue);
                     })
                 {
                     Border = 1,
@@ -127,7 +128,7 @@ namespace FusionUI.UI.Factories
             return holder;
         }
 
-        public static UIContainer<Slider> SliderVerticalHolderNew(FrameProcessor ui, float OffsetX, float OffsetY, float width, float height,
+        public static UIContainer<Slider> SliderVerticalHolderNew(float OffsetX, float OffsetY, float width, float height,
             ScalableFrame parent, string label,
             Action<float> changeAction, float min, float max, float initValue, out Slider slider,
             bool minMaxSelector = false, string imageSlider = null,
@@ -135,19 +136,19 @@ namespace FusionUI.UI.Factories
         {
             var sizeLabel = UIConfig.FontBody[1].MeasureString(ScalableFrame.TryGetText(label));
 
-            UIContainer<Slider> holder = new UIContainer<Slider>(ui, parent.UnitPaddingLeft, 0, parent.UnitWidth - parent.UnitPaddingLeft - parent.UnitPaddingRight, sizeLabel.Height / ApplicationInterface.gridUnitDefault + height + OffsetY, "", Color.Zero)
+            var holder = new UIContainer<Slider>(parent.UnitPaddingLeft, 0, parent.UnitWidth - parent.UnitPaddingLeft - parent.UnitPaddingRight, sizeLabel.Height / ApplicationInterface.gridUnitDefault + height + OffsetY, "", Color.Zero)
             {
             };
-            
 
-            ScalableFrame labelFrame = new FormatTextBlock(ui, OffsetX, OffsetY, holder.UnitWidth, (sizeLabel.Height) /ApplicationInterface.gridUnitDefault, label, labelBackColor ?? Color.Zero, UIConfig.FontBody, 0)
+
+            ScalableFrame labelFrame = new FormatTextBlock(OffsetX, OffsetY, holder.UnitWidth, (sizeLabel.Height) /ApplicationInterface.gridUnitDefault, label, labelBackColor ?? Color.Zero, UIConfig.FontBody, 0)
             {
                 TextAlignment = labelAlignment,
                 //UnitTextOffsetY = 4,
-                FontHolder = UIConfig.FontBody,                                    
+                FontHolder = UIConfig.FontBody,
             };
 
-            slider = new Slider(ui, OffsetX, labelFrame.UnitHeight + OffsetY, holder.UnitWidth, height, "", Color.Zero)
+            slider = new Slider(OffsetX, labelFrame.UnitHeight + OffsetY, holder.UnitWidth, height, "", Color.Zero)
             {
                 backColorForSlider = ColorConstant.BackColorForSlider,
                 ForeColor = ColorConstant.ForeColor,
@@ -159,13 +160,13 @@ namespace FusionUI.UI.Factories
                 UnitSliderWidth = 0.5f,
                 UnitWidthControlElement = 4,
                 UnitHeightControlElement = UIConfig.UnitSliderObjectHeight,
-                Image = ui.Game.Content.Load<DiscTexture>(imageSlider ?? @"UI-new\fv-icons_slider"),
-                IsVertical = IsVertical,                
+                Image = Game.Instance.Content.Load<DiscTexture>(imageSlider ?? @"UI-new\fv-icons_slider"),
+                IsVertical = IsVertical,
             };
             holder.UnitHeight = labelFrame.UnitHeight + slider.UnitHeight;
             if (showValue)
             {
-                ScalableFrame valueFrame = new ScalableFrame(ui, OffsetX, OffsetY, holder.UnitWidth - 2 * OffsetX,
+                ScalableFrame valueFrame = new ScalableFrame(OffsetX, OffsetY, holder.UnitWidth - 2 * OffsetX,
                     height, percent ? $"{initValue * 100:0.##}%" : $"{initValue:0.##}", Color.Zero)
                 {
                     TextAlignment = Alignment.BaselineRight,
@@ -193,7 +194,7 @@ namespace FusionUI.UI.Factories
             {
                 holder.UnitHeight += OffsetY + UIConfig.UnitPalette2LabelHeight + UIConfig.UnitPalette2ElementOffset;
                 float EditboxWidth = 25;
-                Editbox minEdit = new Editbox(ui, OffsetX,
+                Editbox minEdit = new Editbox(OffsetX,
                     2 * OffsetY + UIConfig.UnitPalette2LabelHeight + UIConfig.UnitPalette2ButtonHeight, EditboxWidth,
                     UIConfig.UnitPalette2LabelHeight, $"{slider.MinValue}", Color.Black)
                 {
@@ -209,7 +210,7 @@ namespace FusionUI.UI.Factories
                 {
                     if (args.IsClick) minEdit.SetActiveStatus(false);
                 };
-                Editbox maxEdit = new Editbox(ui, holder.UnitWidth - OffsetX - EditboxWidth,
+                Editbox maxEdit = new Editbox(holder.UnitWidth - OffsetX - EditboxWidth,
                     2 * OffsetY + UIConfig.UnitPalette2LabelHeight + UIConfig.UnitPalette2ButtonHeight, EditboxWidth,
                     UIConfig.UnitPalette2LabelHeight, $"{slider.MaxValue}", Color.Black)
                 {
@@ -226,7 +227,7 @@ namespace FusionUI.UI.Factories
                     if (args.IsClick) maxEdit.SetActiveStatus(false);
                 };
                 var s = slider;
-                Button setMinMaxButton = new Button(ui, OffsetX + EditboxWidth,
+                Button setMinMaxButton = new Button(OffsetX + EditboxWidth,
                     2 * OffsetY + UIConfig.UnitPalette2LabelHeight + UIConfig.UnitPalette2ButtonHeight,
                     holder.UnitWidth - 2 * (OffsetX + EditboxWidth), UIConfig.UnitPalette2LabelHeight, "Set",
                     UIConfig.ButtonColor, UIConfig.ActiveColor, 200,
@@ -251,7 +252,7 @@ namespace FusionUI.UI.Factories
             return holder;
         }
 
-        public static ScalableFrame SliderHorizontalHolderNew(FrameProcessor ui, float OffsetX, float OffsetY,
+        public static ScalableFrame SliderHorizontalHolderNew(float OffsetX, float OffsetY,
             float width, float height,
             ScalableFrame parent, string label, float labelWidth,
             Action<float> changeAction, float min, float max, float initValue, out Slider slider,
@@ -263,12 +264,12 @@ namespace FusionUI.UI.Factories
             var sizeLabel = UIConfig.FontBody[2].MeasureString(ScalableFrame.TryGetText(label));
             var labelFontHolder = labelFont ?? UIConfig.FontBody;
             var valueFontHolder = valueFont ?? UIConfig.FontBody;
-            ScalableFrame holder = new ScalableFrame(ui, parent.UnitPaddingLeft, 0,
+            ScalableFrame holder = new ScalableFrame(parent.UnitPaddingLeft, 0,
                 parent.UnitWidth - parent.UnitPaddingLeft - parent.UnitPaddingRight,
                 height + OffsetY, "", Color.Zero);
 
 
-            ScalableFrame labelFrame = new FormatTextBlock(ui, OffsetX, OffsetY, labelWidth,
+            ScalableFrame labelFrame = new FormatTextBlock(OffsetX, OffsetY, labelWidth,
                 height, label, Color.Zero, labelFontHolder, 0, minHeight: height)
             {
                 TextAlignment = labelAlignment,
@@ -277,7 +278,7 @@ namespace FusionUI.UI.Factories
                 IsShortText = false,
             };
 
-            slider = new Slider(ui, OffsetX - 2 + labelWidth, OffsetY,
+            slider = new Slider(OffsetX - 2 + labelWidth, OffsetY,
                 holder.UnitWidth - labelWidth - (showValue ? valueWidth : 0), height, "", Color.Zero)
             {
                 backColorForSlider = ColorConstant.BackColorForSlider,
@@ -290,13 +291,13 @@ namespace FusionUI.UI.Factories
                 UnitSliderWidth = 0.5f,
                 UnitWidthControlElement = 4,
                 UnitHeightControlElement = UIConfig.UnitSliderObjectHeight,
-                Image = ui.Game.Content.Load<DiscTexture>(imageSlider ?? @"UI-new\fv-icons_slider"),
+                Image = Game.Instance.Content.Load<DiscTexture>(imageSlider ?? @"UI-new\fv-icons_slider"),
                 IsVertical = IsVertical
             };
 
             if (showValue)
             {
-                ScalableFrame valueFrame = new ScalableFrame(ui, holder.UnitWidth - valueWidth, OffsetY, valueWidth,
+                ScalableFrame valueFrame = new ScalableFrame(holder.UnitWidth - valueWidth, OffsetY, valueWidth,
                     height, percent ? $"{initValue * 100:0.##}%" : $"{initValue:0.##}", Color.Zero)
                 {
                     TextAlignment = valueAlignment,
@@ -323,7 +324,7 @@ namespace FusionUI.UI.Factories
             {
                 holder.UnitHeight += OffsetY + UIConfig.UnitPalette2LabelHeight + UIConfig.UnitPalette2ElementOffset;
                 float EditboxWidth = 25;
-                Editbox minEdit = new Editbox(ui, OffsetX,
+                Editbox minEdit = new Editbox(OffsetX,
                     2 * OffsetY + UIConfig.UnitPalette2LabelHeight + UIConfig.UnitPalette2ButtonHeight, EditboxWidth,
                     UIConfig.UnitPalette2LabelHeight, $"{slider.MinValue}", Color.Black)
                 {
@@ -339,7 +340,7 @@ namespace FusionUI.UI.Factories
                 {
                     if (args.IsClick) minEdit.SetActiveStatus(false);
                 };
-                Editbox maxEdit = new Editbox(ui, holder.UnitWidth - OffsetX - EditboxWidth,
+                Editbox maxEdit = new Editbox(holder.UnitWidth - OffsetX - EditboxWidth,
                     2 * OffsetY + UIConfig.UnitPalette2LabelHeight + UIConfig.UnitPalette2ButtonHeight, EditboxWidth,
                     UIConfig.UnitPalette2LabelHeight, $"{slider.MaxValue}", Color.Black)
                 {
@@ -356,7 +357,7 @@ namespace FusionUI.UI.Factories
                     if (args.IsClick) maxEdit.SetActiveStatus(false);
                 };
                 var s = slider;
-                Button setMinMaxButton = new Button(ui, OffsetX + EditboxWidth,
+                Button setMinMaxButton = new Button(OffsetX + EditboxWidth,
                     2 * OffsetY + UIConfig.UnitPalette2LabelHeight + UIConfig.UnitPalette2ButtonHeight,
                     holder.UnitWidth - 2 * (OffsetX + EditboxWidth), UIConfig.UnitPalette2LabelHeight, "Set",
                     UIConfig.ButtonColor, UIConfig.ActiveColor, 200,
@@ -380,5 +381,40 @@ namespace FusionUI.UI.Factories
 
             return holder;
         }
+
+        #region Obsoletes
+        public static UIContainer<Slider> SliderVerticalHolder(FrameProcessor ui, float OffsetX, float OffsetY,
+            ScalableFrame parent, string label,
+            Action<float> changeAction, float min, float max, float initValue, out Slider slider, bool minMaxSelector = false, string imageSlider = null, bool IsVertical = false, bool percent = false)
+        {
+            return SliderVerticalHolder(OffsetX, OffsetY, parent, label, changeAction, min, max, initValue, out slider,
+                minMaxSelector, imageSlider, IsVertical, percent);
+        }
+
+        public static UIContainer<Slider> SliderVerticalHolderNew(FrameProcessor ui, float OffsetX, float OffsetY, float width, float height,
+            ScalableFrame parent, string label,
+            Action<float> changeAction, float min, float max, float initValue, out Slider slider,
+            bool minMaxSelector = false, string imageSlider = null,
+            bool IsVertical = false, bool showValue = true, Alignment labelAlignment = Alignment.TopCenter, bool percent = false, Color? labelBackColor = null)
+        {
+            return SliderVerticalHolderNew(OffsetX, OffsetY, width, height, parent, label, changeAction, min, max,
+                initValue, out slider, minMaxSelector, imageSlider, IsVertical, showValue, labelAlignment, percent,
+                labelBackColor);
+        }
+
+        public static ScalableFrame SliderHorizontalHolderNew(FrameProcessor ui, float OffsetX, float OffsetY,
+            float width, float height,
+            ScalableFrame parent, string label, float labelWidth,
+            Action<float> changeAction, float min, float max, float initValue, out Slider slider,
+            bool minMaxSelector = false, string imageSlider = null,
+            bool IsVertical = false, bool showValue = true, float valueWidth = 0,
+            Alignment labelAlignment = Alignment.MiddleCenter, Alignment valueAlignment = Alignment.MiddleCenter,
+            UIConfig.FontHolder? labelFont = null, UIConfig.FontHolder? valueFont = null, bool percent = false)
+        {
+            return SliderHorizontalHolderNew(OffsetX, OffsetY, width, height, parent, label, labelWidth,
+                 changeAction, min, max, initValue, out slider, minMaxSelector, imageSlider, IsVertical, showValue, valueWidth,
+                 labelAlignment, valueAlignment, labelFont, valueFont, percent);
+        }
+        #endregion
     }
 }

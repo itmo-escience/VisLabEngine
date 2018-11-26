@@ -37,7 +37,7 @@ namespace FusionUI.UI.Plots2_0
         {
         }
 
-        public override double StepX => 1;        
+        public override double StepX => 1;
 
         protected override float offsetX => 0.5f;
         protected override float offsetY => 0.0f;
@@ -47,7 +47,7 @@ namespace FusionUI.UI.Plots2_0
             get
             {
                 var pds = PlotData.Where(a => a != null).ToList();
-                if (pds.Count() == 0) return RectangleD.Empty;                
+                if (pds.Count() == 0) return RectangleD.Empty;
                 var lim = new RectangleD()
                 {
                     Left = pds[0].ActiveDepths.Any() ? pds[0].ActiveDepths.Min() : 0,
@@ -145,13 +145,13 @@ namespace FusionUI.UI.Plots2_0
         public string YLabel = "";
         public string XLabel = "";
         public string Measure = "";
-        public bool Dirty = true;        
+        public bool Dirty = true;
         public List<double> PredefinedStepsX, predefinedStepsY;
 		[XmlIgnore]
 		public UIConfig.FontHolder BoldFontHolder;
 		[XmlIgnore]
 		public SpriteFont BoldFont => BoldFontHolder[ApplicationInterface.uiScale];
-        
+
         public int Index = 0;
 
         //public Func<double, string> XStringFunc = f => $"{f:0.##}", YStringFunc = f => $"{f:0.##}";
@@ -164,7 +164,10 @@ namespace FusionUI.UI.Plots2_0
 
         public ScaleParams Settings;
 
-        public PlotScale (FrameProcessor ui, PlotCanvas plotWindow) : base (ui, plotWindow.UnitX, plotWindow.UnitY, plotWindow.UnitWidth, plotWindow.UnitHeight, "", Color.Zero) {
+        [Obsolete("Please use version without FrameProcessor")]
+        public PlotScale(FrameProcessor ui, PlotCanvas plotWindow) : this(plotWindow) {}
+
+        public PlotScale (PlotCanvas plotWindow) : base (plotWindow.UnitX, plotWindow.UnitY, plotWindow.UnitWidth, plotWindow.UnitHeight, "", Color.Zero) {
             Plot = plotWindow;
                 predefinedStepsY = new List<double>() { 10e-9f, 2 * 10e-9f, 10e-8f, 2 * 10e-8f, 10e-7f, 2 * 10e-7f, 10e-6f, 2 * 10e-6f, 10e-5f, 2 * 10e-5f, 10e-4f, 2 * 10e-4f, 10e-3f, 2 * 10e-3f, 10e-2f, 2 * 10e-2f, 0.1f, 0.5f, 1, 5, 10, 25, 50, 100, 200, 500, 1000, 2000, 3000, 5000, 10000 };
                 PredefinedStepsX = new List<double>() { 1, 2, 5, 10, 30, 60, 90, 180, 365, 730, 1095};
@@ -293,17 +296,17 @@ namespace FusionUI.UI.Plots2_0
             //}
             X = -parent.GlobalRectangle.X;
             Y = -parent.GlobalRectangle.Y;
-            Width = ui.RootFrame.GlobalRectangle.Width;
-            Height = ui.RootFrame.GlobalRectangle.Height;
+            Width = ApplicationInterface.Instance.rootFrame.GlobalRectangle.Width;
+            Height = ApplicationInterface.Instance.rootFrame.GlobalRectangle.Height;
         }
 
-        protected override void DrawFrame (GameTime gameTime, SpriteLayer sb, int clipRectIndex) {            
-            //if (!Active) return;            
-            //if (!PlotData.Data.Any()) return;            
+        protected override void DrawFrame (GameTime gameTime, SpriteLayer sb, int clipRectIndex) {
+            //if (!Active) return;
+            //if (!PlotData.Data.Any()) return;
             X = -parent.GlobalRectangle.X;
             Y = -parent.GlobalRectangle.Y;
-            Width = ui.RootFrame.GlobalRectangle.Width;
-            Height = ui.RootFrame.GlobalRectangle.Height;
+            Width = ApplicationInterface.Instance.rootFrame.GlobalRectangle.Width;
+            Height = ApplicationInterface.Instance.rootFrame.GlobalRectangle.Height;
             if ((Settings & ScaleParams.DrawScaleX) != 0)
             {
                 DrawHorizontal(gameTime, sb, clipRectIndex);
@@ -354,7 +357,7 @@ namespace FusionUI.UI.Plots2_0
                 UpdateScaleSteps();
                 Dirty = false;
             }
-            var whiteTex = this.Game.RenderSystem.WhiteTexture;
+            var whiteTex = Game.Instance.RenderSystem.WhiteTexture;
             bool left = Index % 2 == 0;
             int offset = (int)(Index / 2 * (UIConfig.UnitPlotScaleWidth * ScaleMultiplier * (left ? -1 : 1)) + (left ? 0 : Plot.Width));
 
@@ -367,7 +370,7 @@ namespace FusionUI.UI.Plots2_0
             //UnitHeight = Plot.UnitHeight;
 
             var color = Plot.ActiveScale == this || Plot.ActiveScale == null ? CaptionsColor : ForeColor;
-            
+
             //sb.Draw(whiteTex, new RectangleF(Plot.GlobalRectangle.Left + offset + (int)(r.Height / 2) - r.Height, Plot.GlobalRectangle.Bottom + UIConfig.UnitPlotNumbersHeight + UIConfig.UnitPlotVerticalOffset, r.Height, r.Width), Color.Green);
             if ((Settings & ScaleParams.NotDisplayName) == 0)
             {
@@ -391,7 +394,7 @@ namespace FusionUI.UI.Plots2_0
             var MaxY = (float)Limits.Bottom;
             var MinY = (float)Limits.Top;
             if (StepY < float.Epsilon || (MaxY - MinY) / StepY > 100) return;
-            for (double pos = Math.Floor(MinY / StepY) * StepY; pos <= MaxY; pos += StepY) {                
+            for (double pos = Math.Floor(MinY / StepY) * StepY; pos <= MaxY; pos += StepY) {
                 var s = yFunc.Invoke(pos) ?? "";
                                 var b = Font.MeasureStringF(s);
                 float h = (float)(Plot.GlobalRectangle.Bottom - ((pos - MinY - offsetY * StepY) / (MaxY - MinY) * Plot.GlobalRectangle.Height));
@@ -420,8 +423,8 @@ namespace FusionUI.UI.Plots2_0
                         Font.DrawString(sb, s, Plot.GlobalRectangle.Left + offset + 2, h + (b.Height + b.Y) / 2,
                             color, clipRectIndex);
                     }
-                }                
-            }           
+                }
+            }
         }
 
         private void DrawHorizontal (GameTime gameTime, SpriteLayer sb, int clipRectIndex) {
@@ -435,7 +438,7 @@ namespace FusionUI.UI.Plots2_0
             var MaxX = (float)Limits.Right;
             var MinY = (float)Limits.Top;
             var MaxY = (float)Limits.Bottom;
-            var whiteTex = this.Game.RenderSystem.WhiteTexture;            
+            var whiteTex = Game.Instance.RenderSystem.WhiteTexture;
             int zeroH = (Settings & ScaleParams.DrawAtZero) != 0 ? MathUtil.Clamp((int) ((0 - MinY) / (MaxY - MinY) * Plot.GlobalRectangle.Height), 0, Plot.GlobalRectangle.Height) : 0;
             sb.Draw(whiteTex,
                 new RectangleF(Plot.GlobalRectangle.Left, Plot.GlobalRectangle.Bottom - zeroH + Index * UIConfig.UnitPlotScaleHeight * ScaleMultiplier,
@@ -454,7 +457,7 @@ namespace FusionUI.UI.Plots2_0
                 var s = xFunc.Invoke(pos) ?? "";
                 var b = Font.MeasureStringF(s);
                 bool flip = false;//b.Width > StepX / (MaxX - MinX) * Plot.GlobalRectangle.Width * 1.25f;
-                float w =  (float)((pos - offsetX * StepX - MinX)/(MaxX - MinX)*Plot.GlobalRectangle.Width - (flip ? 0 : b.Width/2));                
+                float w =  (float)((pos - offsetX * StepX - MinX)/(MaxX - MinX)*Plot.GlobalRectangle.Width - (flip ? 0 : b.Width/2));
                 if (w > -b.Width / 2 && w < Plot.GlobalRectangle.Width - b.Width / 2 &&
                     (Settings & ScaleParams.NotWriteNumbersX) == 0)
                 {
@@ -481,10 +484,10 @@ namespace FusionUI.UI.Plots2_0
         }
 
         public void AddData(PlotData data)
-        {            
+        {
         }
 
         public bool ForceActive;
-        public bool Active => ForceActive || PlotData != null && PlotData.Any(d => d.Data.Values.Any(a => a.Any(b => b.Value.IsPresent)));        
-    }    
+        public bool Active => ForceActive || PlotData != null && PlotData.Any(d => d.Data.Values.Any(a => a.Any(b => b.Value.IsPresent)));
+    }
 }

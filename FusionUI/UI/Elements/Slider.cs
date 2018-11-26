@@ -15,7 +15,6 @@ namespace FusionUI.UI.Elements
 		protected Slider()
 		{
 		}
-		private FrameProcessor ui;
 
         public float MinValue = 0;
         public float MaxValue = 1;
@@ -31,7 +30,7 @@ namespace FusionUI.UI.Elements
         {
             get { return _presetValues; }
             set
-            {                
+            {
                 _presetValues = value.ToList();
                 _presetValues.Add(MinValue);
                 _presetValues.Add(MaxValue);
@@ -49,7 +48,7 @@ namespace FusionUI.UI.Elements
             get { return _currentValue; }
             set
             {
-                _currentValue = MathUtil.Clamp((RoundValues ? (float)Math.Round(value) : value), MinValue, MaxValue);                
+                _currentValue = MathUtil.Clamp((RoundValues ? (float)Math.Round(value) : value), MinValue, MaxValue);
                 OnChange?.Invoke(value);
             }
         }
@@ -70,12 +69,14 @@ namespace FusionUI.UI.Elements
         public Color HoverColor { get; set; }
         public Color HoverForeColor { get; set; }
 
-        public Slider(FrameProcessor ui, float x, float y, float w, float h, string text, Color backColor) : base(ui, x, y, w, h, text, backColor)
+        [Obsolete("Please use constructor without FrameProcessor")]
+        public Slider(FrameProcessor ui, float x, float y, float w, float h, string text, Color backColor) :
+            this(x, y, w, h, text, backColor) { }
+
+        public Slider(float x, float y, float w, float h, string text, Color backColor) : base(x, y, w, h, text, backColor)
         {
-            this.ui = ui;
             initAllEvent();
         }
-
 
         void initAllEvent()
         {
@@ -99,13 +100,13 @@ namespace FusionUI.UI.Elements
             ActionOut += outAction;
             ActionLost += outAction;
             ActionUp += outAction;
-            ActionClick += outAction;                       
+            ActionClick += outAction;
             // hovered
 
             //Game.Touch.Manipulate += args =>
             //{
             //    if (this.GlobalRectangle.Contains(args.Position))
-            //    {                    
+            //    {
             //        if (args.IsEventBegin)
             //        {
             //            Slider_TouchDown(this, args);
@@ -118,7 +119,7 @@ namespace FusionUI.UI.Elements
             //        {
             //            Slider_TouchMove(this, args);
             //        }
-            //    }                                
+            //    }
             //};
         }
 
@@ -170,7 +171,7 @@ namespace FusionUI.UI.Elements
         void Slider_Touch(object sender, TouchEventArgs e)
         {
             IsDrag = false;
-        }       
+        }
 
         void Slider_TouchMove(object sender, TouchEventArgs e)
         {
@@ -211,7 +212,7 @@ namespace FusionUI.UI.Elements
             int h;
             int vw;
 
-            var whiteTex = Game.RenderSystem.WhiteTexture;
+            var whiteTex = Game.Instance.RenderSystem.WhiteTexture;
             if (!IsVertical)
             {
                 x = GlobalRectangle.X + this.PaddingLeft + widthControlElement;
@@ -225,7 +226,7 @@ namespace FusionUI.UI.Elements
                 if (PresetValues != null && DrawPreset)
                 {
                     for (int i = 0; i < PresetValues.Count; i++)
-                    {                 
+                    {
                         var pos = (PresetValues[i] - MinValue) / (MaxValue - MinValue) * w +
                                   x;
                         sb.Draw(Image ?? whiteTex, pos - ApplicationInterface.ScaleMod, y - ApplicationInterface.ScaleMod * 2, ApplicationInterface.ScaleMod * 2, h + ApplicationInterface.ScaleMod * 4, PresetValues[i] < CurrentValue ? HoverForeColor : backColorForSlider);
@@ -237,7 +238,7 @@ namespace FusionUI.UI.Elements
                     sb.Draw(Image, new Rectangle(x + vw - widthControlElement / 2, y - heightControlElement / 2, widthControlElement, heightControlElement), HoverForeColor, clipRectIndex);
                 }
 
-                
+
             }
             else
             {
@@ -264,8 +265,6 @@ namespace FusionUI.UI.Elements
                     );
                 }
             }
-
-
         }
     }
 }

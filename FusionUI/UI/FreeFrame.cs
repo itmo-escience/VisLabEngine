@@ -24,19 +24,20 @@ namespace FusionUI.UI
 		[XmlIgnore]
 		public Action<FreeFrame> ActionMove;
 
-        public FreeFrame(FrameProcessor ui, float x, float y, float w, float h, string text, Color backColor) : base(ui, x, y, w, h, text, backColor)
+	    public FreeFrame()
+	    {
+	    }
+
+        public FreeFrame(float x, float y, float w, float h, string text, Color backColor) : base(x, y, w, h, text, backColor)
         {
             InitAllEvent();
         }
 
-		public FreeFrame(FrameProcessor ui) : base(ui)
-		{
-			//InitAllEvent();
-		}
+        [Obsolete("Please use constructor without FrameProcessor")]
+	    public FreeFrame(FrameProcessor ui) : this() { }
 
-		protected FreeFrame()
-		{
-		}
+        [Obsolete("Please use constructor without FrameProcessor")]
+        public FreeFrame(FrameProcessor ui, float x, float y, float w, float h, string text, Color backColor) : this(x, y, w, h, text, backColor) { }
 
 		protected override void Update(GameTime gameTime)
         {
@@ -96,9 +97,9 @@ namespace FusionUI.UI
         }
 		#region Serialization
 		/*-----------------------------------------------------------------------------------------
-         * 
+         *
          *	Serialization :
-         * 
+         *
         -----------------------------------------------------------------------------------------*/
 
 		/// <summary>

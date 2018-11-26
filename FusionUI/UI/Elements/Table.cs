@@ -30,18 +30,22 @@ namespace FusionUI.UI.Elements
 		[XmlIgnore]
 		public Action<Vector2> OnResize;
 
-        public Table(FrameProcessor ui, float x, float y, Color backColor, int i, int j, float cellWidth = defaultCellWidth, float cellHeight = defaultCellHeight) : base(ui, x, y, cellWidth * i, cellHeight * j, "", backColor)
-        {            
+        [Obsolete("Please use constructor without FrameProcessor")]
+        public Table(FrameProcessor ui, float x, float y, Color backColor, int i, int j, float cellWidth = defaultCellWidth, float cellHeight = defaultCellHeight)
+            : this(x, y, backColor, i, j, cellWidth, cellHeight) { }
+
+        public Table(float x, float y, Color backColor, int i, int j, float cellWidth = defaultCellWidth, float cellHeight = defaultCellHeight) : base(x, y, cellWidth * i, cellHeight * j, "", backColor)
+        {
             CellWidth = cellWidth;
             CellHeight = cellHeight;
-            InitTable(i, j);            
+            InitTable(i, j);
         }
 
         public void InitTable(int i, int j)
         {
             foreach (var child in this.Children)
             {
-                child.Clear(this);                
+                child.Clear(this);
             }
             this.Children.Clear();
             Cells = new List<List<Cell>>();
@@ -55,7 +59,7 @@ namespace FusionUI.UI.Elements
                 }
                 for (int k2 = 0; k2 < j; k2++)
                 {
-                    var cell = new Cell(ui, k * CellWidth, k2 * CellHeight, CellWidth, CellHeight, "", Color.Zero, this)
+                    var cell = new Cell(k * CellWidth, k2 * CellHeight, CellWidth, CellHeight, "", Color.Zero, this)
                     {
                         IndexRow = k,
                         IndexColumn = k2,
@@ -99,7 +103,7 @@ namespace FusionUI.UI.Elements
 
         //public void AddRow()
         //{
-            
+
         //}
 
         public void SetValueCell(string value, int i, int j)
@@ -108,7 +112,7 @@ namespace FusionUI.UI.Elements
             {
                 Cells.Add(new List<Cell>());
             }
-            var sizeText = Cells[i][j].FontHolder[ApplicationInterface.uiScale].MeasureString(value);            
+            var sizeText = Cells[i][j].FontHolder[ApplicationInterface.uiScale].MeasureString(value);
             Cells[i][j].Text = value;
 
             if (Cells[i][j].Width < sizeText.Width + defaultOffsetX * 2 * ApplicationInterface.ScaleMod &&
@@ -137,7 +141,7 @@ namespace FusionUI.UI.Elements
                         Cells[i][j].UnitX += diffX;
                     }
                 }
-                
+
             }
 
             if (diffY != 0)
@@ -176,13 +180,17 @@ namespace FusionUI.UI.Elements
 
         private Vector2 prevPositon = Vector2.Zero;
 
-        public Cell(FrameProcessor ui, float x, float y, float w, float h, string text, Color backColor, Table t) : base(ui, x, y, w, h, text, backColor)
+        [Obsolete("Please use constructor without FrameProcessor")]
+        public Cell(FrameProcessor ui, float x, float y, float w, float h, string text, Color backColor, Table t)
+            : this(x, y, w, h, text, backColor, t) { }
+
+        public Cell(float x, float y, float w, float h, string text, Color backColor, Table t) : base(x, y, w, h, text, backColor)
         {
-            this.Table = t;
+            Table = t;
 //            Border = 1;
             TextAlignment = Alignment.MiddleCenter;
 
-            var rightSide = new ScalableFrame(ui, this.UnitWidth - clickableFieldWidth, clickableFieldWidth, 
+            var rightSide = new ScalableFrame(UnitWidth - clickableFieldWidth, clickableFieldWidth,
                 clickableFieldWidth, this.UnitHeight - clickableFieldWidth*2,
                 "", Color.Zero)
             {
@@ -194,7 +202,7 @@ namespace FusionUI.UI.Elements
                     prevPositon = GlobalRectangle.Location;
                     prevPositon.X += GlobalRectangle.Width;
                 }
-                    
+
                 var diff = (args.Position - prevPositon).X / ApplicationInterface.gridUnitDefault;
                 if(this.UnitWidth > clickableFieldWidth+3 || diff > 0)
                     Table.ResizeTable(IndexRow, IndexColumn, diff, 0);
@@ -205,7 +213,7 @@ namespace FusionUI.UI.Elements
                 prevPositon = Vector2.Zero;
             };
 
-            var bottomSide = new ScalableFrame(ui, clickableFieldWidth, this.UnitHeight - clickableFieldWidth,
+            var bottomSide = new ScalableFrame(clickableFieldWidth, this.UnitHeight - clickableFieldWidth,
                 this.UnitWidth - 2 * clickableFieldWidth, clickableFieldWidth, "", Color.Zero)
             {
                 Anchor = FrameAnchor.Left | FrameAnchor.Right | FrameAnchor.Bottom

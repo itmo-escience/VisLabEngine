@@ -115,7 +115,7 @@ namespace FusionUI.UI
             get { return text; }
             set
             {
-                text = value;                
+                text = value;
                 DefaultText = value.Trim();
                 UpdateLanguage();
 				OnPropertyChanged();
@@ -155,13 +155,13 @@ namespace FusionUI.UI
                 TryLoadResource = false;
             }
 
-            
+
         }
 
 
 
         public string DefaultText = "_";
-       
+
 
         #region Padding
 
@@ -286,7 +286,7 @@ namespace FusionUI.UI
 
         #endregion
 
-        #region Image 
+        #region Image
 
         private float unitImageOffsetX, unitImageOffsetY;
 
@@ -325,21 +325,15 @@ namespace FusionUI.UI
 
 		#endregion
 
-		internal ScalableFrame()
+		public ScalableFrame()
 		{
-		}
-
-		public ScalableFrame(FrameProcessor ui) : base(ui)
-        {
-            ForeColor = UIConfig.ActiveTextColor;
+		    ForeColor = UIConfig.ActiveTextColor;
         }
 
-        public ScalableFrame(FrameProcessor ui, float x, float y, float w, float h, string text, Color backColor)
-            : base(
-                ui, (int) (x * ScaleMultiplier), (int) (y * ScaleMultiplier), (int) (w * ScaleMultiplier),
-                (int) (h * ScaleMultiplier), text, backColor)
+        public ScalableFrame(float x, float y, float w, float h, string text, Color backColor)
+            : base((int)(x * ScaleMultiplier), (int)(y * ScaleMultiplier), (int)(w * ScaleMultiplier),
+                (int)(h * ScaleMultiplier), text, backColor)
         {
-            //base.Ghost = true;
             UnitX = x;
             UnitY = y;
             UnitWidth = w;
@@ -347,6 +341,14 @@ namespace FusionUI.UI
             ForeColor = UIConfig.ActiveTextColor;
             ApplicationInterface.Instance.onScaleUpdate += UpdateScale;
         }
+
+        [Obsolete("Please use constructor without frame processor")]
+        public ScalableFrame(FrameProcessor ui) : this () { }
+
+        [Obsolete("Please use constructor without frame processor")]
+        public ScalableFrame(FrameProcessor ui, float x, float y, float w, float h, string text, Color backColor)
+            : this((int) (x * ScaleMultiplier), (int) (y * ScaleMultiplier), (int) (w * ScaleMultiplier),
+                (int) (h * ScaleMultiplier), text, backColor) { }
 
         public void UpdateScale()
         {
@@ -357,8 +359,8 @@ namespace FusionUI.UI
         {
             foreach (var frame in Children)
             {
-                if (frame is ScalableFrame)
-                    ((ScalableFrame) frame).UpdateScale();
+                if (frame is ScalableFrame scalableFrame)
+                    scalableFrame.UpdateScale();
             }
             UpdateMove();
             UpdateResize(false);
@@ -367,9 +369,9 @@ namespace FusionUI.UI
 
 		#region Serialization
 		/*-----------------------------------------------------------------------------------------
-         * 
+         *
          *	Serialization :
-         * 
+         *
         -----------------------------------------------------------------------------------------*/
 
 		/// <summary>
@@ -452,9 +454,10 @@ namespace FusionUI.UI
 
 	public class FullScreenFrame<T> : FullScreenFrame where T : ScalableFrame
     {
-		public FullScreenFrame(FrameProcessor ui) : base(ui)
-        {
-        }
+        [Obsolete("Please use constructor without FrameProcessor")]
+        public FullScreenFrame(FrameProcessor ui) : this() { }
+
+        public FullScreenFrame() {}
 
         public T Item;
 
@@ -503,16 +506,15 @@ namespace FusionUI.UI
 
     public class FullScreenFrame : ScalableFrame
     {
-		protected FullScreenFrame()
-		{
-		}
+        [Obsolete("Please use constructor without FrameProcessor")]
+        public FullScreenFrame(FrameProcessor ui) : this() { }
 
-		public FullScreenFrame(FrameProcessor ui) : base(ui)
+        public FullScreenFrame()
         {
             X = 0;
             Y = 0;
-            Width = ui.Game.RenderSystem.DisplayBounds.Width;
-            Height = ui.Game.RenderSystem.DisplayBounds.Height;
+            Width = Game.Instance.RenderSystem.DisplayBounds.Width;
+            Height = Game.Instance.RenderSystem.DisplayBounds.Height;
         }
 
         protected override void Update(GameTime time)
@@ -520,8 +522,8 @@ namespace FusionUI.UI
             base.Update(time);
             X = 0;
             Y = 0;
-            Width = ui.Game.RenderSystem.DisplayBounds.Width;
-            Height = ui.Game.RenderSystem.DisplayBounds.Height;
-        }        
+            Width = Game.Instance.RenderSystem.DisplayBounds.Width;
+            Height = Game.Instance.RenderSystem.DisplayBounds.Height;
+        }
     }
 }

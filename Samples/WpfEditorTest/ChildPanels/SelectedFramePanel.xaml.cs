@@ -37,6 +37,8 @@ namespace WpfEditorTest.ChildPanels
 				_selectedframe = value;
 				if (_selectedframe != null)
 				{
+					this.Visibility = Visibility.Visible;
+
 					this.Width = WidthBuffer = _selectedframe.Width;
 					this.Height = HeightBuffer = _selectedframe.Height;
 
@@ -70,17 +72,21 @@ namespace WpfEditorTest.ChildPanels
 							switch (e.PropertyName)
 							{
 								case "Width":
+								case "UnitWidth":
 									{
 										this.WidthBuffer = this._selectedframe.Width;
 										break;
 									}
 								case "Height":
+								case "UnitHeight":
 									{
 										this.HeightBuffer = this._selectedframe.Height;
 										break;
 									}
 								case "X":
 								case "Y":
+								case "UnitX":
+								case "UnitY":
 									{
 										//var frameDelta = new TranslateTransform(this._selectedframe.GlobalRectangle.X - this.RenderTransform.Value.OffsetX, this._selectedframe.GlobalRectangle.Y - this.RenderTransform.Value.OffsetY);
 
@@ -108,6 +114,10 @@ namespace WpfEditorTest.ChildPanels
 							} 
 						}
 					};
+				}
+				else
+				{
+					this.Visibility = Visibility.Collapsed;
 				}
 
 
