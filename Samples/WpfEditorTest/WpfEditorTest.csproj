@@ -88,8 +88,8 @@
       <DependentUpon>FrameTreeView.xaml</DependentUpon>
     </Compile>
     <Compile Include="ChildPanels\IDraggablePanel.cs" />
-    <Compile Include="ChildPanels\SelectedFramePanel.xaml.cs">
-      <DependentUpon>SelectedFramePanel.xaml</DependentUpon>
+    <Compile Include="ChildPanels\FrameSelectionPanel.xaml.cs">
+      <DependentUpon>FrameSelectionPanel.xaml</DependentUpon>
     </Compile>
     <Compile Include="DataTemplateSelectorOfProperty.cs" />
     <Compile Include="Extentions.cs" />
@@ -109,7 +109,7 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="ChildPanels\SelectedFramePanel.xaml">
+    <Page Include="ChildPanels\FrameSelectionPanel.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

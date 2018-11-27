@@ -22,16 +22,16 @@ namespace WpfEditorTest.ChildPanels
 	{
 		public string _selectedFrameTemplate;
 
-		public Point _previousMouseLocation { get; set; }
-		public Transform _previousTransform { get; set; }
-		public bool _mousePressed { get; set; }
-		public InterfaceEditor _window { get; set; }
+		public Point PreviousMouseLocation { get; set; }
+		public Transform PreviousTransform { get; set; }
+		public bool MousePressed { get; set; }
+		public InterfaceEditor Window { get; set; }
 
 		public FramePalette( InterfaceEditor interfaceEditor )
 		{
 			InitializeComponent();
 			Transform _previousTransform = this.RenderTransform;
-			_window = interfaceEditor;
+			Window = interfaceEditor;
 			Height = StaticData.OptionsWindowSize; Width = StaticData.OptionsWindowSize;
 
 			//this.Margin = new Thickness(_window.Width - this.Width, 0, 0, _window.Height - this.Height);
@@ -41,21 +41,21 @@ namespace WpfEditorTest.ChildPanels
 
 		public void Border_MouseDown( object sender, MouseButtonEventArgs e )
 		{
-			this._mousePressed = true;
-			_previousMouseLocation = e.MouseDevice.GetPosition(_window);
-			_previousTransform = this.RenderTransform;
+			this.MousePressed = true;
+			PreviousMouseLocation = e.MouseDevice.GetPosition(Window);
+			PreviousTransform = this.RenderTransform;
 		}
 
 		private void Border_MouseDown_1( object sender, MouseButtonEventArgs e )
 		{
 			this._selectedFrameTemplate = (string)(sender as Border).Tag;
-			_window.Cursor = Cursors.Hand;
+			Window.Cursor = Cursors.Hand;
 		}
 
 		private void UserControl_MouseUp( object sender, MouseButtonEventArgs e )
 		{
 			this._selectedFrameTemplate = null;
-			_window.Cursor = Cursors.Arrow;
+			Window.Cursor = Cursors.Arrow;
 		}
 	}
 }

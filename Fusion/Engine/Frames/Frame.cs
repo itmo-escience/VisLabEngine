@@ -1705,10 +1705,10 @@ namespace Fusion.Engine.Frames {
 
 		protected void OnPropertyChanged( [System.Runtime.CompilerServices.CallerMemberName] string changedProperty = "" )
 		{
-			this.PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(changedProperty));
+			PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(changedProperty));
 			if (changedProperty == "Children")
 			{
-				this.parent?.OnPropertyChanged("Children");
+				parent?.OnPropertyChanged("Children");
 			}
 		}
 

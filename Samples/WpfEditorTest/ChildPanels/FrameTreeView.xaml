@@ -6,7 +6,7 @@
              xmlns:local="clr-namespace:WpfEditorTest.ChildPanels"
              mc:Ignorable="d" 
              d:DesignHeight="264" d:DesignWidth="264">
-    <Grid>
+    <Grid MouseDown="Grid_MouseDown">
         <Grid.RowDefinitions>
             <RowDefinition Height="32"/>
             <RowDefinition/>

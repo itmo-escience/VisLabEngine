@@ -13,6 +13,7 @@ using System.Diagnostics;
 using Fusion.Core.Configuration;
 using Fusion.Engine.Common;
 using Fusion.Engine.Graphics;
+using Point = SharpDX.Point;
 
 
 namespace Fusion.Engine.Frames {
@@ -205,11 +206,56 @@ namespace Fusion.Engine.Frames {
 		{
 			return mouseProcessor.GetHoveredFrame(frame);
 		}
-		/*-----------------------------------------------------------------------------------------
+
+
+        /*-----------------------------------------------------------------------------------------
 		 *
 		 *	Input processing :
 		 *
 		-----------------------------------------------------------------------------------------*/
 
+        /// <inheritdoc cref="GetFramesAt(Fusion.Engine.Frames.Frame,Point)" />
+	    public static Stack<Frame> GetFramesAt(Frame root, int x, int y)
+	    {
+	        return GetFramesAt(root, new Point(x, y));
+	    }
+
+        /// <summary>
+        /// Gets all frames at specified position.
+        /// </summary>
+        /// <param name="root">Frame to start with</param>
+        /// <param name="position">Point of interest</param>
+        /// <returns>Frames in the display order, Frame with max ZOrder returned on top of the stack</returns>
+        public static Stack<Frame> GetFramesAt(Frame root, Point position)
+        {
+            var result = new Stack<Frame>();
+
+            var toProcess = new Stack<Frame>();
+            toProcess.Push(root);
+
+            while (toProcess.Any())
+            {
+                var current = toProcess.Pop();
+
+                var absLeft = current.GlobalRectangle.Left;
+                var absTop = current.GlobalRectangle.Top;
+                var absRight = current.GlobalRectangle.Right;
+                var absBottom = current.GlobalRectangle.Bottom;
+
+                var hovered = position.X >= absLeft && position.X < absRight
+                              && position.Y >= absTop && position.Y < absBottom;
+
+                if (!hovered) continue;
+
+                foreach (var child in current.Children)
+                {
+                    toProcess.Push(child);
+                }
+
+                result.Push(current);
+            }
+
+            return result;
+        }
 	}
 }

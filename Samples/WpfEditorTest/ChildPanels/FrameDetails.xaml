@@ -1,15 +1,15 @@
 ﻿<UserControl x:Class="WpfEditorTest.ChildPanels.FrameDetails"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
-             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:local="clr-namespace:WpfEditorTest.ChildPanels"
              xmlns:conv="clr-namespace:WpfEditorTest"
              xmlns:system ="clr-namespace:System;assembly=mscorlib"
              xmlns:math ="clr-namespace:Fusion.Core.Mathematics;assembly=Fusion"
              xmlns:frames ="clr-namespace:Fusion.Engine.Frames;assembly=Fusion"
              xmlns:wpfTool ="http://schemas.xceed.com/wpf/xaml/toolkit"
-             mc:Ignorable="d" 
+             mc:Ignorable="d"
              d:DesignHeight="264" d:DesignWidth="264">
     <UserControl.Resources>
         <conv:PropertyValueConverter x:Key="propValueConverter"/>
@@ -174,30 +174,9 @@
                                       Text="{Binding PropName}"/>
                 </Border>
                 <StackPanel Height="auto" Width="auto" Orientation="Vertical">
-                    <!--<ItemsControl ItemsSource="{Binding EnumValues}" Tag="{Binding Prop}">
-                        <ItemsControl.ItemTemplate>
-                        <DataTemplate>
-                                <Border BorderThickness="1" BorderBrush="Gray" Background="Green" Width="auto" HorizontalAlignment="Stretch">
-                                    <StackPanel Orientation="Horizontal">
-                                        <CheckBox VerticalAlignment = "Center" Tag="{Binding}"  IsChecked="{Binding Path=., Converter={StaticResource flagEnumConverter}, ConverterParameter={x:Static frames:FrameAnchor.None}}">
-                                        </CheckBox>
-                                        <TextBlock TextAlignment ="Left"
-			                             TextWrapping = "Wrap"
-			                             VerticalAlignment = "Center"
-                                         FontFamily="Times New Roman"
-                                         Text="{Binding}"/>
-                                    </StackPanel>
-                                </Border>
-                            </DataTemplate>
-                    </ItemsControl.ItemTemplate>
-                    </ItemsControl>-->
-
                     <Border BorderThickness="1" BorderBrush="Gray" Width="auto" HorizontalAlignment="Stretch">
                         <StackPanel>
-                            <!--<StackPanel Orientation="Horizontal">
-                                <CheckBox VerticalAlignment = "Center" IsChecked="{Binding Prop, Converter={StaticResource propValueConverter}, ConverterParameter={x:Static frames:FrameAnchor.None}}"/>
-                                <TextBlock TextAlignment ="Left" TextWrapping = "Wrap" VerticalAlignment = "Center" FontFamily="Times New Roman" Text="None"/>
-                            </StackPanel>-->
+
                             <StackPanel Orientation="Horizontal">
                                 <CheckBox VerticalAlignment = "Center" IsChecked="{Binding Prop, Converter={StaticResource propValueConverter}, ConverterParameter={x:Static frames:FrameAnchor.Left}}"/>
                                 <TextBlock TextAlignment ="Left" TextWrapping = "Wrap" VerticalAlignment = "Center" FontFamily="Times New Roman" Text="Left"/>
@@ -214,10 +193,6 @@
                                 <CheckBox VerticalAlignment = "Center" IsChecked="{Binding Prop, Converter={StaticResource propValueConverter}, ConverterParameter={x:Static frames:FrameAnchor.Bottom}}"/>
                                 <TextBlock TextAlignment ="Left" TextWrapping = "Wrap" VerticalAlignment = "Center" FontFamily="Times New Roman" Text="Bottom"/>
                             </StackPanel>
-                            <!--<StackPanel Orientation="Horizontal">
-                                <CheckBox VerticalAlignment = "Center" IsChecked="{Binding Prop, Converter={StaticResource flagEnumConverter}, ConverterParameter={x:Static frames:FrameAnchor.All}}"/>
-                                <TextBlock TextAlignment ="Left" TextWrapping = "Wrap" VerticalAlignment = "Center" FontFamily="Times New Roman" Text="All"/>
-                            </StackPanel>-->
                         </StackPanel>
                     </Border>
 
@@ -253,52 +228,6 @@
         <ScrollViewer Height="auto" Width="auto" Background="LightGray" Grid.Row="1">
             <StackPanel Height="auto" Width="auto">
                 <ItemsControl x:Name="FrameDetailsControls" ItemTemplateSelector="{StaticResource propTemplateSelector}">
-                    <!--<ItemsControl.ItemTemplate>
-                        <DataTemplate>
-                            <ContentControl Content="{Binding}">
-                                <ContentControl.Style>
-                                    <Style TargetType="{x:Type ContentControl}">
-                                        <Setter Property="ContentTemplate" Value="{StaticResource IntegerProp}"/>
-                                        <Style.Triggers>
-                                            <DataTrigger Binding="{Binding Prop}" Value="{x:Type math:Color}">
-                                                <Setter Property="ContentTemplate" Value="{StaticResource ColorProp}"/>
-                                            </DataTrigger>
-                                        </Style.Triggers>
-                                    </Style>
-                                </ContentControl.Style>
-                            </ContentControl>
-                        </DataTemplate>
-                    </ItemsControl.ItemTemplate>-->
-
-                    <!--<ItemsControl.Resources>
-                         <DataTemplate DataType="{x:Type system:Int32}">
-                             <Rectangle Width="50" Height="50" Fill="Red" />
-                         </DataTemplate>
-                         <DataTemplate DataType="{x:Type math:Color}">
-                             <Rectangle Width="50" Height="50" Fill="Blue" />
-                         </DataTemplate>
-                     </ItemsControl.Resources>-->
-                    <!--<ItemsControl.ItemTemplate>
-                        <DataTemplate>
-                            <DockPanel Height="auto" Width="auto">
-                                <Border BorderThickness="1" BorderBrush="Gray" Background="Red" MinHeight="32" MinWidth="100">
-                                    <TextBlock TextAlignment ="Left"
-			                             TextWrapping = "Wrap"
-			                             VerticalAlignment = "Center"
-                                            FontFamily="Times New Roman"
-                                      Text="{Binding PropName}"/>
-                                </Border>
-                                <Border BorderThickness="1" BorderBrush="Gray" Background="Green" MinHeight="32" Width="auto" HorizontalAlignment="Stretch" DataContext="{Binding Prop}">
-                                    <TextBox TextAlignment ="Center"
-			                             TextWrapping = "Wrap"
-			                             VerticalAlignment = "Center"
-                                            FontFamily="Times New Roman"
-                                      Text="{Binding Prop, Converter={StaticResource propValueConverter}, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
-                                    </TextBox>
-                                </Border>
-                            </DockPanel>
-                        </DataTemplate>
-                    </ItemsControl.ItemTemplate>-->
                 </ItemsControl>
             </StackPanel>
         </ScrollViewer>
