@@ -32,8 +32,8 @@ namespace WpfEditorTest
 	    private readonly List<IDraggablePanel> _panels = new List<IDraggablePanel>();
 
 	    public string TemplatesPath = Path.GetFullPath(Path.Combine(Directory.GetParent(Assembly.GetEntryAssembly().Location).FullName, "..\\..\\..\\FramesXML"));
-
-	    private readonly Game _engine;
+	    Binding childrenBinding;
+        private readonly Game _engine;
 
 		public FusionUI.UI.ScalableFrame DragFieldFrame;
 		public FusionUI.UI.ScalableFrame SceneFrame;
@@ -107,7 +107,68 @@ namespace WpfEditorTest
             MoveFrameToDragField(_treeView.SelectedFrame);
         }
 
-        protected override void OnSourceInitialized( EventArgs e )
+		internal void TryLoadSceneAsTemplate()
+		{
+			var startPath = Path.GetFullPath(Path.Combine(TemplatesPath, ".."));
+			var filter = "XML files(*.xml)| *.xml";
+			using (var dialog = new System.Windows.Forms.OpenFileDialog() { InitialDirectory = startPath, Multiselect = false, Filter = filter })
+			{
+			    if (dialog.ShowDialog() != System.Windows.Forms.DialogResult.OK) return;
+
+			    var createdFrame = CreateFrameFromFile(dialog.FileName);
+			    if (createdFrame != null && createdFrame.GetType() == typeof(FusionUI.UI.ScalableFrame))
+			    {
+			        RootFrame.Remove(SceneFrame);
+			        ResetSelectedFrame();
+			        SceneFrame = (FusionUI.UI.ScalableFrame)createdFrame;
+			        RootFrame.Add(SceneFrame);
+			        childrenBinding = new Binding("Children")
+			        {
+			            Source = SceneFrame,
+			        };
+			        _treeView.ElementHierarcyView.SetBinding(TreeView.ItemsSourceProperty, childrenBinding);
+			    }
+			}
+		}
+
+		internal void TrySaveSceneAsTemplate()
+		{
+			var startPath = Path.GetFullPath(Path.Combine(TemplatesPath, ".."));
+			var filter = "XML files(*.xml)| *.xml";
+			using (var dialog = new System.Windows.Forms.SaveFileDialog() { InitialDirectory = startPath, Filter = filter })
+			{
+				if (dialog.ShowDialog() == System.Windows.Forms.DialogResult.OK)
+				{
+					Fusion.Core.Utils.FrameSerializer.Write(SceneFrame, dialog.FileName);
+				}
+			}
+		}
+
+		internal void TrySaveFrameAsTemplate()
+		{
+			if (_frameSelectionPanel.SelectedFrame!=null)
+			{
+				if (!Directory.Exists(TemplatesPath))
+				{
+					Directory.CreateDirectory(TemplatesPath);
+				}
+			    var selectedFrame = _frameSelectionPanel.SelectedFrame;
+
+                Fusion.Core.Utils.FrameSerializer.Write(selectedFrame, TemplatesPath+ "\\" + (selectedFrame.Text?? selectedFrame.GetType().ToString()) + ".xml");
+				this.LoadPalettes();
+			}
+		}
+
+		public void LoadPalettes()
+		{
+			if (Directory.Exists(TemplatesPath))
+			{
+				var templates = Directory.GetFiles(TemplatesPath, "*.xml").ToList();
+				_palette.AvailableFrames.ItemsSource = templates.Select(t => t.Split('\\').Last().Split('.').First());
+			}
+		}
+
+		protected override void OnSourceInitialized( EventArgs e )
 		{
 			base.OnSourceInitialized(e);
 			DxElem.HandleInput(this);
@@ -215,11 +276,7 @@ namespace WpfEditorTest
             if(_frameSelectionPanel.SelectedFrame != null)
 		    {
                 TryLandSelectedFrameOnScene(e.GetPosition(this));
-		        _frameSelectionPanel.SelectedFrame = null;
 		    }
-
-		    _frameSelectionPanel.DragMousePressed = false;
-		    _frameSelectionPanel.CurrentDrag = null;
 
             foreach (var panel in _panels)
 			{
@@ -228,7 +285,8 @@ namespace WpfEditorTest
 
 			if (_palette._selectedFrameTemplate != null)
 			{
-				Fusion.Core.Utils.FrameSerializer.Read(Path.Combine(TemplatesPath, _palette._selectedFrameTemplate)+".xml", out var createdFrame);
+
+				var createdFrame = CreateFrameFromFile(Path.Combine(TemplatesPath, _palette._selectedFrameTemplate) + ".xml");
 
 				if (createdFrame != null)
 				{
@@ -237,9 +295,14 @@ namespace WpfEditorTest
 					SceneFrame.Add(createdFrame);
 				}
 				_palette._selectedFrameTemplate = null;
-
-			    Cursor = Cursors.Arrow;
+				Cursor = Cursors.Arrow;
 			}
+		}
+
+		private Frame CreateFrameFromFile( string filePath )
+		{
+			Fusion.Core.Utils.FrameSerializer.Read(filePath, out var createdFrame);
+			return createdFrame;
 		}
 
 		private void LocalGrid_MouseDown( object sender, MouseButtonEventArgs e )
@@ -255,9 +318,9 @@ namespace WpfEditorTest
 	        if (e.Key == Key.Delete && _treeView.ElementHierarcyView.SelectedItem != null)
 	        {
 	            var selected = (Frame)_treeView.ElementHierarcyView.SelectedItem;
-	            _details.FrameDetailsControls.ItemsSource = null;
-
 	            selected.Parent?.Remove(selected);
+
+                ResetSelectedFrame();
 	        }
 	    }
 
@@ -285,7 +348,15 @@ namespace WpfEditorTest
             }
 	    }
 
-	    public void MoveFrameToDragField(Frame frame)
+		private void ResetSelectedFrame()
+		{
+			_details.FrameDetailsControls.ItemsSource = null;
+			_frameSelectionPanel.SelectedFrame = null;
+		    _frameSelectionPanel.DragMousePressed = false;
+		    _frameSelectionPanel.CurrentDrag = null;
+        }
+
+		public void MoveFrameToDragField(Frame frame)
 		{
 			frame.Parent?.Remove(frame);
 
@@ -319,7 +390,7 @@ namespace WpfEditorTest
 
 			if (prop.PropertyType != typeof(string))
 			{
-			    _prop = Activator.CreateInstance(prop.PropertyType);
+			    //_prop = Activator.CreateInstance(prop.PropertyType);
 			    _prop = prop.GetValue(obj);
 			}
 			else
@@ -359,8 +430,7 @@ namespace WpfEditorTest
 			}
 		}
 
-
-	    public Fusion.Engine.Frames.Frame Obj { get; set; }
+	    public Frame Obj { get; set; }
 
 	    public PropertyInfo PropInfo { get; set; }
 	    public Type PropType { get; set; }

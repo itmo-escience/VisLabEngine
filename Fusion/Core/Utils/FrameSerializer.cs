@@ -113,51 +113,37 @@ namespace Fusion.Core.Utils
 
 		public void ReadXml( XmlReader reader )
 		{
-			XmlSerializer typesSerializer = new XmlSerializer(typeof(SerializableDictionary<string, string>));
-			XmlSerializer versionSerializer = new XmlSerializer(typeof(string));
+			var typesSerializer = new XmlSerializer(typeof(SerializableDictionary<string, string>));
+			var versionSerializer = new XmlSerializer(typeof(string));
 
-			bool wasEmpty = reader.IsEmptyElement;
+			var wasEmpty = reader.IsEmptyElement;
 			reader.Read();
 
 			if (wasEmpty)
 				return;
 
-			//reader.ReadStartElement("holder");
-
-			//reader.ReadStartElement("version");
-			string version = (string)versionSerializer.Deserialize(reader);
-			this.Version = version;
-			//reader.ReadEndElement();
+		    var version = (string)versionSerializer.Deserialize(reader);
+			Version = version;
 
 			if (version != FrameSerializer.SerializerVersion) {
 				Console.WriteLine($"Версии текущего сериализатора ({FrameSerializer.SerializerVersion}) и десериализуемогог объекта ({version}) не совпадают.");
 				return;
 			}
 
-			//reader.ReadStartElement("types");
-			SerializableDictionary<string, string> types = (SerializableDictionary<string, string>)typesSerializer.Deserialize(reader);
-			this.FrameTypes = types;
-			//reader.ReadEndElement();
+			var types = (SerializableDictionary<string, string>)typesSerializer.Deserialize(reader);
+			FrameTypes = types;
 
-			List<Type> frameTypes = new List<Type>();
+			var frameTypes = new List<Type>();
 			foreach (var keyValuePair in types)
 			{
 				var assembly = Assembly.Load(keyValuePair.Value);
 				frameTypes.Add(assembly.GetType(keyValuePair.Key));
 			}
 
-			XmlSerializer frameSerializer = new XmlSerializer(typeof(Frame), frameTypes.ToArray());
+			var frameSerializer = new XmlSerializer(typeof(Frame), frameTypes.ToArray());
 
-			//reader.ReadStartElement("serializableFrame");
-				Frame frame = (Frame)frameSerializer.Deserialize(reader);
-				this.SerializableFrame = frame;
-				//reader.ReadEndElement();
-
-			//reader.ReadEndElement();
-
-			//reader.MoveToContent();
-
-			//reader.ReadEndElement();
+			var frame = (Frame)frameSerializer.Deserialize(reader);
+			SerializableFrame = frame;
 		}
 
 		public void WriteXml( XmlWriter writer )

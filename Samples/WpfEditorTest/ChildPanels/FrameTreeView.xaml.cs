@@ -82,5 +82,14 @@ namespace WpfEditorTest.ChildPanels
 	        e.Handled = true;
 	    }
 
-    }
+		private void SaveScene_Click(object sender, RoutedEventArgs e )
+		{
+			Window.TrySaveSceneAsTemplate();
+		}
+
+		private void LoadScene_Click( object sender, RoutedEventArgs e )
+		{
+			Window.TryLoadSceneAsTemplate();
+		}
+	}
 }

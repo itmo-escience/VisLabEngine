@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Xml.Serialization;
 using Fusion.Core.Mathematics;
 using Fusion.Engine.Common;
@@ -172,7 +173,7 @@ namespace FusionUI.UI
             SuppressActions = true;
         }
 
-        public new List<Frame> Children { get { return holder.Children; }
+        public new ObservableCollection<Frame> Children { get { return holder.Children; }
 			set
 			{
 				foreach (Frame child in value)

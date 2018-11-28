@@ -33,9 +33,9 @@ namespace WpfEditorTest.ChildPanels
 			PreviousTransform = RenderTransform;
 		}
 
-		private void Button_Click( object sender, RoutedEventArgs e )
+		private void Save_Click( object sender, RoutedEventArgs e )
 		{
-
+			Window.TrySaveFrameAsTemplate();
 		}
 	}
 }
