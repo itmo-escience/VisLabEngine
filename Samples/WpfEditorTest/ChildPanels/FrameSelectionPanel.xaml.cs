@@ -243,10 +243,15 @@ namespace WpfEditorTest.ChildPanels
 		private void UserControl_MouseDown( object sender, MouseButtonEventArgs e )
 		{
 			e.Handled = false;
-			MousePressed = true;
-			PreviousMouseLocation = e.MouseDevice.GetPosition(Window);
-			PreviousTransform = RenderTransform;
+            StartFrameDragging(e.MouseDevice.GetPosition(Window));
 		}
+
+	    public void StartFrameDragging(Point mousePosition)
+	    {
+	        MousePressed = true;
+	        PreviousMouseLocation = mousePosition;
+	        PreviousTransform = RenderTransform;
+        }
 
 		private void Drag_MouseDown( object sender, MouseButtonEventArgs e )
 		{

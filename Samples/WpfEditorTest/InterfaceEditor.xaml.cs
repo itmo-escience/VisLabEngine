@@ -321,6 +321,7 @@ namespace WpfEditorTest
 		    if (hovered != null)
 		    {
 		        SelectFrame(hovered);
+                _frameSelectionPanel.StartFrameDragging(e.GetPosition(this));
 		    }
 		}
 
@@ -339,8 +340,8 @@ namespace WpfEditorTest
 	    {
 	        _treeView.SelectedFrame = frame;
 	        _frameSelectionPanel.SelectedFrame = frame;
-	        _frameSelectionPanel.Visibility = Visibility.Visible;
-	        MoveFrameToDragField(frame);
+            _frameSelectionPanel.Visibility = Visibility.Visible;
+            MoveFrameToDragField(frame);
 	    }
 
         private void ResetSelectedFrame()
