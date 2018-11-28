@@ -5,32 +5,30 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
+using Frame = Fusion.Engine.Frames.Frame;
 
 namespace WpfEditorTest.ChildPanels
 {
-	/// <summary>
-	/// Interaction logic for FrameTreeView.xaml
-	/// </summary>
-	public partial class FrameTreeView : UserControl, IDraggablePanel
-	{
-		private readonly ItemsControl _frameDetailsControls;
+    /// <summary>
+    /// Interaction logic for FrameTreeView.xaml
+    /// </summary>
+    public partial class FrameTreeView : UserControl, IDraggablePanel
+    {
+        private readonly ItemsControl _frameDetailsControls;
 
-		public Point PreviousMouseLocation { get; set; }
-		public Transform PreviousTransform { get; set; }
-		public bool MousePressed { get; set; }
-		public InterfaceEditor Window { get; set; }
-		public Fusion.Engine.Frames.Frame SelectedFrame
-		{
-			get => _selectedFrame;
-			set {
-			    _selectedFrame = value;
-				SelectedFrameChanged?.Invoke(this, null);
-			}
-		}
+        public Point PreviousMouseLocation { get; set; }
+        public Transform PreviousTransform { get; set; }
+        public bool MousePressed { get; set; }
+        public InterfaceEditor Window { get; set; }
 
-		private Fusion.Engine.Frames.Frame _selectedFrame;
+        private Frame _selectedFrame;
+        public Frame SelectedFrame
+        {
+            get => _selectedFrame;
+            set => SetSelectedFrame(value);
+        }
 
-		public EventHandler SelectedFrameChanged;
+	    public EventHandler<Frame> SelectedFrameChangedInUI;
 
 		public FrameTreeView( InterfaceEditor interfaceEditor, ItemsControl frameDetailsControls)
 		{
@@ -42,22 +40,18 @@ namespace WpfEditorTest.ChildPanels
 			Height = StaticData.OptionsWindowSize;
 		    Width = StaticData.OptionsWindowSize;
 
-			this.HorizontalAlignment = HorizontalAlignment.Right;
-			this.VerticalAlignment = VerticalAlignment.Bottom;
-
-			SelectedFrameChanged += ( s, e ) => {
-
-			};
+			HorizontalAlignment = HorizontalAlignment.Right;
+			VerticalAlignment = VerticalAlignment.Bottom;
 		}
 
 		private void TextBlock_MouseDown( object sender, MouseButtonEventArgs e )
 		{
-			SetSelectedFrame((Fusion.Engine.Frames.Frame)((sender as TextBlock).Tag));
-		}
+		    SelectedFrameChangedInUI?.Invoke(this, SelectedFrame);
+        }
 
-		public void SetSelectedFrame( Fusion.Engine.Frames.Frame frame )
+		private void SetSelectedFrame(Frame frame)
 		{
-			SelectedFrame = frame;
+			_selectedFrame = frame;
 
 			var publicProperties = SelectedFrame.GetType().GetProperties(BindingFlags.Public | BindingFlags.Instance);
 

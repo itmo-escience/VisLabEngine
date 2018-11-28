@@ -79,7 +79,7 @@ namespace WpfEditorTest
             LocalGrid.Children.Add(_treeView);
             _panels.Add(_treeView);
 
-            _treeView.SelectedFrameChanged += SelectFrame;
+            _treeView.SelectedFrameChangedInUI += (_, frame) => SelectFrame(frame);
 
             var templates = Directory.GetFiles(TemplatesPath, "*.xml").ToList();
             _palette.AvailableFrames.ItemsSource = templates.Select(t => t.Split('\\').Last().Split('.').First());
@@ -88,7 +88,8 @@ namespace WpfEditorTest
             SceneFrame = (FusionUI.UI.ScalableFrame)RootFrame.Children.FirstOrDefault();
             DragFieldFrame = new FusionUI.UI.ScalableFrame(0, 0, RootFrame.UnitWidth, RootFrame.UnitHeight, "DragFieldFrame", Fusion.Core.Mathematics.Color.Zero)
             {
-                Anchor = FrameAnchor.All
+                Anchor = FrameAnchor.All,
+                ZOrder = 1000000,
             };
             RootFrame.Add(DragFieldFrame);
 
@@ -101,13 +102,15 @@ namespace WpfEditorTest
             _treeView.ElementHierarcyView.SetBinding(TreeView.ItemsSourceProperty, b);
         }
 
-        private void SelectFrame(object sender, EventArgs args)
+	    protected override void OnSourceInitialized(EventArgs e)
 	    {
-            _frameSelectionPanel.SelectedFrame = _treeView.SelectedFrame;
-            MoveFrameToDragField(_treeView.SelectedFrame);
-        }
+	        base.OnSourceInitialized(e);
+	        DxElem.HandleInput(this);
+	    }
 
-		internal void TryLoadSceneAsTemplate()
+        #region Save/load stuff
+
+        internal void TryLoadSceneAsTemplate()
 		{
 			var startPath = Path.GetFullPath(Path.Combine(TemplatesPath, ".."));
 			var filter = "XML files(*.xml)| *.xml";
@@ -168,11 +171,13 @@ namespace WpfEditorTest
 			}
 		}
 
-		protected override void OnSourceInitialized( EventArgs e )
-		{
-			base.OnSourceInitialized(e);
-			DxElem.HandleInput(this);
-		}
+	    private Frame CreateFrameFromFile(string filePath)
+	    {
+	        Fusion.Core.Utils.FrameSerializer.Read(filePath, out var createdFrame);
+	        return createdFrame;
+	    }
+
+        #endregion
 
 		private void LocalGrid_MouseMove( object sender, MouseEventArgs e )
 		{
@@ -274,9 +279,15 @@ namespace WpfEditorTest
 		private void LocalGrid_MouseLeftButtonUp( object sender, MouseButtonEventArgs e )
 		{
             if(_frameSelectionPanel.SelectedFrame != null)
-		    {
-                TryLandSelectedFrameOnScene(e.GetPosition(this));
-		    }
+            {
+                if (_frameSelectionPanel.DragMousePressed)
+                    _frameSelectionPanel.DragMousePressed = false;
+                else
+                {
+                    LandFrameOnScene(_frameSelectionPanel.SelectedFrame, e.GetPosition(this));
+                    _frameSelectionPanel.UpdateSelectedFramePosition();
+                }
+            }
 
             foreach (var panel in _panels)
 			{
@@ -285,33 +296,33 @@ namespace WpfEditorTest
 
 			if (_palette._selectedFrameTemplate != null)
 			{
-
 				var createdFrame = CreateFrameFromFile(Path.Combine(TemplatesPath, _palette._selectedFrameTemplate) + ".xml");
 
-				if (createdFrame != null)
+                if (createdFrame != null)
 				{
-					createdFrame.X = (int)e.MouseDevice.GetPosition(this).X - createdFrame.Width / 2;
-					createdFrame.Y = (int)e.MouseDevice.GetPosition(this).Y - createdFrame.Height / 2;
-					SceneFrame.Add(createdFrame);
+				    createdFrame.X = (int)e.MouseDevice.GetPosition(this).X - createdFrame.Width / 2;
+				    createdFrame.Y = (int)e.MouseDevice.GetPosition(this).Y - createdFrame.Height / 2;
+                    LandFrameOnScene(createdFrame, e.GetPosition(this));
 				}
 				_palette._selectedFrameTemplate = null;
 				Cursor = Cursors.Arrow;
 			}
 		}
 
-		private Frame CreateFrameFromFile( string filePath )
-		{
-			Fusion.Core.Utils.FrameSerializer.Read(filePath, out var createdFrame);
-			return createdFrame;
-		}
-
 		private void LocalGrid_MouseDown( object sender, MouseButtonEventArgs e )
 		{
 			var hovered = GetHoveredFrameOnScene(e.GetPosition(DxElem), true);
 
-            if(hovered != null)
-                _treeView.SetSelectedFrame(hovered);
-        }
+		    if (hovered != _frameSelectionPanel.SelectedFrame)
+		    {
+                ResetSelectedFrame();
+		    }
+
+		    if (hovered != null)
+		    {
+		        SelectFrame(hovered);
+		    }
+		}
 
 	    private void Window_KeyDown(object sender, KeyEventArgs e)
 	    {
@@ -324,9 +335,26 @@ namespace WpfEditorTest
 	        }
 	    }
 
+	    private void SelectFrame(Frame frame)
+	    {
+	        _treeView.SelectedFrame = frame;
+	        _frameSelectionPanel.SelectedFrame = frame;
+	        _frameSelectionPanel.Visibility = Visibility.Visible;
+	        MoveFrameToDragField(frame);
+	    }
+
+        private void ResetSelectedFrame()
+		{
+			_details.FrameDetailsControls.ItemsSource = null;
+			_frameSelectionPanel.SelectedFrame = null;
+		    _frameSelectionPanel.DragMousePressed = false;
+		    _frameSelectionPanel.CurrentDrag = null;
+		    _frameSelectionPanel.Visibility = Visibility.Collapsed;
+        }
+
 	    public Frame GetHoveredFrameOnScene(Point mousePos, bool ignoreScene)
 	    {
-	        var hoveredFrames = FrameProcessor.GetFramesAt(SceneFrame, (int) mousePos.X, (int) mousePos.Y);
+	        var hoveredFrames = FrameProcessor.GetFramesAt(SceneFrame, (int)mousePos.X, (int)mousePos.Y);
 
 	        if (ignoreScene)
 	        {
@@ -336,7 +364,7 @@ namespace WpfEditorTest
 	            }
 
 	            return null;
-            }
+	        }
 	        else
 	        {
 	            if (hoveredFrames.Any()) // if something is there
@@ -345,18 +373,10 @@ namespace WpfEditorTest
 	            }
 
 	            return null;
-            }
+	        }
 	    }
 
-		private void ResetSelectedFrame()
-		{
-			_details.FrameDetailsControls.ItemsSource = null;
-			_frameSelectionPanel.SelectedFrame = null;
-		    _frameSelectionPanel.DragMousePressed = false;
-		    _frameSelectionPanel.CurrentDrag = null;
-        }
-
-		public void MoveFrameToDragField(Frame frame)
+        public void MoveFrameToDragField(Frame frame)
 		{
 			frame.Parent?.Remove(frame);
 
@@ -364,14 +384,13 @@ namespace WpfEditorTest
 			_frameSelectionPanel.UpdateSelectedFramePosition();
 		}
 
-	    public void TryLandSelectedFrameOnScene(Point pos)
+	    public void LandFrameOnScene(Frame frame, Point pos)
 	    {
-	        _frameSelectionPanel.SelectedFrame.Parent.Remove(_frameSelectionPanel.SelectedFrame);
+	        frame.Parent?.Remove(frame);
 
+            // If we can't find where to land it (that's weird) just try attach to the scene
 	        var hoveredFrame = GetHoveredFrameOnScene(pos, false) ?? SceneFrame;
-	        hoveredFrame.Add(_frameSelectionPanel.SelectedFrame);
-
-            _frameSelectionPanel.UpdateSelectedFramePosition();
+	        hoveredFrame.Add(frame);
 	    }
 	}
 

@@ -1,6 +1,7 @@
 ﻿using Fusion.Engine.Frames;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
@@ -26,6 +27,9 @@ namespace WpfEditorTest.ChildPanels
 			get => _selectedFrame;
 			set
 			{
+			    if (_selectedFrame != null)
+			        _selectedFrame.PropertyChanged -= FrameDimensionsChange;
+
 				_selectedFrame = value;
 			    if (_selectedFrame == null) return;
 
@@ -45,44 +49,46 @@ namespace WpfEditorTest.ChildPanels
 
 			    UpdateVisualAnchors(_selectedFrame.Anchor);
 
-			    _selectedFrame.PropertyChanged += ( s, e ) =>
-			    {
-			        if (_locked) return;
-
-			        switch (e.PropertyName)
-			        {
-			            case "Width":
-			            {
-			                WidthBuffer = _selectedFrame.Width;
-			                break;
-			            }
-			            case "Height":
-			            {
-			                HeightBuffer = _selectedFrame.Height;
-			                break;
-			            }
-			            case "X":
-			            case "Y":
-			            {
-			                var frameDelta = new TranslateTransform();
-			                RenderTransform = frameDelta;
-			                frameDelta.X = _selectedFrame.GlobalRectangle.X;
-			                frameDelta.Y = _selectedFrame.GlobalRectangle.Y;
-			                PreviousTransform = RenderTransform;
-
-			                _oldX = RenderTransform.Value.OffsetX;
-			                _oldY = RenderTransform.Value.OffsetY;
-			                break;
-			            }
-			            case "Anchor":
-			            {
-			                UpdateVisualAnchors(_selectedFrame.Anchor);
-			                break;
-			            }
-			        }
-			    };
+			    _selectedFrame.PropertyChanged += FrameDimensionsChange;
 			}
 		}
+
+	    private void FrameDimensionsChange(object sender, PropertyChangedEventArgs args)
+	    {
+	        if (_locked) return;
+
+	        switch (args.PropertyName)
+	        {
+	            case "Width":
+	            {
+	                WidthBuffer = _selectedFrame.Width;
+	                break;
+	            }
+	            case "Height":
+	            {
+	                HeightBuffer = _selectedFrame.Height;
+	                break;
+	            }
+	            case "X":
+	            case "Y":
+	            {
+	                var frameDelta = new TranslateTransform();
+	                RenderTransform = frameDelta;
+	                frameDelta.X = _selectedFrame.GlobalRectangle.X;
+	                frameDelta.Y = _selectedFrame.GlobalRectangle.Y;
+	                PreviousTransform = RenderTransform;
+
+	                _oldX = RenderTransform.Value.OffsetX;
+	                _oldY = RenderTransform.Value.OffsetY;
+	                break;
+	            }
+	            case "Anchor":
+	            {
+	                UpdateVisualAnchors(_selectedFrame.Anchor);
+	                break;
+	            }
+	        }
+        }
 
 		private void UpdateVisualAnchors( FrameAnchor anchor )
 		{
