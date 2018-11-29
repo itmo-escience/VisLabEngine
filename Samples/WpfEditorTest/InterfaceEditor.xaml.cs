@@ -25,7 +25,11 @@ namespace WpfEditorTest
 	/// </summary>
 	public partial class InterfaceEditor : Window
 	{
-		private readonly FrameDetails _details;
+	    public static RoutedCommand SaveFrameCmd = new RoutedCommand();
+	    public static RoutedCommand SaveSceneCmd = new RoutedCommand();
+	    public static RoutedCommand LoadSceneCmd = new RoutedCommand();
+
+        private readonly FrameDetails _details;
 		private readonly FramePalette _palette;
 		private readonly FrameTreeView _treeView;
 		private readonly FrameSelectionPanel _frameSelectionPanel;
@@ -39,7 +43,7 @@ namespace WpfEditorTest
 		public FusionUI.UI.ScalableFrame SceneFrame;
 		public FusionUI.UI.MainFrame RootFrame;
 
-		public InterfaceEditor()
+        public InterfaceEditor()
         {
             InitializeComponent();
 
@@ -67,9 +71,8 @@ namespace WpfEditorTest
             LocalGrid.Children.Add(_frameSelectionPanel);
             _panels.Add(_frameSelectionPanel);
 
-            _details = new FrameDetails(this);
-            LocalGrid.Children.Add(_details);
-            _panels.Add(_details);
+            _details = new FrameDetails();
+            SourceInitialized += (_, args) => { _details.Owner = this; _details.Show(); };
 
             _palette = new FramePalette(this);
             LocalGrid.Children.Add(_palette);
@@ -107,79 +110,6 @@ namespace WpfEditorTest
 	        base.OnSourceInitialized(e);
 	        DxElem.HandleInput(this);
 	    }
-
-        #region Save/load stuff
-
-        internal void TryLoadSceneAsTemplate()
-		{
-			var startPath = Path.GetFullPath(Path.Combine(TemplatesPath, ".."));
-			var filter = "XML files(*.xml)| *.xml";
-			using (var dialog = new System.Windows.Forms.OpenFileDialog() { InitialDirectory = startPath, Multiselect = false, Filter = filter })
-			{
-			    if (dialog.ShowDialog() != System.Windows.Forms.DialogResult.OK) return;
-
-			    var createdFrame = CreateFrameFromFile(dialog.FileName);
-			    if (createdFrame != null && createdFrame.GetType() == typeof(FusionUI.UI.ScalableFrame))
-			    {
-			        RootFrame.Remove(SceneFrame);
-			        ResetSelectedFrame();
-			        SceneFrame = (FusionUI.UI.ScalableFrame)createdFrame;
-			        RootFrame.Add(SceneFrame);
-					DragFieldFrame.ZOrder = 1000000;
-
-					childrenBinding = new Binding("Children")
-			        {
-			            Source = SceneFrame,
-			        };
-			        _treeView.ElementHierarcyView.SetBinding(TreeView.ItemsSourceProperty, childrenBinding);
-			    }
-			}
-		}
-
-		internal void TrySaveSceneAsTemplate()
-		{
-			var startPath = Path.GetFullPath(Path.Combine(TemplatesPath, ".."));
-			var filter = "XML files(*.xml)| *.xml";
-			using (var dialog = new System.Windows.Forms.SaveFileDialog() { InitialDirectory = startPath, Filter = filter })
-			{
-				if (dialog.ShowDialog() == System.Windows.Forms.DialogResult.OK)
-				{
-					Fusion.Core.Utils.FrameSerializer.Write(SceneFrame, dialog.FileName);
-				}
-			}
-		}
-
-		internal void TrySaveFrameAsTemplate()
-		{
-			if (_frameSelectionPanel.SelectedFrame!=null)
-			{
-				if (!Directory.Exists(TemplatesPath))
-				{
-					Directory.CreateDirectory(TemplatesPath);
-				}
-			    var selectedFrame = _frameSelectionPanel.SelectedFrame;
-
-                Fusion.Core.Utils.FrameSerializer.Write(selectedFrame, TemplatesPath+ "\\" + (selectedFrame.Text?? selectedFrame.GetType().ToString()) + ".xml");
-				this.LoadPalettes();
-			}
-		}
-
-		public void LoadPalettes()
-		{
-			if (Directory.Exists(TemplatesPath))
-			{
-				var templates = Directory.GetFiles(TemplatesPath, "*.xml").ToList();
-				_palette.AvailableFrames.ItemsSource = templates.Select(t => t.Split('\\').Last().Split('.').First());
-			}
-		}
-
-	    private Frame CreateFrameFromFile(string filePath)
-	    {
-	        Fusion.Core.Utils.FrameSerializer.Read(filePath, out var createdFrame);
-	        return createdFrame;
-	    }
-
-        #endregion
 
 		private void LocalGrid_MouseMove( object sender, MouseEventArgs e )
 		{
@@ -347,7 +277,7 @@ namespace WpfEditorTest
 
 			_frameSelectionPanel.SelectedFrame = frame;
             _frameSelectionPanel.Visibility = Visibility.Visible;
-            
+
 	    }
 
         private void ResetSelectedFrame()
@@ -401,9 +331,102 @@ namespace WpfEditorTest
 
 			//_treeView.ElementHierarcyView.SetSelectedItem(frame);
 		}
-	}
 
-	public class Propsy : INotifyPropertyChanged
+        #region Save/load stuff
+
+        internal void TryLoadSceneAsTemplate()
+        {
+            var startPath = Path.GetFullPath(Path.Combine(TemplatesPath, ".."));
+            var filter = "XML files(*.xml)| *.xml";
+            using (var dialog = new System.Windows.Forms.OpenFileDialog() { InitialDirectory = startPath, Multiselect = false, Filter = filter })
+            {
+                if (dialog.ShowDialog() != System.Windows.Forms.DialogResult.OK) return;
+
+                var createdFrame = CreateFrameFromFile(dialog.FileName);
+                if (createdFrame != null && createdFrame.GetType() == typeof(FusionUI.UI.ScalableFrame))
+                {
+                    RootFrame.Remove(SceneFrame);
+                    ResetSelectedFrame();
+                    SceneFrame = (FusionUI.UI.ScalableFrame)createdFrame;
+                    RootFrame.Add(SceneFrame);
+                    DragFieldFrame.ZOrder = 1000000;
+
+                    childrenBinding = new Binding("Children")
+                    {
+                        Source = SceneFrame,
+                    };
+                    _treeView.ElementHierarcyView.SetBinding(TreeView.ItemsSourceProperty, childrenBinding);
+                }
+            }
+        }
+
+        internal void TrySaveSceneAsTemplate()
+        {
+            var startPath = Path.GetFullPath(Path.Combine(TemplatesPath, ".."));
+            var filter = "XML files(*.xml)| *.xml";
+            using (var dialog = new System.Windows.Forms.SaveFileDialog() { InitialDirectory = startPath, Filter = filter })
+            {
+                if (dialog.ShowDialog() == System.Windows.Forms.DialogResult.OK)
+                {
+                    Fusion.Core.Utils.FrameSerializer.Write(SceneFrame, dialog.FileName);
+                }
+            }
+        }
+
+        internal void TrySaveFrameAsTemplate()
+        {
+            if (_frameSelectionPanel.SelectedFrame != null)
+            {
+                if (!Directory.Exists(TemplatesPath))
+                {
+                    Directory.CreateDirectory(TemplatesPath);
+                }
+                var selectedFrame = _frameSelectionPanel.SelectedFrame;
+
+                Fusion.Core.Utils.FrameSerializer.Write(selectedFrame, TemplatesPath + "\\" + (selectedFrame.Text ?? selectedFrame.GetType().ToString()) + ".xml");
+                this.LoadPalettes();
+            }
+        }
+
+        public void LoadPalettes()
+        {
+            if (Directory.Exists(TemplatesPath))
+            {
+                var templates = Directory.GetFiles(TemplatesPath, "*.xml").ToList();
+                _palette.AvailableFrames.ItemsSource = templates.Select(t => t.Split('\\').Last().Split('.').First());
+            }
+        }
+
+        private Frame CreateFrameFromFile(string filePath)
+        {
+            Fusion.Core.Utils.FrameSerializer.Read(filePath, out var createdFrame);
+            return createdFrame;
+        }
+
+        private void ExecutedSaveFrameCommand(object sender, ExecutedRoutedEventArgs e)
+	    {
+	        TrySaveFrameAsTemplate();
+	    }
+
+	    private void ExecutedSaveSceneCommand(object sender, ExecutedRoutedEventArgs e)
+	    {
+	        TrySaveSceneAsTemplate();
+	    }
+
+	    private void ExecutedLoadSceneCommand(object sender, ExecutedRoutedEventArgs e)
+	    {
+	        TryLoadSceneAsTemplate();
+	    }
+
+        private void AlwaysCanExecute(object sender, CanExecuteRoutedEventArgs e)
+	    {
+	        e.CanExecute = true;
+	    }
+
+	    #endregion
+    }
+
+    public class Propsy : INotifyPropertyChanged
 	{
 		public Propsy( PropertyInfo prop, Frame obj )
 		{

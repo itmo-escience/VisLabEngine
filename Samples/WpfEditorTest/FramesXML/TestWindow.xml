@@ -39,7 +39,7 @@
         <string>Fusion.Engine.Frames.Frame</string>
       </key>
       <value>
-        <string>Fusion, Version=0.2.6904.32674, Culture=neutral, PublicKeyToken=null</string>
+        <string>Fusion, Version=0.2.6907.24180, Culture=neutral, PublicKeyToken=null</string>
       </value>
     </item>
     <item>
@@ -502,7 +502,7 @@
             <UnitTextOffsetY>0</UnitTextOffsetY>
             <UnitImageOffsetX>0</UnitImageOffsetX>
             <UnitImageOffsetY>0</UnitImageOffsetY>
-            <DisableFree>true</DisableFree>
+            <DisableFree>false</DisableFree>
             <CanChangeSize>false</CanChangeSize>
             <ClampPos>true</ClampPos>
             <FixedSize />
@@ -1299,7 +1299,7 @@
                 <UnitTextOffsetY>0</UnitTextOffsetY>
                 <UnitImageOffsetX>0</UnitImageOffsetX>
                 <UnitImageOffsetY>0</UnitImageOffsetY>
-                <DisableFree>true</DisableFree>
+                <DisableFree>false</DisableFree>
                 <CanChangeSize>false</CanChangeSize>
                 <ClampPos>true</ClampPos>
               </Frame>
@@ -1723,7 +1723,7 @@
     <UnitTextOffsetY>0</UnitTextOffsetY>
     <UnitImageOffsetX>0</UnitImageOffsetX>
     <UnitImageOffsetY>0</UnitImageOffsetY>
-    <DisableFree>true</DisableFree>
+    <DisableFree>false</DisableFree>
     <CanChangeSize>false</CanChangeSize>
     <ClampPos>true</ClampPos>
     <FixedSize />

@@ -1,4 +1,4 @@
-﻿<UserControl x:Class="WpfEditorTest.ChildPanels.FrameDetails"
+﻿<Window x:Class="WpfEditorTest.ChildPanels.FrameDetails"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
@@ -10,8 +10,15 @@
              xmlns:frames ="clr-namespace:Fusion.Engine.Frames;assembly=Fusion"
              xmlns:wpfTool ="http://schemas.xceed.com/wpf/xaml/toolkit"
              mc:Ignorable="d"
-             d:DesignHeight="264" d:DesignWidth="264" MouseLeftButtonUp="UserControl_MouseLeftButtonUp">
-    <UserControl.Resources>
+             d:DesignHeight="264" d:DesignWidth="264"
+        Title="Details"
+        WindowStyle="ToolWindow"
+        ShowInTaskbar="False"
+        ResizeMode="CanResize"
+        SizeToContent="Manual"
+        MinWidth="350" MinHeight="150"
+        MaxWidth="350" MaxHeight="950">
+    <Window.Resources>
         <conv:PropertyValueConverter x:Key="propValueConverter"/>
         <conv:FlagEnumConverter x:Key="flagEnumConverter"/>
         <conv:DataTemplateSelectorOfProperty x:Key="propTemplateSelector"/>
@@ -87,7 +94,7 @@
                                       Text="{Binding PropName}"/>
                 </Border>
                 <Border BorderThickness="1" BorderBrush="Gray" MinHeight="32" Width="auto" HorizontalAlignment="Stretch">
-                    <wpfTool:IntegerUpDown TextAlignment ="Center"
+                    <wpfTool:IntegerUpDown TextAlignment="Center"
 			            VerticalAlignment = "Center"
                         FontFamily="Times New Roman"
                         Value="{Binding Path=Prop, Converter={StaticResource propValueConverter}, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
@@ -199,38 +206,11 @@
                 </StackPanel>
             </DockPanel>
         </DataTemplate>
-
-    </UserControl.Resources>
-    <Grid MouseDown="Grid_MouseDown">
-        <Grid.RowDefinitions>
-            <RowDefinition Height="32"/>
-            <RowDefinition/>
-        </Grid.RowDefinitions>
-        <Border Width="auto" Height="auto" MouseLeftButtonDown="Border_MouseDown" Grid.Row="0">
-            <Border.Background>
-                <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
-                    <GradientStop Color="LightGray" Offset="1"/>
-                    <GradientStop Color="White" Offset="0.5"/>
-                    <GradientStop Color="Gray"/>
-                </LinearGradientBrush>
-            </Border.Background>
-            <Grid>
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition/>
-                    <ColumnDefinition Width="40"/>
-                    <ColumnDefinition Width="17"/>
-                </Grid.ColumnDefinitions>
-                <TextBlock Text="FrameDetails" HorizontalAlignment="Left" VerticalAlignment="Center" FontSize="14" Grid.Column="0" Margin="4,0,0,0"></TextBlock>
-                <Button Name="Save" Grid.Column="1" Background="White" Margin="4,4,4,4" Click="Save_Click" BorderBrush="#FF707070">
-                    <TextBlock Text="Save" HorizontalAlignment="Center"></TextBlock>
-                </Button>
-            </Grid>
-        </Border>
-        <ScrollViewer Height="auto" Width="auto" Background="LightGray" Grid.Row="1">
-            <StackPanel Height="auto" Width="auto">
-                <ItemsControl x:Name="FrameDetailsControls" ItemTemplateSelector="{StaticResource propTemplateSelector}">
-                </ItemsControl>
-            </StackPanel>
-        </ScrollViewer>
-    </Grid>
-</UserControl>
+    </Window.Resources>
+    <ScrollViewer Height="auto" Width="auto" Background="LightGray">
+        <StackPanel Height="auto" Width="auto">
+            <ItemsControl x:Name="FrameDetailsControls" ItemTemplateSelector="{StaticResource propTemplateSelector}">
+            </ItemsControl>
+        </StackPanel>
+    </ScrollViewer>
+</Window>

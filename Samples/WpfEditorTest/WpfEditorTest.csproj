@@ -79,6 +79,9 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Compile Include="BoolToIndexConverter.cs" />
+    <Compile Include="ChildPanels\DraggablePanel.xaml.cs">
+      <DependentUpon>DraggablePanel.xaml</DependentUpon>
+    </Compile>
     <Compile Include="ChildPanels\FrameDetails.xaml.cs">
       <DependentUpon>FrameDetails.xaml</DependentUpon>
     </Compile>
@@ -98,6 +101,10 @@
     <Compile Include="FramePropertyHolder.cs" />
     <Compile Include="PropertyValueConverter.cs" />
     <Compile Include="StaticData.cs" />
+    <Page Include="ChildPanels\DraggablePanel.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="ChildPanels\FrameDetails.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>

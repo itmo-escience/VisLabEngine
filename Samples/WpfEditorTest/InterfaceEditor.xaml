@@ -9,12 +9,39 @@
         xmlns:math ="clr-namespace:Fusion.Core.Mathematics;assembly=Fusion"
         xmlns:panels ="clr-namespace:WpfEditorTest.ChildPanels"
         mc:Ignorable="d"
-        Title="InterfaceEditor" Height="675" Width="1200" WindowStartupLocation="CenterScreen" KeyDown="Window_KeyDown">
+        Title="InterfaceEditor" Width="800" WindowStartupLocation="CenterScreen" KeyDown="Window_KeyDown">
     <Window.Resources>
         <local:PropertyValueConverter x:Key="propValueConverter">
         </local:PropertyValueConverter>
     </Window.Resources>
-    <Grid Width="auto" Height="auto" Name="LocalGrid" MouseMove="LocalGrid_MouseMove" MouseLeftButtonUp="LocalGrid_MouseLeftButtonUp" MouseDown="LocalGrid_MouseDown" >
-        <ZWpfLib:DXElement HorizontalAlignment="Left" Height="auto" Width="auto" x:Name="DxElem" VerticalAlignment="Top" Grid.Column="0" Grid.RowSpan="3" ScrollViewer.CanContentScroll="True" />
+    <Window.CommandBindings>
+        <CommandBinding Command="{x:Static local:InterfaceEditor.LoadSceneCmd}"
+                        Executed="ExecutedLoadSceneCommand"
+                        CanExecute="AlwaysCanExecute" />
+        <CommandBinding Command="{x:Static local:InterfaceEditor.SaveSceneCmd}"
+                        Executed="ExecutedSaveSceneCommand"
+                        CanExecute="AlwaysCanExecute" />
+        <CommandBinding Command="{x:Static local:InterfaceEditor.SaveFrameCmd}"
+                        Executed="ExecutedSaveFrameCommand"
+                        CanExecute="AlwaysCanExecute" />
+    </Window.CommandBindings>
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="600" />
+        </Grid.RowDefinitions>
+        <ToolBarTray DockPanel.Dock="Top" Grid.Row="0" IsLocked="True">
+            <ToolBar>
+                <Button Command="{x:Static local:InterfaceEditor.SaveSceneCmd}" Content="Save scene" />
+                <Button Command="{x:Static local:InterfaceEditor.LoadSceneCmd}" Content="Load scene" />
+                <Button Command="{x:Static local:InterfaceEditor.SaveFrameCmd}" Content="Save frame" />
+            </ToolBar>
+        </ToolBarTray>
+        <Grid Grid.Row="1" Width="auto" Height="auto" Name="LocalGrid"
+              MouseMove="LocalGrid_MouseMove"
+              MouseLeftButtonUp="LocalGrid_MouseLeftButtonUp"
+              MouseDown="LocalGrid_MouseDown">
+            <ZWpfLib:DXElement HorizontalAlignment="Left" Height="auto" Width="auto" x:Name="DxElem" VerticalAlignment="Top" Grid.Column="0" Grid.RowSpan="3" ScrollViewer.CanContentScroll="True" />
+        </Grid>
     </Grid>
 </Window>
