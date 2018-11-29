@@ -5,8 +5,8 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:WpfEditorTest.ChildPanels"
              mc:Ignorable="d" 
-             d:DesignHeight="264" d:DesignWidth="264" MouseUp="UserControl_MouseUp" >
-    <Grid>
+             d:DesignHeight="264" d:DesignWidth="264" MouseUp="UserControl_MouseUp" MouseLeftButtonUp="UserControl_MouseLeftButtonUp">
+    <Grid MouseDown="Grid_MouseDown">
         <Grid.RowDefinitions>
             <RowDefinition Height="32"/>
             <RowDefinition/>

@@ -46,19 +46,21 @@ namespace WpfEditorTest.ChildPanels
 
 		private void TextBlock_MouseDown( object sender, MouseButtonEventArgs e )
 		{
-		    SelectedFrameChangedInUI?.Invoke(this, SelectedFrame);
+		    SelectedFrameChangedInUI?.Invoke(this, (Frame)(sender as TextBlock).Tag);
         }
 
 		private void SetSelectedFrame(Frame frame)
 		{
 			_selectedFrame = frame;
 
-			var publicProperties = SelectedFrame.GetType().GetProperties(BindingFlags.Public | BindingFlags.Instance);
+			ElementHierarcyView.SetSelectedItem(frame);
+
+			var publicProperties = _selectedFrame.GetType().GetProperties(BindingFlags.Public | BindingFlags.Instance);
 
 			var propsies = (
 			    from property in publicProperties
 			    where property.GetMethod != null && property.SetMethod != null && !property.CustomAttributes.Any(ca => ca.AttributeType.Name == "XmlIgnoreAttribute")
-			    select new Propsy(property, SelectedFrame)
+			    select new Propsy(property, _selectedFrame)
 			).ToList();
 
 		    _frameDetailsControls.ItemsSource = propsies.OrderBy(p => p.PropName).ToList();
@@ -84,6 +86,11 @@ namespace WpfEditorTest.ChildPanels
 		private void LoadScene_Click( object sender, RoutedEventArgs e )
 		{
 			Window.TryLoadSceneAsTemplate();
+		}
+
+		private void UserControl_MouseLeftButtonUp( object sender, MouseButtonEventArgs e )
+		{
+			e.Handled = true;
 		}
 	}
 }

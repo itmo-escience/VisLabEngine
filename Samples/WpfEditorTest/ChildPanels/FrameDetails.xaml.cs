@@ -37,5 +37,14 @@ namespace WpfEditorTest.ChildPanels
 		{
 			Window.TrySaveFrameAsTemplate();
 		}
+
+		private void Grid_MouseDown( object sender, MouseButtonEventArgs e )
+		{
+			e.Handled = true;
+		}
+
+		private void UserControl_MouseLeftButtonUp( object sender, MouseButtonEventArgs e ) {
+			e.Handled = true;
+		}
 	}
 }

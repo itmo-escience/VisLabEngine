@@ -251,7 +251,8 @@ namespace WpfEditorTest.ChildPanels
 	        MousePressed = true;
 	        PreviousMouseLocation = mousePosition;
 	        PreviousTransform = RenderTransform;
-        }
+			Window.MoveFrameToDragField(_selectedFrame);
+		}
 
 		private void Drag_MouseDown( object sender, MouseButtonEventArgs e )
 		{

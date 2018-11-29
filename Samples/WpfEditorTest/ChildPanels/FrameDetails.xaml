@@ -10,7 +10,7 @@
              xmlns:frames ="clr-namespace:Fusion.Engine.Frames;assembly=Fusion"
              xmlns:wpfTool ="http://schemas.xceed.com/wpf/xaml/toolkit"
              mc:Ignorable="d"
-             d:DesignHeight="264" d:DesignWidth="264">
+             d:DesignHeight="264" d:DesignWidth="264" MouseLeftButtonUp="UserControl_MouseLeftButtonUp">
     <UserControl.Resources>
         <conv:PropertyValueConverter x:Key="propValueConverter"/>
         <conv:FlagEnumConverter x:Key="flagEnumConverter"/>
@@ -201,7 +201,7 @@
         </DataTemplate>
 
     </UserControl.Resources>
-    <Grid>
+    <Grid MouseDown="Grid_MouseDown">
         <Grid.RowDefinitions>
             <RowDefinition Height="32"/>
             <RowDefinition/>

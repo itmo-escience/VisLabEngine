@@ -125,7 +125,9 @@ namespace WpfEditorTest
 			        ResetSelectedFrame();
 			        SceneFrame = (FusionUI.UI.ScalableFrame)createdFrame;
 			        RootFrame.Add(SceneFrame);
-			        childrenBinding = new Binding("Children")
+					DragFieldFrame.ZOrder = 1000000;
+
+					childrenBinding = new Binding("Children")
 			        {
 			            Source = SceneFrame,
 			        };
@@ -313,15 +315,18 @@ namespace WpfEditorTest
 		{
 			var hovered = GetHoveredFrameOnScene(e.GetPosition(DxElem), true);
 
-		    if (hovered != _frameSelectionPanel.SelectedFrame)
-		    {
-                ResetSelectedFrame();
-		    }
-
 		    if (hovered != null)
 		    {
 		        SelectFrame(hovered);
-                _frameSelectionPanel.StartFrameDragging(e.GetPosition(this));
+
+				if (hovered != _frameSelectionPanel.SelectedFrame)
+				{
+					ResetSelectedFrame();
+				}
+				else
+				{
+					_frameSelectionPanel.StartFrameDragging(e.GetPosition(this));
+				}
 		    }
 		}
 
@@ -339,9 +344,10 @@ namespace WpfEditorTest
 	    private void SelectFrame(Frame frame)
 	    {
 	        _treeView.SelectedFrame = frame;
-	        _frameSelectionPanel.SelectedFrame = frame;
+
+			_frameSelectionPanel.SelectedFrame = frame;
             _frameSelectionPanel.Visibility = Visibility.Visible;
-            MoveFrameToDragField(frame);
+            
 	    }
 
         private void ResetSelectedFrame()
@@ -392,7 +398,9 @@ namespace WpfEditorTest
             // If we can't find where to land it (that's weird) just try attach to the scene
 	        var hoveredFrame = GetHoveredFrameOnScene(pos, false) ?? SceneFrame;
 	        hoveredFrame.Add(frame);
-	    }
+
+			//_treeView.ElementHierarcyView.SetSelectedItem(frame);
+		}
 	}
 
 	public class Propsy : INotifyPropertyChanged
