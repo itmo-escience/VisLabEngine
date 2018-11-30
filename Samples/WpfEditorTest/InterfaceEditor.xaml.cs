@@ -73,10 +73,7 @@ namespace WpfEditorTest
 
             _details = new FrameDetails();
             _treeView = new FrameTreeView();
-
-            _palette = new FramePalette(this);
-            LocalGrid.Children.Add(_palette);
-            _panels.Add(_palette);
+            _palette = new FramePalette();
 
             SourceInitialized += (_, args) =>
             {
@@ -84,7 +81,9 @@ namespace WpfEditorTest
                 _details.Show();
                 _treeView.Owner = this;
                 _treeView.Show();
-            };
+				_palette.Owner = this;
+				_palette.Show();
+			};
 
             _treeView.SelectedFrameChangedInUI += (_, frame) => SelectFrame(frame);
 

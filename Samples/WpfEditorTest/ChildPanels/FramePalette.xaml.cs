@@ -18,54 +18,31 @@ namespace WpfEditorTest.ChildPanels
 	/// <summary>
 	/// Interaction logic for FramePalette.xaml
 	/// </summary>
-	public partial class FramePalette : UserControl, IDraggablePanel
+	public partial class FramePalette : Window
 	{
 		public string _selectedFrameTemplate;
 
 		public Point PreviousMouseLocation { get; set; }
 		public Transform PreviousTransform { get; set; }
 		public bool MousePressed { get; set; }
-		public InterfaceEditor Window { get; set; }
 
-		public FramePalette( InterfaceEditor interfaceEditor )
+		public FramePalette()
 		{
 			InitializeComponent();
-			Transform _previousTransform = this.RenderTransform;
-			Window = interfaceEditor;
-			Height = StaticData.OptionsWindowSize; Width = StaticData.OptionsWindowSize;
 
-			//this.Margin = new Thickness(_window.Width - this.Width, 0, 0, _window.Height - this.Height);
+			Height = StaticData.OptionsWindowSize;
+			Width = StaticData.OptionsWindowSize;
+
 			this.HorizontalAlignment = HorizontalAlignment.Right;
 			this.VerticalAlignment = VerticalAlignment.Top;
+
+			Closing += ( s, e ) => { e.Cancel = true; };
 		}
 
-		public void Border_MouseDown( object sender, MouseButtonEventArgs e )
-		{
-			this.MousePressed = true;
-			PreviousMouseLocation = e.MouseDevice.GetPosition(Window);
-			PreviousTransform = this.RenderTransform;
-		}
 
 		private void Border_MouseDown_1( object sender, MouseButtonEventArgs e )
 		{
 			this._selectedFrameTemplate = (string)(sender as Border).Tag;
-			Window.Cursor = Cursors.Hand;
-		}
-
-		private void UserControl_MouseUp( object sender, MouseButtonEventArgs e )
-		{
-			this._selectedFrameTemplate = null;
-			Window.Cursor = Cursors.Arrow;
-		}
-
-		private void Grid_MouseDown( object sender, MouseButtonEventArgs e )
-		{
-			e.Handled = true;
-		}
-
-		private void UserControl_MouseLeftButtonUp( object sender, MouseButtonEventArgs e )
-		{
-			e.Handled = true;
 		}
 	}
 }

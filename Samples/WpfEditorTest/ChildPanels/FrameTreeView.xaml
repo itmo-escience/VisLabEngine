@@ -6,7 +6,7 @@
              xmlns:local="clr-namespace:WpfEditorTest.ChildPanels"
              mc:Ignorable="d"
              d:DesignHeight="264" d:DesignWidth="264"
-        Title="Details"
+        Title="Scene TreeView"
         WindowStyle="ToolWindow"
         ShowInTaskbar="False"
         ResizeMode="CanResize"
