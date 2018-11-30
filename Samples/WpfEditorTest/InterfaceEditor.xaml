@@ -40,7 +40,7 @@
                 <Button Command="{x:Static local:InterfaceEditor.SaveFrameCmd}" Content="Save frame" />
             </ToolBar>
         </ToolBarTray>
-        <Canvas Grid.Row="1" Name="LocalGrid"
+        <Grid Grid.Row="1" Name="LocalGrid"
                 MouseMove="LocalGrid_MouseMove"
                 MouseLeftButtonUp="LocalGrid_MouseLeftButtonUp"
                 MouseDown="LocalGrid_MouseDown">
@@ -49,6 +49,6 @@
                                MinHeight="100" MaxHeight="10000"
                                MinWidth="100" MaxWidth="10000"
                                />
-        </Canvas>
+        </Grid>
     </Grid>
 </Window>
