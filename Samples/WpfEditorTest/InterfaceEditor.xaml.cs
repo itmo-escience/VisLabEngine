@@ -29,7 +29,11 @@ namespace WpfEditorTest
 	    public static RoutedCommand SaveSceneCmd = new RoutedCommand();
 	    public static RoutedCommand LoadSceneCmd = new RoutedCommand();
 
-        private readonly FrameDetails _details;
+		private int DeltaX = 0;
+		private int DeltaY = 0;
+		private Point InitMousePosition;
+
+		private readonly FrameDetails _details;
 		private readonly FramePalette _palette;
 		private readonly FrameTreeView _treeView;
 		private readonly FrameSelectionPanel _frameSelectionPanel;
@@ -116,99 +120,110 @@ namespace WpfEditorTest
 
 		private void LocalGrid_MouseMove( object sender, MouseEventArgs e )
 		{
-			foreach (var panel in _panels)
+			if (_frameSelectionPanel.DragMousePressed)
 			{
-				if (panel.GetType() == typeof(FrameSelectionPanel) && _frameSelectionPanel.DragMousePressed)
+				var drag = _frameSelectionPanel.CurrentDrag;
+
+				Point currentLocation = e.MouseDevice.GetPosition(this);
+				var deltaX = currentLocation.X - _frameSelectionPanel.PreviousMouseLocation.X;
+				var deltaY = currentLocation.Y - _frameSelectionPanel.PreviousMouseLocation.Y;
+				TranslateTransform delta = null;// = new TranslateTransform (deltaX, deltaY);
+
+
+
+				switch (_frameSelectionPanel.Drags.IndexOf(drag))
 				{
-					var drag = _frameSelectionPanel.CurrentDrag;
-
-					Point currentLocation = e.MouseDevice.GetPosition(this);
-					var deltaX = currentLocation.X - _frameSelectionPanel.PreviousMouseLocation.X;
-					var deltaY = currentLocation.Y - _frameSelectionPanel.PreviousMouseLocation.Y;
-					TranslateTransform delta = null;// = new TranslateTransform (deltaX, deltaY);
-
-
-
-					switch (_frameSelectionPanel.Drags.IndexOf(drag))
-					{
-						case 0:
-							{
-								delta = new TranslateTransform(deltaX, deltaY);
-								_frameSelectionPanel.HeightBuffer -= deltaY;
-								_frameSelectionPanel.WidthBuffer -= deltaX;
-								break;
-							}
-						case 1:
-							{
-								delta = new TranslateTransform(0, deltaY);
-								_frameSelectionPanel.HeightBuffer -= deltaY;
-								break;
-							}
-						case 2:
-							{
-								delta = new TranslateTransform(0, deltaY);
-								_frameSelectionPanel.HeightBuffer -= deltaY;
-								_frameSelectionPanel.WidthBuffer += deltaX;
-								break;
-							}
-						case 3:
-							{
-								delta = new TranslateTransform(deltaX, 0);
-								_frameSelectionPanel.WidthBuffer -= deltaX;
-								break;
-							}
-						case 4:
-							{
-								delta = new TranslateTransform(0, 0);
-								_frameSelectionPanel.WidthBuffer += deltaX;
-								break;
-							}
-						case 5:
-							{
-								delta = new TranslateTransform(deltaX, 0);
-								_frameSelectionPanel.HeightBuffer += deltaY;
-								_frameSelectionPanel.WidthBuffer -= deltaX;
-								break;
-							}
-						case 6:
-							{
-								delta = new TranslateTransform(0, 0);
-								_frameSelectionPanel.HeightBuffer += deltaY;
-								break;
-							}
-						case 7:
-							{
-								delta = new TranslateTransform(0, 0);
-								_frameSelectionPanel.HeightBuffer += deltaY;
-								_frameSelectionPanel.WidthBuffer += deltaX;
-								break;
-							}
-					}
-
-					var group = new TransformGroup();
-					group.Children.Add(_frameSelectionPanel.PreviousTransform);
-					group.Children.Add(delta);
-					_frameSelectionPanel.RenderTransform = group;
-					_frameSelectionPanel.PreviousTransform = _frameSelectionPanel.RenderTransform;
-					_frameSelectionPanel.PreviousMouseLocation = currentLocation;
-
+					case 0:
+						{
+							delta = new TranslateTransform(deltaX, deltaY);
+							_frameSelectionPanel.HeightBuffer -= deltaY;
+							_frameSelectionPanel.WidthBuffer -= deltaX;
+							break;
+						}
+					case 1:
+						{
+							delta = new TranslateTransform(0, deltaY);
+							_frameSelectionPanel.HeightBuffer -= deltaY;
+							break;
+						}
+					case 2:
+						{
+							delta = new TranslateTransform(0, deltaY);
+							_frameSelectionPanel.HeightBuffer -= deltaY;
+							_frameSelectionPanel.WidthBuffer += deltaX;
+							break;
+						}
+					case 3:
+						{
+							delta = new TranslateTransform(deltaX, 0);
+							_frameSelectionPanel.WidthBuffer -= deltaX;
+							break;
+						}
+					case 4:
+						{
+							delta = new TranslateTransform(0, 0);
+							_frameSelectionPanel.WidthBuffer += deltaX;
+							break;
+						}
+					case 5:
+						{
+							delta = new TranslateTransform(deltaX, 0);
+							_frameSelectionPanel.HeightBuffer += deltaY;
+							_frameSelectionPanel.WidthBuffer -= deltaX;
+							break;
+						}
+					case 6:
+						{
+							delta = new TranslateTransform(0, 0);
+							_frameSelectionPanel.HeightBuffer += deltaY;
+							break;
+						}
+					case 7:
+						{
+							delta = new TranslateTransform(0, 0);
+							_frameSelectionPanel.HeightBuffer += deltaY;
+							_frameSelectionPanel.WidthBuffer += deltaX;
+							break;
+						}
 				}
-				else if (panel.MousePressed)
-				{
-					Point currentLocation = e.MouseDevice.GetPosition(this);
 
-					var delta = new TranslateTransform
-					(currentLocation.X - panel.PreviousMouseLocation.X, currentLocation.Y - panel.PreviousMouseLocation.Y);
+				var group = new TransformGroup();
+				group.Children.Add(_frameSelectionPanel.PreviousTransform);
+				group.Children.Add(delta);
+				_frameSelectionPanel.RenderTransform = group;
+				_frameSelectionPanel.PreviousTransform = _frameSelectionPanel.RenderTransform;
+				_frameSelectionPanel.PreviousMouseLocation = currentLocation;
 
-					var group = new TransformGroup();
-					group.Children.Add(panel.PreviousTransform);
-					group.Children.Add(delta);
-
-					((UserControl)panel).RenderTransform = group;
-					panel.PreviousTransform = ((UserControl)panel).RenderTransform;
-					panel.PreviousMouseLocation = currentLocation;
-				}
 			}
+			else if (_frameSelectionPanel.MousePressed)
+			{
+				this.GetMouseDeltaAfterFrameMouseDown(e);
+				if (!_frameSelectionPanel.IsMoved && (DeltaX!=0 || DeltaY!=0))
+				{
+					this.MoveFrameToDragField(_frameSelectionPanel.SelectedFrame);
+					_frameSelectionPanel.IsMoved = true;
+				}
+
+				Point currentLocation = e.MouseDevice.GetPosition(this);
+
+				var delta = new TranslateTransform
+				(currentLocation.X - _frameSelectionPanel.PreviousMouseLocation.X, currentLocation.Y - _frameSelectionPanel.PreviousMouseLocation.Y);
+
+				var group = new TransformGroup();
+				group.Children.Add(_frameSelectionPanel.PreviousTransform);
+				group.Children.Add(delta);
+
+				((UserControl)_frameSelectionPanel).RenderTransform = group;
+				_frameSelectionPanel.PreviousTransform = ((UserControl)_frameSelectionPanel).RenderTransform;
+				_frameSelectionPanel.PreviousMouseLocation = currentLocation;
+			}
+		}
+
+		private void GetMouseDeltaAfterFrameMouseDown( MouseEventArgs e )
+		{
+			var currentMousePosition = e.GetPosition(this);
+			DeltaX = (int)InitMousePosition.X - (int)currentMousePosition.X;
+			DeltaY = (int)InitMousePosition.Y - (int)currentMousePosition.Y;
 		}
 
 		private void LocalGrid_MouseLeftButtonUp( object sender, MouseButtonEventArgs e )
@@ -217,17 +232,17 @@ namespace WpfEditorTest
             {
                 if (_frameSelectionPanel.DragMousePressed)
                     _frameSelectionPanel.DragMousePressed = false;
-                else
+                else if(_frameSelectionPanel.IsMoved)
                 {
-                    LandFrameOnScene(_frameSelectionPanel.SelectedFrame, e.GetPosition(this));
+					_frameSelectionPanel.IsMoved = false;
+
+					LandFrameOnScene(_frameSelectionPanel.SelectedFrame, e.GetPosition(this));
                     _frameSelectionPanel.UpdateSelectedFramePosition();
                 }
             }
 
-            foreach (var panel in _panels)
-			{
-				panel.MousePressed = false;
-			}
+			_frameSelectionPanel.MousePressed = false;
+			
 
 			if (_palette._selectedFrameTemplate != null)
 			{
@@ -240,7 +255,6 @@ namespace WpfEditorTest
                     LandFrameOnScene(createdFrame, e.GetPosition(this));
 				}
 				_palette._selectedFrameTemplate = null;
-				Cursor = Cursors.Arrow;
 			}
 		}
 
@@ -251,23 +265,28 @@ namespace WpfEditorTest
 		    if (hovered != null)
 		    {
 		        SelectFrame(hovered);
-
-				if (hovered != _frameSelectionPanel.SelectedFrame)
-				{
-					ResetSelectedFrame();
-				}
-				else
-				{
-					_frameSelectionPanel.StartFrameDragging(e.GetPosition(this));
-				}
-		    }
+				InitMousePosition = e.GetPosition(this);
+				_frameSelectionPanel.StartFrameDragging(e.GetPosition(this));
+				//if (hovered != _frameSelectionPanel.SelectedFrame)
+				//{
+				//	ResetSelectedFrame();
+				//}
+				//else
+				//{
+				//	
+				//}
+			}
+			else
+			{
+				ResetSelectedFrame();
+			}
 		}
 
 	    private void Window_KeyDown(object sender, KeyEventArgs e)
 	    {
-	        if (e.Key == Key.Delete && _treeView.ElementHierarchyView.SelectedItem != null)
+	        if (e.Key == Key.Delete && _frameSelectionPanel.SelectedFrame != null)
 	        {
-	            var selected = (Frame)_treeView.ElementHierarchyView.SelectedItem;
+	            var selected = _frameSelectionPanel.SelectedFrame;
 	            selected.Parent?.Remove(selected);
 
                 ResetSelectedFrame();
