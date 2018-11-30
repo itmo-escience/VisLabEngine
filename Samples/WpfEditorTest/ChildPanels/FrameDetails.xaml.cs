@@ -1,5 +1,7 @@
-﻿using System.Windows;
-using System.Windows.Input;
+﻿using System.Linq;
+using System.Reflection;
+using System.Windows;
+using Fusion.Engine.Frames;
 
 namespace WpfEditorTest.ChildPanels
 {
@@ -19,8 +21,17 @@ namespace WpfEditorTest.ChildPanels
             Closing += (s, e) => e.Cancel = true;
 		}
 
-		private void UserControl_MouseLeftButtonUp( object sender, MouseButtonEventArgs e ) {
-			e.Handled = true;
-		}
+	    public void SetSelectFrame(Frame frame)
+	    {
+	        var publicProperties = frame.GetType().GetProperties(BindingFlags.Public | BindingFlags.Instance);
+
+	        var propsies = (
+	            from property in publicProperties
+	            where property.GetMethod != null && property.SetMethod != null && !property.CustomAttributes.Any(ca => ca.AttributeType.Name == "XmlIgnoreAttribute")
+	            select new Propsy(property, frame)
+	        ).ToList();
+
+	        FrameDetailsControls.ItemsSource = propsies.OrderBy(p => p.PropName).ToList();
+        }
 	}
 }

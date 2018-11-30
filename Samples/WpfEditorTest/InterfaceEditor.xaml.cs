@@ -72,15 +72,19 @@ namespace WpfEditorTest
             _panels.Add(_frameSelectionPanel);
 
             _details = new FrameDetails();
-            SourceInitialized += (_, args) => { _details.Owner = this; _details.Show(); };
+            _treeView = new FrameTreeView();
 
             _palette = new FramePalette(this);
             LocalGrid.Children.Add(_palette);
             _panels.Add(_palette);
 
-            _treeView = new FrameTreeView(this, _details.FrameDetailsControls);
-            LocalGrid.Children.Add(_treeView);
-            _panels.Add(_treeView);
+            SourceInitialized += (_, args) =>
+            {
+                _details.Owner = this;
+                _details.Show();
+                _treeView.Owner = this;
+                _treeView.Show();
+            };
 
             _treeView.SelectedFrameChangedInUI += (_, frame) => SelectFrame(frame);
 
@@ -102,7 +106,7 @@ namespace WpfEditorTest
                 UpdateSourceTrigger = UpdateSourceTrigger.PropertyChanged,
                 Mode = BindingMode.OneWay
             };
-            _treeView.ElementHierarcyView.SetBinding(TreeView.ItemsSourceProperty, b);
+            _treeView.ElementHierarchyView.SetBinding(TreeView.ItemsSourceProperty, b);
         }
 
 	    protected override void OnSourceInitialized(EventArgs e)
@@ -262,9 +266,9 @@ namespace WpfEditorTest
 
 	    private void Window_KeyDown(object sender, KeyEventArgs e)
 	    {
-	        if (e.Key == Key.Delete && _treeView.ElementHierarcyView.SelectedItem != null)
+	        if (e.Key == Key.Delete && _treeView.ElementHierarchyView.SelectedItem != null)
 	        {
-	            var selected = (Frame)_treeView.ElementHierarcyView.SelectedItem;
+	            var selected = (Frame)_treeView.ElementHierarchyView.SelectedItem;
 	            selected.Parent?.Remove(selected);
 
                 ResetSelectedFrame();
@@ -273,11 +277,11 @@ namespace WpfEditorTest
 
 	    private void SelectFrame(Frame frame)
 	    {
+            _details.SetSelectFrame(frame);
 	        _treeView.SelectedFrame = frame;
 
 			_frameSelectionPanel.SelectedFrame = frame;
             _frameSelectionPanel.Visibility = Visibility.Visible;
-
 	    }
 
         private void ResetSelectedFrame()
@@ -355,7 +359,7 @@ namespace WpfEditorTest
                     {
                         Source = SceneFrame,
                     };
-                    _treeView.ElementHierarcyView.SetBinding(TreeView.ItemsSourceProperty, childrenBinding);
+                    _treeView.ElementHierarchyView.SetBinding(TreeView.ItemsSourceProperty, childrenBinding);
                 }
             }
         }
