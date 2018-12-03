@@ -6,21 +6,37 @@
              xmlns:local="clr-namespace:WpfEditorTest.ChildPanels"
              mc:Ignorable="d" 
              d:DesignHeight="100" d:DesignWidth="100" HorizontalAlignment="Left" VerticalAlignment="Top" BorderBrush="White" BorderThickness="2">
-    <UserControl.Background>
-        <LinearGradientBrush EndPoint="50,20" MappingMode="Absolute" StartPoint="50,0" SpreadMethod="Repeat" Opacity="0.3">
-            <LinearGradientBrush.RelativeTransform>
-                <TransformGroup>
-                    <ScaleTransform CenterY="0.5" CenterX="0.5"/>
-                    <SkewTransform AngleY="-45" CenterY="0.5" CenterX="0.5"/>
-                    <RotateTransform CenterY="0.5" CenterX="0.5"/>
-                    <TranslateTransform/>
-                </TransformGroup>
-            </LinearGradientBrush.RelativeTransform>
-            <GradientStop Color="#FFEEFF45"/>
-            <GradientStop Color="Black" Offset="1"/>
-        </LinearGradientBrush>
-    </UserControl.Background>
-    <Grid>
 
+    <Grid>
+        <Grid.Background>
+            <LinearGradientBrush EndPoint="50,20" MappingMode="Absolute" StartPoint="50,0" SpreadMethod="Repeat" Opacity="0.2">
+                <LinearGradientBrush.RelativeTransform>
+                    <TransformGroup>
+                        <ScaleTransform CenterY="0.5" CenterX="0.5"/>
+                        <SkewTransform AngleY="-45" CenterY="0.5" CenterX="0.5"/>
+                        <RotateTransform CenterY="0.5" CenterX="0.5"/>
+                        <TranslateTransform/>
+                    </TransformGroup>
+                </LinearGradientBrush.RelativeTransform>
+                <GradientStop Color="White"/>
+                <GradientStop Color="Black" Offset="1"/>
+            </LinearGradientBrush>
+        </Grid.Background>
+        <Grid>
+            <Grid.Background>
+                <LinearGradientBrush EndPoint="50,20" MappingMode="Absolute" StartPoint="50,0" SpreadMethod="Repeat" Opacity="0.2">
+                    <LinearGradientBrush.RelativeTransform>
+                        <TransformGroup>
+                            <ScaleTransform CenterY="0.5" CenterX="0.5"/>
+                            <SkewTransform AngleY="45" CenterY="0.5" CenterX="0.5"/>
+                            <RotateTransform CenterY="0.5" CenterX="0.5"/>
+                            <TranslateTransform/>
+                        </TransformGroup>
+                    </LinearGradientBrush.RelativeTransform>
+                    <GradientStop Color="White"/>
+                    <GradientStop Color="Black" Offset="1"/>
+                </LinearGradientBrush>
+            </Grid.Background>
+        </Grid>
     </Grid>
 </UserControl>

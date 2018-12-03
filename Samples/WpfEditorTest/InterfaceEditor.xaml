@@ -43,7 +43,7 @@
         <Grid Grid.Row="1" Name="LocalGrid"
                 MouseMove="LocalGrid_MouseMove"
                 MouseLeftButtonUp="LocalGrid_MouseLeftButtonUp"
-                MouseDown="LocalGrid_MouseDown">
+                MouseLeftButtonDown="LocalGrid_MouseLeftButtonDown">
             <ZWpfLib:DXElement x:Name="DxElem"
                                HorizontalAlignment="Left" VerticalAlignment="Top"
                                MinHeight="100" MaxHeight="10000"

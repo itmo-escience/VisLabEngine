@@ -39,8 +39,8 @@ namespace WpfEditorTest.ChildPanels
 
 				var delta = new TranslateTransform();
 				RenderTransform = delta;
-				delta.X = _selectedFrame.GlobalRectangle.X;
-				delta.Y = _selectedFrame.GlobalRectangle.Y;
+				delta.X = _selectedFrame.GlobalRectangle.X;// == _selectedFrame.X ? _selectedFrame.GlobalRectangle.X : _selectedFrame.X;
+				delta.Y = _selectedFrame.GlobalRectangle.Y;// == _selectedFrame.Y ? _selectedFrame.GlobalRectangle.Y : _selectedFrame.Y;
 				PreviousTransform = RenderTransform;
 
 				foreach (var drag in Drags)
@@ -117,6 +117,14 @@ namespace WpfEditorTest.ChildPanels
 			set {
 				_isMoved = value;
 				this.Cursor = value ? Cursors.Cross : Cursors.Arrow;
+				if (value)
+				{
+					VisualAnchors.ForEach(a=>a.Visibility = Visibility.Collapsed);
+				}
+				else
+				{
+					UpdateVisualAnchors(_selectedFrame.Anchor);
+				}
 			}
 		}
 		public Border CurrentDrag { get; set; }
@@ -257,7 +265,7 @@ namespace WpfEditorTest.ChildPanels
 			//throw new NotImplementedException();
 		}
 
-		private void UserControl_MouseDown( object sender, MouseButtonEventArgs e )
+		private void UserControl_MouseLeftButtonDown( object sender, MouseButtonEventArgs e )
 		{
 			e.Handled = false;
 			StartFrameDragging(e.MouseDevice.GetPosition(Window));
@@ -271,7 +279,7 @@ namespace WpfEditorTest.ChildPanels
 			//Window.MoveFrameToDragField(_selectedFrame);
 		}
 
-		private void Drag_MouseDown( object sender, MouseButtonEventArgs e )
+		private void Drag_MouseLeftButtonDown( object sender, MouseButtonEventArgs e )
 		{
 			e.Handled = true;
 
@@ -279,6 +287,13 @@ namespace WpfEditorTest.ChildPanels
 			DragMousePressed = true;
 			PreviousMouseLocation = e.MouseDevice.GetPosition(Window);
 			PreviousDragTransform = CurrentDrag.RenderTransform;
+		}
+
+		private void Drag_MouseRightButtonDown( object sender, MouseButtonEventArgs e )
+		{
+			FrameAnchor changedAnchor = (FrameAnchor)Enum.Parse(typeof(FrameAnchor), (sender as Border).Tag as string);
+			_selectedFrame.Anchor ^= changedAnchor;
+			this.UpdateVisualAnchors(_selectedFrame.Anchor);
 		}
 	}
 }

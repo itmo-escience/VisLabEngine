@@ -72,13 +72,12 @@ namespace WpfEditorTest
 
             DxElem.Renderer = _engine;
 
-            _frameSelectionPanel = new FrameSelectionPanel(this);
-            LocalGrid.Children.Add(_frameSelectionPanel);
-            _panels.Add(_frameSelectionPanel);
-
 			_parentHighlightPanel = new ParentHighlightPanel();
 			LocalGrid.Children.Add(_parentHighlightPanel);
-			//_panels.Add(_parentHighlightPanel);
+
+			_frameSelectionPanel = new FrameSelectionPanel(this);
+			LocalGrid.Children.Add(_frameSelectionPanel);
+			_panels.Add(_frameSelectionPanel);
 
 			_details = new FrameDetails();
             _treeView = new FrameTreeView();
@@ -209,7 +208,7 @@ namespace WpfEditorTest
 					_frameSelectionPanel.IsMoved = true;
 				}
 
-				if (_frameSelectionPanel.IsMoved)
+				if (_frameSelectionPanel.IsMoved || _palette._selectedFrameTemplate != null)
 				{
 					var hovered = GetHoveredFrameOnScene(e.GetPosition(DxElem), true);
 
@@ -240,22 +239,7 @@ namespace WpfEditorTest
 
 		private void LocalGrid_MouseLeftButtonUp( object sender, MouseButtonEventArgs e )
 		{
-            if(_frameSelectionPanel.SelectedFrame != null)
-            {
-                if (_frameSelectionPanel.DragMousePressed)
-                    _frameSelectionPanel.DragMousePressed = false;
-                else if(_frameSelectionPanel.IsMoved)
-                {
-					_frameSelectionPanel.IsMoved = false;
-					_parentHighlightPanel.SelectedFrame = null;
-
-					LandFrameOnScene(_frameSelectionPanel.SelectedFrame, e.GetPosition(this));
-                    _frameSelectionPanel.UpdateSelectedFramePosition();
-                }
-            }
-
-			_frameSelectionPanel.MousePressed = false;
-
+			this.ReleaseFrame(e.GetPosition(this));
 
 			if (_palette._selectedFrameTemplate != null)
 			{
@@ -263,19 +247,26 @@ namespace WpfEditorTest
 
                 if (createdFrame != null)
 				{
-				    createdFrame.X = (int)e.MouseDevice.GetPosition(this).X - createdFrame.Width / 2;
-				    createdFrame.Y = (int)e.MouseDevice.GetPosition(this).Y - createdFrame.Height / 2;
 
-                    LandFrameOnScene(createdFrame, e.GetPosition(this));
+					createdFrame.X = (int)e.MouseDevice.GetPosition(this).X - createdFrame.Width / 2;
+					createdFrame.Y = (int)e.MouseDevice.GetPosition(this).Y - createdFrame.Height / 2;
+					LandFrameOnScene(createdFrame, e.GetPosition(this));
+					SelectFrame(createdFrame);
 
-				    createdFrame.X -= createdFrame.Parent.X;
-				    createdFrame.Y -= createdFrame.Parent.Y;
-                }
+					var delta = new TranslateTransform();
+					_frameSelectionPanel.RenderTransform = delta;
+					delta.X = createdFrame.X;
+					delta.Y = createdFrame.Y;
+					_frameSelectionPanel.PreviousTransform = _frameSelectionPanel.RenderTransform;
+					_frameSelectionPanel.UpdateSelectedFramePosition();
+					//createdFrame.X -= createdFrame.Parent.X;
+					//createdFrame.Y -= createdFrame.Parent.Y;
+				}
 				_palette._selectedFrameTemplate = null;
 			}
 		}
 
-		private void LocalGrid_MouseDown( object sender, MouseButtonEventArgs e )
+		private void LocalGrid_MouseLeftButtonDown( object sender, MouseButtonEventArgs e )
 		{
 			var hovered = GetHoveredFrameOnScene(e.GetPosition(DxElem), true);
 
@@ -295,7 +286,7 @@ namespace WpfEditorTest
 			}
 			else
 			{
-				ResetSelectedFrame();
+				ResetSelectedFrame(e.GetPosition(this));
 			}
 		}
 
@@ -306,27 +297,22 @@ namespace WpfEditorTest
 	            var selected = _frameSelectionPanel.SelectedFrame;
 	            selected.Parent?.Remove(selected);
 
-                ResetSelectedFrame();
+                ResetSelectedFrame(new Point(0,0));
 	        }
 	    }
 
 	    private void SelectFrame(Frame frame)
 	    {
             _details.SetSelectFrame(frame);
-			//foreach (var item in _treeView.ElementHierarchyView.Items)
-			//{
-			//	_treeView.ElementHierarchyView.JumpToFolder(frame);
-			//}
 			_treeView.SelectedFrame = frame;
-
-
-
 			_frameSelectionPanel.SelectedFrame = frame;
             _frameSelectionPanel.Visibility = Visibility.Visible;
 	    }
 
-        private void ResetSelectedFrame()
+        private void ResetSelectedFrame( Point point )
 		{
+			this.ReleaseFrame(point);
+
 			_details.FrameDetailsControls.ItemsSource = null;
 			_frameSelectionPanel.SelectedFrame = null;
 		    _frameSelectionPanel.DragMousePressed = false;
@@ -334,7 +320,25 @@ namespace WpfEditorTest
 		    _frameSelectionPanel.Visibility = Visibility.Collapsed;
         }
 
-	    public Frame GetHoveredFrameOnScene(Point mousePos, bool ignoreScene)
+		private void ReleaseFrame( Point point )
+		{
+			if (_frameSelectionPanel.SelectedFrame != null)
+			{
+				if (_frameSelectionPanel.DragMousePressed)
+					_frameSelectionPanel.DragMousePressed = false;
+				else if (_frameSelectionPanel.IsMoved)
+				{
+					_frameSelectionPanel.IsMoved = false;
+					_parentHighlightPanel.SelectedFrame = null;
+
+					LandFrameOnScene(_frameSelectionPanel.SelectedFrame, point);
+					_frameSelectionPanel.UpdateSelectedFramePosition();
+				}
+			}
+			_frameSelectionPanel.MousePressed = false;
+		}
+
+		public Frame GetHoveredFrameOnScene(Point mousePos, bool ignoreScene)
 	    {
 	        var hoveredFrames = FrameProcessor.GetFramesAt(SceneFrame, (int)mousePos.X, (int)mousePos.Y);
 
@@ -392,7 +396,7 @@ namespace WpfEditorTest
                 if (createdFrame != null && createdFrame.GetType() == typeof(FusionUI.UI.ScalableFrame))
                 {
                     RootFrame.Remove(SceneFrame);
-                    ResetSelectedFrame();
+                    ResetSelectedFrame(new Point(0,0));
                     SceneFrame = (FusionUI.UI.ScalableFrame)createdFrame;
                     RootFrame.Add(SceneFrame);
                     DragFieldFrame.ZOrder = 1000000;
