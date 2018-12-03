@@ -242,7 +242,7 @@ namespace WpfEditorTest
             }
 
 			_frameSelectionPanel.MousePressed = false;
-			
+
 
 			if (_palette._selectedFrameTemplate != null)
 			{
@@ -252,8 +252,12 @@ namespace WpfEditorTest
 				{
 				    createdFrame.X = (int)e.MouseDevice.GetPosition(this).X - createdFrame.Width / 2;
 				    createdFrame.Y = (int)e.MouseDevice.GetPosition(this).Y - createdFrame.Height / 2;
+
                     LandFrameOnScene(createdFrame, e.GetPosition(this));
-				}
+
+				    createdFrame.X -= createdFrame.Parent.X;
+				    createdFrame.Y -= createdFrame.Parent.Y;
+                }
 				_palette._selectedFrameTemplate = null;
 			}
 		}
@@ -273,7 +277,7 @@ namespace WpfEditorTest
 				//}
 				//else
 				//{
-				//	
+				//
 				//}
 			}
 			else
@@ -349,12 +353,13 @@ namespace WpfEditorTest
 			_frameSelectionPanel.UpdateSelectedFramePosition();
 		}
 
-	    public void LandFrameOnScene(Frame frame, Point pos)
+	    public void LandFrameOnScene(Frame frame, Point mousePosition)
 	    {
 	        frame.Parent?.Remove(frame);
 
             // If we can't find where to land it (that's weird) just try attach to the scene
-	        var hoveredFrame = GetHoveredFrameOnScene(pos, false) ?? SceneFrame;
+	        var hoveredFrame = GetHoveredFrameOnScene(mousePosition, false) ?? SceneFrame;
+
 	        hoveredFrame.Add(frame);
 
 			//_treeView.ElementHierarcyView.SetSelectedItem(frame);

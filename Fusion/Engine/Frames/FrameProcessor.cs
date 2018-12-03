@@ -247,7 +247,7 @@ namespace Fusion.Engine.Frames {
 
                 if (!hovered) continue;
 
-                foreach (var child in current.Children)
+                foreach (var child in current.Children.Reverse())
                 {
                     toProcess.Push(child);
                 }
