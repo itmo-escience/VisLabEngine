@@ -5,7 +5,7 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:local="clr-namespace:WpfEditorTest.ChildPanels"
              mc:Ignorable="d"
-             d:DesignHeight="100" d:DesignWidth="100" Background="#26FFFFFF" HorizontalAlignment="Left" VerticalAlignment="Top" Visibility="Collapsed" MouseDown="UserControl_MouseDown">
+             d:DesignHeight="100" d:DesignWidth="100" Background="#26FFFFFF" HorizontalAlignment="Left" VerticalAlignment="Top" Visibility="Visible" MouseDown="UserControl_MouseDown">
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="9"/>
@@ -17,23 +17,58 @@
             <ColumnDefinition Width="1*"/>
             <ColumnDefinition Width="9"/>
         </Grid.ColumnDefinitions>
-        <Border Name="BottomDrag" BorderBrush="Black" Background="White" BorderThickness="1" Grid.Column="1" HorizontalAlignment="Center" Height="9" Grid.Row="2" Width="20" MouseDown="Drag_MouseDown"/>
-        <Border Name="TopDrag" BorderBrush="Black" Background="White" BorderThickness="1" Grid.Column="1" HorizontalAlignment="Center" Height="9" Grid.Row="0" Width="20" MouseDown="Drag_MouseDown"/>
-        <Border Name="LeftDrag" BorderBrush="Black" Background="White" BorderThickness="1" Grid.Column="0" Height="20" Grid.Row="1" VerticalAlignment="Center" Width="9" MouseDown="Drag_MouseDown"/>
-        <Border Name="RightDrag" BorderBrush="Black" Background="White" BorderThickness="1" Grid.Column="2" Height="20" Grid.Row="1" VerticalAlignment="Center" Width="9" MouseDown="Drag_MouseDown"/>
+        <Border Name="PositionInfo" BorderThickness="0,0,0,1" BorderBrush="White" Grid.Column="0" Height="28" Grid.Row="0" 
+                Width="40" MouseDown="Drag_MouseDown" Cursor="SizeNWSE" Margin="-40,-27,9,8">
+            <StackPanel>
+                <StackPanel Orientation="Horizontal">
+                    <TextBlock Foreground="White" FontFamily="Consolas" TextAlignment ="Left" FontSize="12" Text="X:"></TextBlock>
+                    <TextBlock Foreground="White" FontFamily="Consolas" TextAlignment ="Right" FontSize="12" Text="{Binding X}" Width="27"></TextBlock>
+                </StackPanel>
+                <StackPanel  Orientation="Horizontal">
+                    <TextBlock Foreground="White" FontFamily="Consolas" TextAlignment ="Left" FontSize="12" Text="Y:"></TextBlock>
+                    <TextBlock Foreground="White" FontFamily="Consolas" TextAlignment ="Right" FontSize="12" Text="{Binding Y}" Width="27"></TextBlock>
+                </StackPanel>
+            </StackPanel>
+        </Border>
+        <Border Name="SizeInfo" BorderThickness="0,1,0,0" BorderBrush="White" Grid.Column="2" Height="28" Grid.Row="2" 
+                Width="40" MouseDown="Drag_MouseDown" Cursor="SizeNWSE" Margin="9,8,-40,-27">
+            <StackPanel>
+                <StackPanel Orientation="Horizontal">
+                    <TextBlock Foreground="White" FontFamily="Consolas" TextAlignment ="Left" FontSize="12" Text="W:"></TextBlock>
+                    <TextBlock Foreground="White" FontFamily="Consolas" TextAlignment ="Right" FontSize="12" Text="{Binding Width}" Width="27"></TextBlock>
+                </StackPanel>
+                <StackPanel Orientation="Horizontal">
+                    <TextBlock Foreground="White" FontFamily="Consolas" TextAlignment ="Left" FontSize="12" Text="H:"></TextBlock>
+                    <TextBlock Foreground="White" FontFamily="Consolas" TextAlignment ="Right" FontSize="12" Text="{Binding Height}" Width="27"></TextBlock>
+                </StackPanel>
+            </StackPanel>
+        </Border>
 
-        <Border Name="BottomAnchorLine" Background="{DynamicResource {x:Static SystemColors.MenuHighlightBrushKey}}" Grid.Column="1" HorizontalAlignment="Center"
-                Height="20" Grid.Row="2" Width="2" Margin="0,9,0,-20" Visibility="Collapsed"/>
-        <Border Name="TopAnchorLine" Background="{DynamicResource {x:Static SystemColors.MenuHighlightBrushKey}}" Grid.Column="1" HorizontalAlignment="Center"
-                Height="20" Grid.Row="0" Width="2" Margin="0,-20,0,9" Visibility="Collapsed"/>
-        <Border Name="LeftAnchorLine" Background="{DynamicResource {x:Static SystemColors.MenuHighlightBrushKey}}" Grid.Column="0" VerticalAlignment="Center"
-                Height="2" Grid.Row="1" Width="20" Margin="-20,0,9,0" Visibility="Collapsed"/>
-        <Border Name="RightAnchorLine" Background="{DynamicResource {x:Static SystemColors.MenuHighlightBrushKey}}" Grid.Column="2" VerticalAlignment="Center"
-                Height="2" Grid.Row="1" Width="20" Margin="9,0,-20,0" Visibility="Collapsed"/>
+        <Border Name="BottomDrag" BorderBrush="Black" Background="White" BorderThickness="1" Grid.Column="1" HorizontalAlignment="Center" 
+                Height="9" Grid.Row="2" Width="20" MouseDown="Drag_MouseDown" Cursor="SizeNS"/>
+        <Border Name="TopDrag" BorderBrush="Black" Background="White" BorderThickness="1" Grid.Column="1" HorizontalAlignment="Center" 
+                Height="9" Grid.Row="0" Width="20" MouseDown="Drag_MouseDown" Cursor="SizeNS"/>
+        <Border Name="LeftDrag" BorderBrush="Black" Background="White" BorderThickness="1" Grid.Column="0" Height="20" Grid.Row="1" 
+                VerticalAlignment="Center" Width="9" MouseDown="Drag_MouseDown" Cursor="SizeWE"/>
+        <Border Name="RightDrag" BorderBrush="Black" Background="White" BorderThickness="1" Grid.Column="2" Height="20" Grid.Row="1" 
+                VerticalAlignment="Center" Width="9" MouseDown="Drag_MouseDown" Cursor="SizeWE"/>
 
-        <Border Name="BottomLeftDrag" BorderBrush="Black" Background="White" BorderThickness="1" Grid.Column="0" Height="9" Grid.Row="2" Width="9" MouseDown="Drag_MouseDown"/>
-        <Border Name="BottomRightDrag" BorderBrush="Black" Background="White" BorderThickness="1" Grid.Column="2" Height="9" Grid.Row="2" Width="9" MouseDown="Drag_MouseDown"/>
-        <Border Name="TopLeftDrag" BorderBrush="Black" Background="White" BorderThickness="1" Grid.Column="0" Height="9" Grid.Row="0" Width="9" MouseDown="Drag_MouseDown"/>
-        <Border Name="TopRightDrag" BorderBrush="Black" Background="White" BorderThickness="1" Grid.Column="2" Height="9" Grid.Row="0" Width="9" MouseDown="Drag_MouseDown"/>
+        <Border Name="BottomAnchorLine" Background="{DynamicResource {x:Static SystemColors.MenuHighlightBrushKey}}" Grid.Column="1" 
+                HorizontalAlignment="Center" Height="20" Grid.Row="2" Width="2" Margin="0,9,0,-20" Visibility="Collapsed"/>
+        <Border Name="TopAnchorLine" Background="{DynamicResource {x:Static SystemColors.MenuHighlightBrushKey}}" Grid.Column="1" 
+                HorizontalAlignment="Center" Height="20" Grid.Row="0" Width="2" Margin="0,-20,0,9" Visibility="Collapsed"/>
+        <Border Name="LeftAnchorLine" Background="{DynamicResource {x:Static SystemColors.MenuHighlightBrushKey}}" Grid.Column="0" 
+                VerticalAlignment="Center" Height="2" Grid.Row="1" Width="20" Margin="-20,0,9,0" Visibility="Collapsed"/>
+        <Border Name="RightAnchorLine" Background="{DynamicResource {x:Static SystemColors.MenuHighlightBrushKey}}" Grid.Column="2" 
+                VerticalAlignment="Center" Height="2" Grid.Row="1" Width="20" Margin="9,0,-20,0" Visibility="Collapsed"/>
+
+        <Border Name="BottomLeftDrag" BorderBrush="Black" Background="White" BorderThickness="1" Grid.Column="0" Height="9" Grid.Row="2" 
+                Width="9" MouseDown="Drag_MouseDown" Cursor="SizeNESW"/>
+        <Border Name="BottomRightDrag" BorderBrush="Black" Background="White" BorderThickness="1" Grid.Column="2" Height="9" Grid.Row="2" 
+                Width="9" MouseDown="Drag_MouseDown" Cursor="SizeNWSE"/>
+        <Border Name="TopLeftDrag" BorderBrush="Black" Background="White" BorderThickness="1" Grid.Column="0" Height="9" Grid.Row="0" 
+                Width="9" MouseDown="Drag_MouseDown" Cursor="SizeNWSE"/>
+        <Border Name="TopRightDrag" BorderBrush="Black" Background="White" BorderThickness="1" Grid.Column="2" Height="9" Grid.Row="0" 
+                Width="9" MouseDown="Drag_MouseDown" Cursor="SizeNESW"/>
     </Grid>
 </UserControl>
