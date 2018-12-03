@@ -211,7 +211,6 @@ namespace WpfEditorTest
 				if (_frameSelectionPanel.IsMoved || _palette._selectedFrameTemplate != null)
 				{
 					var hovered = GetHoveredFrameOnScene(e.GetPosition(DxElem), true);
-
 					_parentHighlightPanel.SelectedFrame = hovered;
 				}
 
@@ -227,6 +226,11 @@ namespace WpfEditorTest
 				((UserControl)_frameSelectionPanel).RenderTransform = group;
 				_frameSelectionPanel.PreviousTransform = ((UserControl)_frameSelectionPanel).RenderTransform;
 				_frameSelectionPanel.PreviousMouseLocation = currentLocation;
+			}
+			else if (_palette._selectedFrameTemplate != null)
+			{
+				var hovered = GetHoveredFrameOnScene(e.GetPosition(DxElem), true);
+				_parentHighlightPanel.SelectedFrame = hovered;
 			}
 		}
 
@@ -263,6 +267,7 @@ namespace WpfEditorTest
 					//createdFrame.Y -= createdFrame.Parent.Y;
 				}
 				_palette._selectedFrameTemplate = null;
+				_parentHighlightPanel.SelectedFrame = null;
 			}
 		}
 
