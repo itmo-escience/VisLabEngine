@@ -17,7 +17,7 @@
         <TreeView Name="ElementHierarchyView" Background="LightGray" Height="auto" Width="auto">
             <TreeView.ItemTemplate>
                 <HierarchicalDataTemplate ItemsSource="{Binding Path=Children}">
-                    <TextBlock Text="{Binding Text}" Tag="{Binding}" MouseDown="TextBlock_MouseDown"/>
+                    <TextBlock Text="{Binding Name}" Tag="{Binding}" MouseDown="TextBlock_MouseDown"/>
                 </HierarchicalDataTemplate>
             </TreeView.ItemTemplate>
         </TreeView>

@@ -1,22 +1,19 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Fusion;
 using Fusion.Core.Mathematics;
 using Fusion.Engine.Input;
 using Fusion.Engine.Graphics;
 using Fusion.Engine.Common;
-using Forms = System.Windows.Forms;
 using System.IO;
 using System.Reflection;
 using System.Xml.Serialization;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 
-namespace Fusion.Engine.Frames {
-	public partial class Frame : INotifyPropertyChanged
+namespace Fusion.Engine.Frames
+{
+	public class Frame : INotifyPropertyChanged
 	{
 		public string Name { get => _name; set { _name = value; OnPropertyChanged(); } }
 
@@ -484,15 +481,13 @@ namespace Fusion.Engine.Frames {
 			BorderColor = Color.White;
 			ShadowColor = Color.Zero;
 			OverallColor = Color.White;
+		    Name = GenerateName(GetType());
 
 			TextAlignment = Alignment.TopLeft;
 
 			Anchor = FrameAnchor.Left | FrameAnchor.Top;
 
 			ImageColor = Color.White;
-
-			//LayoutChanged	+= (s,e) => RunLayout(true);
-			//Resize			+= (s,e) => RunLayout(true);
 		}
 
 
@@ -1716,5 +1711,24 @@ namespace Fusion.Engine.Frames {
 		{
 			return this.Text;
 		}
-	}
+
+	    #region Naming
+
+        private static readonly Dictionary<Type, int> GeneratedCountOfType = new Dictionary<Type, int>();
+	    private static string GenerateName(Type type)
+	    {
+	        if (GeneratedCountOfType.TryGetValue(type, out var value))
+	        {
+	            GeneratedCountOfType[type] = value + 1;
+	        }
+	        else
+	        {
+	            GeneratedCountOfType[type] = 1;
+	        }
+
+	        return $"{type.Name}_{value}";
+        }
+
+	    #endregion
+    }
 }
