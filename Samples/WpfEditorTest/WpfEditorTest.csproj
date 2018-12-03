@@ -92,6 +92,9 @@
     <Compile Include="ChildPanels\FrameSelectionPanel.xaml.cs">
       <DependentUpon>FrameSelectionPanel.xaml</DependentUpon>
     </Compile>
+    <Compile Include="ChildPanels\ParentHighlightPanel.xaml.cs">
+      <DependentUpon>ParentHighlightPanel.xaml</DependentUpon>
+    </Compile>
     <Compile Include="DataTemplateSelectorOfProperty.cs" />
     <Compile Include="Extentions.cs" />
     <Compile Include="FlagValueConverter.cs" />
@@ -111,6 +114,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="ChildPanels\FrameSelectionPanel.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="ChildPanels\ParentHighlightPanel.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

@@ -37,7 +37,8 @@ namespace WpfEditorTest
 		private readonly FramePalette _palette;
 		private readonly FrameTreeView _treeView;
 		private readonly FrameSelectionPanel _frameSelectionPanel;
-	    private readonly List<IDraggablePanel> _panels = new List<IDraggablePanel>();
+		private readonly ParentHighlightPanel _parentHighlightPanel;
+		private readonly List<IDraggablePanel> _panels = new List<IDraggablePanel>();
 
 	    public string TemplatesPath = Path.GetFullPath(Path.Combine(Directory.GetParent(Assembly.GetEntryAssembly().Location).FullName, "..\\..\\..\\FramesXML"));
 	    Binding childrenBinding;
@@ -75,7 +76,11 @@ namespace WpfEditorTest
             LocalGrid.Children.Add(_frameSelectionPanel);
             _panels.Add(_frameSelectionPanel);
 
-            _details = new FrameDetails();
+			_parentHighlightPanel = new ParentHighlightPanel();
+			LocalGrid.Children.Add(_parentHighlightPanel);
+			//_panels.Add(_parentHighlightPanel);
+
+			_details = new FrameDetails();
             _treeView = new FrameTreeView();
             _palette = new FramePalette();
 
@@ -204,6 +209,13 @@ namespace WpfEditorTest
 					_frameSelectionPanel.IsMoved = true;
 				}
 
+				if (_frameSelectionPanel.IsMoved)
+				{
+					var hovered = GetHoveredFrameOnScene(e.GetPosition(DxElem), true);
+
+					_parentHighlightPanel.SelectedFrame = hovered;
+				}
+
 				Point currentLocation = e.MouseDevice.GetPosition(this);
 
 				var delta = new TranslateTransform
@@ -235,6 +247,7 @@ namespace WpfEditorTest
                 else if(_frameSelectionPanel.IsMoved)
                 {
 					_frameSelectionPanel.IsMoved = false;
+					_parentHighlightPanel.SelectedFrame = null;
 
 					LandFrameOnScene(_frameSelectionPanel.SelectedFrame, e.GetPosition(this));
                     _frameSelectionPanel.UpdateSelectedFramePosition();
