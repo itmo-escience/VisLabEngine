@@ -296,7 +296,13 @@ namespace WpfEditorTest
 	    private void SelectFrame(Frame frame)
 	    {
             _details.SetSelectFrame(frame);
-	        _treeView.SelectedFrame = frame;
+			//foreach (var item in _treeView.ElementHierarchyView.Items)
+			//{
+			//	_treeView.ElementHierarchyView.JumpToFolder(frame);
+			//}
+			_treeView.SelectedFrame = frame;
+
+
 
 			_frameSelectionPanel.SelectedFrame = frame;
             _frameSelectionPanel.Visibility = Visibility.Visible;

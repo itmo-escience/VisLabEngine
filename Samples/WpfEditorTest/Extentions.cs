@@ -1,43 +1,71 @@
-﻿using System.Windows.Controls;
+﻿using System.Collections.Generic;
+using System.Windows.Controls;
 
 namespace WpfEditorTest
 {
 	public static class TreeViewExtension
 	{
-		public static bool SetSelectedItem( this TreeView treeView, object item )
+		/// <summary>
+		/// Expand a TreeView to a specific node
+		/// </summary>
+		/// <param name="tv">The treeview</param>
+		/// <param name="node">The string of the node in the Item.Tag property to expand to</param>
+		public static void JumpToFolder(this TreeView tv, Fusion.Engine.Frames.Frame node )
 		{
-			return SetSelected(treeView, item);
+			bool done = false;
+			ItemCollection ic = tv.Items;
+
+			while (!done)
+			{
+				bool found = false;
+
+				foreach (TreeViewItem tvi in ic)
+				{
+					if (tvi.Equals(node))
+					{
+						found = true;
+						tvi.IsExpanded = true;
+						ic = tvi.Items;
+						if (tvi.Equals(node)) done = true;
+						break;
+					}
+				}
+
+				done = (found == false && done == false);
+			}
 		}
 
-		public static bool SetSelected( ItemsControl parent, object child )
+		public static void SetSelectedItem( this TreeView treeView, Fusion.Engine.Frames.Frame item )
 		{
-			if (parent == null || child == null)
-				return false;
+			SetSelected(treeView, item);
+		}
 
-			TreeViewItem childNode = parent.ItemContainerGenerator
-			.ContainerFromItem(child) as TreeViewItem;
+		public static void SetSelected( ItemsControl parent, Fusion.Engine.Frames.Frame child )
+		{
+			var currentFrame = child;
+			List<Fusion.Engine.Frames.Frame> frames = new List<Fusion.Engine.Frames.Frame>();
 
-			if (childNode != null)
+			while (currentFrame.Parent!=null && currentFrame.Parent.Text!="Scene")
 			{
-				//childNode.Focus();
-				return childNode.IsSelected = true;
+				currentFrame = currentFrame.Parent;
+				frames.Add(currentFrame);
 			}
 
-			if (parent.Items.Count > 0)
+			frames.Reverse();
+			TreeViewItem childNode;
+
+			foreach (var frame in frames)
 			{
-				foreach (object childItem in parent.Items)
-				{
-					ItemsControl childControl = parent
-					  .ItemContainerGenerator
-					  .ContainerFromItem(childItem)
-					  as ItemsControl;
-
-					if (SetSelected(childControl, child))
-						return true;
-				}
+				childNode = parent.ItemContainerGenerator.ContainerFromItem(frame) as TreeViewItem;
+				childNode.IsExpanded = true;
+				parent.UpdateLayout();
+				parent = parent
+					.ItemContainerGenerator
+					.ContainerFromItem(frame)
+					as ItemsControl;
 			}
-
-			return false;
+			childNode = parent.ItemContainerGenerator.ContainerFromItem(child) as TreeViewItem;
+			childNode.IsSelected = true;
 		}
 	}
 }
