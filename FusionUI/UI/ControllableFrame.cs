@@ -473,10 +473,10 @@ namespace FusionUI.UI
             if (!Active || !Visible) return false;
             bool flag = false;
             Selected = true;
-			Children.Reverse();
-			var reversedChildren = Children;
 			//Children.Reverse();
-			foreach (var frame in reversedChildren)
+			//var reversedChildren = Children;
+			//Children.Reverse();
+			foreach (var frame in Children.Reverse())
             {
                 if (flag) return flag;
                 if (frame is ControllableFrame)
@@ -494,7 +494,7 @@ namespace FusionUI.UI
                     }
                 }
             }
-			Children.Reverse();
+			//Children.Reverse();
 
 			if (!flag)
             {
@@ -508,10 +508,10 @@ namespace FusionUI.UI
             bool flag = false;
             bool wasSelected = Selected;
             Selected = false;
-			Children.Reverse();
-			var reversedChildren = Children;
 			//Children.Reverse();
-			foreach (var frame in reversedChildren)
+			//var reversedChildren = Children;
+			//Children.Reverse();
+			foreach (var frame in Children.Reverse())
             {
                 if (flag) return flag;
                 if (frame is ControllableFrame)
@@ -528,7 +528,7 @@ namespace FusionUI.UI
                     }
                 }
             }
-			Children.Reverse();
+			//Children.Reverse();
 
 			if (!flag && wasSelected)
             {
@@ -542,10 +542,10 @@ namespace FusionUI.UI
         {
             if (!Active || !Visible || !Selected) return false;
             bool flag = false;
-			Children.Reverse();
-			var reversedChildren = Children;
 			//Children.Reverse();
-			foreach (var frame in reversedChildren)
+			//var reversedChildren = Children;
+			//Children.Reverse();
+			foreach (var frame in Children.Reverse())
             {
                 if (flag) return flag;
                 if (frame is ControllableFrame)
@@ -562,7 +562,7 @@ namespace FusionUI.UI
                     }
                 }
             }
-			Children.Reverse();
+			//Children.Reverse();
 
 			if (!flag)
             {
@@ -574,10 +574,10 @@ namespace FusionUI.UI
         {
             bool flag = false;
             if (!Active || !Visible || !Selected) return false;
-			Children.Reverse();
-			var reversedChildren = Children;
 			//Children.Reverse();
-			foreach (var frame in reversedChildren)
+			//var reversedChildren = Children;
+			//Children.Reverse();
+			foreach (var frame in Children.Reverse())
             {
                 if (flag) return flag;
                 if (frame is ControllableFrame)
@@ -587,7 +587,7 @@ namespace FusionUI.UI
                         flag |= sFrame.InnerActionDrag(args) || sFrame.SuppressActions;
                 }
             }
-			Children.Reverse();
+			//Children.Reverse();
 
 			if (!flag) ActionDrag?.Invoke(args, ref flag);
             return flag;
@@ -598,10 +598,10 @@ namespace FusionUI.UI
             bool flag = false;
             if (!Active || !Visible) return false;
             oldPos = null;
-			Children.Reverse();
-			var reversedChildren = Children;
 			//Children.Reverse();
-			foreach (var frame in reversedChildren)
+			//var reversedChildren = Children;
+			//Children.Reverse();
+			foreach (var frame in Children.Reverse())
             {
                 if (flag)
                 {
@@ -617,7 +617,7 @@ namespace FusionUI.UI
                     }
                 }
             }
-			Children.Reverse();
+			//Children.Reverse();
 
 			if (!flag)
             {

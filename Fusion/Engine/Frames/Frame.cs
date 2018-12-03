@@ -917,9 +917,9 @@ namespace Fusion.Engine.Frames
 				}
 
 				list.Add(currentDrawFrame);
-				currentDrawFrame.Frame.Children.Reverse();
-				var reversedChildren = currentDrawFrame.Frame.Children;
-				foreach (var child in reversedChildren)
+				//currentDrawFrame.Frame.Children.Reverse();
+				//var reversedChildren = currentDrawFrame.Frame.Children;
+				foreach (var child in currentDrawFrame.Frame.Children.Reverse())
 				{
 
 					var color = currentDrawFrame.Color * child.OverallColor;
@@ -931,7 +931,7 @@ namespace Fusion.Engine.Frames
 						stack.Push(new DrawFrameItem(child, color, outer, inner, currentDrawFrame.Text + "-" + child.Text));
 					}
 				}
-				currentDrawFrame.Frame.Children.Reverse();
+				//currentDrawFrame.Frame.Children.Reverse();
 			}
 
 			for (var i = 0; i < list.Count; i++)

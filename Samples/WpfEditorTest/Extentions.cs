@@ -19,7 +19,7 @@ namespace WpfEditorTest
 
 			if (childNode != null)
 			{
-				childNode.Focus();
+				//childNode.Focus();
 				return childNode.IsSelected = true;
 			}
 

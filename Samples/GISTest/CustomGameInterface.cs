@@ -163,9 +163,9 @@ namespace GISTest
 			viewLayer.SpriteLayers.Add(userInterface.FramesSpriteLayer);
 
 			var testWindow = CreateStartFrame();
-			Scene = new ScalableFrame(this.rootFrame.ui, 0, 0, this.rootFrame.UnitWidth, this.rootFrame.UnitHeight, "Scene", Color.Zero) { Anchor= FrameAnchor.All };
+			Scene = new ScalableFrame(0, 0, this.rootFrame.UnitWidth, this.rootFrame.UnitHeight, "Scene", Color.Zero) { Anchor= FrameAnchor.All };
 			//DragFieldFrame = new ScalableFrame(this.rootFrame.ui, 0, 0, this.rootFrame.UnitWidth, this.rootFrame.UnitHeight, "DragFieldFrame", Color.Zero) { Anchor = FrameAnchor.All };
-			Scene.Add(testWindow);
+			//Scene.Add(testWindow);
 			Scene.Visible = true;
 			Scene.Ghost = false;
 			//this.rootFrame.Add(DragFieldFrame);

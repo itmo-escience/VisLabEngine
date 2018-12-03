@@ -109,6 +109,7 @@ namespace WpfEditorTest.ChildPanels
 		public Transform PreviousDragTransform { get; set; }
 		public Transform PreviousTransform { get; set; }
 		public bool MousePressed { get; set; }
+		public bool IsMoved { get; set; }
 		public Border CurrentDrag { get; set; }
 		public bool DragMousePressed { get; set; }
 		public InterfaceEditor Window { get; set; }
@@ -177,9 +178,8 @@ namespace WpfEditorTest.ChildPanels
 				{
 					UpdateSelectedFramePosition();
 				}
-
-			    UpdateAnchorLines();
-            };
+				UpdateAnchorLines();
+			};
 
 			_oldX = RenderTransform.Value.OffsetX;
 			_oldY = RenderTransform.Value.OffsetY;
@@ -196,6 +196,8 @@ namespace WpfEditorTest.ChildPanels
 
 			_oldX = RenderTransform.Value.OffsetX;
 			_oldY = RenderTransform.Value.OffsetY;
+
+			UpdateAnchorLines();
 			_locked = false;
 		}
 
@@ -243,15 +245,15 @@ namespace WpfEditorTest.ChildPanels
 		private void UserControl_MouseDown( object sender, MouseButtonEventArgs e )
 		{
 			e.Handled = false;
-            StartFrameDragging(e.MouseDevice.GetPosition(Window));
+			StartFrameDragging(e.MouseDevice.GetPosition(Window));
 		}
 
 	    public void StartFrameDragging(Point mousePosition)
 	    {
-	        MousePressed = true;
-	        PreviousMouseLocation = mousePosition;
+			MousePressed = true;
+			PreviousMouseLocation = mousePosition;
 	        PreviousTransform = RenderTransform;
-			Window.MoveFrameToDragField(_selectedFrame);
+			//Window.MoveFrameToDragField(_selectedFrame);
 		}
 
 		private void Drag_MouseDown( object sender, MouseButtonEventArgs e )

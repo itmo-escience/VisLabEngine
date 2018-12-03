@@ -351,7 +351,6 @@ namespace WpfEditorTest.ChildPanels
 
 		private void UserControl_MouseDown( object sender, MouseButtonEventArgs e )
 		{
-			e.Handled = false;
 			this._mousePressed = true;
 			_previousMouseLocation = e.MouseDevice.GetPosition(_window);
 			_previousTransform = this.RenderTransform;
