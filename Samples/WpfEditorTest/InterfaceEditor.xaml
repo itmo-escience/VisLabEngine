@@ -27,6 +27,12 @@
         <CommandBinding Command="{x:Static local:InterfaceEditor.SaveFrameCmd}"
                         Executed="ExecutedSaveFrameCommand"
                         CanExecute="AlwaysCanExecute" />
+        <CommandBinding Command="{x:Static local:InterfaceEditor.RedoChangeCmd}"
+                        Executed="ExecutedRedoChangeCommand"
+                        CanExecute="AlwaysCanExecute" />
+        <CommandBinding Command="{x:Static local:InterfaceEditor.UndoChangeCmd}"
+                        Executed="ExecutedUndoChangeCommand"
+                        CanExecute="AlwaysCanExecute" />
     </Window.CommandBindings>
     <Grid MaxWidth="10000" MaxHeight="10000">
         <Grid.RowDefinitions>
@@ -38,6 +44,9 @@
                 <Button Command="{x:Static local:InterfaceEditor.SaveSceneCmd}" Content="Save scene" />
                 <Button Command="{x:Static local:InterfaceEditor.LoadSceneCmd}" Content="Load scene" />
                 <Button Command="{x:Static local:InterfaceEditor.SaveFrameCmd}" Content="Save frame" />
+
+                <Button Command="{x:Static local:InterfaceEditor.UndoChangeCmd}" Content="Undo change" />
+                <Button Command="{x:Static local:InterfaceEditor.RedoChangeCmd}" Content="Redo change" />
             </ToolBar>
         </ToolBarTray>
         <Grid Grid.Row="1" Name="LocalGrid"

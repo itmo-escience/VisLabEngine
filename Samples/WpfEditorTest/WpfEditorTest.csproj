@@ -99,8 +99,13 @@
     <Compile Include="Extentions.cs" />
     <Compile Include="FlagValueConverter.cs" />
     <Compile Include="FramePropertyHolder.cs" />
+    <Compile Include="Property.cs" />
     <Compile Include="PropertyValueConverter.cs" />
     <Compile Include="StaticData.cs" />
+    <Compile Include="UndoRedo\CommandGroup.cs" />
+    <Compile Include="UndoRedo\CommandManager.cs" />
+    <Compile Include="UndoRedo\IEditorCommand.cs" />
+    <Compile Include="UndoRedo\FramePropertyChangeCommand.cs" />
     <Page Include="ChildPanels\FrameDetails.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>

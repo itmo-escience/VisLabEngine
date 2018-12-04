@@ -836,6 +836,7 @@ namespace Fusion.Engine.Frames
 		{
 			GlobalRectangle = new Rectangle(X + px, Y + py, Width, Height);
 			ForEachChildren(ch => ch.UpdateGlobalRect(px + X, py + Y));
+			OnPropertyChanged("GlobalRectangle");
 		}
 
 
