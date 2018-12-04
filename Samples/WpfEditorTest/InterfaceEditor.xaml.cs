@@ -94,8 +94,9 @@ namespace WpfEditorTest
 			};
 
             _treeView.SelectedFrameChangedInUI += (_, frame) => SelectFrame(frame);
+			_treeView.RequestFrameDeletionInUI += ( _, __ ) => TryDeleteSelectedFrame();
 
-            var templates = Directory.GetFiles(TemplatesPath, "*.xml").ToList();
+			var templates = Directory.GetFiles(TemplatesPath, "*.xml").ToList();
             _palette.AvailableFrames.ItemsSource = templates.Select(t => t.Split('\\').Last().Split('.').First());
 
             RootFrame = ApplicationInterface.Instance.rootFrame;
@@ -297,16 +298,25 @@ namespace WpfEditorTest
 
 	    private void Window_KeyDown(object sender, KeyEventArgs e)
 	    {
-	        if (e.Key == Key.Delete && _frameSelectionPanel.SelectedFrame != null)
+	        if (e.Key == Key.Delete)
 	        {
-	            var selected = _frameSelectionPanel.SelectedFrame;
-	            selected.Parent?.Remove(selected);
+				this.TryDeleteSelectedFrame();
 
-                ResetSelectedFrame(new Point(0,0));
 	        }
 	    }
 
-	    private void SelectFrame(Frame frame)
+		private void TryDeleteSelectedFrame()
+		{
+			if (_frameSelectionPanel.SelectedFrame != null)
+			{
+				var selected = _frameSelectionPanel.SelectedFrame;
+				selected.Parent?.Remove(selected);
+
+				ResetSelectedFrame(new Point(0, 0));
+			}
+		}
+
+		private void SelectFrame(Frame frame)
 	    {
             _details.SetSelectFrame(frame);
 			_treeView.SelectedFrame = frame;
