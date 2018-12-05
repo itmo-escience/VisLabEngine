@@ -63,11 +63,13 @@ namespace WpfEditorTest.ChildPanels
 			switch (args.PropertyName)
 			{
 				case "Width":
+				case "UnitWidth":
 					{
 						WidthBuffer = _selectedFrame.Width;
 						break;
 					}
 				case "Height":
+				case "UnitHeight":
 					{
 						HeightBuffer = _selectedFrame.Height;
 						break;

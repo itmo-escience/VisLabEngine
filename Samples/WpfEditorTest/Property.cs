@@ -46,7 +46,7 @@ namespace WpfEditorTest
 					var val = PropInfo.GetValue(Obj);
 					if (!Prop.Equals(val))
 					{
-						_prop = PropInfo.GetValue(Obj);
+						Prop = PropInfo.GetValue(Obj);
 					}
 				}
 			};
