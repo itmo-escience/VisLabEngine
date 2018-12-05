@@ -72,8 +72,9 @@ namespace WpfEditorTest.ChildPanels
 						HeightBuffer = _selectedFrame.Height;
 						break;
 					}
-				case "X":
-				case "Y":
+				//case "X":
+				//case "Y":
+				case "GlobalRectangle":
 					{
 						var frameDelta = new TranslateTransform();
 						RenderTransform = frameDelta;

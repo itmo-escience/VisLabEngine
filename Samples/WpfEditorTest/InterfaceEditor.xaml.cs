@@ -17,6 +17,7 @@ using Fusion.Engine.Input;
 using WpfEditorTest.ChildPanels;
 using Frame = Fusion.Engine.Frames.Frame;
 using KeyEventArgs = System.Windows.Input.KeyEventArgs;
+using CommandManager = WpfEditorTest.UndoRedo.CommandManager;
 
 namespace WpfEditorTest
 {
@@ -25,9 +26,11 @@ namespace WpfEditorTest
 	/// </summary>
 	public partial class InterfaceEditor : Window
 	{
-	    public static RoutedCommand SaveFrameCmd = new RoutedCommand();
+		public static RoutedCommand SaveFrameCmd = new RoutedCommand();
 	    public static RoutedCommand SaveSceneCmd = new RoutedCommand();
 	    public static RoutedCommand LoadSceneCmd = new RoutedCommand();
+		public static RoutedCommand RedoChangeCmd = new RoutedCommand();
+		public static RoutedCommand UndoChangeCmd = new RoutedCommand();
 
 		private int DeltaX = 0;
 		private int DeltaY = 0;
@@ -94,8 +97,9 @@ namespace WpfEditorTest
 			};
 
             _treeView.SelectedFrameChangedInUI += (_, frame) => SelectFrame(frame);
+			_treeView.RequestFrameDeletionInUI += ( _, __ ) => TryDeleteSelectedFrame();
 
-            var templates = Directory.GetFiles(TemplatesPath, "*.xml").ToList();
+			var templates = Directory.GetFiles(TemplatesPath, "*.xml").ToList();
             _palette.AvailableFrames.ItemsSource = templates.Select(t => t.Split('\\').Last().Split('.').First());
 
             RootFrame = ApplicationInterface.Instance.rootFrame;
@@ -297,16 +301,24 @@ namespace WpfEditorTest
 
 	    private void Window_KeyDown(object sender, KeyEventArgs e)
 	    {
-	        if (e.Key == Key.Delete && _frameSelectionPanel.SelectedFrame != null)
+	        if (e.Key == Key.Delete)
 	        {
-	            var selected = _frameSelectionPanel.SelectedFrame;
-	            selected.Parent?.Remove(selected);
-
-                ResetSelectedFrame(new Point(0,0));
+				this.TryDeleteSelectedFrame();
 	        }
 	    }
 
-	    private void SelectFrame(Frame frame)
+		private void TryDeleteSelectedFrame()
+		{
+			if (_frameSelectionPanel.SelectedFrame != null)
+			{
+				var selected = _frameSelectionPanel.SelectedFrame;
+				selected.Parent?.Remove(selected);
+
+				ResetSelectedFrame(new Point(0, 0));
+			}
+		}
+
+		private void SelectFrame(Frame frame)
 	    {
             _details.SetSelectFrame(frame);
 			_treeView.SelectedFrame = frame;
@@ -337,6 +349,7 @@ namespace WpfEditorTest
 					_parentHighlightPanel.SelectedFrame = null;
 
 					LandFrameOnScene(_frameSelectionPanel.SelectedFrame, point);
+					SelectFrame(_frameSelectionPanel.SelectedFrame);
 					_frameSelectionPanel.UpdateSelectedFramePosition();
 				}
 			}
@@ -473,82 +486,21 @@ namespace WpfEditorTest
 	        TryLoadSceneAsTemplate();
 	    }
 
-        private void AlwaysCanExecute(object sender, CanExecuteRoutedEventArgs e)
+		private void ExecutedUndoChangeCommand( object sender, ExecutedRoutedEventArgs e )
+		{
+			CommandManager.Instance.TryUndoCommand();
+		}
+
+		private void ExecutedRedoChangeCommand( object sender, ExecutedRoutedEventArgs e )
+		{
+			CommandManager.Instance.TryRedoCommand();
+		}
+
+		private void AlwaysCanExecute(object sender, CanExecuteRoutedEventArgs e)
 	    {
 	        e.CanExecute = true;
 	    }
 
 	    #endregion
     }
-
-    public class Propsy : INotifyPropertyChanged
-	{
-		public Propsy( PropertyInfo prop, Frame obj )
-		{
-			Obj = obj;
-			PropName = prop.Name;
-			PropInfo = prop;
-			PropType = prop.PropertyType;
-			if (PropType.IsEnum)
-			{
-				EnumValues = Enum.GetValues(PropType).Cast<object>().ToList();
-			}
-
-			if (prop.PropertyType != typeof(string))
-			{
-			    //_prop = Activator.CreateInstance(prop.PropertyType);
-			    _prop = prop.GetValue(obj);
-			}
-			else
-			{
-				if (prop.GetValue(obj) != null)
-				{
-				    _prop = Activator.CreateInstance(prop.PropertyType, (prop.GetValue(obj) as string).ToCharArray());
-				}
-				else
-				{
-                    _prop = string.Empty;
-				}
-			}
-
-			Obj.PropertyChanged += (s, e) => {
-				if (e.PropertyName == PropName)
-				{
-					var val = PropInfo.GetValue(Obj);
-					if (!Prop.Equals(val))
-					{
-                        _prop = PropInfo.GetValue(Obj);
-					}
-				}
-			};
-		}
-
-		private object _prop;
-		public object Prop
-		{
-			get => _prop;
-		    set
-			{
-			    _prop = value;
-                var convertedValue = Convert.ChangeType(value, PropInfo.PropertyType);
-                PropInfo.SetValue(Obj, convertedValue);
-                OnPropertyChanged();
-			}
-		}
-
-	    public Frame Obj { get; set; }
-
-	    public PropertyInfo PropInfo { get; set; }
-	    public Type PropType { get; set; }
-		public string PropName { get; set; }
-
-	    public IList<object> EnumValues { get; set; }
-
-        public event PropertyChangedEventHandler PropertyChanged;
-
-		protected void OnPropertyChanged( [System.Runtime.CompilerServices.CallerMemberName] string changedProperty = "" )
-		{
-			PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(changedProperty));
-		}
-	}
 }

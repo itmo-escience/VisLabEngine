@@ -25,6 +25,7 @@ namespace WpfEditorTest.ChildPanels
         }
 
         public EventHandler<Frame> SelectedFrameChangedInUI;
+		public EventHandler RequestFrameDeletionInUI;
 
 		public FrameTreeView()
 		{
@@ -43,5 +44,13 @@ namespace WpfEditorTest.ChildPanels
 		{
 		    SelectedFrameChangedInUI?.Invoke(this, (Frame)(sender as TextBlock).Tag);
         }
+
+		private void Window_KeyDown( object sender, KeyEventArgs e )
+		{
+			if (e.Key == Key.Delete)
+			{
+				RequestFrameDeletionInUI?.Invoke(this,null);
+			}
+		}
 	}
 }

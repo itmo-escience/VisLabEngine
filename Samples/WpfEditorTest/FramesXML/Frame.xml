@@ -7,11 +7,12 @@
         <string>Fusion.Engine.Frames.Frame</string>
       </key>
       <value>
-        <string>Fusion, Version=0.2.6897.32711, Culture=neutral, PublicKeyToken=null</string>
+        <string>Fusion, Version=0.2.6912.28359, Culture=neutral, PublicKeyToken=null</string>
       </value>
     </item>
   </dictionary>
   <Frame xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <Name>Frame_1</Name>
     <Visible>true</Visible>
     <Ghost>false</Ghost>
     <Enabled>true</Enabled>
@@ -53,10 +54,10 @@
       <X>0</X>
       <Y>0</Y>
     </ShadowOffset>
-    <X>0</X>
-    <Y>0</Y>
-    <Width>100</Width>
-    <Height>100</Height>
+    <X>1145</X>
+    <Y>592</Y>
+    <Width>251</Width>
+    <Height>236</Height>
     <PaddingLeft>0</PaddingLeft>
     <PaddingRight>0</PaddingRight>
     <PaddingTop>0</PaddingTop>
