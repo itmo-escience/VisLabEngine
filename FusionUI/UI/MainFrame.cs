@@ -2,18 +2,13 @@
 using System.Runtime.Serialization;
 using System.Xml.Serialization;
 using Fusion.Core.Mathematics;
+using Fusion.Engine.Common;
 using Fusion.Engine.Frames;
 
 namespace FusionUI.UI
 {
-	public class MainFrame : ControllableFrame {
-		[XmlIgnore]
-		public FrameProcessor ui;
-
-		protected MainFrame()
-		{
-		}
-
+	public class MainFrame : ControllableFrame
+	{
 		public void Add(Frame frame)
         {
             frame.ZOrder = 1000;
@@ -37,20 +32,23 @@ namespace FusionUI.UI
             set { Height = (int)(value * ApplicationInterface.ScaleMod); }
         }
 
-        public MainFrame(FrameProcessor ui)
+        [Obsolete("Please use constructor without FrameProcessor")]
+	    public MainFrame(FrameProcessor ui) : this () { }
+
+        public MainFrame()
         {
             ApplicationInterface.Instance.rootFrame = this;
-            ui.RootFrame = this;
+            ApplicationInterface.Instance.FrameProcessor.RootFrame = this;
             X = 0;
             Y = 0;
-            Width = ui.Game.RenderSystem.DisplayBounds.Width;
-            Height = ui.Game.RenderSystem.DisplayBounds.Height;
+            Width = Game.Instance.RenderSystem.DisplayBounds.Width;
+            Height = Game.Instance.RenderSystem.DisplayBounds.Height;
+            BackColor = Color.Zero;
 
-            ui.Game.RenderSystem.DisplayBoundsChanged += (sender, args) => {
-                Width = ui.Game.RenderSystem.DisplayBounds.Width;
-                Height = ui.Game.RenderSystem.DisplayBounds.Height;
+            Game.Instance.RenderSystem.DisplayBoundsChanged += (sender, args) => {
+                Width = Game.Instance.RenderSystem.DisplayBounds.Width;
+                Height = Game.Instance.RenderSystem.DisplayBounds.Height;
             };
-            this.ui = ui;
             init ();
 
             AddMouseActions ();

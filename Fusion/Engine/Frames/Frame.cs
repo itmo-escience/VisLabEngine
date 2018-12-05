@@ -430,7 +430,7 @@ namespace Fusion.Engine.Frames
         /// <summary>
         /// Constructs basic frame
         /// </summary>
-        public Frame() : this(0, 0, 1, 1, "", Color.Black) { }
+        public Frame() : this(0, 0, 1, 1, "", Color.Zero) { }
 
 	    /// <summary>
 	    /// Constructs basic frame
@@ -1002,7 +1002,8 @@ namespace Fusion.Engine.Frames
 			spriteLayer.Draw(whiteTex, gx, gy + bt, bl, h - bt - bb, clr, clipRectIndex);
 			spriteLayer.Draw(whiteTex, gx + w - br, gy + bt, br, h - bt - bb, clr, clipRectIndex);
 
-			spriteLayer.Draw(whiteTex, GetBorderedRectangle(), BackColor, clipRectIndex);
+		    var rectangle = GetBorderedRectangle();
+		    spriteLayer.Draw(whiteTex, rectangle, BackColor, clipRectIndex);
 		}
 
 
@@ -1709,7 +1710,7 @@ namespace Fusion.Engine.Frames
 
 		public override string ToString()
 		{
-			return this.Text;
+			return Name;
 		}
 
 	    #region Naming
