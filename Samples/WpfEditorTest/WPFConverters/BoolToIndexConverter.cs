@@ -6,7 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Data;
 
-namespace WpfEditorTest
+namespace WpfEditorTest.WPFConverters
 {
     public class BoolToIndexConverter : IValueConverter
 	{

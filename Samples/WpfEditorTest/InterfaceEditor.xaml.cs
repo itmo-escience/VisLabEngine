@@ -19,6 +19,9 @@ using Frame = Fusion.Engine.Frames.Frame;
 using KeyEventArgs = System.Windows.Input.KeyEventArgs;
 using CommandManager = WpfEditorTest.UndoRedo.CommandManager;
 using WpfEditorTest.UndoRedo;
+using System.Windows.Media.Imaging;
+using Bitmap = System.Drawing.Bitmap;
+using System.Windows.Interop;
 
 namespace WpfEditorTest
 {
@@ -32,6 +35,9 @@ namespace WpfEditorTest
 	    public static RoutedCommand LoadSceneCmd = new RoutedCommand();
 		public static RoutedCommand RedoChangeCmd = new RoutedCommand();
 		public static RoutedCommand UndoChangeCmd = new RoutedCommand();
+		public static RoutedCommand CopyFrameCmd = new RoutedCommand();
+		public static RoutedCommand PasteFrameCmd = new RoutedCommand();
+
 
 		private int DeltaX = 0;
 		private int DeltaY = 0;
@@ -45,7 +51,6 @@ namespace WpfEditorTest
 		private readonly FrameTreeView _treeView;
 		private readonly FrameSelectionPanel _frameSelectionPanel;
 		private readonly ParentHighlightPanel _parentHighlightPanel;
-		private readonly List<IDraggablePanel> _panels = new List<IDraggablePanel>();
 
 	    public string TemplatesPath = Path.GetFullPath(Path.Combine(Directory.GetParent(Assembly.GetEntryAssembly().Location).FullName, "..\\..\\..\\FramesXML"));
 	    Binding childrenBinding;
@@ -84,7 +89,6 @@ namespace WpfEditorTest
 
 			_frameSelectionPanel = new FrameSelectionPanel(this);
 			LocalGrid.Children.Add(_frameSelectionPanel);
-			_panels.Add(_frameSelectionPanel);
 
 			_details = new FrameDetails();
             _treeView = new FrameTreeView();
@@ -123,7 +127,11 @@ namespace WpfEditorTest
                 Mode = BindingMode.OneWay
             };
             _treeView.ElementHierarchyView.SetBinding(TreeView.ItemsSourceProperty, b);
-        }
+
+			//UndoButton.DataContext = CommandManager.Instance.UndoStackIsNotEmpty;
+			//RedoButton.DataContext = CommandManager.Instance.RedoStackIsNotEmpty;
+
+		}
 
 	    protected override void OnSourceInitialized(EventArgs e)
 	    {
@@ -390,10 +398,10 @@ namespace WpfEditorTest
 					var command = new CommandGroup(
 						new FrameParentChangeCommand(_frameSelectionPanel.SelectedFrame, hoveredFrame, InitFrameParent),
 						new FramePropertyChangeCommand(_frameSelectionPanel.SelectedFrame, "X",
-						(int)point.X - hoveredFrame.GlobalRectangle.X - _frameSelectionPanel.SelectedFrame.Width / 2,
+						(int)point.X - hoveredFrame.GlobalRectangle.X - ((int)point.X-_frameSelectionPanel.SelectedFrame.GlobalRectangle.X),
 						(int)InitFramePosition.X),
 						new FramePropertyChangeCommand(_frameSelectionPanel.SelectedFrame, "Y",
-						(int)point.Y - hoveredFrame.GlobalRectangle.Y - _frameSelectionPanel.SelectedFrame.Height / 2,
+						(int)point.Y - hoveredFrame.GlobalRectangle.Y - ((int)point.Y - _frameSelectionPanel.SelectedFrame.GlobalRectangle.Y),
 						(int)InitFramePosition.Y)
 					);
 					CommandManager.Instance.Execute(command);
@@ -554,11 +562,62 @@ namespace WpfEditorTest
 			CommandManager.Instance.TryRedoCommand();
 		}
 
+		private void ExecutedCopyFrameCommand( object sender, ExecutedRoutedEventArgs e )
+		{
+			var selectedFrame = _frameSelectionPanel.SelectedFrame;
+			if (selectedFrame!=null)
+			{
+				//var xmlFrame = Fusion.Core.Utils.FrameSerializer.WriteToString(selectedFrame);
+				//Clipboard.SetData(DataFormats.Text, (Object)xmlFrame); 
+				var upperLeft = this.PointToScreen(new Point(selectedFrame.X, selectedFrame.Y));
+				var lowerRight = this.PointToScreen(new Point(selectedFrame.X+ selectedFrame.Width, selectedFrame.Y+ selectedFrame.Height));
+				_frameSelectionPanel.Visibility = Visibility.Collapsed;
+				_frameSelectionPanel.UpdateLayout();
+
+				var img = this.CopyScreen(
+					(int)upperLeft.X,
+					(int)upperLeft.Y + (int)SystemParameters.WindowCaptionHeight + 9,
+					(int)lowerRight.X,
+					(int)lowerRight.Y + (int)SystemParameters.WindowCaptionHeight + 9
+					);
+				_frameSelectionPanel.Visibility = Visibility.Visible;
+				_frameSelectionPanel.UpdateLayout();
+				Clipboard.SetData(DataFormats.Bitmap, (Object)img);
+			}
+
+		}
+
+		private void ExecutedPasteFrameCmdCommand( object sender, ExecutedRoutedEventArgs e )
+		{
+			var t = 0;
+		}
+
 		private void AlwaysCanExecute(object sender, CanExecuteRoutedEventArgs e)
 	    {
 	        e.CanExecute = true;
 	    }
 
-	    #endregion
-    }
+		#endregion
+
+		#region ImageDrawing
+		private BitmapSource CopyScreen( int left, int top, int right, int bottom )
+		{
+			using (var screenBmp = new Bitmap(
+				right - left,
+				bottom - top
+				))
+			{
+				using (var bmpGraphics = System.Drawing.Graphics.FromImage(screenBmp))
+				{
+					bmpGraphics.CopyFromScreen(left, top, 0, 0, screenBmp.Size);
+					return Imaging.CreateBitmapSourceFromHBitmap(
+						screenBmp.GetHbitmap(),
+						IntPtr.Zero,
+						Int32Rect.Empty,
+						BitmapSizeOptions.FromEmptyOptions());
+				}
+			}
+		}
+		#endregion
+	}
 }

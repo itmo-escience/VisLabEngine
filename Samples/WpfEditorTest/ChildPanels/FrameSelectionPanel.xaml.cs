@@ -6,13 +6,15 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
+using WpfEditorTest.UndoRedo;
+using CommandManager = WpfEditorTest.UndoRedo.CommandManager;
 
 namespace WpfEditorTest.ChildPanels
 {
 	/// <summary>
 	/// Interaction logic for SelectedFramePanel.xaml
 	/// </summary>
-	public partial class FrameSelectionPanel : UserControl, IDraggablePanel
+	public partial class FrameSelectionPanel : UserControl
 	{
 		private Fusion.Engine.Frames.Frame _selectedFrame;
 		private double _widthBuffer;
@@ -97,8 +99,8 @@ namespace WpfEditorTest.ChildPanels
 					}
 				case "Parent":
 					{
-						if (_selectedFrame.Parent == null)
-							RequestFrameSelectionReset?.Invoke(this, null);
+						//if (_selectedFrame.Parent == null)
+							//RequestFrameSelectionReset?.Invoke(this, null);
 						break;
 					}
 			}
@@ -307,7 +309,9 @@ namespace WpfEditorTest.ChildPanels
 		private void Drag_MouseRightButtonDown( object sender, MouseButtonEventArgs e )
 		{
 			FrameAnchor changedAnchor = (FrameAnchor)Enum.Parse(typeof(FrameAnchor), (sender as Border).Tag as string);
-			_selectedFrame.Anchor ^= changedAnchor;
+			var initialAnchor = _selectedFrame.Anchor;
+			var command = new FramePropertyChangeCommand(_selectedFrame, "Anchor", initialAnchor ^= changedAnchor);
+			CommandManager.Instance.Execute(command);
 			this.UpdateVisualAnchors(_selectedFrame.Anchor);
 		}
 	}

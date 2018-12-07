@@ -41,6 +41,7 @@
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Data" />
+    <Reference Include="System.Drawing" />
     <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml" />
     <Reference Include="Microsoft.CSharp" />
@@ -78,7 +79,7 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
-    <Compile Include="BoolToIndexConverter.cs" />
+    <Compile Include="WPFConverters\BoolToIndexConverter.cs" />
     <Compile Include="ChildPanels\FrameDetails.xaml.cs">
       <DependentUpon>FrameDetails.xaml</DependentUpon>
     </Compile>
@@ -88,20 +89,18 @@
     <Compile Include="ChildPanels\FrameTreeView.xaml.cs">
       <DependentUpon>FrameTreeView.xaml</DependentUpon>
     </Compile>
-    <Compile Include="ChildPanels\IDraggablePanel.cs" />
     <Compile Include="ChildPanels\FrameSelectionPanel.xaml.cs">
       <DependentUpon>FrameSelectionPanel.xaml</DependentUpon>
     </Compile>
     <Compile Include="ChildPanels\ParentHighlightPanel.xaml.cs">
       <DependentUpon>ParentHighlightPanel.xaml</DependentUpon>
     </Compile>
-    <Compile Include="DataTemplateSelectorOfProperty.cs" />
+    <Compile Include="WPFConverters\ButtonEnableConverter.cs" />
+    <Compile Include="WPFConverters\DataTemplateSelectorOfProperty.cs" />
     <Compile Include="Extentions.cs" />
-    <Compile Include="FlagValueConverter.cs" />
     <Compile Include="UndoRedo\FrameParentChangeCommand.cs" />
-    <Compile Include="FramePropertyHolder.cs" />
     <Compile Include="Property.cs" />
-    <Compile Include="PropertyValueConverter.cs" />
+    <Compile Include="WPFConverters\PropertyValueConverter.cs" />
     <Compile Include="StaticData.cs" />
     <Compile Include="UndoRedo\CommandGroup.cs" />
     <Compile Include="UndoRedo\CommandManager.cs" />
