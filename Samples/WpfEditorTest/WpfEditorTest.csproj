@@ -98,6 +98,7 @@
     <Compile Include="DataTemplateSelectorOfProperty.cs" />
     <Compile Include="Extentions.cs" />
     <Compile Include="FlagValueConverter.cs" />
+    <Compile Include="UndoRedo\FrameParentChangeCommand.cs" />
     <Compile Include="FramePropertyHolder.cs" />
     <Compile Include="Property.cs" />
     <Compile Include="PropertyValueConverter.cs" />

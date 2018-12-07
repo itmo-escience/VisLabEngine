@@ -46,7 +46,8 @@ namespace WpfEditorTest
 					var val = PropInfo.GetValue(Obj);
 					if (!Prop.Equals(val))
 					{
-						Prop = PropInfo.GetValue(Obj);
+						_prop = PropInfo.GetValue(Obj);
+						OnPropertyChanged(nameof(Prop));
 					}
 				}
 			};
@@ -58,11 +59,11 @@ namespace WpfEditorTest
 			get => _prop;
 			set
 			{
-				_prop = value;
 				var convertedValue = Convert.ChangeType(value, PropInfo.PropertyType);
 				//PropInfo.SetValue(Obj, convertedValue);
-				var command = new FramePropertyChangeCommand(Obj,PropName,value);
+				var command = new FramePropertyChangeCommand(Obj, PropName, value);
 				CommandManager.Instance.Execute(command);
+
 				OnPropertyChanged();
 			}
 		}
