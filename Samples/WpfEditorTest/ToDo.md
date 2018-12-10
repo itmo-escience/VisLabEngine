@@ -65,6 +65,7 @@
   - [x] Реализация стека команд 
   - [x] Ctrl+Z/Ctrl+Y keybindings
   - [ ] Disable buttons when action is not possible
+- [ ] Tooltip для всех кнопок в панели меню
 ---
 ### РЕФАКТОРИНГ ВСЕЕЕЕЕЕХ ФРЕЙМОВ ДО ЕДИНОГО!!!!!!
 - Очиста базового класса Frame от лишних "сущностей"
