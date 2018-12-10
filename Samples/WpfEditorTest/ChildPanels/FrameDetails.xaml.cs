@@ -1,6 +1,9 @@
-﻿using System.Linq;
+﻿using System;
+using System.Configuration;
+using System.Linq;
 using System.Reflection;
 using System.Windows;
+using System.Windows.Media;
 using Fusion.Engine.Frames;
 
 namespace WpfEditorTest.ChildPanels
@@ -15,10 +18,14 @@ namespace WpfEditorTest.ChildPanels
 			InitializeComponent();
 			Height = StaticData.OptionsWindowSize; Width = StaticData.OptionsWindowSize;
 
+			Left = int.Parse(ConfigurationManager.AppSettings.Get("DetailsPanelX"));
+			Top = int.Parse(ConfigurationManager.AppSettings.Get("DetailsPanelY"));
+			Visibility = (Visibility)Enum.Parse(typeof(Visibility), ConfigurationManager.AppSettings.Get("DetailsPanelVisibility"));
+
 			HorizontalAlignment = HorizontalAlignment.Right;
 			VerticalAlignment = VerticalAlignment.Center;
 
-            Closing += (s, e) => e.Cancel = true;
+            Closing += (s, e) => {Visibility= Visibility.Collapsed; e.Cancel = true; };
 		}
 
 	    public void SetSelectFrame(Frame frame)

@@ -14,7 +14,7 @@
         Width="800" Height="600"
         MinWidth="400" MinHeight="300"
         WindowStartupLocation="CenterScreen"
-        KeyDown="Window_KeyDown">
+        KeyDown="Window_KeyDown" Closing="Window_Closing">
     <Window.Resources>
         <conv:ButtonEnableConverter x:Key="btnEnableConverter"/>
     </Window.Resources>
@@ -55,14 +55,22 @@
         </Grid.RowDefinitions>
         <ToolBarTray Grid.Row="0" IsLocked="True" >
             <ToolBar>
-                <Button Command="{x:Static local:InterfaceEditor.SaveSceneCmd}" Content="Save scene" />
-                <Button Command="{x:Static local:InterfaceEditor.LoadSceneCmd}" Content="Load scene" />
-                <Button Command="{x:Static local:InterfaceEditor.SaveFrameCmd}" Content="Save frame" />
+                <Button Command="{x:Static local:InterfaceEditor.SaveSceneCmd}" Content="Save scene" ToolTip="Save scene to file..."/>
+                <Button Command="{x:Static local:InterfaceEditor.LoadSceneCmd}" Content="Load scene" ToolTip="Load scene rom file..."/>
+                <Button Command="{x:Static local:InterfaceEditor.SaveFrameCmd}" Content="Save frame" ToolTip="Save selected frame as template..."/>
 
-                <Button Name="UndoButton" Command="{x:Static local:InterfaceEditor.UndoChangeCmd}" Content="Undo change"
-                        IsEnabled="{Binding}"/>
-                <Button Name="RedoButton" Command="{x:Static local:InterfaceEditor.RedoChangeCmd}" Content="Redo change" 
-                        IsEnabled="{Binding}"/>
+                <Button Name="UndoButton" Command="{x:Static local:InterfaceEditor.UndoChangeCmd}" Content="Undo change" ToolTip="Revert last change to frame"
+                        IsEnabled="False"/>
+                <Button Name="RedoButton" Command="{x:Static local:InterfaceEditor.RedoChangeCmd}" Content="Redo change" ToolTip="Repeat reverted change to frame"
+                        IsEnabled="False"/>
+
+                <Menu>
+                    <MenuItem Header="Windows">
+                        <MenuItem Name="miFrameProperties" Header="Frame Properties" Click="MenuItem_Click"/>
+                        <MenuItem Name="miSceneTreeView" Header="Scene TreeView" Click="MenuItem_Click"/>
+                        <MenuItem Name="miFrameTemplates" Header="Frame Templates" Click="MenuItem_Click"/>
+                    </MenuItem>
+                </Menu>
             </ToolBar>
         </ToolBarTray>
         <Grid Grid.Row="1" Name="LocalGrid"

@@ -22,6 +22,7 @@ using WpfEditorTest.UndoRedo;
 using System.Windows.Media.Imaging;
 using Bitmap = System.Drawing.Bitmap;
 using System.Windows.Interop;
+using System.Configuration;
 
 namespace WpfEditorTest
 {
@@ -94,7 +95,12 @@ namespace WpfEditorTest
             _treeView = new FrameTreeView();
             _palette = new FramePalette();
 
-            SourceInitialized += (_, args) =>
+			miFrameProperties.Tag = _details;
+			miFrameTemplates.Tag = _palette;
+			miSceneTreeView.Tag = _treeView;
+
+
+			SourceInitialized += (_, args) =>
             {
                 _details.Owner = this;
                 _details.Show();
@@ -128,8 +134,10 @@ namespace WpfEditorTest
             };
             _treeView.ElementHierarchyView.SetBinding(TreeView.ItemsSourceProperty, b);
 
-			//UndoButton.DataContext = CommandManager.Instance.UndoStackIsNotEmpty;
-			//RedoButton.DataContext = CommandManager.Instance.RedoStackIsNotEmpty;
+			CommandManager.Instance.PropertyChanged += ( s, e ) => {
+				UndoButton.IsEnabled = CommandManager.Instance.UndoStackIsNotEmpty;
+				RedoButton.IsEnabled = CommandManager.Instance.RedoStackIsNotEmpty;
+			};
 
 		}
 
@@ -619,5 +627,30 @@ namespace WpfEditorTest
 			}
 		}
 		#endregion
+
+		private void Window_Closing( object sender, CancelEventArgs e )
+		{
+			var configFile = ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.None);
+			var settings = configFile.AppSettings.Settings;
+			settings["DetailsPanelX"].Value = _details.Left.ToString();
+			settings["DetailsPanelY"].Value = _details.Top.ToString();
+			settings["TreeViewPanelX"].Value = _treeView.Left.ToString();
+			settings["TreeViewPanelY"].Value = _treeView.Top.ToString();
+			settings["PalettePanelX"].Value = _palette.Left.ToString();
+			settings["PalettePanelY"].Value = _palette.Top.ToString();
+			settings["DetailsPanelVisibility"].Value = _details.Visibility.ToString();
+			settings["PalettePanelVisibility"].Value = _palette.Visibility.ToString();
+			settings["TreeViewPanelVisibility"].Value = _treeView.Visibility.ToString();
+
+			configFile.Save(ConfigurationSaveMode.Modified);
+			ConfigurationManager.RefreshSection(configFile.AppSettings.SectionInformation.Name);
+		}
+
+		private void MenuItem_Click( object sender, RoutedEventArgs e )
+		{
+			Window panel = (sender as MenuItem).Tag as Window;
+			panel.Visibility = Visibility.Visible;
+			panel.Focus();
+		}
 	}
 }
