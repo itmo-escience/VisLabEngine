@@ -529,7 +529,7 @@ namespace Fusion.Engine.Frames
 				}
 				ReorderChildren();
 				frame.parent = this;
-
+				frame.OnPropertyChanged("Parent");
 				frame.OnStatusChanged(FrameStatus.None);
 				OnPropertyChanged("Children");
 			}
@@ -550,6 +550,7 @@ namespace Fusion.Engine.Frames
 			foreach (var child in Children)
 			{
 				child.parent = this;
+				child.OnPropertyChanged("Parent");
 				child.RestoreParents();
 			}
 		}
@@ -576,6 +577,7 @@ namespace Fusion.Engine.Frames
 			foreach (var child in children)
 			{
 				child.parent = null;
+				child.OnPropertyChanged("Parent");
 			}
 			children.Clear();
 			OnPropertyChanged("Children");
@@ -593,6 +595,7 @@ namespace Fusion.Engine.Frames
 			{
 				children.Insert(index, frame);
 				frame.parent = this;
+				frame.OnPropertyChanged("Parent");
 				frame.OnStatusChanged(FrameStatus.None);
 				OnPropertyChanged("Children");
 			}
@@ -610,6 +613,7 @@ namespace Fusion.Engine.Frames
 			{
 				this.children.Remove(frame);
 				frame.parent = null;
+				frame.OnPropertyChanged("Parent");
 				OnPropertyChanged("Children");
 			}
 		}

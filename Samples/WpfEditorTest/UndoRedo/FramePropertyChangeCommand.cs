@@ -23,6 +23,11 @@ namespace WpfEditorTest.UndoRedo
 			_previousValue = _propertyToChange.GetValue(_frame);
 		}
 
+		public FramePropertyChangeCommand( Frame frame, string propertyName, object valueToSet, object forcedPreviousValue ) : this(frame, propertyName, valueToSet)
+		{
+			_previousValue = forcedPreviousValue;
+		}
+
 		public void Do()
 		{
 			_propertyToChange.SetValue(_frame, _valueToSet);

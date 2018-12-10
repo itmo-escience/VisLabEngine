@@ -8,6 +8,7 @@
         xmlns:system ="clr-namespace:System;assembly=mscorlib"
         xmlns:math ="clr-namespace:Fusion.Core.Mathematics;assembly=Fusion"
         xmlns:panels ="clr-namespace:WpfEditorTest.ChildPanels"
+        xmlns:conv="clr-namespace:WpfEditorTest.WPFConverters"
         mc:Ignorable="d"
         Title="InterfaceEditor"
         Width="800" Height="600"
@@ -15,7 +16,7 @@
         WindowStartupLocation="CenterScreen"
         KeyDown="Window_KeyDown">
     <Window.Resources>
-        <local:PropertyValueConverter x:Key="propValueConverter" />
+        <conv:ButtonEnableConverter x:Key="btnEnableConverter"/>
     </Window.Resources>
     <Window.CommandBindings>
         <CommandBinding Command="{x:Static local:InterfaceEditor.LoadSceneCmd}"
@@ -33,7 +34,20 @@
         <CommandBinding Command="{x:Static local:InterfaceEditor.UndoChangeCmd}"
                         Executed="ExecutedUndoChangeCommand"
                         CanExecute="AlwaysCanExecute" />
+        <CommandBinding Command="{x:Static local:InterfaceEditor.CopyFrameCmd}"
+                        Executed="ExecutedCopyFrameCommand"
+                        CanExecute="AlwaysCanExecute" />
+        <CommandBinding Command="{x:Static local:InterfaceEditor.PasteFrameCmd}"
+                        Executed="ExecutedPasteFrameCmdCommand"
+                        CanExecute="AlwaysCanExecute" />
     </Window.CommandBindings>
+    <Window.InputBindings>
+        <KeyBinding Command="{x:Static local:InterfaceEditor.UndoChangeCmd}" Key="Z" Modifiers="Ctrl"/>
+        <KeyBinding Command="{x:Static local:InterfaceEditor.RedoChangeCmd}" Key="Y" Modifiers="Ctrl"/>
+        <KeyBinding Command="{x:Static local:InterfaceEditor.SaveSceneCmd}" Key="S" Modifiers="Ctrl+Shift"/>
+        <KeyBinding Command="{x:Static local:InterfaceEditor.CopyFrameCmd}" Key="C" Modifiers="Ctrl"/>
+        <KeyBinding Command="{x:Static local:InterfaceEditor.PasteFrameCmd}" Key="V" Modifiers="Ctrl"/>
+    </Window.InputBindings>
     <Grid MaxWidth="10000" MaxHeight="10000">
         <Grid.RowDefinitions>
             <RowDefinition Height="32"/>
@@ -45,8 +59,10 @@
                 <Button Command="{x:Static local:InterfaceEditor.LoadSceneCmd}" Content="Load scene" />
                 <Button Command="{x:Static local:InterfaceEditor.SaveFrameCmd}" Content="Save frame" />
 
-                <Button Command="{x:Static local:InterfaceEditor.UndoChangeCmd}" Content="Undo change" />
-                <Button Command="{x:Static local:InterfaceEditor.RedoChangeCmd}" Content="Redo change" />
+                <Button Name="UndoButton" Command="{x:Static local:InterfaceEditor.UndoChangeCmd}" Content="Undo change"
+                        IsEnabled="{Binding}"/>
+                <Button Name="RedoButton" Command="{x:Static local:InterfaceEditor.RedoChangeCmd}" Content="Redo change" 
+                        IsEnabled="{Binding}"/>
             </ToolBar>
         </ToolBarTray>
         <Grid Grid.Row="1" Name="LocalGrid"

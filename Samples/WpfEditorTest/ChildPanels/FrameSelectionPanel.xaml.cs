@@ -6,13 +6,15 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
+using WpfEditorTest.UndoRedo;
+using CommandManager = WpfEditorTest.UndoRedo.CommandManager;
 
 namespace WpfEditorTest.ChildPanels
 {
 	/// <summary>
 	/// Interaction logic for SelectedFramePanel.xaml
 	/// </summary>
-	public partial class FrameSelectionPanel : UserControl, IDraggablePanel
+	public partial class FrameSelectionPanel : UserControl
 	{
 		private Fusion.Engine.Frames.Frame _selectedFrame;
 		private double _widthBuffer;
@@ -22,6 +24,8 @@ namespace WpfEditorTest.ChildPanels
 		private double _oldY;
 		private bool _locked = false;
 		private bool _isMoved;
+
+		public EventHandler RequestFrameSelectionReset;
 
 		public Fusion.Engine.Frames.Frame SelectedFrame
 		{
@@ -63,11 +67,13 @@ namespace WpfEditorTest.ChildPanels
 			switch (args.PropertyName)
 			{
 				case "Width":
+				case "UnitWidth":
 					{
 						WidthBuffer = _selectedFrame.Width;
 						break;
 					}
 				case "Height":
+				case "UnitHeight":
 					{
 						HeightBuffer = _selectedFrame.Height;
 						break;
@@ -89,6 +95,12 @@ namespace WpfEditorTest.ChildPanels
 				case "Anchor":
 					{
 						UpdateVisualAnchors(_selectedFrame.Anchor);
+						break;
+					}
+				case "Parent":
+					{
+						//if (_selectedFrame.Parent == null)
+							//RequestFrameSelectionReset?.Invoke(this, null);
 						break;
 					}
 			}
@@ -129,6 +141,8 @@ namespace WpfEditorTest.ChildPanels
 			}
 		}
 		public Border CurrentDrag { get; set; }
+		public Size SelectedFrameInitSize { get; private set; }
+		public Point SelectedFrameInitPosition { get; private set; }
 		public bool DragMousePressed { get; set; }
 		public InterfaceEditor Window { get; set; }
 		public List<Border> Drags { get; private set; }
@@ -285,6 +299,8 @@ namespace WpfEditorTest.ChildPanels
 			e.Handled = true;
 
 			CurrentDrag = sender as Border;
+			SelectedFrameInitSize = new Size(SelectedFrame.Width,SelectedFrame.Height);
+			SelectedFrameInitPosition = new Point(SelectedFrame.X, SelectedFrame.Y);
 			DragMousePressed = true;
 			PreviousMouseLocation = e.MouseDevice.GetPosition(Window);
 			PreviousDragTransform = CurrentDrag.RenderTransform;
@@ -293,7 +309,9 @@ namespace WpfEditorTest.ChildPanels
 		private void Drag_MouseRightButtonDown( object sender, MouseButtonEventArgs e )
 		{
 			FrameAnchor changedAnchor = (FrameAnchor)Enum.Parse(typeof(FrameAnchor), (sender as Border).Tag as string);
-			_selectedFrame.Anchor ^= changedAnchor;
+			var initialAnchor = _selectedFrame.Anchor;
+			var command = new FramePropertyChangeCommand(_selectedFrame, "Anchor", initialAnchor ^= changedAnchor);
+			CommandManager.Instance.Execute(command);
 			this.UpdateVisualAnchors(_selectedFrame.Anchor);
 		}
 	}

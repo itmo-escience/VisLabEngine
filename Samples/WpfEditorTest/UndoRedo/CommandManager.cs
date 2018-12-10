@@ -14,6 +14,9 @@ namespace WpfEditorTest.UndoRedo
 		private Stack<IEditorCommand> _doCommands = new Stack<IEditorCommand>();
 		private Stack<IEditorCommand> _undoCommands = new Stack<IEditorCommand>();
 
+		public bool UndoStackIsNotEmpty { get { return _undoCommands.Count > 0; } }
+		public bool RedoStackIsNotEmpty { get { return _doCommands.Count > 0; } }
+
 		public bool TryUndoCommand()
 		{
 			if (_undoCommands.Count==0)

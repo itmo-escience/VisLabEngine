@@ -4,7 +4,7 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:local="clr-namespace:WpfEditorTest.ChildPanels"
-             xmlns:conv="clr-namespace:WpfEditorTest"
+             xmlns:conv="clr-namespace:WpfEditorTest.WPFConverters"
              xmlns:system ="clr-namespace:System;assembly=mscorlib"
              xmlns:math ="clr-namespace:Fusion.Core.Mathematics;assembly=Fusion"
              xmlns:frames ="clr-namespace:Fusion.Engine.Frames;assembly=Fusion"
@@ -20,7 +20,6 @@
         MaxWidth="350" MaxHeight="950">
     <Window.Resources>
         <conv:PropertyValueConverter x:Key="propValueConverter"/>
-        <conv:FlagEnumConverter x:Key="flagEnumConverter"/>
         <conv:DataTemplateSelectorOfProperty x:Key="propTemplateSelector"/>
         <conv:BoolToIndexConverter x:Key="boolToIndexConverter" />
 
