@@ -15,7 +15,7 @@ using Fusion.Core.Shell;
 
 namespace Fusion.Drivers.Graphics {
 
-	internal class GraphicsParameters {
+	public class GraphicsParameters {
 
 		/// <summary>
 		/// Enables debug graphics device.
@@ -48,18 +48,18 @@ namespace Fusion.Drivers.Graphics {
 		public InterlacingMode	InterlacingMode		{ get; set; }
 
 		/// <summary>
-		/// 
+		///
 		/// </summary>
 		public GraphicsProfile	GraphicsProfile		{ get; set; }
 
 		/// <summary>
-		/// 
+		///
 		/// </summary>
 		public int MsaaLevel { get; set; }
 
 
 		/// <summary>
-		/// 
+		///
 		/// </summary>
 		public GraphicsParameters()
 		{
@@ -68,7 +68,7 @@ namespace Fusion.Drivers.Graphics {
 
 
 		/// <summary>
-		/// 
+		///
 		/// </summary>
 		void SetDefault ()
 		{

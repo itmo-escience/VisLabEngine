@@ -32,7 +32,7 @@ namespace Fusion.Drivers.Graphics.Display {
 
 
 		/// <summary>
-		/// 
+		///
 		/// </summary>
 		/// <param name="parameters"></param>
 		public NV3DVisionDisplay( Game game, GraphicsDevice device, GraphicsParameters parameters ) : base( game, device, parameters )
@@ -41,7 +41,7 @@ namespace Fusion.Drivers.Graphics.Display {
 
 			//
 			//	Init NV API and enable stereo :
-			//	
+			//
 			NvApi.Initialize();
 			NvApi.Stereo_Enable();
 			NvApi.Stereo_SetDriverMode( NvStereoDriverMode.Direct );
@@ -49,7 +49,7 @@ namespace Fusion.Drivers.Graphics.Display {
 
 			//
 			//	Create main window
-			//	
+			//
 			window	=	CreateForm( parameters, null );
 
 
@@ -58,7 +58,7 @@ namespace Fusion.Drivers.Graphics.Display {
 
 			var driverType			=	DriverType.Hardware;
 
-			var featureLevel	=	HardwareProfileChecker.GetFeatureLevel( parameters.GraphicsProfile ); 
+			var featureLevel	=	HardwareProfileChecker.GetFeatureLevel( parameters.GraphicsProfile );
 
 
 			swapChainDesc = new SwapChainDescription () {
@@ -107,9 +107,9 @@ namespace Fusion.Drivers.Graphics.Display {
 
 
 		/// <summary>
-		/// 
+		///
 		/// </summary>
-		public override void CreateDisplayResources ()
+		internal override void CreateDisplayResources ()
 		{
 			base.CreateDisplayResources();
 
@@ -120,7 +120,7 @@ namespace Fusion.Drivers.Graphics.Display {
 
 
 		/// <summary>
-		/// 
+		///
 		/// </summary>
 		public override void Update ()
 		{
@@ -143,12 +143,12 @@ namespace Fusion.Drivers.Graphics.Display {
 
 
 		/// <summary>
-		/// 
+		///
 		/// </summary>
 		/// <param name="disposing"></param>
 		protected override void Dispose ( bool disposing )
 		{
-			if (disposing) {				   
+			if (disposing) {
 				NvApi.Stereo_Deactivate( stereoHandle );
 				NvApi.Stereo_DestroyHandle( stereoHandle );
 
@@ -162,7 +162,7 @@ namespace Fusion.Drivers.Graphics.Display {
 
 
 		/// <summary>
-		/// 
+		///
 		/// </summary>
 		public override void Prepare ()
 		{
@@ -171,7 +171,7 @@ namespace Fusion.Drivers.Graphics.Display {
 
 
 		/// <summary>
-		/// 
+		///
 		/// </summary>
 		/// <param name="syncInterval"></param>
 		public override void SwapBuffers( int syncInterval )
@@ -191,7 +191,7 @@ namespace Fusion.Drivers.Graphics.Display {
 			get	{
 				return fullscr;
 			}
-			set {
+			internal set {
 				if (value!=fullscr) {
 					fullscr = value;
 					swapChain.SetFullscreenState( value, null );
@@ -204,11 +204,11 @@ namespace Fusion.Drivers.Graphics.Display {
 
 
 		/// <summary>
-		/// 
+		///
 		/// </summary>
 		public override Rectangle Bounds
 		{
-			get { 
+			get {
 				return new Rectangle( 0, 0, window.ClientSize.Width, window.ClientSize.Height );
 			}
 		}
@@ -216,7 +216,7 @@ namespace Fusion.Drivers.Graphics.Display {
 
 
 		/// <summary>
-		/// 
+		///
 		/// </summary>
 		public override Form Window
 		{
@@ -234,7 +234,7 @@ namespace Fusion.Drivers.Graphics.Display {
 			get {
 				return targetEye;
 			}
-			set {
+			internal set {
 				targetEye = value;
 				if (targetEye==StereoEye.Mono) NvApi.Stereo_SetActiveEye( stereoHandle, NvStereoActiveEye.Mono ); else
 				if (targetEye==StereoEye.Left) NvApi.Stereo_SetActiveEye( stereoHandle, NvStereoActiveEye.Left ); else
@@ -242,7 +242,7 @@ namespace Fusion.Drivers.Graphics.Display {
 					throw new ArgumentException("value");
 			}
 		}
-		
+
 
 		/// <summary>
 		/// List of stereo eye to render.
@@ -254,7 +254,7 @@ namespace Fusion.Drivers.Graphics.Display {
 
 
 		/// <summary>
-		/// 
+		///
 		/// </summary>
 		public override RenderTarget2D	BackbufferColor {
 			get { return backbufferColor; }
@@ -263,15 +263,10 @@ namespace Fusion.Drivers.Graphics.Display {
 
 
 		/// <summary>
-		/// 
+		///
 		/// </summary>
 		public override DepthStencil2D	BackbufferDepth {
 			get { return backbufferDepth; }
 		}
-
-
-
-
-
 	}
 }

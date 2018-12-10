@@ -36,7 +36,7 @@ namespace Fusion.Drivers.Graphics.Display {
 
 
 		/// <summary>
-		/// 
+		///
 		/// </summary>
 		/// <param name="parameters"></param>
 		public StereoInterlacedDisplay( Game game, GraphicsDevice device, GraphicsParameters parameters ) : base( game, device, parameters )
@@ -57,7 +57,7 @@ namespace Fusion.Drivers.Graphics.Display {
 
 			var driverType			=	DriverType.Hardware;
 
-			var featureLevel	=	HardwareProfileChecker.GetFeatureLevel( parameters.GraphicsProfile ); 
+			var featureLevel	=	HardwareProfileChecker.GetFeatureLevel( parameters.GraphicsProfile );
 
 
 			swapChainDesc = new SwapChainDescription () {
@@ -85,10 +85,10 @@ namespace Fusion.Drivers.Graphics.Display {
 
 
 
-		/// <summary>
-		/// 
-		/// </summary>
-		public override void CreateDisplayResources ()
+        /// <summary>
+        ///
+        /// </summary>
+        internal override void CreateDisplayResources ()
 		{
 			base.CreateDisplayResources();
 
@@ -112,7 +112,7 @@ namespace Fusion.Drivers.Graphics.Display {
 
 
 		/// <summary>
-		/// 
+		///
 		/// </summary>
 		public override void Update ()
 		{
@@ -141,7 +141,7 @@ namespace Fusion.Drivers.Graphics.Display {
 
 
 		/// <summary>
-		/// 
+		///
 		/// </summary>
 		/// <param name="disposing"></param>
 		protected override void Dispose ( bool disposing )
@@ -164,7 +164,7 @@ namespace Fusion.Drivers.Graphics.Display {
 
 
 		/// <summary>
-		/// 
+		///
 		/// </summary>
 		public override void Prepare ()
 		{
@@ -173,7 +173,7 @@ namespace Fusion.Drivers.Graphics.Display {
 
 
 		/// <summary>
-		/// 
+		///
 		/// </summary>
 		/// <param name="syncInterval"></param>
 		public override void SwapBuffers( int syncInterval )
@@ -183,7 +183,7 @@ namespace Fusion.Drivers.Graphics.Display {
 			var location	=	window.ClientRectangle.Location;
 
 			var interlacingMode	=	InterlacingMode.VerticalLR;
-			
+
 			if (location.X%2==0) {
 				if (interlacingMode==InterlacingMode.VerticalLR)   flag = Flags.VERTICAL_LR;
 				if (interlacingMode==InterlacingMode.VerticalRL)   flag = Flags.VERTICAL_RL;
@@ -199,7 +199,7 @@ namespace Fusion.Drivers.Graphics.Display {
 				if (interlacingMode==InterlacingMode.HorizontalLR) flag = Flags.HORIZONTAL_RL;
 				if (interlacingMode==InterlacingMode.HorizontalRL) flag = Flags.HORIZONTAL_LR;
 			}
-			
+
 			MergeStereoBuffers( backbufferColor1, backbufferColor2, backbufferColor1Resolved, backbufferColor2Resolved, backbufferColor, flag );
 
 			swapChain.Present( syncInterval, PresentFlags.None );
@@ -217,7 +217,8 @@ namespace Fusion.Drivers.Graphics.Display {
 			get	{
 				return fullscr;
 			}
-			set {
+		    internal set
+            {
 				if (value!=fullscr) {
 					fullscr = value;
 					window.Invoke( changeFullscreen, window, fullscr );
@@ -228,11 +229,11 @@ namespace Fusion.Drivers.Graphics.Display {
 
 
 		/// <summary>
-		/// 
+		///
 		/// </summary>
 		public override Rectangle Bounds
 		{
-			get { 
+			get {
 				return new Rectangle( 0, 0, window.ClientSize.Width, window.ClientSize.Height );
 			}
 		}
@@ -242,19 +243,19 @@ namespace Fusion.Drivers.Graphics.Display {
 
 
 		/// <summary>
-		/// 
+		///
 		/// </summary>
 		public override Form Window
 		{
 			get { return window; }
 		}
 
-		
+
 		/// <summary>
-		/// 
+		///
 		/// </summary>
 		public override StereoEye TargetEye {
-			get; set;
+			get; internal set;
 		}
 
 
@@ -268,14 +269,14 @@ namespace Fusion.Drivers.Graphics.Display {
 
 
 		/// <summary>
-		/// 
+		///
 		/// </summary>
 		public override RenderTarget2D	BackbufferColor {
-			get { 
+			get {
 				if (TargetEye==StereoEye.Left) {
-					return backbufferColor1; 
+					return backbufferColor1;
 				} else if ( TargetEye==StereoEye.Right ) {
-					return backbufferColor2; 
+					return backbufferColor2;
 				} else {
 					throw new InvalidOperationException("TargetEye must be StereoEye.Left or StereoEye.Right");
 				}
@@ -285,14 +286,14 @@ namespace Fusion.Drivers.Graphics.Display {
 
 
 		/// <summary>
-		/// 
+		///
 		/// </summary>
 		public override DepthStencil2D	BackbufferDepth {
 			get {
 				if (TargetEye==StereoEye.Left) {
-					return backbufferDepth1; 
+					return backbufferDepth1;
 				} else if ( TargetEye==StereoEye.Right ) {
-					return backbufferDepth2; 
+					return backbufferDepth2;
 				} else {
 					throw new InvalidOperationException("TargetEye must be StereoEye.Left or StereoEye.Right");
 				}

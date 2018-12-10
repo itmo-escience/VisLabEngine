@@ -76,8 +76,6 @@
     <Compile Include="DeviceUtil.cs" />
     <Compile Include="DisposeGroup.cs" />
     <Compile Include="DXElement.cs" />
-    <Compile Include="DXElementAsync.cs" />
-    <Compile Include="DXImageSourceAsync.cs" />
     <Compile Include="DXImageSource.cs" />
     <Compile Include="DXSharing.cs" />
     <Compile Include="Properties\AssemblyInfo.cs">

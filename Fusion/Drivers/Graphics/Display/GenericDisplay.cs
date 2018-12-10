@@ -31,7 +31,7 @@ namespace Fusion.Drivers.Graphics.Display {
 
 
 		/// <summary>
-		/// 
+		///
 		/// </summary>
 		/// <param name="parameters"></param>
 		public GenericDisplay( Game game, GraphicsDevice device, GraphicsParameters parameters ) : base( game, device, parameters )
@@ -58,7 +58,7 @@ namespace Fusion.Drivers.Graphics.Display {
 
 			var driverType			=	DriverType.Hardware;
 
-			var featureLevel	=	HardwareProfileChecker.GetFeatureLevel( parameters.GraphicsProfile ); 
+			var featureLevel	=	HardwareProfileChecker.GetFeatureLevel( parameters.GraphicsProfile );
 
 
 			swapChainDesc = new SwapChainDescription () {
@@ -96,9 +96,9 @@ namespace Fusion.Drivers.Graphics.Display {
 
 
 		/// <summary>
-		/// 
+		///
 		/// </summary>
-		public override void CreateDisplayResources ()
+		internal override void CreateDisplayResources ()
 		{
 			base.CreateDisplayResources();
 
@@ -109,7 +109,7 @@ namespace Fusion.Drivers.Graphics.Display {
 
 
 		/// <summary>
-		/// 
+		///
 		/// </summary>
 		public override void Update ()
 		{
@@ -132,7 +132,7 @@ namespace Fusion.Drivers.Graphics.Display {
 
 
 		/// <summary>
-		/// 
+		///
 		/// </summary>
 		/// <param name="disposing"></param>
 		protected override void Dispose ( bool disposing )
@@ -154,7 +154,7 @@ namespace Fusion.Drivers.Graphics.Display {
 
 
 		/// <summary>
-		/// 
+		///
 		/// </summary>
 		/// <param name="syncInterval"></param>
 		public override void SwapBuffers( int syncInterval )
@@ -173,7 +173,7 @@ namespace Fusion.Drivers.Graphics.Display {
 			get	{
 				return fullscr;
 			}
-			set {
+			internal set {
 				if (value!=fullscr) {
 					fullscr = value;
 					window.Invoke( changeFullscreen, window, fullscr );
@@ -185,11 +185,11 @@ namespace Fusion.Drivers.Graphics.Display {
 
 
 		/// <summary>
-		/// 
+		///
 		/// </summary>
 		public override Rectangle Bounds
 		{
-			get { 
+			get {
 				return new Rectangle( 0, 0, window.ClientSize.Width, window.ClientSize.Height );
 			}
 		}
@@ -197,7 +197,7 @@ namespace Fusion.Drivers.Graphics.Display {
 
 
 		/// <summary>
-		/// 
+		///
 		/// </summary>
 		public override Form Window
 		{
@@ -209,10 +209,10 @@ namespace Fusion.Drivers.Graphics.Display {
 
 
 		/// <summary>
-		/// 
+		///
 		/// </summary>
 		public override StereoEye TargetEye {
-			get; set;
+			get; internal set;
 		}
 
 
@@ -226,7 +226,7 @@ namespace Fusion.Drivers.Graphics.Display {
 
 
 		/// <summary>
-		/// 
+		///
 		/// </summary>
 		public override RenderTarget2D	BackbufferColor {
 			get { return backbufferColor; }
@@ -235,7 +235,7 @@ namespace Fusion.Drivers.Graphics.Display {
 
 
 		/// <summary>
-		/// 
+		///
 		/// </summary>
 		public override DepthStencil2D	BackbufferDepth {
 			get { return backbufferDepth; }

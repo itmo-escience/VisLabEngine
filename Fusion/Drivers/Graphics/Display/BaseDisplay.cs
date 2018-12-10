@@ -1,27 +1,19 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using SharpDX.Direct3D;
-using SharpDX.Direct3D11;
-using SharpDX.Windows;
 using SharpDX.DXGI;
 using D3D = SharpDX.Direct3D11;
-using DXGI = SharpDX.DXGI;
 using System.Windows.Forms;
 using Forms = System.Windows.Forms;
 using Fusion.Engine.Common;
 using Fusion.Core.Mathematics;
 using Fusion.Input.Touch;
-//using SharpDX.DirectManipulation;
 
 
-namespace Fusion.Drivers.Graphics.Display {
-	abstract class BaseDisplay : GraphicsResource {
-
+namespace Fusion.Drivers.Graphics.Display
+{
+	public abstract class BaseDisplay : GraphicsResource
+	{
 		protected readonly	Game Game;
-		public 		D3D.Device d3dDevice = null;
+		internal D3D.Device d3dDevice = null;
 
 		protected Ubershader	stereo;
 		protected StateFactory	factory;
@@ -37,10 +29,10 @@ namespace Fusion.Drivers.Graphics.Display {
 
 
 		/// <summary>
-		/// 
+		///
 		/// </summary>
 		/// <param name="parameters"></param>
-		public BaseDisplay( Game game, GraphicsDevice device, GraphicsParameters parameters ) : base(device)
+		internal BaseDisplay( Game game, GraphicsDevice device, GraphicsParameters parameters ) : base(device)
 		{
 			this.Game	=	game;
 
@@ -50,9 +42,9 @@ namespace Fusion.Drivers.Graphics.Display {
 
 
 		/// <summary>
-		/// 
+		///
 		/// </summary>
-		public virtual void CreateDisplayResources ()
+		internal virtual void CreateDisplayResources ()
 		{
 			Game.Reloading += (s,e) => LoadContent();
 			LoadContent();
@@ -61,23 +53,23 @@ namespace Fusion.Drivers.Graphics.Display {
 
 
 		/// <summary>
-		/// 
+		///
 		/// </summary>
-		void LoadContent ()
+		private void LoadContent ()
 		{
 			stereo	=	Game.Content.Load<Ubershader>("stereo");
 			factory	=	stereo.CreateFactory( typeof(Flags), Primitive.TriangleList, VertexInputElement.Empty, BlendState.Opaque, RasterizerState.CullNone, DepthStencilState.None );
 		}
 
 
-		public virtual void Resize(int newWidth, int newHeight)
+		internal virtual void Resize(int newWidth, int newHeight)
 		{
 
 		}
 
 
 		/// <summary>
-		/// 
+		///
 		/// </summary>
 		/// <param name="left">Left source buffer</param>
 		/// <param name="right">Right source buffer</param>
@@ -93,10 +85,10 @@ namespace Fusion.Drivers.Graphics.Display {
 
 			if (leftResolved!=null) {
 				device.Resolve( left, leftResolved );
-			} 
+			}
 			if (rightResolved!=null) {
 				device.Resolve( right, rightResolved );
-			} 
+			}
 
 
 			device.PipelineState		=	factory[ (int)flag ];
@@ -112,7 +104,7 @@ namespace Fusion.Drivers.Graphics.Display {
 
 
 		/// <summary>
-		/// 
+		///
 		/// </summary>
 		/// <param name="disposing"></param>
 		protected override void Dispose ( bool disposing )
@@ -129,7 +121,7 @@ namespace Fusion.Drivers.Graphics.Display {
 		/// Current stereo eye
 		/// </summary>
 		public abstract StereoEye TargetEye {
-			get; set;
+			get; internal set;
 		}
 
 		public abstract bool Focused {
@@ -168,7 +160,7 @@ namespace Fusion.Drivers.Graphics.Display {
 		/// </summary>
 		public abstract bool Fullscreen {
 			get;
-			set;
+			internal set;
 		}
 
 
@@ -183,7 +175,7 @@ namespace Fusion.Drivers.Graphics.Display {
 
 
 		/// <summary>
-		/// 
+		///
 		/// </summary>
 		public abstract Form Window {
 			get;
@@ -192,14 +184,14 @@ namespace Fusion.Drivers.Graphics.Display {
 
 
 		/// <summary>
-		/// 
+		///
 		/// </summary>
 		public abstract void Prepare ();
 
 
 
 		/// <summary>
-		/// 
+		///
 		/// </summary>
 		/// <param name="syncInterval"></param>
 		public abstract void SwapBuffers ( int syncInterval );
@@ -207,13 +199,13 @@ namespace Fusion.Drivers.Graphics.Display {
 
 
 		/// <summary>
-		/// 
+		///
 		/// </summary>
 		public abstract void Update ();
 
 
 		/// <summary>
-		/// 
+		///
 		/// </summary>
 		/// <param name="window"></param>
 		/// <param name="fullscr"></param>
@@ -221,11 +213,11 @@ namespace Fusion.Drivers.Graphics.Display {
 		protected ChangeFullscreenDelegate changeFullscreen = new ChangeFullscreenDelegate( ChangeFullscreen );
 
 		/// <summary>
-		/// 
+		///
 		/// </summary>
 		/// <param name="window"></param>
 		/// <param name="fullscr"></param>
-		static void ChangeFullscreen ( Form window, bool fullscr ) 
+		private static void ChangeFullscreen ( Form window, bool fullscr )
 		{
 			if (fullscr) {
 				window.FormBorderStyle	=	FormBorderStyle.None;
@@ -241,11 +233,11 @@ namespace Fusion.Drivers.Graphics.Display {
 
 
 		/// <summary>
-		/// 
+		///
 		/// </summary>
 		/// <param name="parameters"></param>
 		/// <returns></returns>
-		public Form CreateForm ( GraphicsParameters parameters, Output output )
+		internal Form CreateForm ( GraphicsParameters parameters, Output output )
 		{
 			var form = new Form() {
 				Text			=	Game.GameTitle,
@@ -262,7 +254,7 @@ namespace Fusion.Drivers.Graphics.Display {
 				var bounds		=	output.Description.DesktopBounds;
 				var scrW		=	bounds.Right - bounds.Left;
 				var scrH		=	bounds.Bottom - bounds.Top;
-				
+
 				form.Location	=	new System.Drawing.Point( bounds.Left + (scrW - form.Width)/2, bounds.Top + (scrH - form.Height)/2 );
 				form.Text		+=	" - [" + output.Description.DeviceName + "]";
 			}
@@ -281,12 +273,12 @@ namespace Fusion.Drivers.Graphics.Display {
 
 
 		/// <summary>
-		/// 
+		///
 		/// </summary>
 		/// <param name="parameters"></param>
 		/// <param name="output"></param>
 		/// <returns></returns>
-		public Form CreateTouchForm(GraphicsParameters parameters, Output output)
+		internal Form CreateTouchForm(GraphicsParameters parameters, Output output)
 		{
 			var form = new TouchForm() {
 				Text			=	Game.GameTitle,
@@ -314,7 +306,7 @@ namespace Fusion.Drivers.Graphics.Display {
 			form.Move		+= (s, e) => Game.InputDevice.RemoveAllPressedKeys();
 
 			form.TouchTap			+= (args) => Game.InputDevice.NotifyTouchTap(args);
-			form.TouchDoubleTap		+= (args) => Game.InputDevice.NotifyTouchDoubleTap(args);            
+			form.TouchDoubleTap		+= (args) => Game.InputDevice.NotifyTouchDoubleTap(args);
 			form.TouchSecondaryTap	+= (args) => Game.InputDevice.NotifyTouchSecondaryTap(args);
 			form.TouchManipulation	+= (args) => Game.InputDevice.NotifyTouchManipulation(args);
             form.TouchHold          += (args) => Game.InputDevice.NotifyTouchHold(args);
@@ -342,7 +334,7 @@ namespace Fusion.Drivers.Graphics.Display {
 		}
 
 
-		void form_FormClosing ( object sender, FormClosingEventArgs e )
+		private void form_FormClosing ( object sender, FormClosingEventArgs e )
 		{
 			if (Game.ExitRequested) {
 				e.Cancel	=	false;
@@ -354,21 +346,21 @@ namespace Fusion.Drivers.Graphics.Display {
 
 
 
-		void form_KeyPress ( object sender, KeyPressEventArgs e )
+		private void form_KeyPress ( object sender, KeyPressEventArgs e )
 		{
 			Game.InputDevice.NotifyKeyPress( e.KeyChar );
 		}
 
 
 
-		void form_KeyUp ( object sender, KeyEventArgs e )
+		private void form_KeyUp ( object sender, KeyEventArgs e )
 		{
 			Game.InputDevice.NotifyKeyUp( (Fusion.Drivers.Input.Keys)(int)e.KeyCode, e.Alt, e.Shift, e.Control );
 		}
 
 
 
-		void form_KeyDown ( object sender, KeyEventArgs e )
+		private void form_KeyDown ( object sender, KeyEventArgs e )
 		{
 			if (e.Alt && e.KeyCode==Forms.Keys.Enter) {
 				Fullscreen = !Fullscreen;
@@ -380,18 +372,18 @@ namespace Fusion.Drivers.Graphics.Display {
 
 
 		/// <summary>
-		/// 
+		///
 		/// </summary>
 		protected void ShowAdapterInfo ( GraphicsParameters parameters )
 		{
-			Log.Message("Mode : {0}x{1} {3} MS:{2} Stereo:{5} {4}", 
-				parameters.Width, 
-				parameters.Height, 
+			Log.Message("Mode : {0}x{1} {3} MS:{2} Stereo:{5} {4}",
+				parameters.Width,
+				parameters.Height,
 				0,
-				parameters.FullScreen ? "FS" : "W", 
+				parameters.FullScreen ? "FS" : "W",
 				parameters.UseDebugDevice ? "(Debug)" : "",
 				parameters.StereoMode );
-			
+
 			using ( var factory2 = new Factory1() ) {
 
 				Log.Message("Adapters:");
@@ -400,7 +392,7 @@ namespace Fusion.Drivers.Graphics.Display {
 					foreach (var adapter in factory2.Adapters) {
 						var aDesc = adapter.Description;
 						Log.Message("   {0} - {1}", aDesc.Description, D3D.Device.GetSupportedFeatureLevel(adapter));
-					
+
 						foreach ( var output in adapter.Outputs ) {
 							var desc = output.Description;
 							var bnds = output.Description.DesktopBounds;

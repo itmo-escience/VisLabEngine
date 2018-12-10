@@ -1,5 +1,4 @@
-﻿using SharpDX.Direct3D11;
-using System;
+﻿using System;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Threading;
@@ -8,40 +7,45 @@ using System.Windows;
 using System.Windows.Input;
 using System.Windows.Interop;
 using System.Windows.Media;
+using Fusion.Drivers.Graphics;
+using Fusion.Drivers.Graphics.Display;
 using Fusion.Engine.Common;
+using Texture2D = SharpDX.Direct3D11.Texture2D;
 
 namespace ZWpfLib
 {
 	/// <summary>
-	/// A <see cref="UIElement"/> displaying DirectX scene. 
+	/// A <see cref="UIElement"/> displaying DirectX scene.
 	/// Takes care of resizing and refreshing a <see cref="DXImageSource"/>.
 	/// It does no Direct3D work, which is delegated to
 	/// the <see cref="IDirect3D"/> <see cref="Renderer"/> object.
 	/// </summary>
 	public class DXElement : FrameworkElement
     {
-		Stopwatch renderTimer;
+		private readonly Stopwatch _renderTimer;
 
-		/// <summary>
-		/// The image source where the DirectX scene (from the <see cref="Renderer"/>) will be rendered.
-		/// </summary>
-		public DXImageSource Surface { get; }
+        /// <summary>
+        /// The image source where the DirectX scene (from the <see cref="Renderer"/>) will be rendered.
+        /// </summary>
+        private DXImageSource Surface { get; }
 
-
-		public DXElement()
+        public DXElement()
         {
 			base.SnapsToDevicePixels = true;
 
-            renderTimer = new Stopwatch();
-			Surface = new DXImageSource();
-			Surface.IsFrontBufferAvailableChanged += delegate {
-				UpdateReallyLoopRendering();
-				if (!IsReallyLoopRendering && Surface.IsFrontBufferAvailable)
-					Render();
-			};
-			IsVisibleChanged += delegate { UpdateReallyLoopRendering(); };
-		}
+            _renderTimer = new Stopwatch();
 
+			Surface = new DXImageSource();
+
+            Surface.IsFrontBufferAvailableChanged += delegate {
+				UpdateReallyLoopRendering();
+				//if (!IsReallyLoopRendering && Surface.IsFrontBufferAvailable)
+					//Render();
+			};
+
+
+            IsVisibleChanged += delegate { UpdateReallyLoopRendering(); };
+		}
 
 		private IntPtr WndProc(IntPtr hwnd, int msg, IntPtr wParam, IntPtr lParam, ref bool handled)
 		{
@@ -78,14 +82,42 @@ namespace ZWpfLib
 				new PropertyMetadata((d, e) => ((DXElement)d).OnRendererChanged((Game)e.OldValue, (Game)e.NewValue)));
 
 
-		private void OnRendererChanged(Game oldValue, Game newValue)
+        private void OnRendererChanged(Game oldValue, Game newValue)
 		{
 			UpdateSize();
 			UpdateReallyLoopRendering();
+
+		    if (oldValue != null)
+		    {
+		        var d = (WpfDisplay) oldValue.GraphicsDevice.Display;
+                d.UpdateReady -= SetReadyToRenderAgain;
+		    }
+
+		    if (newValue != null)
+		    {
+		        var d = (WpfDisplay) newValue.GraphicsDevice.Display;
+		        d.UpdateReady += SetReadyToRenderAgain;
+            }
 		}
 
 
-		protected override void OnVisualParentChanged(DependencyObject oldParent)
+        private object _readyToRender = new object();
+        private void SetReadyToRenderAgain(object sender, EventArgs e)
+        {
+            /*
+            lock (_readyToRender)
+            {
+                var display = (WpfDisplay) sender;
+
+                if(_buf != null)
+                    display.ReturnBuffer();
+
+                _buf = display.ExtractBuffer();
+            }
+            */
+        }
+
+        protected override void OnVisualParentChanged(DependencyObject oldParent)
 		{
 			if (IsInDesignMode)
 				return;
@@ -113,10 +145,9 @@ namespace ZWpfLib
 
 		protected override int VisualChildrenCount { get { return 0; } }
 
-
-		protected override void OnRender(DrawingContext dc)
+        protected override void OnRender(DrawingContext dc)
 		{
-			dc.DrawImage(Surface, new Rect(RenderSize));
+            dc.DrawImage(Surface, new Rect(RenderSize));
 		}
 
 
@@ -135,103 +166,63 @@ namespace ZWpfLib
 			{
 				IsReallyLoopRendering = newValue;
 				if (IsReallyLoopRendering) {
-					renderTimer.Start();
+					_renderTimer.Start();
 					CompositionTarget.Rendering += OnLoopRendering;
 				} else {
 					CompositionTarget.Rendering -= OnLoopRendering;
-					renderTimer.Stop();
+					_renderTimer.Stop();
 				}
 			}
 		}
 
 
-		void SetBackBuffer(Game ren, DXImageSource sur)
+		void SetBackBuffer(RenderTarget2D target, DXImageSource sur)
 		{
-			if (ren == null) return;
-			sur.SetD3D11BackBuffer(ren.GraphicsDevice.BackbufferColor.Surface.Resource.QueryInterface<Texture2D>());
+            sur.SetD3D11BackBuffer(target.Surface.Resource.QueryInterface<Texture2D>());
 		}
 
 
-		void OnLoopRendering(object sender, EventArgs e) 
+		void OnLoopRendering(object sender, EventArgs e)
 		{
-			if (!IsReallyLoopRendering)
+		    var renderingTime = ((RenderingEventArgs) e).RenderingTime;
+
+            if (!IsReallyLoopRendering)
 				return;
-			Render(); 
+			Render(renderingTime);
 		}
 
 
 
 		void UpdateSize()
 		{
-			if (Renderer == null)
+			if (Renderer == null || !Renderer.IsInitialized)
 				return;
 			Renderer.GraphicsDevice.Resize((int)DesiredSize.Width, (int)DesiredSize.Height);
-			Renderer.UpdateExternal();
-			SetBackBuffer(Renderer, Surface);
+
+            //Render();
+
 			Console.WriteLine(DesiredSize);
 		}
 
-		
+        private RenderTarget2D _buf = null;
 		/// <summary>
 		/// Will redraw the underlying surface once.
 		/// </summary>
-		public void Render()
+		public void Render(TimeSpan renderingTime)
 		{
-			if (Renderer == null || IsInDesignMode)
+			if (Renderer == null || !Renderer.IsInitialized || IsInDesignMode || renderingTime == TimeSpan.Zero)
 				return;
 
-			Renderer.UpdateExternal();
-			Surface.Invalidate();
-		}
 
+		    var display = (WpfDisplay) Renderer.GraphicsDevice.Display;
 
+		    if (_buf != null)
+		        display.ReturnBuffer();
 
-		#region override input: Key, Mouse
-		/*
-		protected override void OnMouseDown(MouseButtonEventArgs e)
-		{
-			base.OnMouseDown(e);
-			if (Renderer is IInteractiveDirect3D)
-				((IInteractiveDirect3D)Renderer).OnMouseDown(this, e);
-		}
+		    _buf = display.ExtractBuffer();
 
-		protected override void OnMouseMove(MouseEventArgs e)
-		{
-			base.OnMouseMove(e);
-			if (Renderer is IInteractiveDirect3D)
-				((IInteractiveDirect3D)Renderer).OnMouseMove(this, e);
-		}
-
-		protected override void OnMouseUp(MouseButtonEventArgs e)
-		{
-			base.OnMouseUp(e);
-			if (Renderer is IInteractiveDirect3D)
-				((IInteractiveDirect3D)Renderer).OnMouseUp(this, e);
-		}
-
-		protected override void OnMouseWheel(MouseWheelEventArgs e)
-		{
-			base.OnMouseWheel(e);
-			if (Renderer is IInteractiveDirect3D)
-				((IInteractiveDirect3D)Renderer).OnMouseWheel(this, e);
-		}
-
-		protected override void OnKeyDown(KeyEventArgs e)
-		{
-			base.OnKeyDown(e);
-			if (Renderer is IInteractiveDirect3D)
-				((IInteractiveDirect3D)Renderer).OnKeyDown(this, e);
-		}
-
-		protected override void OnKeyUp(KeyEventArgs e)
-		{
-			base.OnKeyUp(e);
-			if (Renderer is IInteractiveDirect3D)
-				((IInteractiveDirect3D)Renderer).OnKeyUp(this, e);
-		}
-		*/
-		#endregion
-
+            SetBackBuffer(_buf, Surface);
+        }
 
 
 		/// <summary>

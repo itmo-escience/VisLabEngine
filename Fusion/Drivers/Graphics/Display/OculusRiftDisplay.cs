@@ -41,7 +41,7 @@ namespace Fusion.Drivers.Graphics.Display {
 		OculusTextureSwapChain[] oculusSwapChains;
 
 		/// <summary>
-		/// 
+		///
 		/// </summary>
 		/// <param name="game"></param>
 		/// <param name="device"></param>
@@ -102,10 +102,10 @@ namespace Fusion.Drivers.Graphics.Display {
 		public override bool Focused => window.Focused;
 
 
-		/// <summary>
-		/// 
-		/// </summary>
-		public override void CreateDisplayResources()
+        /// <summary>
+        ///
+        /// </summary>
+        internal override void CreateDisplayResources()
 		{
 			base.CreateDisplayResources();
 
@@ -117,7 +117,7 @@ namespace Fusion.Drivers.Graphics.Display {
 			for (int i = 0; i < 2; i++) {
 				OVR.Sizei idealSize = hmd.GetFovTextureSize((OVR.EyeType)i, hmd.DefaultEyeFov[i], 1.0f);
 				oculusSwapChains[i] = hmd.CreateTextureSwapChain(d3dDevice.NativePointer, idealSize.Width, idealSize.Height);
-				
+
 				eyeTextures[i]		= new EyeTexture(device, oculusSwapChains[i]) {
 					DepthStencil2D		= new DepthStencil2D(device, DepthFormat.D24S8, idealSize.Width, idealSize.Height),
 					Viewport			= new Viewport(0, 0, idealSize.Width, idealSize.Height),
@@ -162,7 +162,7 @@ namespace Fusion.Drivers.Graphics.Display {
 
 
 		/// <summary>
-		/// 
+		///
 		/// </summary>
 		public override void Prepare()
 		{
@@ -210,7 +210,7 @@ namespace Fusion.Drivers.Graphics.Display {
 
 
 		/// <summary>
-		/// 
+		///
 		/// </summary>
 		public override void Update()
 		{
@@ -220,7 +220,7 @@ namespace Fusion.Drivers.Graphics.Display {
 
 
 		/// <summary>
-		/// 
+		///
 		/// </summary>
 		/// <param name="syncInterval"></param>
 		public override void SwapBuffers(int syncInterval)
@@ -231,7 +231,7 @@ namespace Fusion.Drivers.Graphics.Display {
 			layerEyeFov.Header.Type		= OVR.LayerType.EyeFov;
 			layerEyeFov.Header.Flags	= OVR.LayerFlags.None;
 			layerEyeFov.SensorSampleTime = sampleTime;
-			
+
 			for (int i = 0; i < 2; i++) {
 				layerEyeFov.ColorTexture[i] = eyeTextures[i].SwapTexture.TextureChain;
 				layerEyeFov.Viewport[i]		= eyeTextures[i].ViewportSize;
@@ -265,7 +265,7 @@ namespace Fusion.Drivers.Graphics.Display {
 
 
 			/// <summary>
-		/// 
+		///
 		/// </summary>
 		/// <param name="disposing"></param>
 		protected override void Dispose ( bool disposing )
@@ -290,7 +290,7 @@ namespace Fusion.Drivers.Graphics.Display {
 
 
 		/// <summary>
-		/// 
+		///
 		/// </summary>
 		public override Rectangle Bounds
 		{
@@ -310,17 +310,17 @@ namespace Fusion.Drivers.Graphics.Display {
 
 
 		/// <summary>
-		/// 
+		///
 		/// </summary>
 		public override RenderTarget2D	BackbufferColor {
-			get { 
+			get {
 
 				if (TargetEye==StereoEye.Left) {
 					int textureIndex = eyeTextures[0].SwapTexture.GetCurrentTextureIndex();
-					return eyeTextures[0].RenderTargets[textureIndex]; 
+					return eyeTextures[0].RenderTargets[textureIndex];
 				} else if ( TargetEye==StereoEye.Right ) {
 					int textureIndex = eyeTextures[1].SwapTexture.GetCurrentTextureIndex();
-					return eyeTextures[1].RenderTargets[textureIndex];  
+					return eyeTextures[1].RenderTargets[textureIndex];
 				} else {
 					throw new InvalidOperationException("TargetEye must be StereoEye.Left or StereoEye.Right");
 				}
@@ -330,14 +330,14 @@ namespace Fusion.Drivers.Graphics.Display {
 
 
 		/// <summary>
-		/// 
+		///
 		/// </summary>
 		public override DepthStencil2D	BackbufferDepth {
 			get {
 				if (TargetEye==StereoEye.Left) {
-					return eyeTextures[0].DepthStencil2D; 
+					return eyeTextures[0].DepthStencil2D;
 				} else if ( TargetEye==StereoEye.Right ) {
-					return eyeTextures[1].DepthStencil2D; 
+					return eyeTextures[1].DepthStencil2D;
 				} else {
 					throw new InvalidOperationException("TargetEye must be StereoEye.Left or StereoEye.Right");
 				}
@@ -347,7 +347,7 @@ namespace Fusion.Drivers.Graphics.Display {
 
 
 		/// <summary>
-		/// 
+		///
 		/// </summary>
 		public override Form Window
 		{
@@ -356,11 +356,11 @@ namespace Fusion.Drivers.Graphics.Display {
 
 
 		/// <summary>
-		/// 
+		///
 		/// </summary>
 		public override StereoEye TargetEye
 		{
-			get; set;
+			get; internal set;
 		}
 
 
@@ -371,7 +371,8 @@ namespace Fusion.Drivers.Graphics.Display {
 			get	{
 				return false;
 			}
-			set {
+		    internal set
+            {
 
 			}
 		}

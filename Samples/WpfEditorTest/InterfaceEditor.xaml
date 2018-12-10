@@ -50,9 +50,11 @@
             </ToolBar>
         </ToolBarTray>
         <Grid Grid.Row="1" Name="LocalGrid"
-                MouseMove="LocalGrid_MouseMove"
-                MouseLeftButtonUp="LocalGrid_MouseLeftButtonUp"
-                MouseLeftButtonDown="LocalGrid_MouseLeftButtonDown">
+              MouseMove="LocalGrid_MouseMove"
+              MouseLeftButtonUp="LocalGrid_MouseLeftButtonUp"
+              MouseLeftButtonDown="LocalGrid_MouseLeftButtonDown"
+              Background="Chartreuse"
+            >
             <ZWpfLib:DXElement x:Name="DxElem"
                                HorizontalAlignment="Left" VerticalAlignment="Top"
                                MinHeight="100" MaxHeight="10000"

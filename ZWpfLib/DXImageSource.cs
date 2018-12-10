@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Windows;
 using System.Windows.Interop;
+using Fusion.Drivers.Graphics;
 using SharpDX.Direct3D9;
 
 namespace ZWpfLib
@@ -35,25 +36,25 @@ namespace ZWpfLib
 			IsDisposed = true;
 		}
 
-	
-		public void Invalidate()
-		{
-			if (IsDisposed)
-				throw new ObjectDisposedException(GetType().Name);
 
-			if (backBuffer == null) return;
-			{
-				Lock();
-				AddDirtyRect(new Int32Rect(0, 0, base.PixelWidth, base.PixelHeight));
-				Unlock();
-			}
-		}
+        public void Invalidate()
+        {
+            if (IsDisposed)
+                throw new ObjectDisposedException(GetType().Name);
+
+            if (backBuffer == null) return;
+            {
+                Lock();
+                AddDirtyRect(new Int32Rect(0, 0, base.PixelWidth, base.PixelHeight));
+                Unlock();
+            }
+        }
 
 
 		public void SetD3D11BackBuffer(SharpDX.Direct3D11.Texture2D texture)
 		{
-			SetBackBuffer(d3d9.Device.GetSharedD3D9(texture));
-		}
+            SetBackBuffer(d3d9.Device.GetSharedD3D9(texture));
+        }
 
 
 		public void SetBackBuffer(Texture texture)
@@ -72,17 +73,23 @@ namespace ZWpfLib
 
 				if (texture != null) {
 					using (Surface surface = texture.GetSurfaceLevel(0)) {
-						Lock();
-						SetBackBuffer(D3DResourceType.IDirect3DSurface9, surface.NativePointer);
-						AddDirtyRect(new Int32Rect(0, 0, base.PixelWidth, base.PixelHeight));
-						Unlock();
+					    if (TryLock(new Duration(default(TimeSpan))))
+					    {
+					        SetBackBuffer(D3DResourceType.IDirect3DSurface9, surface.NativePointer);
+					        AddDirtyRect(new Int32Rect(0, 0, base.PixelWidth, base.PixelHeight));
+					    }
+
+					    Unlock();
 					}
 				}
 				else {
-					Lock();
-					SetBackBuffer(D3DResourceType.IDirect3DSurface9, IntPtr.Zero);
-					AddDirtyRect(new Int32Rect(0, 0, base.PixelWidth, base.PixelHeight));
-					Unlock();
+				    if (TryLock(new Duration(default(TimeSpan))))
+				    {
+				        SetBackBuffer(D3DResourceType.IDirect3DSurface9, IntPtr.Zero);
+				        AddDirtyRect(new Int32Rect(0, 0, base.PixelWidth, base.PixelHeight));
+				    }
+
+				    Unlock();
 				}
 			}
 			finally {

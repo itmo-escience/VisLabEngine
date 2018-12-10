@@ -7,11 +7,13 @@ using System.ComponentModel;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Threading;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
 using System.Windows.Input;
 using System.Windows.Media;
+using Fusion.Drivers.Graphics.Display;
 using Fusion.Engine.Frames;
 using Fusion.Engine.Input;
 using WpfEditorTest.ChildPanels;
@@ -50,8 +52,9 @@ namespace WpfEditorTest
 		public FusionUI.UI.ScalableFrame DragFieldFrame;
 		public FusionUI.UI.ScalableFrame SceneFrame;
 		public FusionUI.UI.MainFrame RootFrame;
+	    private readonly CancellationTokenSource _tokenSource;
 
-        public InterfaceEditor()
+	    public InterfaceEditor()
         {
             InitializeComponent();
 
@@ -71,11 +74,19 @@ namespace WpfEditorTest
             _engine.RenderSystem.VSyncInterval = 1;
 
             Directory.SetCurrentDirectory(@"..\..\..\..\GISTest\bin\x64\Debug");
-            _engine.InitExternal();
+            _engine.OnInitialized += OnEngineInitialized;
 
-            DxElem.Renderer = _engine;
+            _tokenSource = new CancellationTokenSource();
+            Closing += (sender, args) => { _tokenSource.Cancel(); };
 
-			_parentHighlightPanel = new ParentHighlightPanel();
+            var runner = new Thread(() =>
+            {
+                Thread.CurrentThread.IsBackground = true;
+                _engine.RunExternal(_tokenSource.Token);
+            }) {Name = "Engine runner"};
+            runner.Start();
+
+            _parentHighlightPanel = new ParentHighlightPanel();
 			LocalGrid.Children.Add(_parentHighlightPanel);
 
 			_frameSelectionPanel = new FrameSelectionPanel(this);
@@ -98,26 +109,34 @@ namespace WpfEditorTest
 
             _treeView.SelectedFrameChangedInUI += (_, frame) => SelectFrame(frame);
 			_treeView.RequestFrameDeletionInUI += ( _, __ ) => TryDeleteSelectedFrame();
+        }
 
-			var templates = Directory.GetFiles(TemplatesPath, "*.xml").ToList();
-            _palette.AvailableFrames.ItemsSource = templates.Select(t => t.Split('\\').Last().Split('.').First());
+	    private void OnEngineInitialized()
+	    {
+	        Dispatcher.Invoke(() =>
+	        {
+                DxElem.Renderer = _engine;
 
-            RootFrame = ApplicationInterface.Instance.rootFrame;
-            SceneFrame = (FusionUI.UI.ScalableFrame)RootFrame.Children.FirstOrDefault();
-            DragFieldFrame = new FusionUI.UI.ScalableFrame(0, 0, RootFrame.UnitWidth, RootFrame.UnitHeight, "DragFieldFrame", Fusion.Core.Mathematics.Color.Zero)
-            {
-                Anchor = FrameAnchor.All,
-                ZOrder = 1000000,
-            };
-            RootFrame.Add(DragFieldFrame);
+	            var templates = Directory.GetFiles(TemplatesPath, "*.xml").ToList();
+	            _palette.AvailableFrames.ItemsSource = templates.Select(t => t.Split('\\').Last().Split('.').First());
 
-            var b = new Binding("Children")
-            {
-                Source = SceneFrame,
-                UpdateSourceTrigger = UpdateSourceTrigger.PropertyChanged,
-                Mode = BindingMode.OneWay
-            };
-            _treeView.ElementHierarchyView.SetBinding(TreeView.ItemsSourceProperty, b);
+	            RootFrame = ApplicationInterface.Instance.rootFrame;
+	            SceneFrame = (FusionUI.UI.ScalableFrame)RootFrame.Children.FirstOrDefault();
+	            DragFieldFrame = new FusionUI.UI.ScalableFrame(0, 0, RootFrame.UnitWidth, RootFrame.UnitHeight, "DragFieldFrame", Fusion.Core.Mathematics.Color.Zero)
+	            {
+	                Anchor = FrameAnchor.All,
+	                ZOrder = 1000000,
+	            };
+	            RootFrame.Add(DragFieldFrame);
+
+	            var b = new Binding("Children")
+	            {
+	                Source = SceneFrame,
+	                UpdateSourceTrigger = UpdateSourceTrigger.PropertyChanged,
+	                Mode = BindingMode.OneWay
+	            };
+	            _treeView.ElementHierarchyView.SetBinding(TreeView.ItemsSourceProperty, b);
+            });
         }
 
 	    protected override void OnSourceInitialized(EventArgs e)

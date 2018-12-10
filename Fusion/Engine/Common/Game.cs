@@ -647,7 +647,7 @@ namespace Fusion.Engine.Common {
 
 					GraphicsDevice.RestoreBackbuffer();
 
-					GraphicsDevice.ClearBackbuffer(BackColor);
+				    GraphicsDevice.ClearBackbuffer(BackColor);
 
 					this.Draw( gameTimeInternal, eye );
 				}

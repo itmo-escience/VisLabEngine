@@ -28,9 +28,9 @@ namespace Fusion.Drivers.Graphics {
 		/// <summary>
 		/// Current graphics profile.
 		/// </summary>
-		public GraphicsProfile GraphicsProfile { 
-			get; 
-			private set; 
+		public GraphicsProfile GraphicsProfile {
+			get;
+			private set;
 		}
 
 		/// <summary>
@@ -41,25 +41,25 @@ namespace Fusion.Drivers.Graphics {
 		/// <summary>
 		/// Gets current display bounds.
 		/// </summary>
-		public Rectangle DisplayBounds	{ 
-			get { 
-				return new Rectangle(0,0, display.Bounds.Width, display.Bounds.Height); 
-			} 
+		public Rectangle DisplayBounds	{
+			get {
+				return new Rectangle(0,0, display.Bounds.Width, display.Bounds.Height);
+			}
 		}
 
 		/// <summary>
 		/// Sets and gets fullscreen mode.
 		/// <remarks>Not all stereo modes support fullscreen or windowed mode.</remarks>
 		/// </summary>
-		public bool FullScreen  { 
-			get { return display.Fullscreen; } 
+		public bool FullScreen  {
+			get { return display.Fullscreen; }
 			set {
 				if (deviceContext != null) {
 					lock (deviceContext) {
 						display.Fullscreen = value;
 					}
 				}
-			} 
+			}
 		}
 
 		/// <summary>
@@ -68,22 +68,22 @@ namespace Fusion.Drivers.Graphics {
 		/// </summary>
 		public event EventHandler	DisplayBoundsChanged;
 
-		/// <summary>
-		/// Backbuffer color target.
-		/// </summary>
-		public RenderTarget2D	BackbufferColor	{ 
-			get { 
-				return display.BackbufferColor; 
-			} 
+        /// <summary>
+        /// Backbuffer color target.
+        /// </summary>
+        public RenderTarget2D	BackbufferColor	{
+			get {
+				return display.BackbufferColor;
+			}
 		}
 
 		/// <summary>
 		/// Backbuffer depth stencil surface.
 		/// </summary>
-		public DepthStencil2D	BackbufferDepth	{ 
-			get { 
-				return display.BackbufferDepth; 
-			} 
+		public DepthStencil2D	BackbufferDepth	{
+			get {
+				return display.BackbufferDepth;
+			}
 		}
 
 
@@ -91,32 +91,32 @@ namespace Fusion.Drivers.Graphics {
 		/// <summary>
 		/// Pixel shader sampler collection.
 		/// </summary>
-		public SamplerStateCollection	PixelShaderSamplers		{ get; private set; }	
+		public SamplerStateCollection	PixelShaderSamplers		{ get; private set; }
 
 		/// <summary>
 		/// Vertex shader sampler collection.
 		/// </summary>
-		public SamplerStateCollection	VertexShaderSamplers	{ get; private set; }	
+		public SamplerStateCollection	VertexShaderSamplers	{ get; private set; }
 
 		/// <summary>
 		/// Geometry shader sampler collection.
 		/// </summary>
-		public SamplerStateCollection	GeometryShaderSamplers	{ get; private set; }	
+		public SamplerStateCollection	GeometryShaderSamplers	{ get; private set; }
 
 		/// <summary>
 		/// Compute shader sampler collection.
 		/// </summary>
-		public SamplerStateCollection	ComputeShaderSamplers	{ get; private set; }	
+		public SamplerStateCollection	ComputeShaderSamplers	{ get; private set; }
 
 		/// <summary>
 		/// Domain shader sampler collection.
 		/// </summary>
-		public SamplerStateCollection	DomainShaderSamplers	{ get; private set; }	
+		public SamplerStateCollection	DomainShaderSamplers	{ get; private set; }
 
 		/// <summary>
 		/// Hull shader sampler collection.
 		/// </summary>
-		public SamplerStateCollection	HullShaderSamplers		{ get; private set; }	
+		public SamplerStateCollection	HullShaderSamplers		{ get; private set; }
 		#endregion
 
 
@@ -124,32 +124,32 @@ namespace Fusion.Drivers.Graphics {
 		/// <summary>
 		/// Pixel shader resource collection.
 		/// </summary>
-		public ShaderResourceCollection	PixelShaderResources	{ get; private set; }	
+		public ShaderResourceCollection	PixelShaderResources	{ get; private set; }
 
 		/// <summary>
 		/// Vertex shader resource collection.
 		/// </summary>
-		public ShaderResourceCollection	VertexShaderResources	{ get; private set; }	
+		public ShaderResourceCollection	VertexShaderResources	{ get; private set; }
 
 		/// <summary>
 		/// Geometry shader resource collection.
 		/// </summary>
-		public ShaderResourceCollection	GeometryShaderResources	{ get; private set; }	
+		public ShaderResourceCollection	GeometryShaderResources	{ get; private set; }
 
 		/// <summary>
 		/// Compute shader resource collection.
 		/// </summary>
-		public ShaderResourceCollection	ComputeShaderResources	{ get; private set; }	
+		public ShaderResourceCollection	ComputeShaderResources	{ get; private set; }
 
 		/// <summary>
 		/// Domain shader resource collection.
 		/// </summary>
-		public ShaderResourceCollection	DomainShaderResources	{ get; private set; }	
+		public ShaderResourceCollection	DomainShaderResources	{ get; private set; }
 
 		/// <summary>
 		/// Hull shader resource collection.
 		/// </summary>
-		public ShaderResourceCollection	HullShaderResources		{ get; private set; }	
+		public ShaderResourceCollection	HullShaderResources		{ get; private set; }
 		#endregion
 
 
@@ -157,32 +157,32 @@ namespace Fusion.Drivers.Graphics {
 		/// <summary>
 		/// Pixel shader constant buffer collection.
 		/// </summary>
-		public ConstantBufferCollection	PixelShaderConstants	{ get; private set; }	
+		public ConstantBufferCollection	PixelShaderConstants	{ get; private set; }
 
 		/// <summary>
 		/// Vertex shader constant buffer collection.
 		/// </summary>
-		public ConstantBufferCollection	VertexShaderConstants	{ get; private set; }	
+		public ConstantBufferCollection	VertexShaderConstants	{ get; private set; }
 
 		/// <summary>
 		/// Geometry shader constant buffer collection.
 		/// </summary>
-		public ConstantBufferCollection	GeometryShaderConstants	{ get; private set; }	
+		public ConstantBufferCollection	GeometryShaderConstants	{ get; private set; }
 
 		/// <summary>
 		/// Compute shader constant buffer collection.
 		/// </summary>
-		public ConstantBufferCollection	ComputeShaderConstants	{ get; private set; }	
+		public ConstantBufferCollection	ComputeShaderConstants	{ get; private set; }
 
 		/// <summary>
 		/// Domain shader constant buffer collection.
 		/// </summary>
-		public ConstantBufferCollection	DomainShaderConstants	{ get; private set; }	
+		public ConstantBufferCollection	DomainShaderConstants	{ get; private set; }
 
 		/// <summary>
 		/// Hull shader constant buffer collection.
 		/// </summary>
-		public ConstantBufferCollection	HullShaderConstants		{ get; private set; }	
+		public ConstantBufferCollection	HullShaderConstants		{ get; private set; }
 		#endregion
 
 
@@ -208,9 +208,9 @@ namespace Fusion.Drivers.Graphics {
 
 		HashSet<IDisposable>	toDispose = new HashSet<IDisposable>();
 
-		internal Device			Device			{ get { return device; } }			
-		internal DeviceContext	DeviceContext	{ get { return deviceContext; } }	
-		internal BaseDisplay	Display			{ get { return display; } }
+		internal Device			Device			{ get { return device; } }
+		internal DeviceContext	DeviceContext	{ get { return deviceContext; } }
+		public BaseDisplay	Display			{ get { return display; } }
 
 		BaseDisplay				display			=	null;
 		Device					device			=	null;
@@ -218,7 +218,7 @@ namespace Fusion.Drivers.Graphics {
 
 
 		/// <summary>
-		/// 
+		///
 		/// </summary>
 		public GraphicsDevice ( Game game )
 		{
@@ -258,9 +258,9 @@ namespace Fusion.Drivers.Graphics {
 				parameters.FullScreen	=	false;
 				parameters.StereoMode	=	StereoMode.Disabled;
 
-				display	=	new GenericDisplay( Game, this, parameters ); 
+				display	=	new GenericDisplay( Game, this, parameters );
 			}
-			
+
 
 			device			=	display.d3dDevice;
 			deviceContext	=	device.ImmediateContext;
@@ -270,7 +270,7 @@ namespace Fusion.Drivers.Graphics {
 
 			//
 			//	create color buffer :
-			//	
+			//
 			PixelShaderResources	=	new ShaderResourceCollection( this, DeviceContext.PixelShader		);
 			VertexShaderResources 	=	new ShaderResourceCollection( this, DeviceContext.VertexShader		);
 			GeometryShaderResources =	new ShaderResourceCollection( this, DeviceContext.GeometryShader	);
@@ -300,7 +300,7 @@ namespace Fusion.Drivers.Graphics {
 
 
 		/// <summary>
-		/// 
+		///
 		/// </summary>
 		protected override void Dispose ( bool disposing )
 		{
@@ -345,7 +345,7 @@ namespace Fusion.Drivers.Graphics {
 
 
 		/// <summary>
-		/// 
+		///
 		/// </summary>
 		internal void NotifyViewportChanges ()
 		{
@@ -359,7 +359,7 @@ namespace Fusion.Drivers.Graphics {
 
 
 		/// <summary>
-		/// 
+		///
 		/// </summary>
 		internal void Present ( int syncInterval )
 		{
@@ -379,12 +379,12 @@ namespace Fusion.Drivers.Graphics {
 
 				display.Update();
 			}
-		}
+        }
 
 		/*-----------------------------------------------------------------------------------------
-		 * 
+		 *
 		 * 	Drawing stuff :
-		 *	
+		 *
 		-----------------------------------------------------------------------------------------*/
 
 		/// <summary>
@@ -423,7 +423,7 @@ namespace Fusion.Drivers.Graphics {
 			lock (deviceContext) {
 				if (indexBuffer!=null) {
 					deviceContext.InputAssembler.SetIndexBuffer( indexBuffer.Buffer, DXGI.Format.R32_UInt, 0 );
-				} else {	
+				} else {
 					deviceContext.InputAssembler.SetIndexBuffer( null, Format.Unknown, 0 );
 				}
 
@@ -462,7 +462,7 @@ namespace Fusion.Drivers.Graphics {
 		/// <param name="vertexCount"></param>
 		/// <param name="vertexFirstIndex"></param>
 		public void Draw ( int vertexCount, int firstIndex )
-		{					
+		{
 			lock (deviceContext) {
 				ApplyGpuState();
 				//deviceContext.InputAssembler.PrimitiveTopology	=	Converter.Convert( primitive );
@@ -472,12 +472,12 @@ namespace Fusion.Drivers.Graphics {
 
 
 		/// <summary>
-		/// 
+		///
 		/// </summary>
 		/// <param name="vertexCount"></param>
 		/// <param name="vertexFirstIndex"></param>
 		public void DrawAuto ()
-		{									 
+		{
 			lock (deviceContext) {
 				ApplyGpuState();
 				//deviceContext.InputAssembler.PrimitiveTopology	=	Converter.Convert( primitive );
@@ -488,7 +488,7 @@ namespace Fusion.Drivers.Graphics {
 
 
 		/// <summary>
-		/// 
+		///
 		/// </summary>
 		/// <param name="primitive"></param>
 		/// <param name="vertexCountPerInstance"></param>
@@ -507,7 +507,7 @@ namespace Fusion.Drivers.Graphics {
 
 
 		/// <summary>
-		/// 
+		///
 		/// </summary>
 		/// <param name="indexCount"></param>
 		/// <param name="firstIndex"></param>
@@ -524,7 +524,7 @@ namespace Fusion.Drivers.Graphics {
 
 
 		/// <summary>
-		/// 
+		///
 		/// </summary>
 		/// <param name="indexCount"></param>
 		/// <param name="firstIndex"></param>
@@ -540,7 +540,7 @@ namespace Fusion.Drivers.Graphics {
 
 
 		/// <summary>
-		/// 
+		///
 		/// </summary>
 		/// <param name="threadGroupCountX"></param>
 		/// <param name="threadGroupCountY"></param>
@@ -549,14 +549,14 @@ namespace Fusion.Drivers.Graphics {
 		{
 			lock (deviceContext) {
 				ApplyGpuState();
-				deviceContext.Dispatch( threadGroupCountX, threadGroupCountY, threadGroupCountZ ); 
+				deviceContext.Dispatch( threadGroupCountX, threadGroupCountY, threadGroupCountZ );
 			}
 		}
 
 
-		
+
 		/// <summary>
-		/// 
+		///
 		/// </summary>
 		/// <param name="layout"></param>
 		/// <param name="vertexBuffer"></param>
@@ -613,9 +613,9 @@ namespace Fusion.Drivers.Graphics {
 
 
 		/*-----------------------------------------------------------------------------------------
-		 * 
+		 *
 		 * 	State control
-		 *	
+		 *
 		-----------------------------------------------------------------------------------------*/
 
 		/// <summary>
@@ -658,9 +658,9 @@ namespace Fusion.Drivers.Graphics {
 
 
 		/*-----------------------------------------------------------------------------------------
-		 * 
+		 *
 		 *	Targets :
-		 * 
+		 *
 		-----------------------------------------------------------------------------------------*/
 
 		RenderTargetSurface[]	renderTargetSurfaces	=	new RenderTargetSurface[8];
@@ -668,7 +668,7 @@ namespace Fusion.Drivers.Graphics {
 
 
 		/// <summary>
-		/// 
+		///
 		/// </summary>
 		public void RestoreBackbuffer ()
 		{
@@ -682,7 +682,7 @@ namespace Fusion.Drivers.Graphics {
 
 
 		/// <summary>
-		/// 
+		///
 		/// </summary>
 		/// <param name="color"></param>
 		public void ClearBackbuffer ( Color4 color, float depth = 1, byte stencil = 0 )
@@ -731,12 +731,12 @@ namespace Fusion.Drivers.Graphics {
 				}
 
 				if (renderTargets.Any()) {
-				
+
 					if (w==-1 || h==-1) {
 						w	=	renderTargets.First().Width;
 						h	=	renderTargets.First().Height;
 					}
-				
+
 					if ( !renderTargets.All( surf => surf == null || (surf.Width == w && surf.Height == h) ) ) {
 						throw new ArgumentException("All surfaces must be the same size", "renderTargets");
 					}
@@ -760,7 +760,7 @@ namespace Fusion.Drivers.Graphics {
 
 
 		/// <summary>
-		/// 
+		///
 		/// </summary>
 		/// <param name="depthStencil"></param>
 		/// <param name="renderTargets"></param>
@@ -816,7 +816,7 @@ namespace Fusion.Drivers.Graphics {
 
 
 		/// <summary>
-		/// 
+		///
 		/// </summary>
 		/// <param name="source"></param>
 		/// <param name="destination"></param>
@@ -828,7 +828,7 @@ namespace Fusion.Drivers.Graphics {
 
 
 		/// <summary>
-		/// 
+		///
 		/// </summary>
 		/// <param name="source"></param>
 		/// <param name="destination"></param>
@@ -854,7 +854,7 @@ namespace Fusion.Drivers.Graphics {
 
 
 		/// <summary>
-		/// 
+		///
 		/// </summary>
 		/// <param name="x"></param>
 		/// <param name="y"></param>
@@ -868,7 +868,7 @@ namespace Fusion.Drivers.Graphics {
 
 
 		/// <summary>
-		/// 
+		///
 		/// </summary>
 		/// <param name="x"></param>
 		/// <param name="y"></param>
@@ -882,7 +882,7 @@ namespace Fusion.Drivers.Graphics {
 
 
 		/// <summary>
-		/// 
+		///
 		/// </summary>
 		/// <param name="x"></param>
 		/// <param name="y"></param>
@@ -899,7 +899,7 @@ namespace Fusion.Drivers.Graphics {
 	    {
 	        ViewportF[] viewports = new ViewportF[1];
             lock (deviceContext)
-	        {	            
+	        {
 	            deviceContext.Rasterizer.GetViewports(viewports);
 	        }
 
@@ -909,42 +909,42 @@ namespace Fusion.Drivers.Graphics {
 
 
 		/// <summary>
-		/// 
+		///
 		/// </summary>
 		/// <param name="register"></param>
 		/// <param name="buffer"></param>
-		/// <param name="initialCount">An array of append and consume buffer offsets. 
-		/// A value of -1 indicates to keep the current offset. 
+		/// <param name="initialCount">An array of append and consume buffer offsets.
+		/// A value of -1 indicates to keep the current offset.
 		/// Any other values set the hidden counter for that appendable and consumable UAV. </param>
-		public void SetCSRWBuffer ( int register, StructuredBuffer buffer, int initialCount = -1 ) 
-		{ 
+		public void SetCSRWBuffer ( int register, StructuredBuffer buffer, int initialCount = -1 )
+		{
 			if (register>8) {
 				throw new GraphicsException("Could not bind RW buffer at register " + register.ToString() + " (max 8)");
 			}
 
 			lock (deviceContext) {
-				DeviceContext.ComputeShader.SetUnorderedAccessView( register, buffer==null?null:buffer.UAV, initialCount ); 
+				DeviceContext.ComputeShader.SetUnorderedAccessView( register, buffer==null?null:buffer.UAV, initialCount );
 			}
 		}
 
 
 
 		/// <summary>
-		/// 
+		///
 		/// </summary>
 		/// <param name="register"></param>
 		/// <param name="buffer"></param>
-		/// <param name="initialCount">An array of append and consume buffer offsets. 
-		/// A value of -1 indicates to keep the current offset. 
+		/// <param name="initialCount">An array of append and consume buffer offsets.
+		/// A value of -1 indicates to keep the current offset.
 		/// Any other values set the hidden counter for that appendable and consumable UAV. </param>
-		public void SetPSRWBuffer ( int register, StructuredBuffer buffer, int initialCount = -1 ) 
-		{ 
+		public void SetPSRWBuffer ( int register, StructuredBuffer buffer, int initialCount = -1 )
+		{
 			if (register>8) {
 				throw new GraphicsException("Could not bind RW buffer at register " + register.ToString() + " (max 8)");
 			}
 
 			lock (deviceContext) {
-				DeviceContext.OutputMerger.SetUnorderedAccessView ( register, buffer==null?null:buffer.UAV, initialCount ); 
+				DeviceContext.OutputMerger.SetUnorderedAccessView ( register, buffer==null?null:buffer.UAV, initialCount );
 			}
 		}
 
@@ -955,17 +955,17 @@ namespace Fusion.Drivers.Graphics {
 		/// </summary>
 		/// <param name="register"></param>
 		/// <param name="buffer"></param>
-		/// <param name="initialCount">An array of append and consume buffer offsets. 
-		/// A value of -1 indicates to keep the current offset. 
+		/// <param name="initialCount">An array of append and consume buffer offsets.
+		/// A value of -1 indicates to keep the current offset.
 		/// Any other values set the hidden counter for that appendable and consumable UAV. </param>
-		public void SetCSRWTexture ( int register, RenderTargetSurface surface ) 
-		{ 
+		public void SetCSRWTexture ( int register, RenderTargetSurface surface )
+		{
 			if (register>8) {
 				throw new GraphicsException("Could not bind RW texture at register " + register.ToString() + " (max 8)");
 			}
 
 			lock (deviceContext) {
-				DeviceContext.ComputeShader.SetUnorderedAccessView( register, surface==null?null:surface.UAV, -1 ); 
+				DeviceContext.ComputeShader.SetUnorderedAccessView( register, surface==null?null:surface.UAV, -1 );
 			}
 		}
 
@@ -976,24 +976,24 @@ namespace Fusion.Drivers.Graphics {
 		/// </summary>
 		/// <param name="register"></param>
 		/// <param name="buffer"></param>
-		/// <param name="initialCount">An array of append and consume buffer offsets. 
-		/// A value of -1 indicates to keep the current offset. 
+		/// <param name="initialCount">An array of append and consume buffer offsets.
+		/// A value of -1 indicates to keep the current offset.
 		/// Any other values set the hidden counter for that appendable and consumable UAV. </param>
-		public void SetPSRWTexture ( int register, RenderTargetSurface surface ) 
-		{ 
+		public void SetPSRWTexture ( int register, RenderTargetSurface surface )
+		{
 			if (register>8) {
 				throw new GraphicsException("Could not bind RW texture at register " + register.ToString() + " (max 8)");
 			}
 
 			lock (deviceContext) {
-				DeviceContext.OutputMerger.SetUnorderedAccessView ( register, surface==null?null:surface.UAV, -1 ); 
+				DeviceContext.OutputMerger.SetUnorderedAccessView ( register, surface==null?null:surface.UAV, -1 );
 			}
 		}
 
 
 
 		/// <summary>
-		/// 
+		///
 		/// </summary>
 		/// <param name="register"></param>
 		/// <param name="volumeTexture"></param>
@@ -1004,14 +1004,14 @@ namespace Fusion.Drivers.Graphics {
 			}
 
 			lock (deviceContext) {
-				DeviceContext.OutputMerger.SetUnorderedAccessView ( register, volumeTexture==null?null:volumeTexture.UAV, -1 ); 
+				DeviceContext.OutputMerger.SetUnorderedAccessView ( register, volumeTexture==null?null:volumeTexture.UAV, -1 );
 			}
 		}
 
 
 
 		/// <summary>
-		/// 
+		///
 		/// </summary>
 		/// <param name="register"></param>
 		/// <param name="volumeTexture"></param>
@@ -1022,7 +1022,7 @@ namespace Fusion.Drivers.Graphics {
 			}
 
 			lock (deviceContext) {
-				DeviceContext.ComputeShader.SetUnorderedAccessView ( register, volumeTexture==null?null:volumeTexture.UAV, -1 ); 
+				DeviceContext.ComputeShader.SetUnorderedAccessView ( register, volumeTexture==null?null:volumeTexture.UAV, -1 );
 			}
 		}
 

@@ -58,40 +58,43 @@ namespace WpfEditorTest.ChildPanels
 
 		private void FrameDimensionsChange( object sender, PropertyChangedEventArgs args )
 		{
-			if (_locked) return;
+		    Dispatcher.Invoke(() =>
+		    {
+		        if (_locked) return;
 
-			switch (args.PropertyName)
-			{
-				case "Width":
-					{
-						WidthBuffer = _selectedFrame.Width;
-						break;
-					}
-				case "Height":
-					{
-						HeightBuffer = _selectedFrame.Height;
-						break;
-					}
-				//case "X":
-				//case "Y":
-				case "GlobalRectangle":
-					{
-						var frameDelta = new TranslateTransform();
-						RenderTransform = frameDelta;
-						frameDelta.X = _selectedFrame.GlobalRectangle.X;
-						frameDelta.Y = _selectedFrame.GlobalRectangle.Y;
-						PreviousTransform = RenderTransform;
+		        switch (args.PropertyName)
+		        {
+		            case "Width":
+		            {
+		                WidthBuffer = _selectedFrame.Width;
+		                break;
+		            }
+		            case "Height":
+		            {
+		                HeightBuffer = _selectedFrame.Height;
+		                break;
+		            }
+		            //case "X":
+		            //case "Y":
+		            case "GlobalRectangle":
+		            {
+		                var frameDelta = new TranslateTransform();
+		                RenderTransform = frameDelta;
+		                frameDelta.X = _selectedFrame.GlobalRectangle.X;
+		                frameDelta.Y = _selectedFrame.GlobalRectangle.Y;
+		                PreviousTransform = RenderTransform;
 
-						_oldX = RenderTransform.Value.OffsetX;
-						_oldY = RenderTransform.Value.OffsetY;
-						break;
-					}
-				case "Anchor":
-					{
-						UpdateVisualAnchors(_selectedFrame.Anchor);
-						break;
-					}
-			}
+		                _oldX = RenderTransform.Value.OffsetX;
+		                _oldY = RenderTransform.Value.OffsetY;
+		                break;
+		            }
+		            case "Anchor":
+		            {
+		                UpdateVisualAnchors(_selectedFrame.Anchor);
+		                break;
+		            }
+		        }
+		    });
 		}
 
 		private void UpdateVisualAnchors( FrameAnchor anchor )

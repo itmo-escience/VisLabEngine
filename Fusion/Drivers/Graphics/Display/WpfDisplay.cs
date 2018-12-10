@@ -1,130 +1,180 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.Collections.Concurrent;
+using System.Threading;
 using SharpDX.Direct3D;
 using SharpDX.Direct3D11;
-using SharpDX.Windows;
 using SharpDX.DXGI;
-using D3D = SharpDX.Direct3D11;
-using DXGI = SharpDX.DXGI;
 using System.Windows.Forms;
 using Fusion.Core.Mathematics;
-using Native.NvApi;
 using Fusion.Engine.Common;
+using Buffer = SharpDX.Direct3D11.Buffer;
 using D3DDevice = SharpDX.Direct3D11.Device;
-using System.Threading;
 
 namespace Fusion.Drivers.Graphics.Display
 {
-	class WpfDisplay : BaseDisplay
+	public class WpfDisplay : BaseDisplay
 	{
-		StereoEye[] eyeList = new[] { StereoEye.Mono };
+	    public event EventHandler UpdateReady;
 
-		RenderTarget2D backbufferColor;
-		DepthStencil2D backbufferDepth;
-		int clientWidth;
-		int clientHeight;
+	    public override StereoEye[] StereoEyeList => new[] { StereoEye.Mono };
 
-		int syncTime = (int)(1000.0 / 60.0);
+        private ConcurrentQueue<RenderTarget2D> _frontBuffers = new ConcurrentQueue<RenderTarget2D>();
+	    private RenderTarget2D _currentBuffer;
+	    private RenderTarget2D _extractedBuffer;
+	    private readonly object _extractedBufferLockHolder = new object();
+        public override RenderTarget2D BackbufferColor => _currentBuffer;
+
+        private DepthStencil2D _backbufferDepth;
+	    public override DepthStencil2D BackbufferDepth => _backbufferDepth;
+
+	    public override StereoEye TargetEye { get; internal set; }
+	    public override bool Fullscreen { get => false; internal set { } }
+	    public override Rectangle Bounds => new Rectangle(0, 0, _clientWidth, _clientHeight);
+	    public override Form Window => null;
+	    public override bool Focused { get => true; }
+
+
+        private int _clientWidth;
+	    private int _clientHeight;
+
+	    private const int SyncTime = (int)(1000.0 / 60.0);
 
 		public WpfDisplay(Game game, GraphicsDevice device, GraphicsParameters parameters) : base(game, device, parameters)
 		{
-			clientWidth		= parameters.Width;
-			clientHeight	= parameters.Height;
+			_clientWidth = parameters.Width;
+			_clientHeight = parameters.Height;
 
-			var factory = new Factory1();
-			var adapter = factory.GetAdapter(0);
-			//for(int i = 0; i < factory.GetAdapterCount(); i++)
-			//	Console.WriteLine(factory.GetAdapter(i).Description.Description);
+			var adapter = new Factory1().GetAdapter(0);
 
-			d3dDevice = new D3DDevice(adapter, DeviceCreationFlags.BgraSupport
+		    var creationFlags = DeviceCreationFlags.BgraSupport;
 #if Debug
-				| DeviceCreationFlags.Debug
-#endif               
-				, new SharpDX.Direct3D.FeatureLevel[] { SharpDX.Direct3D.FeatureLevel.Level_11_1, SharpDX.Direct3D.FeatureLevel.Level_11_0 });
+            creationFlags |= DeviceCreationFlags.Debug;
+#endif
 
-
-
+            d3dDevice = new D3DDevice(adapter, creationFlags, FeatureLevel.Level_11_1, FeatureLevel.Level_11_0);
 		}
 
-		public override StereoEye TargetEye { get; set; }
-
-		public override StereoEye[] StereoEyeList => eyeList;
-
-		public override RenderTarget2D BackbufferColor => backbufferColor;
-
-		public override DepthStencil2D BackbufferDepth => backbufferDepth;
-
-		public override bool Fullscreen { get => false; set { } }
-
-		public override Rectangle Bounds => new Rectangle(0,0, clientWidth, clientHeight);
-
-		public override Form Window => null;
-
-		public override bool Focused { get => true; }
-
-
-		public override void CreateDisplayResources()
+	    internal override void CreateDisplayResources()
 		{
 			base.CreateDisplayResources();
 
-			backbufferColor?.Dispose();
-			backbufferDepth?.Dispose();
+            _extractedBuffer?.Dispose();
+            _currentBuffer?.Dispose();
+            while(_frontBuffers.TryDequeue(out var buffer))
+                buffer.Dispose();
 
-			backbufferColor = new RenderTarget2D(device, ColorFormat.Bgra8, clientWidth, clientHeight, false, false, true);
-			backbufferDepth = new DepthStencil2D(device, DepthFormat.D24S8, backbufferColor.Width, backbufferColor.Height, backbufferColor.SampleCount);
-		}
+			_backbufferDepth?.Dispose();
 
 
-		public override void Prepare()
-		{
-			
-		}
+
+		    _frontBuffers.Enqueue(CreateBuffer());
+		    _frontBuffers.Enqueue(CreateBuffer());
+		    _currentBuffer = CreateBuffer();
+
+            _backbufferDepth = new DepthStencil2D(device, DepthFormat.D24S8, _currentBuffer.Width, _currentBuffer.Height, _currentBuffer.SampleCount);
+        }
+
+	    private RenderTarget2D CreateBuffer()
+	    {
+	        return new RenderTarget2D(device, ColorFormat.Bgra8, _clientWidth, _clientHeight, false, false, true);
+        }
+
+		public override void Prepare() { }
 
 		public override void SwapBuffers(int syncInterval)
 		{
-			d3dDevice.ImmediateContext.Flush();
+		    var q = new Query(d3dDevice, new QueryDescription { Type = QueryType.Event });
 
-			//if (syncInterval < 0) return;
-			//
-			//int miliseconds = (int)(Game.Time.ElapsedSec * 1000);
-			//
-			//if(miliseconds < syncTime) {
-			//	Thread.Sleep(syncTime - miliseconds);
-			//}
+            d3dDevice.ImmediateContext.Flush();
+		    d3dDevice.ImmediateContext.End(q);
+
+            while (true)
+            {
+                if (d3dDevice.ImmediateContext.GetData(q, out int queryResult) && queryResult != 0)
+                {
+                    break;
+                }
+            }
+
+            q.Dispose();
+
+            _frontBuffers.Enqueue(_currentBuffer);
+            if (!_frontBuffers.TryDequeue(out _currentBuffer))
+            {
+                throw new InvalidOperationException("There is no backBuffer in the queue. What happened?");
+            }
 		}
+
+
+        /// <summary>
+        /// Gets one buffer out of front buffer collection
+        /// </summary>
+        /// <returns></returns>
+	    public RenderTarget2D ExtractBuffer()
+	    {
+	        lock (_extractedBufferLockHolder)
+	        {
+	            if (_extractedBuffer != null)
+	                throw new InvalidOperationException("Return extracted buffer before extracting again.");
+
+	            if (!_frontBuffers.TryDequeue(out _extractedBuffer))
+	            {
+                    throw new InvalidOperationException("There is no backBuffer in the queue. What happened?");
+	            }
+
+	            return _extractedBuffer;
+	        }
+	    }
+
+	    /// <summary>
+	    /// Returns extracted buffer to front buffer collection
+	    /// </summary>
+	    /// <returns></returns>
+        public void ReturnBuffer()
+	    {
+	        lock (_extractedBufferLockHolder)
+	        {
+	            if (_extractedBuffer == null)
+	                throw new InvalidOperationException("There is nothing to return");
+
+	            _frontBuffers.Enqueue(!_extractedBuffer.IsDisposed ? _extractedBuffer : CreateBuffer());
+
+
+	            _extractedBuffer = null;
+	        }
+	    }
+
 
 		public override void Update()
 		{
-			if(isResizeRequested) {
-				clientWidth = reqWidth;
-				clientHeight = reqHeight;
+            if (_isResizeRequested) {
+				_clientWidth = _reqWidth;
+				_clientHeight = _reqHeight;
 
 				CreateDisplayResources();
 
 				device.NotifyViewportChanges();
 
-				isResizeRequested = false;
+				_isResizeRequested = false;
 			}
+
+            UpdateReady?.Invoke(this, null);
 		}
 
 
-		public override void Resize(int width, int height)
+	    internal override void Resize(int width, int height)
 		{
 			if (width == 0 || height == 0) return;
-			if (clientWidth == width && clientHeight == height) return;
+			if (_clientWidth == width && _clientHeight == height) return;
 
-			reqWidth = width;
-			reqHeight = height;
-			isResizeRequested = true;
+			_reqWidth = width;
+			_reqHeight = height;
+			_isResizeRequested = true;
 		}
 
 
-		bool isResizeRequested = false;
-		int reqWidth = 1;
-		int reqHeight = 1;
-
+	    private bool _isResizeRequested = false;
+	    private int _reqWidth = 1;
+		private int _reqHeight = 1;
 	}
 }
