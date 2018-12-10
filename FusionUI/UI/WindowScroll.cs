@@ -207,6 +207,7 @@ namespace FusionUI.UI
         protected override void Update(GameTime gameTime)
         {
             base.Update(gameTime);
+            scrollHolder.UnitHeight = Math.Min(HeightLimit, holder.UnitHeight);
             if (AllowShrink)
             {
 				if (!ResizedManually)
@@ -216,7 +217,7 @@ namespace FusionUI.UI
 				}
 				else
 				{
-					scrollHolder.UnitHeight = UnitHeight;
+					scrollHolder.UnitHeight = UnitHeight - ((HatPanel?.UnitHeight ?? 0) + (BasementPanel?.UnitHeight ?? 0) + UnitPaddingTop + UnitPaddingBottom);
 				}
             }                        
             holder.UnitY = MathUtil.Clamp(holder.UnitY, Math.Min(MaxHeight - RealHeight, 0), 0);

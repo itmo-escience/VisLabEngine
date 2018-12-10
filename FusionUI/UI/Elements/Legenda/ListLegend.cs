@@ -9,6 +9,7 @@ using Fusion.Engine.Graphics;
 using Fusion.Engine.Graphics.GIS;
 using FusionUI;
 using FusionUI.UI;
+using FusionUI.UI.Elements.TextFormatting;
 
 namespace FusionUI.Legenda
 {
@@ -38,10 +39,9 @@ namespace FusionUI.Legenda
                     legendFrame = new LayoutFrame(ApplicationInterface.Instance.FrameProcessor, 0, 0, Width, 0, Color.Zero, LayoutType.Vertical);
                     if (!String.IsNullOrEmpty(Name))
                     {
-                        var Caption = new ScalableFrame(ui, 0, 0, Width,
-                            UIConfig.UnitLegendElementHeight, Name, Color.Zero)
-                        {
-                            FontHolder = UIConfig.FontSubtitle,
+                        var Caption = new FormatTextBlock(ui, 0, 0, Width,
+                            UIConfig.UnitLegendElementHeight, Name, Color.Zero, UIConfig.FontSubtitle)
+                        {                            
                             UnitPadding = 3,
                         };
                         legendFrame.Add(Caption);

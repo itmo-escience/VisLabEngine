@@ -476,7 +476,7 @@ namespace FusionUI.UI.Elements.TextFormatting
             }
             LastText = Text;
             TextHeight = strings.Sum(a => a.Rect.Height);
-            this.Height = Math.Max(TextHeight, MinHeight);
+            this.Height = Math.Max(TextHeight + PaddingTop + PaddingBottom, MinHeight);
         }
 
         private int TextHeight = 0;

@@ -336,7 +336,7 @@ inout TriangleStream<GS_OUTPUT> stream
 
 #ifdef ARC_LINE	
 	float slicesCount	= 30;
-	float radius 		= length(dis)/2.0f;
+	float radius 		= length(dis) * 0.5f;
 #endif
 		
 float texMinX = 0.0f;
