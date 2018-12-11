@@ -9,7 +9,6 @@ namespace WpfEditorTest.UndoRedo
 
 		private CommandManager()
 		{
-
 		}
 
 		private Stack<IEditorCommand> _doCommands = new Stack<IEditorCommand>();
@@ -28,7 +27,8 @@ namespace WpfEditorTest.UndoRedo
 			var movedCommand = _undoCommands.Pop();
 			movedCommand.Undo();
 			_doCommands.Push(movedCommand);
-			OnPropertyChanged();
+			OnPropertyChanged(nameof(UndoStackIsNotEmpty));
+			OnPropertyChanged(nameof(RedoStackIsNotEmpty));
 			return true;
 		}
 
@@ -40,7 +40,8 @@ namespace WpfEditorTest.UndoRedo
 			var movedCommand = _doCommands.Pop();
 			movedCommand.Do();
 			_undoCommands.Push(movedCommand);
-			OnPropertyChanged();
+			OnPropertyChanged(nameof(UndoStackIsNotEmpty));
+			OnPropertyChanged(nameof(RedoStackIsNotEmpty));
 			return true;
 		}
 
@@ -49,14 +50,16 @@ namespace WpfEditorTest.UndoRedo
 			command.Do();
 			_undoCommands.Push(command);
 			_doCommands.Clear();
-			OnPropertyChanged();
+			OnPropertyChanged(nameof(UndoStackIsNotEmpty));
+			OnPropertyChanged(nameof(RedoStackIsNotEmpty));
 		}
 
 		public void Reset()
 		{
 			_undoCommands.Clear();
 			_doCommands.Clear();
-			OnPropertyChanged();
+			OnPropertyChanged(nameof(UndoStackIsNotEmpty));
+			OnPropertyChanged(nameof(RedoStackIsNotEmpty));
 		}
 
 		protected void OnPropertyChanged( [System.Runtime.CompilerServices.CallerMemberName] string changedProperty = "" )

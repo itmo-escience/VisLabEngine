@@ -134,10 +134,8 @@ namespace WpfEditorTest
             };
             _treeView.ElementHierarchyView.SetBinding(TreeView.ItemsSourceProperty, b);
 
-			CommandManager.Instance.PropertyChanged += ( s, e ) => {
-				UndoButton.IsEnabled = CommandManager.Instance.UndoStackIsNotEmpty;
-				RedoButton.IsEnabled = CommandManager.Instance.RedoStackIsNotEmpty;
-			};
+				UndoButton.DataContext = CommandManager.Instance;
+				RedoButton.DataContext = CommandManager.Instance;
 
 		}
 

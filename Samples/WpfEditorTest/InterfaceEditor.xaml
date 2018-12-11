@@ -60,12 +60,13 @@
                 <Button Command="{x:Static local:InterfaceEditor.SaveFrameCmd}" Content="Save frame" ToolTip="Save selected frame as template..."/>
 
                 <Button Name="UndoButton" Command="{x:Static local:InterfaceEditor.UndoChangeCmd}" Content="Undo change" ToolTip="Revert last change to frame"
-                        IsEnabled="False"/>
+                        IsEnabled="{Binding UndoStackIsNotEmpty}"/>
                 <Button Name="RedoButton" Command="{x:Static local:InterfaceEditor.RedoChangeCmd}" Content="Redo change" ToolTip="Repeat reverted change to frame"
-                        IsEnabled="False"/>
-
+                        IsEnabled="{Binding RedoStackIsNotEmpty}"/>
+            </ToolBar>
+            <ToolBar>
                 <Menu>
-                    <MenuItem Header="Windows">
+                    <MenuItem Header="Panels">
                         <MenuItem Name="miFrameProperties" Header="Frame Properties" Click="MenuItem_Click"/>
                         <MenuItem Name="miSceneTreeView" Header="Scene TreeView" Click="MenuItem_Click"/>
                         <MenuItem Name="miFrameTemplates" Header="Frame Templates" Click="MenuItem_Click"/>
