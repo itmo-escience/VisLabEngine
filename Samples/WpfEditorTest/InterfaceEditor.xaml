@@ -40,11 +40,20 @@
         <CommandBinding Command="{x:Static local:InterfaceEditor.PasteFrameCmd}"
                         Executed="ExecutedPasteFrameCmdCommand"
                         CanExecute="AlwaysCanExecute" />
+        <CommandBinding Command="{x:Static local:InterfaceEditor.QuickSaveSceneCmd}"
+                        Executed="ExecutedQuickSaveSceneCommand"
+                        CanExecute="AlwaysCanExecute" />
+        <CommandBinding Command="{x:Static local:InterfaceEditor.NewSceneCmd}"
+                        Executed="ExecutedNewSceneCommand"
+                        CanExecute="AlwaysCanExecute" />
     </Window.CommandBindings>
     <Window.InputBindings>
         <KeyBinding Command="{x:Static local:InterfaceEditor.UndoChangeCmd}" Key="Z" Modifiers="Ctrl"/>
         <KeyBinding Command="{x:Static local:InterfaceEditor.RedoChangeCmd}" Key="Y" Modifiers="Ctrl"/>
         <KeyBinding Command="{x:Static local:InterfaceEditor.SaveSceneCmd}" Key="S" Modifiers="Ctrl+Shift"/>
+        <KeyBinding Command="{x:Static local:InterfaceEditor.QuickSaveSceneCmd}" Key="S" Modifiers="Ctrl"/>
+        <KeyBinding Command="{x:Static local:InterfaceEditor.NewSceneCmd}" Key="N" Modifiers="Ctrl"/>
+        <KeyBinding Command="{x:Static local:InterfaceEditor.LoadSceneCmd}" Key="O" Modifiers="Ctrl"/>
         <KeyBinding Command="{x:Static local:InterfaceEditor.CopyFrameCmd}" Key="C" Modifiers="Ctrl"/>
         <KeyBinding Command="{x:Static local:InterfaceEditor.PasteFrameCmd}" Key="V" Modifiers="Ctrl"/>
     </Window.InputBindings>
@@ -55,9 +64,10 @@
         </Grid.RowDefinitions>
         <ToolBarTray Grid.Row="0" IsLocked="True" >
             <ToolBar>
+                <Button Command="{x:Static local:InterfaceEditor.NewSceneCmd}" Content="New scene" ToolTip="Create new empty scene"/>
                 <Button Command="{x:Static local:InterfaceEditor.SaveSceneCmd}" Content="Save scene" ToolTip="Save scene to file..."/>
                 <Button Command="{x:Static local:InterfaceEditor.LoadSceneCmd}" Content="Load scene" ToolTip="Load scene rom file..."/>
-                <Button Command="{x:Static local:InterfaceEditor.SaveFrameCmd}" Content="Save frame" ToolTip="Save selected frame as template..."/>
+                <Button Command="{x:Static local:InterfaceEditor.SaveFrameCmd}" Content="Save template" ToolTip="Save selected frame as template..."/>
 
                 <Button Name="UndoButton" Command="{x:Static local:InterfaceEditor.UndoChangeCmd}" Content="Undo change" ToolTip="Revert last change to frame"
                         IsEnabled="{Binding UndoStackIsNotEmpty}"/>

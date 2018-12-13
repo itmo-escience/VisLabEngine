@@ -19,6 +19,9 @@ namespace WpfEditorTest.UndoRedo
 		public bool UndoStackIsNotEmpty { get { return _undoCommands.Count > 0; } }
 		public bool RedoStackIsNotEmpty { get { return _doCommands.Count > 0; } }
 
+		private bool _isDirty = false;
+		public bool IsDirty { get { return _isDirty; } }
+
 		public bool TryUndoCommand()
 		{
 			if (_undoCommands.Count==0)
@@ -29,6 +32,7 @@ namespace WpfEditorTest.UndoRedo
 			_doCommands.Push(movedCommand);
 			OnPropertyChanged(nameof(UndoStackIsNotEmpty));
 			OnPropertyChanged(nameof(RedoStackIsNotEmpty));
+			_isDirty = true;
 			return true;
 		}
 
@@ -42,6 +46,7 @@ namespace WpfEditorTest.UndoRedo
 			_undoCommands.Push(movedCommand);
 			OnPropertyChanged(nameof(UndoStackIsNotEmpty));
 			OnPropertyChanged(nameof(RedoStackIsNotEmpty));
+			_isDirty = true;
 			return true;
 		}
 
@@ -52,6 +57,7 @@ namespace WpfEditorTest.UndoRedo
 			_doCommands.Clear();
 			OnPropertyChanged(nameof(UndoStackIsNotEmpty));
 			OnPropertyChanged(nameof(RedoStackIsNotEmpty));
+			_isDirty = true;
 		}
 
 		public void Reset()
@@ -65,6 +71,11 @@ namespace WpfEditorTest.UndoRedo
 		protected void OnPropertyChanged( [System.Runtime.CompilerServices.CallerMemberName] string changedProperty = "" )
 		{
 			PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(changedProperty));
+		}
+
+		public void SetNotDirty()
+		{
+			_isDirty = false;
 		}
 	}
 }
