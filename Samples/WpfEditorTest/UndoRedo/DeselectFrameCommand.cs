@@ -12,9 +12,9 @@ namespace WpfEditorTest.UndoRedo
 	{
 		private Frame _frame;
 
-		public DeselectFrameCommand( Frame frame )
+		public DeselectFrameCommand()
 		{
-			this._frame = frame;
+			this._frame = SelectionManager.Instance.SelectedFrame;
 		}
 
 		public void Do()

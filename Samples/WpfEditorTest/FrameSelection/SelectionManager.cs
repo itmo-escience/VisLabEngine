@@ -24,8 +24,16 @@ namespace WpfEditorTest.FrameSelection
 
 		public void SelectFrame( Frame frame )
 		{
-			SelectedFrame = frame;
-			FrameSelected?.Invoke(this, SelectedFrame);
+			if (frame!=null)
+			{
+				SelectedFrame = frame;
+				FrameSelected?.Invoke(this, SelectedFrame);
+			}
+			else
+			{
+				FrameSelected?.Invoke(this, frame);
+				SelectedFrame = frame;
+			}
 		}
 
 		public void DeselectFrame()

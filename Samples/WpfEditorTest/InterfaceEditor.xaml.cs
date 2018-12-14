@@ -114,7 +114,10 @@ namespace WpfEditorTest
 				_palette.Show();
 			};
 
-            _treeView.SelectedFrameChangedInUI += (_, frame) => SelectFrame(frame);
+			_treeView.SelectedFrameChangedInUI += ( _, frame ) => {
+				var command = new SelectFrameCommand(frame);
+				CommandManager.Instance.Execute(command);
+			}; //SelectFrame(frame);
 			_treeView.RequestFrameDeletionInUI += ( _, __ ) => TryDeleteSelectedFrame();
 
 			var templates = Directory.GetFiles(TemplatesPath, "*.xml").ToList();
@@ -141,11 +144,19 @@ namespace WpfEditorTest
 				RedoButton.DataContext = CommandManager.Instance;
 
 			SelectionManager.Instance.FrameSelected += ( s, e ) => {
-				this.SelectFrame(e);
+				if (e!=null)
+				{
+					this.SelectFrame(e);
+				}
+				else
+				{
+					var releasedFrame = SelectionManager.Instance.SelectedFrame;
+					this.ResetSelectedFrame(new Point(releasedFrame.GlobalRectangle.X, releasedFrame.GlobalRectangle.Y));
+				}
 			};
-			SelectionManager.Instance.FrameDeselected += ( s, e ) => {
-				this.ResetSelectedFrame(new Point(e.GlobalRectangle.X,e.GlobalRectangle.Y));
-			};
+			//SelectionManager.Instance.FrameDeselected += ( s, e ) => {
+			//	this.ResetSelectedFrame(new Point(e.GlobalRectangle.X,e.GlobalRectangle.Y));
+			//};
 		}
 
 	    protected override void OnSourceInitialized(EventArgs e)
@@ -287,14 +298,15 @@ namespace WpfEditorTest
 					var command = new CommandGroup(
 						new FrameParentChangeCommand(createdFrame, hoveredFrame),
 						new FramePropertyChangeCommand(createdFrame, "X", (int)e.MouseDevice.GetPosition(this).X - hoveredFrame.GlobalRectangle.X - createdFrame.Width / 2),
-						new FramePropertyChangeCommand(createdFrame, "Y", (int)e.MouseDevice.GetPosition(this).Y - hoveredFrame.GlobalRectangle.Y - createdFrame.Height / 2)
+						new FramePropertyChangeCommand(createdFrame, "Y", (int)e.MouseDevice.GetPosition(this).Y - hoveredFrame.GlobalRectangle.Y - createdFrame.Height / 2),
+						new SelectFrameCommand(createdFrame)
 					);
 					CommandManager.Instance.Execute(command);
 
 					//createdFrame.X = (int)e.MouseDevice.GetPosition(this).X - createdFrame.Width / 2;
 					//createdFrame.Y = (int)e.MouseDevice.GetPosition(this).Y - createdFrame.Height / 2;
 					//LandFrameOnScene(createdFrame, e.GetPosition(this));
-					SelectFrame(createdFrame);
+					//SelectFrame(createdFrame);
 
 					var delta = new TranslateTransform();
 					_frameSelectionPanel.RenderTransform = delta;
@@ -317,7 +329,10 @@ namespace WpfEditorTest
 
 		    if (hovered != null)
 		    {
-		        SelectFrame(hovered);
+				//SelectFrame(hovered);
+				var command = new SelectFrameCommand(hovered);
+				CommandManager.Instance.Execute(command);
+
 				InitFramePosition = new Point(hovered.X,hovered.Y);
 				InitFrameParent = hovered.Parent;
 				InitMousePosition = e.GetPosition(this);
@@ -333,7 +348,9 @@ namespace WpfEditorTest
 			}
 			else
 			{
-				ResetSelectedFrame(e.GetPosition(this));
+				//ResetSelectedFrame(e.GetPosition(this));
+				var command = new SelectFrameCommand(null);
+				CommandManager.Instance.Execute(command);
 			}
 		}
 
@@ -350,10 +367,12 @@ namespace WpfEditorTest
 			if (_frameSelectionPanel.SelectedFrame != null)
 			{
 				var selected = _frameSelectionPanel.SelectedFrame;
-				var command = new FrameParentChangeCommand(selected, null);
+				var command = new CommandGroup(
+					new FrameParentChangeCommand(selected, null),
+					new DeselectFrameCommand());
 				CommandManager.Instance.Execute(command);
 
-				ResetSelectedFrame(new Point(0, 0));
+				//ResetSelectedFrame(new Point(0, 0));
 			}
 		}
 
