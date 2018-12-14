@@ -10,23 +10,23 @@ namespace WpfEditorTest.UndoRedo
 {
 	public class SelectFrameCommand : IEditorCommand
 	{
-		private Frame _frame;
-		private Frame _oldFrame;
+		private List<Frame> _frames;
+		private List<Frame> _oldFrames;
 
-		public SelectFrameCommand( Frame frame)
+		public SelectFrameCommand( List<Frame> frame )
 		{
-			this._frame = frame;
-			this._oldFrame = SelectionManager.Instance.SelectedFrame;
+			this._frames = frame;
+			this._oldFrames = SelectionManager.Instance.SelectedFrames;
 		}
 
 		public void Do()
 		{
-			SelectionManager.Instance.SelectFrame(_frame);
+			SelectionManager.Instance.SelectFrame(_frames);
 		}
 
 		public void Undo()
 		{
-			SelectionManager.Instance.SelectFrame(_oldFrame);
+			SelectionManager.Instance.SelectFrame(_oldFrames);
 		}
 	}
 }

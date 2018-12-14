@@ -10,11 +10,11 @@ namespace WpfEditorTest.UndoRedo
 {
 	internal class DeselectFrameCommand : IEditorCommand
 	{
-		private Frame _frame;
+		private List<Frame> _frame;
 
 		public DeselectFrameCommand()
 		{
-			this._frame = SelectionManager.Instance.SelectedFrame;
+			this._frame = SelectionManager.Instance.SelectedFrames;
 		}
 
 		public void Do()

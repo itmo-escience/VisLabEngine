@@ -60,6 +60,11 @@ namespace WpfEditorTest.UndoRedo
 			_isDirty = true;
 		}
 
+		public void ExecuteWithoutMemorising( IEditorCommand command )
+		{
+			command.Do();
+		}
+
 		public void Reset()
 		{
 			_undoCommands.Clear();

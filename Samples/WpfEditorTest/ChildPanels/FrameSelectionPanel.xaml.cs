@@ -169,6 +169,9 @@ namespace WpfEditorTest.ChildPanels
 			}
 		}
 
+		public Point InitFramePosition { get; internal set; }
+		public Fusion.Engine.Frames.Frame InitFrameParent { get; internal set; }
+
 		public FrameSelectionPanel( InterfaceEditor interfaceEditor )
 		{
 			InitializeComponent();

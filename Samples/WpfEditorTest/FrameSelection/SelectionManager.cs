@@ -16,30 +16,22 @@ namespace WpfEditorTest.FrameSelection
 		{
 		}
 
-		public Frame SelectedFrame { get; private set; }
+		public List<Frame> SelectedFrames { get; private set; } = new List<Frame>();
 
-		public event EventHandler<Frame> FrameSelected;
+		public event EventHandler<List<Frame>> FrameSelected;
 
-		public event EventHandler<Frame> FrameDeselected;
+		public event EventHandler<List<Frame>> FrameDeselected;
 
-		public void SelectFrame( Frame frame )
+		public void SelectFrame( List<Frame> frame )
 		{
-			if (frame!=null)
-			{
-				SelectedFrame = frame;
-				FrameSelected?.Invoke(this, SelectedFrame);
-			}
-			else
-			{
-				FrameSelected?.Invoke(this, frame);
-				SelectedFrame = frame;
-			}
+				SelectedFrames = frame;
+				FrameSelected?.Invoke(this, SelectedFrames);
 		}
 
 		public void DeselectFrame()
 		{
-			FrameDeselected?.Invoke(this, SelectedFrame);
-			SelectedFrame = null;
+			FrameDeselected?.Invoke(this, SelectedFrames);
+			SelectedFrames = null;
 		}
 	}
 }
