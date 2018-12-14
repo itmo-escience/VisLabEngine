@@ -68,11 +68,6 @@ namespace GISTest
 		public GameConsole console;
 
 
-		[GameModule("GUI", "gui", InitOrder.Before)]
-		public FrameProcessor FrameProcessor { get { return userInterface; } }
-		FrameProcessor userInterface;
-
-
         SpriteLayer     testSpritelayerLayer;
         SpriteLayer		uiLayer;
 		RenderWorld		masterView;
