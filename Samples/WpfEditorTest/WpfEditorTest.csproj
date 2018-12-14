@@ -40,6 +40,7 @@
       <HintPath>..\..\FusionUI\bin\Debug\FusionUI.dll</HintPath>
     </Reference>
     <Reference Include="System" />
+    <Reference Include="System.Configuration" />
     <Reference Include="System.Data" />
     <Reference Include="System.Drawing" />
     <Reference Include="System.Windows.Forms" />
@@ -79,6 +80,9 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="FrameSelection\SelectionManager.cs" />
+    <Compile Include="UndoRedo\DeselectFrameCommand.cs" />
+    <Compile Include="UndoRedo\SelectFrameCommand.cs" />
     <Compile Include="WPFConverters\BoolToIndexConverter.cs" />
     <Compile Include="ChildPanels\FrameDetails.xaml.cs">
       <DependentUpon>FrameDetails.xaml</DependentUpon>
@@ -97,11 +101,10 @@
     </Compile>
     <Compile Include="WPFConverters\ButtonEnableConverter.cs" />
     <Compile Include="WPFConverters\DataTemplateSelectorOfProperty.cs" />
-    <Compile Include="Extentions.cs" />
     <Compile Include="UndoRedo\FrameParentChangeCommand.cs" />
-    <Compile Include="Property.cs" />
+    <Compile Include="ChildPanels\MVVMFrameProperty.cs" />
     <Compile Include="WPFConverters\PropertyValueConverter.cs" />
-    <Compile Include="StaticData.cs" />
+    <Compile Include="ApplicationConfig.cs" />
     <Compile Include="UndoRedo\CommandGroup.cs" />
     <Compile Include="UndoRedo\CommandManager.cs" />
     <Compile Include="UndoRedo\IEditorCommand.cs" />
@@ -130,20 +133,12 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="MainWindow.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
     <Compile Include="App.xaml.cs">
       <DependentUpon>App.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="InterfaceEditor.xaml.cs">
       <DependentUpon>InterfaceEditor.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="MainWindow.xaml.cs">
-      <DependentUpon>MainWindow.xaml</DependentUpon>
-      <SubType>Code</SubType>
     </Compile>
   </ItemGroup>
   <ItemGroup>

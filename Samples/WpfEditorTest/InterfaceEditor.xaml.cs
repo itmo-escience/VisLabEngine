@@ -22,6 +22,8 @@ using WpfEditorTest.UndoRedo;
 using System.Windows.Media.Imaging;
 using Bitmap = System.Drawing.Bitmap;
 using System.Windows.Interop;
+using System.Configuration;
+using WpfEditorTest.FrameSelection;
 
 namespace WpfEditorTest
 {
@@ -32,7 +34,9 @@ namespace WpfEditorTest
 	{
 		public static RoutedCommand SaveFrameCmd = new RoutedCommand();
 	    public static RoutedCommand SaveSceneCmd = new RoutedCommand();
-	    public static RoutedCommand LoadSceneCmd = new RoutedCommand();
+		public static RoutedCommand QuickSaveSceneCmd = new RoutedCommand();
+		public static RoutedCommand NewSceneCmd = new RoutedCommand();
+		public static RoutedCommand LoadSceneCmd = new RoutedCommand();
 		public static RoutedCommand RedoChangeCmd = new RoutedCommand();
 		public static RoutedCommand UndoChangeCmd = new RoutedCommand();
 		public static RoutedCommand CopyFrameCmd = new RoutedCommand();
@@ -59,8 +63,9 @@ namespace WpfEditorTest
 		public FusionUI.UI.ScalableFrame DragFieldFrame;
 		public FusionUI.UI.ScalableFrame SceneFrame;
 		public FusionUI.UI.MainFrame RootFrame;
+		private string CurrentSceneFile;
 
-        public InterfaceEditor()
+		public InterfaceEditor()
         {
             InitializeComponent();
 
@@ -94,7 +99,12 @@ namespace WpfEditorTest
             _treeView = new FrameTreeView();
             _palette = new FramePalette();
 
-            SourceInitialized += (_, args) =>
+			miFrameProperties.Tag = _details;
+			miFrameTemplates.Tag = _palette;
+			miSceneTreeView.Tag = _treeView;
+
+
+			SourceInitialized += (_, args) =>
             {
                 _details.Owner = this;
                 _details.Show();
@@ -106,7 +116,6 @@ namespace WpfEditorTest
 
             _treeView.SelectedFrameChangedInUI += (_, frame) => SelectFrame(frame);
 			_treeView.RequestFrameDeletionInUI += ( _, __ ) => TryDeleteSelectedFrame();
-			_frameSelectionPanel.RequestFrameSelectionReset += ( _, __ ) => ResetSelectedFrame(new Point(0, 0));
 
 			var templates = Directory.GetFiles(TemplatesPath, "*.xml").ToList();
             _palette.AvailableFrames.ItemsSource = templates.Select(t => t.Split('\\').Last().Split('.').First());
@@ -128,9 +137,15 @@ namespace WpfEditorTest
             };
             _treeView.ElementHierarchyView.SetBinding(TreeView.ItemsSourceProperty, b);
 
-			//UndoButton.DataContext = CommandManager.Instance.UndoStackIsNotEmpty;
-			//RedoButton.DataContext = CommandManager.Instance.RedoStackIsNotEmpty;
+				UndoButton.DataContext = CommandManager.Instance;
+				RedoButton.DataContext = CommandManager.Instance;
 
+			SelectionManager.Instance.FrameSelected += ( s, e ) => {
+				this.SelectFrame(e);
+			};
+			SelectionManager.Instance.FrameDeselected += ( s, e ) => {
+				this.ResetSelectedFrame(new Point(e.GlobalRectangle.X,e.GlobalRectangle.Y));
+			};
 		}
 
 	    protected override void OnSourceInitialized(EventArgs e)
@@ -461,13 +476,16 @@ namespace WpfEditorTest
 
         internal void TryLoadSceneAsTemplate()
         {
-            var startPath = Path.GetFullPath(Path.Combine(TemplatesPath, ".."));
+			if (!this.CheckForChanges())
+				return;
+
+			var startPath = Path.GetFullPath(Path.Combine(TemplatesPath, ".."));
             var filter = "XML files(*.xml)| *.xml";
             using (var dialog = new System.Windows.Forms.OpenFileDialog() { InitialDirectory = startPath, Multiselect = false, Filter = filter })
             {
                 if (dialog.ShowDialog() != System.Windows.Forms.DialogResult.OK) return;
 
-                var createdFrame = CreateFrameFromFile(dialog.FileName);
+				var createdFrame = CreateFrameFromFile(dialog.FileName);
                 if (createdFrame != null && createdFrame.GetType() == typeof(FusionUI.UI.ScalableFrame))
                 {
                     RootFrame.Remove(SceneFrame);
@@ -482,10 +500,33 @@ namespace WpfEditorTest
                     };
                     _treeView.ElementHierarchyView.SetBinding(TreeView.ItemsSourceProperty, childrenBinding);
                 }
-            }
+				this.CurrentSceneFile = dialog.FileName;
+				CommandManager.Instance.SetNotDirty();
+				CommandManager.Instance.Reset();
+			}
         }
 
-        internal void TrySaveSceneAsTemplate()
+		private void TrySetNewScene()
+		{
+			if (!this.CheckForChanges())
+				return;
+			RootFrame.Remove(SceneFrame);
+			ResetSelectedFrame(new Point(0, 0));
+			SceneFrame = new FusionUI.UI.ScalableFrame(0, 0, this.RootFrame.UnitWidth, this.RootFrame.UnitHeight, "Scene", Fusion.Core.Mathematics.Color.Zero) { Anchor = FrameAnchor.All };
+			RootFrame.Add(SceneFrame);
+			DragFieldFrame.ZOrder = 1000000;
+
+			childrenBinding = new Binding("Children")
+			{
+				Source = SceneFrame,
+			};
+			_treeView.ElementHierarchyView.SetBinding(TreeView.ItemsSourceProperty, childrenBinding);
+			this.CurrentSceneFile = null;
+			CommandManager.Instance.SetNotDirty();
+			CommandManager.Instance.Reset();
+		}
+
+		internal void TrySaveSceneAsTemplate()
         {
             var startPath = Path.GetFullPath(Path.Combine(TemplatesPath, ".."));
             var filter = "XML files(*.xml)| *.xml";
@@ -495,10 +536,24 @@ namespace WpfEditorTest
                 {
                     Fusion.Core.Utils.FrameSerializer.Write(SceneFrame, dialog.FileName);
                 }
-            }
+				this.CurrentSceneFile = dialog.FileName;
+
+			}
         }
 
-        internal void TrySaveFrameAsTemplate()
+		internal void TrySaveScene()
+		{
+			if (!String.IsNullOrEmpty(this.CurrentSceneFile))
+			{
+				Fusion.Core.Utils.FrameSerializer.Write(SceneFrame, this.CurrentSceneFile); 
+			}
+			else
+			{
+				TrySaveSceneAsTemplate();
+			}
+		}
+
+		internal void TrySaveFrameAsTemplate()
         {
             if (_frameSelectionPanel.SelectedFrame != null)
             {
@@ -547,7 +602,17 @@ namespace WpfEditorTest
 	        TrySaveSceneAsTemplate();
 	    }
 
-	    private void ExecutedLoadSceneCommand(object sender, ExecutedRoutedEventArgs e)
+		private void ExecutedQuickSaveSceneCommand( object sender, ExecutedRoutedEventArgs e )
+		{
+			TrySaveScene();
+		}
+
+		private void ExecutedNewSceneCommand( object sender, ExecutedRoutedEventArgs e )
+		{
+			TrySetNewScene();
+		}
+
+		private void ExecutedLoadSceneCommand(object sender, ExecutedRoutedEventArgs e)
 	    {
 	        TryLoadSceneAsTemplate();
 	    }
@@ -619,5 +684,71 @@ namespace WpfEditorTest
 			}
 		}
 		#endregion
+
+		private void Window_Closing( object sender, CancelEventArgs e )
+		{
+
+			if (!this.CheckForChanges())
+			{
+				e.Cancel = true;
+				return;
+			}
+				
+
+			var configFile = ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.None);
+			var settings = configFile.AppSettings.Settings;
+			settings["DetailsPanelX"].Value = _details.Left.ToString();
+			settings["DetailsPanelY"].Value = _details.Top.ToString();
+			settings["TreeViewPanelX"].Value = _treeView.Left.ToString();
+			settings["TreeViewPanelY"].Value = _treeView.Top.ToString();
+			settings["PalettePanelX"].Value = _palette.Left.ToString();
+			settings["PalettePanelY"].Value = _palette.Top.ToString();
+			settings["DetailsPanelVisibility"].Value = _details.Visibility.ToString();
+			settings["PalettePanelVisibility"].Value = _palette.Visibility.ToString();
+			settings["TreeViewPanelVisibility"].Value = _treeView.Visibility.ToString();
+
+			configFile.Save(ConfigurationSaveMode.Modified);
+			ConfigurationManager.RefreshSection(configFile.AppSettings.SectionInformation.Name);
+		}
+
+		private bool CheckForChanges()
+		{
+			if (CommandManager.Instance.IsDirty)
+			{
+				var result = MessageBox.Show(@"There are unsaved changes in the current scene.
+								Do you want to save them?", "Attention", MessageBoxButton.YesNoCancel);
+				switch (result)
+				{
+					case MessageBoxResult.Yes:
+						{
+							this.TrySaveScene();
+							return true;
+						}
+					case MessageBoxResult.No:
+						{
+							return true;
+						}
+					case MessageBoxResult.Cancel:
+						{
+							return false;
+						}
+					default:
+						{
+							return true;
+						}
+				}
+			}
+			else
+			{
+				return true;
+			}
+		}
+
+		private void MenuItem_Click( object sender, RoutedEventArgs e )
+		{
+			Window panel = (sender as MenuItem).Tag as Window;
+			panel.Visibility = Visibility.Visible;
+			panel.Focus();
+		}
 	}
 }

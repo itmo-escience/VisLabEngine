@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace WpfEditorTest.UndoRedo
 {
-	class FramePropertyChangeCommand : IEditorCommand
+	internal class FramePropertyChangeCommand : IEditorCommand
 	{
 		Frame _frame;
 		PropertyInfo _propertyToChange;

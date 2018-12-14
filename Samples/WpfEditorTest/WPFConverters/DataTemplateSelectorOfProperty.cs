@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
+using WpfEditorTest.ChildPanels;
 
 namespace WpfEditorTest.WPFConverters
 {
@@ -15,9 +16,9 @@ namespace WpfEditorTest.WPFConverters
 		{
 			FrameworkElement element = container as FrameworkElement;
 
-			if (element != null && item != null && item is Propsy)
+			if (element != null && item != null && item is MVVMFrameProperty)
 			{
-				Propsy Prop = item as Propsy;
+				MVVMFrameProperty Prop = item as MVVMFrameProperty;
 
 
 
