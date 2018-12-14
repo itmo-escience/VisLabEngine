@@ -3,7 +3,7 @@ using System.ComponentModel;
 
 namespace WpfEditorTest.UndoRedo
 {
-	public class CommandManager : INotifyPropertyChanged
+	internal class CommandManager : INotifyPropertyChanged
 	{
 		public static CommandManager Instance { get; } = new CommandManager();
 

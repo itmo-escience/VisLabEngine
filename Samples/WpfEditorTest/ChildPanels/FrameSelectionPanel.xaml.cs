@@ -25,8 +25,6 @@ namespace WpfEditorTest.ChildPanels
 		private bool _locked = false;
 		private bool _isMoved;
 
-		public EventHandler RequestFrameSelectionReset;
-
 		public Fusion.Engine.Frames.Frame SelectedFrame
 		{
 			get => _selectedFrame;
@@ -95,12 +93,6 @@ namespace WpfEditorTest.ChildPanels
 				case "Anchor":
 					{
 						UpdateVisualAnchors(_selectedFrame.Anchor);
-						break;
-					}
-				case "Parent":
-					{
-						//if (_selectedFrame.Parent == null)
-							//RequestFrameSelectionReset?.Invoke(this, null);
 						break;
 					}
 			}
@@ -184,7 +176,7 @@ namespace WpfEditorTest.ChildPanels
 			PreviousTransform = RenderTransform;
 			Window = interfaceEditor;
 
-			Height = StaticData.OptionsWindowSize; Width = StaticData.OptionsWindowSize;
+			Height = ApplicationConfig.OptionsWindowSize; Width = ApplicationConfig.OptionsWindowSize;
 
 			Drags = new List<Border>
 			{

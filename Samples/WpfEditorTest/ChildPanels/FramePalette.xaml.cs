@@ -31,8 +31,8 @@ namespace WpfEditorTest.ChildPanels
 		{
 			InitializeComponent();
 
-			Height = StaticData.OptionsWindowSize;
-			Width = StaticData.OptionsWindowSize;
+			Height = ApplicationConfig.OptionsWindowSize;
+			Width = ApplicationConfig.OptionsWindowSize;
 
 			Left = int.Parse(ConfigurationManager.AppSettings.Get("PalettePanelX"));
 			Top = int.Parse(ConfigurationManager.AppSettings.Get("PalettePanelY"));

@@ -16,7 +16,7 @@ namespace WpfEditorTest.ChildPanels
 		public FrameDetails()
 		{
 			InitializeComponent();
-			Height = StaticData.OptionsWindowSize; Width = StaticData.OptionsWindowSize;
+			Height = ApplicationConfig.OptionsWindowSize; Width = ApplicationConfig.OptionsWindowSize;
 
 			Left = int.Parse(ConfigurationManager.AppSettings.Get("DetailsPanelX"));
 			Top = int.Parse(ConfigurationManager.AppSettings.Get("DetailsPanelY"));
@@ -35,7 +35,7 @@ namespace WpfEditorTest.ChildPanels
 	        var propsies = (
 	            from property in publicProperties
 	            where property.GetMethod != null && property.SetMethod != null && !property.CustomAttributes.Any(ca => ca.AttributeType.Name == "XmlIgnoreAttribute")
-	            select new Propsy(property, frame)
+	            select new MVVMFrameProperty(property, frame)
 	        ).ToList();
 
 	        FrameDetailsControls.ItemsSource = propsies.OrderBy(p => p.PropName).ToList();

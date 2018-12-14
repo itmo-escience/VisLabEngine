@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Configuration;
 using System.Linq;
 using System.Reflection;
@@ -22,7 +23,7 @@ namespace WpfEditorTest.ChildPanels
             set
             {
                 _selectedFrame = value;
-                ElementHierarchyView.SetSelectedItem(value);
+				SetSelected(ElementHierarchyView, _selectedFrame);
             }
         }
 
@@ -33,8 +34,8 @@ namespace WpfEditorTest.ChildPanels
 		{
 			InitializeComponent();
 
-			Height = StaticData.OptionsWindowSize;
-		    Width = StaticData.OptionsWindowSize;
+			Height = ApplicationConfig.OptionsWindowSize;
+		    Width = ApplicationConfig.OptionsWindowSize;
 
 			Left = int.Parse(ConfigurationManager.AppSettings.Get("TreeViewPanelX"));
 			Top = int.Parse(ConfigurationManager.AppSettings.Get("TreeViewPanelY"));
@@ -57,6 +58,34 @@ namespace WpfEditorTest.ChildPanels
 			{
 				RequestFrameDeletionInUI?.Invoke(this,null);
 			}
+		}
+
+		public void SetSelected( ItemsControl parent, Frame child )
+		{
+			var currentFrame = child;
+			List<Frame> frames = new List<Frame>();
+
+			while (currentFrame.Parent != null && currentFrame.Parent.Text != "Scene")
+			{
+				currentFrame = currentFrame.Parent;
+				frames.Add(currentFrame);
+			}
+
+			frames.Reverse();
+			TreeViewItem childNode;
+
+			foreach (var frame in frames)
+			{
+				childNode = parent.ItemContainerGenerator.ContainerFromItem(frame) as TreeViewItem;
+				childNode.IsExpanded = true;
+				parent.UpdateLayout();
+				parent = parent
+					.ItemContainerGenerator
+					.ContainerFromItem(frame)
+					as ItemsControl;
+			}
+			childNode = parent.ItemContainerGenerator.ContainerFromItem(child) as TreeViewItem;
+			childNode.IsSelected = true;
 		}
 	}
 }

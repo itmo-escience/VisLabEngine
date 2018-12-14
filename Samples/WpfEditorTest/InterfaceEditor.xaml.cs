@@ -23,6 +23,7 @@ using System.Windows.Media.Imaging;
 using Bitmap = System.Drawing.Bitmap;
 using System.Windows.Interop;
 using System.Configuration;
+using WpfEditorTest.FrameSelection;
 
 namespace WpfEditorTest
 {
@@ -115,7 +116,6 @@ namespace WpfEditorTest
 
             _treeView.SelectedFrameChangedInUI += (_, frame) => SelectFrame(frame);
 			_treeView.RequestFrameDeletionInUI += ( _, __ ) => TryDeleteSelectedFrame();
-			_frameSelectionPanel.RequestFrameSelectionReset += ( _, __ ) => ResetSelectedFrame(new Point(0, 0));
 
 			var templates = Directory.GetFiles(TemplatesPath, "*.xml").ToList();
             _palette.AvailableFrames.ItemsSource = templates.Select(t => t.Split('\\').Last().Split('.').First());
@@ -140,6 +140,12 @@ namespace WpfEditorTest
 				UndoButton.DataContext = CommandManager.Instance;
 				RedoButton.DataContext = CommandManager.Instance;
 
+			SelectionManager.Instance.FrameSelected += ( s, e ) => {
+				this.SelectFrame(e);
+			};
+			SelectionManager.Instance.FrameDeselected += ( s, e ) => {
+				this.ResetSelectedFrame(new Point(e.GlobalRectangle.X,e.GlobalRectangle.Y));
+			};
 		}
 
 	    protected override void OnSourceInitialized(EventArgs e)
