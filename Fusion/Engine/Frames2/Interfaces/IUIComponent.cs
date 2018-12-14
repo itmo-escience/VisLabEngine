@@ -5,7 +5,7 @@ using Fusion.Engine.Graphics;
 
 namespace Fusion.Engine.Frames2.Interfaces
 {
-    public interface IDrawable
+    public interface IUIComponent
     {
         float X { get; set; }
         float Y { get; set; }
@@ -18,7 +18,7 @@ namespace Fusion.Engine.Frames2.Interfaces
         string Name { get; }
         // TODO: Anchors
 
-        IEnumerable<IController> Controllers { get; }
+        IEnumerable<IUIController> Controllers { get; }
 
         void Update(GameTime gameTime);
         void Draw(SpriteLayer layer);

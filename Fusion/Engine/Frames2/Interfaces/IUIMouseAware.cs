@@ -2,7 +2,7 @@
 
 namespace Fusion.Engine.Frames2.Interfaces
 {
-    public interface IUIControllable
+    public interface IUIMouseAware
     {
         /*
          * Movement related

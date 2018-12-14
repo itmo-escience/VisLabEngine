@@ -249,6 +249,16 @@
     <Compile Include="Engine\Common\Commands\CrashServer.cs" />
     <Compile Include="Engine\Common\AtomAttribute.cs" />
     <Compile Include="Engine\Common\UserInterface.Internal.cs" />
+    <Compile Include="Engine\Frames2\Image.cs" />
+    <Compile Include="Engine\Frames2\Interfaces\IUIComponent.cs" />
+    <Compile Include="Engine\Frames2\Interfaces\IUIController.cs" />
+    <Compile Include="Engine\Frames2\Interfaces\IUIMouseAware.cs" />
+    <Compile Include="Engine\Frames2\Text.cs" />
+    <Compile Include="Engine\Frames2\UIAnimator.cs" />
+    <Compile Include="Engine\Frames2\UIContainer.cs" />
+    <Compile Include="Engine\Frames2\UIEventProcessor.cs" />
+    <Compile Include="Engine\Frames2\UIManager.cs" />
+    <Compile Include="Engine\Frames2\UIPainter.cs" />
     <Compile Include="Engine\Frames\Abstract\DrawFrameItem.cs" />
     <Compile Include="Engine\Frames\Abstract\Events.cs" />
     <Compile Include="Engine\Frames\Abstract\IFrame.cs" />
