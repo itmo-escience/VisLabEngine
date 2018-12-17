@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel;
 
 namespace WpfEditorTest.UndoRedo
@@ -15,12 +16,13 @@ namespace WpfEditorTest.UndoRedo
 		private Stack<IEditorCommand> _undoCommands = new Stack<IEditorCommand>();
 
 		public event PropertyChangedEventHandler PropertyChanged;
+		public event EventHandler<bool> ChangedDirty;
 
 		public bool UndoStackIsNotEmpty { get { return _undoCommands.Count > 0; } }
 		public bool RedoStackIsNotEmpty { get { return _doCommands.Count > 0; } }
 
 		private bool _isDirty = false;
-		public bool IsDirty { get { return _isDirty; } }
+		public bool IsDirty { get { return _isDirty; } private set { _isDirty = value; ChangedDirty?.Invoke(this, _isDirty); } }
 
 		public bool TryUndoCommand()
 		{
@@ -30,9 +32,9 @@ namespace WpfEditorTest.UndoRedo
 			var movedCommand = _undoCommands.Pop();
 			movedCommand.Undo();
 			_doCommands.Push(movedCommand);
+			IsDirty = true;
 			OnPropertyChanged(nameof(UndoStackIsNotEmpty));
 			OnPropertyChanged(nameof(RedoStackIsNotEmpty));
-			_isDirty = true;
 			return true;
 		}
 
@@ -44,9 +46,9 @@ namespace WpfEditorTest.UndoRedo
 			var movedCommand = _doCommands.Pop();
 			movedCommand.Do();
 			_undoCommands.Push(movedCommand);
+			IsDirty = true;
 			OnPropertyChanged(nameof(UndoStackIsNotEmpty));
 			OnPropertyChanged(nameof(RedoStackIsNotEmpty));
-			_isDirty = true;
 			return true;
 		}
 
@@ -55,9 +57,9 @@ namespace WpfEditorTest.UndoRedo
 			command.Do();
 			_undoCommands.Push(command);
 			_doCommands.Clear();
+			IsDirty = true;
 			OnPropertyChanged(nameof(UndoStackIsNotEmpty));
 			OnPropertyChanged(nameof(RedoStackIsNotEmpty));
-			_isDirty = true;
 		}
 
 		public void ExecuteWithoutMemorising( IEditorCommand command )
@@ -80,7 +82,7 @@ namespace WpfEditorTest.UndoRedo
 
 		public void SetNotDirty()
 		{
-			_isDirty = false;
+			IsDirty = false;
 		}
 	}
 }

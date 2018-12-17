@@ -136,7 +136,7 @@ namespace WpfEditorTest.ChildPanels
 		public Size SelectedFrameInitSize { get; private set; }
 		public Point SelectedFrameInitPosition { get; private set; }
 		public bool DragMousePressed { get; set; }
-		public InterfaceEditor Window { get; set; }
+		public ContentControl Window { get; set; }
 		public List<Border> Drags { get; private set; }
 		public List<Border> VisualAnchors { get; private set; }
 
@@ -172,7 +172,7 @@ namespace WpfEditorTest.ChildPanels
 		public Point InitFramePosition { get; internal set; }
 		public Fusion.Engine.Frames.Frame InitFrameParent { get; internal set; }
 
-		public FrameSelectionPanel( InterfaceEditor interfaceEditor )
+		public FrameSelectionPanel( ContentControl interfaceEditor )
 		{
 			InitializeComponent();
 

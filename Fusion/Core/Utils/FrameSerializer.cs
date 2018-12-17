@@ -104,6 +104,33 @@ namespace Fusion.Core.Utils
 
 			return destination;
 		}
+
+		public static Frame ReadFromString(string xmlFrame)
+		{
+			Frame destination = null;
+			//XmlSerializer versionFormatter = new XmlSerializer(typeof(string));
+			XmlSerializer formatter = new XmlSerializer(typeof(SeralizableObjectHolder));
+			// десериализация
+			using (StringReader sr = new StringReader(xmlFrame))
+			{
+				//var version = (string)versionFormatter.Deserialize(fs);
+
+				//if (version == FrameSerializer.SerializerVersion)
+				//{
+				var holder = (SeralizableObjectHolder)formatter.Deserialize(sr);
+
+				destination = holder.SerializableFrame;
+
+				destination.RestoreParents();
+				//}
+				//else
+				//{
+				//	return destination;
+				//}
+			}
+
+			return destination;
+		}
 	}
 
 	public class SeralizableObjectHolder : IXmlSerializable

@@ -84,15 +84,7 @@
                 </Menu>
             </ToolBar>
         </ToolBarTray>
-        <Grid Grid.Row="1" Name="LocalGrid"
-                MouseMove="LocalGrid_MouseMove"
-                MouseLeftButtonUp="LocalGrid_MouseLeftButtonUp"
-                MouseLeftButtonDown="LocalGrid_MouseLeftButtonDown">
-            <ZWpfLib:DXElement x:Name="DxElem"
-                               HorizontalAlignment="Left" VerticalAlignment="Top"
-                               MinHeight="100" MaxHeight="10000"
-                               MinWidth="100" MaxWidth="10000"
-                               />
-        </Grid>
+        <local:WPFSelectionUILayer Grid.Row="1" x:Name="SelectionLayer">
+        </local:WPFSelectionUILayer>
     </Grid>
 </Window>
