@@ -350,14 +350,15 @@ namespace WpfEditorTest
 					//LandFrameOnScene(createdFrame, e.GetPosition(this));
 					//SelectFrame(createdFrame);
 
-					var delta = new TranslateTransform();
-					delta.X = createdFrame.X;
-					delta.Y = createdFrame.Y;
-					foreach (var panel in frameSeletcionPanelList.Values)
-					{
-						panel.RenderTransform = delta;
-						panel.PreviousTransform = panel.RenderTransform;
-					}
+					//var delta = new TranslateTransform();
+					//delta.X = createdFrame.X;
+					//delta.Y = createdFrame.Y;
+					//foreach (var panel in frameSeletcionPanelList.Values)
+					//{
+					//	panel.RenderTransform = delta;
+					//	panel.PreviousTransform = panel.RenderTransform;
+					//}
+
 					//_frameSelectionPanel.UpdateSelectedFramePosition();
 
 					//createdFrame.X -= createdFrame.Parent.X;

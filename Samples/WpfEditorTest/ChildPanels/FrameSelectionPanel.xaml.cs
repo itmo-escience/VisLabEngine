@@ -270,11 +270,6 @@ namespace WpfEditorTest.ChildPanels
 			return (int)_oldX != (int)RenderTransform.Value.OffsetX || (int)_oldY != (int)RenderTransform.Value.OffsetY;
 		}
 
-		public void Border_MouseDown( object sender, MouseButtonEventArgs e )
-		{
-			//throw new NotImplementedException();
-		}
-
 		private void UserControl_MouseLeftButtonDown( object sender, MouseButtonEventArgs e )
 		{
 			e.Handled = false;

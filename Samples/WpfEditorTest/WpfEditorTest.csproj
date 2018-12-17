@@ -109,6 +109,9 @@
     <Compile Include="UndoRedo\CommandManager.cs" />
     <Compile Include="UndoRedo\IEditorCommand.cs" />
     <Compile Include="UndoRedo\FramePropertyChangeCommand.cs" />
+    <Compile Include="WPFSelectionUILayer.xaml.cs">
+      <DependentUpon>WPFSelectionUILayer.xaml</DependentUpon>
+    </Compile>
     <Page Include="ChildPanels\FrameDetails.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -140,6 +143,10 @@
     <Compile Include="InterfaceEditor.xaml.cs">
       <DependentUpon>InterfaceEditor.xaml</DependentUpon>
     </Compile>
+    <Page Include="WPFSelectionUILayer.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs">
