@@ -189,11 +189,11 @@ namespace WpfEditorTest
 			if (SelectionLayer.frameSeletcionPanelList.Count >= 0)
 			{
 				List<IEditorCommand> commands = new List<IEditorCommand>();
+				commands.Add(new SelectFrameCommand(new List<Frame> { }));
 				foreach (var frame in SelectionLayer.frameSeletcionPanelList.Keys)
 				{
 					commands.Add(new FrameParentChangeCommand(frame, null));
 				}
-				commands.Add(new SelectFrameCommand(new List<Frame> { }));
 				var command = new CommandGroup(commands.ToArray());
 				CommandManager.Instance.Execute(command);
 			}
@@ -406,11 +406,14 @@ namespace WpfEditorTest
 
 		private void ExecutedPasteFrameCmdCommand( object sender, ExecutedRoutedEventArgs e )
 		{
-			List<IEditorCommand> commands = new List<IEditorCommand>();
-			this.AddframeToScene(Fusion.Core.Utils.FrameSerializer.ReadFromString(xmlFrameBuffer),
-				System.Windows.Input.Mouse.GetPosition(this), commands);
-			var command = new CommandGroup(commands.ToArray());
-			CommandManager.Instance.Execute(command);
+			if (!string.IsNullOrEmpty(xmlFrameBuffer))
+			{
+				List<IEditorCommand> commands = new List<IEditorCommand>();
+				this.AddframeToScene(Fusion.Core.Utils.FrameSerializer.ReadFromString(xmlFrameBuffer),
+					System.Windows.Input.Mouse.GetPosition(this), commands);
+				var command = new CommandGroup(commands.ToArray());
+				CommandManager.Instance.Execute(command); 
+			}
 		}
 
 		private void AlwaysCanExecute( object sender, CanExecuteRoutedEventArgs e )

@@ -258,6 +258,7 @@ namespace WpfEditorTest
 				FrameSelectionPanel panel;
 				frameSeletcionPanelList.TryGetValue(hovered, out panel);
 
+				if(panel!=null)
 				panel.StartFrameDragging(e.GetPosition(this));
 
 			}
