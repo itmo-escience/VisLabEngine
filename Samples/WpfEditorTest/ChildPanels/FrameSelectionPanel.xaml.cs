@@ -136,7 +136,7 @@ namespace WpfEditorTest.ChildPanels
 		public Size SelectedFrameInitSize { get; private set; }
 		public Point SelectedFrameInitPosition { get; private set; }
 		public bool DragMousePressed { get; set; }
-		public ContentControl Window { get; set; }
+		public Grid Grid { get; set; }
 		public List<Border> Drags { get; private set; }
 		public List<Border> VisualAnchors { get; private set; }
 
@@ -172,12 +172,12 @@ namespace WpfEditorTest.ChildPanels
 		public Point InitFramePosition { get; internal set; }
 		public Fusion.Engine.Frames.Frame InitFrameParent { get; internal set; }
 
-		public FrameSelectionPanel( ContentControl interfaceEditor )
+		public FrameSelectionPanel( Grid interfaceEditor )
 		{
 			InitializeComponent();
 
 			PreviousTransform = RenderTransform;
-			Window = interfaceEditor;
+			Grid = interfaceEditor;
 
 			Height = ApplicationConfig.OptionsWindowSize; Width = ApplicationConfig.OptionsWindowSize;
 
@@ -273,7 +273,7 @@ namespace WpfEditorTest.ChildPanels
 		private void UserControl_MouseLeftButtonDown( object sender, MouseButtonEventArgs e )
 		{
 			e.Handled = false;
-			StartFrameDragging(e.MouseDevice.GetPosition(Window));
+			StartFrameDragging(e.MouseDevice.GetPosition(Grid));
 		}
 
 		public void StartFrameDragging( Point mousePosition )
@@ -292,7 +292,7 @@ namespace WpfEditorTest.ChildPanels
 			SelectedFrameInitSize = new Size(SelectedFrame.Width,SelectedFrame.Height);
 			SelectedFrameInitPosition = new Point(SelectedFrame.X, SelectedFrame.Y);
 			DragMousePressed = true;
-			PreviousMouseLocation = e.MouseDevice.GetPosition(Window);
+			PreviousMouseLocation = e.MouseDevice.GetPosition(Grid);
 			PreviousDragTransform = CurrentDrag.RenderTransform;
 		}
 

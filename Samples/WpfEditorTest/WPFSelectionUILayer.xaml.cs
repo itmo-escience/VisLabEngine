@@ -25,7 +25,7 @@ namespace WpfEditorTest
 	/// <summary>
 	/// Interaction logic for WPFSelectionUILayer.xaml
 	/// </summary>
-	public partial class WPFSelectionUILayer : UserControl
+	public partial class WPFSelectionUILayer : Grid
 	{
 		public Dictionary<Frame, FrameSelectionPanel> frameSeletcionPanelList = new Dictionary<Frame, FrameSelectionPanel>();
 
@@ -50,7 +50,7 @@ namespace WpfEditorTest
 			InitializeComponent();
 
 			_parentHighlightPanel = new ParentHighlightPanel();
-			LocalGrid.Children.Add(_parentHighlightPanel);
+			Children.Add(_parentHighlightPanel);
 
 			SelectionManager.Instance.FrameSelected += ( s, e ) =>
 			{
@@ -59,9 +59,9 @@ namespace WpfEditorTest
 					var commands = this.ResetSelectedFrame(new Point(frameAndPanel.Key.GlobalRectangle.X, frameAndPanel.Key.GlobalRectangle.Y), frameAndPanel.Value);
 					var command = new CommandGroup(commands.ToArray());
 					CommandManager.Instance.ExecuteWithoutMemorising(command);
-					if (LocalGrid.Children.Contains(frameAndPanel.Value))
+					if (Children.Contains(frameAndPanel.Value))
 					{
-						LocalGrid.Children.Remove(frameAndPanel.Value);
+						Children.Remove(frameAndPanel.Value);
 					}
 				}
 				frameSeletcionPanelList.Clear();
@@ -72,7 +72,7 @@ namespace WpfEditorTest
 					{
 						var frameSelectionPanel = new FrameSelectionPanel(this);
 						frameSeletcionPanelList.Add(frame, frameSelectionPanel);
-						LocalGrid.Children.Add(frameSelectionPanel);
+						Children.Add(frameSelectionPanel);
 						this.SelectFrame(frame);
 					}
 				}
@@ -216,7 +216,7 @@ namespace WpfEditorTest
 
 		private void LocalGrid_MouseLeftButtonDown( object sender, MouseButtonEventArgs e )
 		{
-			var hovered = GetHoveredFrameOnScene(e.GetPosition(DxElem), true);
+			var hovered = GetHoveredFrameOnScene(e.GetPosition(this), true);
 
 			if (hovered != null)
 			{
@@ -405,7 +405,7 @@ namespace WpfEditorTest
 
 				if (movedPanel.IsMoved || paletteWindow._selectedFrameTemplate != null)
 				{
-					var hovered = GetHoveredFrameOnScene(e.GetPosition(DxElem), true);
+					var hovered = GetHoveredFrameOnScene(e.GetPosition(this), true);
 					_parentHighlightPanel.SelectedFrame = hovered;
 				}
 
@@ -427,7 +427,7 @@ namespace WpfEditorTest
 			}
 			else if (paletteWindow._selectedFrameTemplate != null)
 			{
-				var hovered = GetHoveredFrameOnScene(e.GetPosition(DxElem), true);
+				var hovered = GetHoveredFrameOnScene(e.GetPosition(this), true);
 				_parentHighlightPanel.SelectedFrame = hovered;
 			}
 		}

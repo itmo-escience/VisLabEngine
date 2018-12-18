@@ -24,6 +24,7 @@ using Bitmap = System.Drawing.Bitmap;
 using System.Windows.Interop;
 using System.Configuration;
 using WpfEditorTest.FrameSelection;
+using ZWpfLib;
 
 namespace WpfEditorTest
 {
@@ -65,7 +66,8 @@ namespace WpfEditorTest
 		public string CurrentSceneFile { get => currentSceneFile; set { currentSceneFile = value; this.UpdateTitle(); } }
 		public string SceneChangedIndicator { get => sceneChangedIndicator; set { sceneChangedIndicator = value; this.UpdateTitle(); } }
 
-		public InterfaceEditor()
+
+        public InterfaceEditor()
 		{
 			InitializeComponent();
 
@@ -87,13 +89,11 @@ namespace WpfEditorTest
 			Directory.SetCurrentDirectory(@"..\..\..\..\GISTest\bin\x64\Debug");
 			_engine.InitExternal();
 
-			SelectionLayer.DxElem.Renderer = _engine;
 
+            //_frameSelectionPanel = new FrameSelectionPanel(this);
+            //LocalGrid.Children.Add(_frameSelectionPanel);
 
-			//_frameSelectionPanel = new FrameSelectionPanel(this);
-			//LocalGrid.Children.Add(_frameSelectionPanel);
-
-			_details = new FrameDetails();
+            _details = new FrameDetails();
 			_treeView = new FrameTreeView();
 			_palette = new FramePalette();
 
@@ -110,7 +110,7 @@ namespace WpfEditorTest
 				_treeView.Show();
 				_palette.Owner = this;
 				_palette.Show();
-			};
+            };
 
 			_treeView.SelectedFrameChangedInUI += ( _, frame ) =>
 			{
@@ -133,8 +133,9 @@ namespace WpfEditorTest
 
 			SelectionLayer.Window = this;
 			SelectionLayer.paletteWindow = _palette;
+		    SelectionLayer.DxElem.Renderer = _engine;
 
-			var b = new Binding("Children")
+            var b = new Binding("Children")
 			{
 				Source = SceneFrame,
 				UpdateSourceTrigger = UpdateSourceTrigger.PropertyChanged,
@@ -163,7 +164,8 @@ namespace WpfEditorTest
 			this.UpdateTitle();
 		}
 
-		protected override void OnSourceInitialized( EventArgs e )
+
+	    protected override void OnSourceInitialized( EventArgs e )
 		{
 			base.OnSourceInitialized(e);
 			SelectionLayer.DxElem.HandleInput(this);
@@ -196,7 +198,7 @@ namespace WpfEditorTest
 				CommandManager.Instance.Execute(command);
 			}
 		}
-		
+
 		#region Save/load stuff
 
 		internal void TryLoadSceneAsTemplate()
@@ -386,7 +388,7 @@ namespace WpfEditorTest
 				if (selectedFrame != null)
 				{
 					xmlFrameBuffer = Fusion.Core.Utils.FrameSerializer.WriteToString(selectedFrame);
-					//Clipboard.SetData(DataFormats.Text, (Object)xmlFrame); 
+					//Clipboard.SetData(DataFormats.Text, (Object)xmlFrame);
 					var upperLeft = this.PointToScreen(new Point(selectedFrame.X, selectedFrame.Y));
 					var lowerRight = this.PointToScreen(new Point(selectedFrame.X + selectedFrame.Width, selectedFrame.Y + selectedFrame.Height));
 
