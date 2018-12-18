@@ -42,6 +42,7 @@ namespace WpfEditorTest
 		public static RoutedCommand UndoChangeCmd = new RoutedCommand();
 		public static RoutedCommand CopyFrameCmd = new RoutedCommand();
 		public static RoutedCommand PasteFrameCmd = new RoutedCommand();
+		public static RoutedCommand CutFrameCmd = new RoutedCommand();
 
 		//private Point InitFramePosition;
 		//private Frame InitFrameParent;
@@ -401,7 +402,12 @@ namespace WpfEditorTest
 					Clipboard.SetData(DataFormats.Bitmap, (Object)img);
 				}
 			}
+		}
 
+		private void ExecutedCutFrameCommand( object sender, ExecutedRoutedEventArgs e )
+		{
+			ExecutedCopyFrameCommand(sender, e);
+			TryDeleteSelectedFrame();
 		}
 
 		private void ExecutedPasteFrameCmdCommand( object sender, ExecutedRoutedEventArgs e )

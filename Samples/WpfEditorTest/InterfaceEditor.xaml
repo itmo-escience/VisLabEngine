@@ -40,6 +40,9 @@
         <CommandBinding Command="{x:Static local:InterfaceEditor.PasteFrameCmd}"
                         Executed="ExecutedPasteFrameCmdCommand"
                         CanExecute="AlwaysCanExecute" />
+        <CommandBinding Command="{x:Static local:InterfaceEditor.CutFrameCmd}"
+                        Executed="ExecutedCutFrameCommand"
+                        CanExecute="AlwaysCanExecute" />
         <CommandBinding Command="{x:Static local:InterfaceEditor.QuickSaveSceneCmd}"
                         Executed="ExecutedQuickSaveSceneCommand"
                         CanExecute="AlwaysCanExecute" />
@@ -56,6 +59,7 @@
         <KeyBinding Command="{x:Static local:InterfaceEditor.LoadSceneCmd}" Key="O" Modifiers="Ctrl"/>
         <KeyBinding Command="{x:Static local:InterfaceEditor.CopyFrameCmd}" Key="C" Modifiers="Ctrl"/>
         <KeyBinding Command="{x:Static local:InterfaceEditor.PasteFrameCmd}" Key="V" Modifiers="Ctrl"/>
+        <KeyBinding Command="{x:Static local:InterfaceEditor.CutFrameCmd}" Key="X" Modifiers="Ctrl"/>
     </Window.InputBindings>
     <Grid MaxWidth="10000" MaxHeight="10000">
         <Grid.RowDefinitions>
