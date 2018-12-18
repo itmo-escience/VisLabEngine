@@ -1,9 +1,8 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using Fusion.Engine.Frames2.Interfaces;
 using Fusion.Engine.Graphics;
 
-namespace Fusion.Engine.Frames2
+namespace Fusion.Engine.Frames2.Managing
 {
     public class UIPainter
     {
@@ -23,7 +22,7 @@ namespace Fusion.Engine.Frames2
 
         private void DrawNonRecursive(SpriteLayer layer)
         {
-            var queue = new Queue<IUIComponent>();
+            var queue = new Queue<UIComponent>();
             queue.Enqueue(_root);
 
             while (queue.Any())

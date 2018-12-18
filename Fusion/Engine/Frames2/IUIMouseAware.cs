@@ -1,6 +1,6 @@
 ﻿using Fusion.Engine.Frames.Abstract;
 
-namespace Fusion.Engine.Frames2.Interfaces
+namespace Fusion.Engine.Frames2
 {
     public interface IUIMouseAware
     {

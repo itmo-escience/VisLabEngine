@@ -1,55 +1,41 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using Fusion.Core.Mathematics;
-using Fusion.Engine.Common;
-using Fusion.Engine.Frames2.Interfaces;
 using Fusion.Engine.Graphics;
 
 namespace Fusion.Engine.Frames2
 {
-    public class UIContainer : IUIComponent
+    public abstract class UIContainer : UIComponent
     {
-        public IEnumerable<IUIComponent> Children;
-        public ChildrenLayout Layout { get; internal set; }
+        private readonly List<UIComponent> _children = new List<UIComponent>();
+        public IReadOnlyList<UIComponent> Children => _children;
 
-        public float X { get; set; }
-        public float Y { get; set; }
-        public float Width { get; set; }
-        public float Height { get; set; }
-        public RectangleF BoundingBox { get; }
-        public bool Visible { get; set; }
-        public Matrix Transform { get; set; }
-        public object Tag { get; set; }
-        public string Name { get; }
-        public IEnumerable<IUIController> Controllers { get; }
+        public override RectangleF BoundingBox =>
+                Children.Where(c => c.Visible)
+                .Aggregate(
+                    RectangleF.Empty,
+                    (bb, child) => RectangleF.Union(child.BoundingBox, bb)
+                );
 
-        public void Add(IUIComponent child)
+        public void Add(UIComponent child)
         {
+            if(_children.Contains(child))
+                return;
 
+            child.Parent = this;
+            _children.Add(child);
         }
 
-        public bool Remove(IUIComponent child)
+        public bool Remove(UIComponent child)
         {
-            return false;
+            if(!Children.Contains(child))
+                return false;
+
+            child.Parent = null;
+            _children.Remove(child);
+            return true;
         }
 
-        public bool Remove(int index)
-        {
-            return false;
-        }
-
-        public void Draw(SpriteLayer layer) { }
-
-        public void Update(GameTime gameTime)
-        {
-
-        }
-    }
-
-    public enum ChildrenLayout
-    {
-        Free,
-        Grid,
-        HStack,
-        VStack
+        public override void Draw(SpriteLayer layer) { }
     }
 }

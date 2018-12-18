@@ -1,9 +1,8 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using Fusion.Engine.Common;
-using Fusion.Engine.Frames2.Interfaces;
 
-namespace Fusion.Engine.Frames2
+namespace Fusion.Engine.Frames2.Managing
 {
     public class UIEventProcessor
     {
@@ -23,7 +22,7 @@ namespace Fusion.Engine.Frames2
 
         public void Update(GameTime time)
         {
-            var stack = new Stack<IUIComponent>();
+            var stack = new Stack<UIComponent>();
 
             stack.Push(_root);
 

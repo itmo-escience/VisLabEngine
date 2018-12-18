@@ -64,6 +64,9 @@
       <HintPath>..\packages\SharpDX.Desktop.4.0.1\lib\net45\SharpDX.Desktop.dll</HintPath>
       <Private>True</Private>
     </Reference>
+    <Reference Include="SharpDX.Direct2D1, Version=4.0.1.0, Culture=neutral, PublicKeyToken=b4dcf0f35e5521f1, processorArchitecture=MSIL">
+      <HintPath>..\..\VisLabProjects\packages\SharpDX.Direct2D1.4.0.1\lib\net45\SharpDX.Direct2D1.dll</HintPath>
+    </Reference>
     <Reference Include="SharpDX.Direct3D11, Version=4.0.1.0, Culture=neutral, PublicKeyToken=b4dcf0f35e5521f1, processorArchitecture=MSIL">
       <HintPath>..\packages\SharpDX.Direct3D11.4.0.1\lib\net45\SharpDX.Direct3D11.dll</HintPath>
       <Private>True</Private>
@@ -249,16 +252,18 @@
     <Compile Include="Engine\Common\Commands\CrashServer.cs" />
     <Compile Include="Engine\Common\AtomAttribute.cs" />
     <Compile Include="Engine\Common\UserInterface.Internal.cs" />
-    <Compile Include="Engine\Frames2\Image.cs" />
-    <Compile Include="Engine\Frames2\Interfaces\IUIComponent.cs" />
-    <Compile Include="Engine\Frames2\Interfaces\IUIController.cs" />
-    <Compile Include="Engine\Frames2\Interfaces\IUIMouseAware.cs" />
-    <Compile Include="Engine\Frames2\Text.cs" />
-    <Compile Include="Engine\Frames2\UIAnimator.cs" />
+    <Compile Include="Engine\Frames2\Components\Image.cs" />
+    <Compile Include="Engine\Frames2\Components\UIBorder.cs" />
+    <Compile Include="Engine\Frames2\Containers\FreePlacement.cs" />
+    <Compile Include="Engine\Frames2\UIComponent.cs" />
+    <Compile Include="Engine\Frames2\IUIController.cs" />
+    <Compile Include="Engine\Frames2\IUIMouseAware.cs" />
+    <Compile Include="Engine\Frames2\Components\Label.cs" />
+    <Compile Include="Engine\Frames2\Managing\UIAnimator.cs" />
     <Compile Include="Engine\Frames2\UIContainer.cs" />
-    <Compile Include="Engine\Frames2\UIEventProcessor.cs" />
-    <Compile Include="Engine\Frames2\UIManager.cs" />
-    <Compile Include="Engine\Frames2\UIPainter.cs" />
+    <Compile Include="Engine\Frames2\Managing\UIEventProcessor.cs" />
+    <Compile Include="Engine\Frames2\Managing\UIManager.cs" />
+    <Compile Include="Engine\Frames2\Drawing\UIPainter.cs" />
     <Compile Include="Engine\Frames\Abstract\DrawFrameItem.cs" />
     <Compile Include="Engine\Frames\Abstract\Events.cs" />
     <Compile Include="Engine\Frames\Abstract\IFrame.cs" />
