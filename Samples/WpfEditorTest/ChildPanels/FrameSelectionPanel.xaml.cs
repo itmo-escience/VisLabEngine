@@ -45,6 +45,9 @@ namespace WpfEditorTest.ChildPanels
 				delta.Y = _selectedFrame.GlobalRectangle.Y;// == _selectedFrame.Y ? _selectedFrame.GlobalRectangle.Y : _selectedFrame.Y;
 				PreviousTransform = RenderTransform;
 
+				_oldX = RenderTransform.Value.OffsetX;
+				_oldY = RenderTransform.Value.OffsetY;
+
 				foreach (var drag in Drags)
 				{
 					drag.RenderTransform = new TranslateTransform(0, 0);

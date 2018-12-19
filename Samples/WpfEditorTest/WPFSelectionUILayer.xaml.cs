@@ -295,7 +295,7 @@ namespace WpfEditorTest
 			{
 				//SelectFrame(hovered);
 				IEditorCommand command = null;
-				if (System.Windows.Input.Keyboard.IsKeyDown(Key.LeftShift))
+				if (Keyboard.IsKeyDown(Key.LeftShift))
 				{
 					var framesToSelect = new List<Frame>(SelectionManager.Instance.SelectedFrames);
 					if (framesToSelect.Contains(hovered))
@@ -487,24 +487,20 @@ namespace WpfEditorTest
 
 				Point currentLocation = e.MouseDevice.GetPosition(this);
 
-				var delta = new TranslateTransform
-				//(currentLocation.X - movedPanel.PreviousMouseLocation.X, currentLocation.Y - movedPanel.PreviousMouseLocation.Y);
-				(currentLocation.X - movedPanel.PreviousMouseLocation.X, currentLocation.Y - movedPanel.PreviousMouseLocation.Y);
-
+				var step = (int)(FusionUI.UI.ScalableFrame.ScaleMultiplier * GridSizeMultiplier);
+				var newX = movedPanel.InitPanelPosition.X - DeltaX;
+				var newY = movedPanel.InitPanelPosition.Y - DeltaY;
+				var dX = newX - movedPanel.InitPanelPosition.X;
+				var dY = newY - movedPanel.InitPanelPosition.Y;
+				if (NeedSnapping())
+				{
+					dX -= -step / 2 + (newX + step / 2) % step;
+					dY -= -step / 2 + (newY + step / 2) % step;
+				}
 				foreach (var panel in frameSelectionPanelList.Values)
 				{
-					var delta2 = new TranslateTransform
-						//(currentLocation.X - movedPanel.PreviousMouseLocation.X, currentLocation.Y - movedPanel.PreviousMouseLocation.Y);
-						(panel.InitPanelPosition.X-DeltaX, panel.InitPanelPosition.Y - DeltaY);
-					if (VisualGrid.Visibility == Visibility.Visible)
-					{
-						delta2.X -= delta2.X % (int)(FusionUI.UI.ScalableFrame.ScaleMultiplier * GridSizeMultiplier);
-						delta2.Y -= delta2.Y % (int)(FusionUI.UI.ScalableFrame.ScaleMultiplier * GridSizeMultiplier);
-					}
-					//var group = new TransformGroup();
-					//group.Children.Add(panel.PreviousTransform);
-					//group.Children.Add(delta);
-					panel.RenderTransform = delta2;//;
+					var delta2 = new TranslateTransform(panel.InitPanelPosition.X + dX, panel.InitPanelPosition.Y + dY);
+					panel.RenderTransform = delta2;
 					panel.PreviousTransform = panel.RenderTransform;
 
 				}
@@ -515,6 +511,11 @@ namespace WpfEditorTest
 				var hovered = GetHoveredFrameOnScene(e.GetPosition(this), true);
 				_parentHighlightPanel.SelectedFrame = hovered;
 			}
+		}
+
+		private bool NeedSnapping()
+		{
+			return VisualGrid.Visibility == Visibility.Visible && !Keyboard.IsKeyDown(Key.LeftAlt);
 		}
 	}
 }
