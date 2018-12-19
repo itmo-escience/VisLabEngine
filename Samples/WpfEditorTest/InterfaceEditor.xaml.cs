@@ -152,12 +152,9 @@ namespace WpfEditorTest
 				this.SceneChangedIndicator = e ? "*" : "";
 			};
 
-			SelectionLayer.FrameSelected += ( s, e ) => {
-				_details.SetSelectFrame(e.Key);
-				_treeView.SelectedFrame = e.Key;
-
-				e.Value.SelectedFrame = e.Key;
-				e.Value.Visibility = Visibility.Visible;
+			SelectionLayer.FrameSelected += ( s, selection ) => {
+				_details.SetSelectFrame(selection.Frame);
+				_treeView.SelectedFrame = selection.Frame;
 			};
 			SelectionLayer.FramesDeselected += ( s, e ) => {
 				_details.FrameDetailsControls.ItemsSource = null;
@@ -188,11 +185,11 @@ namespace WpfEditorTest
 
 		private void TryDeleteSelectedFrame()
 		{
-			if (SelectionLayer.frameSeletcionPanelList.Count >= 0)
+			if (SelectionLayer.frameSelectionPanelList.Count >= 0)
 			{
 				List<IEditorCommand> commands = new List<IEditorCommand>();
 				commands.Add(new SelectFrameCommand(new List<Frame> { }));
-				foreach (var frame in SelectionLayer.frameSeletcionPanelList.Keys)
+				foreach (var frame in SelectionLayer.frameSelectionPanelList.Keys)
 				{
 					commands.Add(new FrameParentChangeCommand(frame, null));
 				}
@@ -218,7 +215,7 @@ namespace WpfEditorTest
 				if (createdFrame != null && createdFrame.GetType() == typeof(FusionUI.UI.ScalableFrame))
 				{
 					RootFrame.Remove(SceneFrame);
-					foreach (var panel in SelectionLayer.frameSeletcionPanelList.Values)
+					foreach (var panel in SelectionLayer.frameSelectionPanelList.Values)
 					{
 						var commands = SelectionLayer.ResetSelectedFrame(new Point(0, 0), panel);
 						var command = new CommandGroup(commands.ToArray());
@@ -246,7 +243,7 @@ namespace WpfEditorTest
 			if (!this.CheckForChanges())
 				return;
 			RootFrame.Remove(SceneFrame);
-			foreach (var panel in SelectionLayer.frameSeletcionPanelList.Values)
+			foreach (var panel in SelectionLayer.frameSelectionPanelList.Values)
 			{
 				var commands = SelectionLayer.ResetSelectedFrame(new Point(0, 0), panel);
 				var command = new CommandGroup(commands.ToArray());
@@ -310,13 +307,13 @@ namespace WpfEditorTest
 
 		internal void TrySaveFrameAsTemplate()
 		{
-			if (SelectionLayer.frameSeletcionPanelList.Count == 1)
+			if (SelectionLayer.frameSelectionPanelList.Count == 1)
 			{
 				if (!Directory.Exists(ApplicationConfig.TemplatesPath))
 				{
 					Directory.CreateDirectory(ApplicationConfig.TemplatesPath);
 				}
-				var selectedFrame = SelectionLayer.frameSeletcionPanelList.FirstOrDefault().Value.SelectedFrame;
+				var selectedFrame = SelectionLayer.frameSelectionPanelList.FirstOrDefault().Value.SelectedFrame;
 
 				Fusion.Core.Utils.FrameSerializer.Write(selectedFrame, ApplicationConfig.TemplatesPath + "\\" + (selectedFrame.Text ?? selectedFrame.GetType().ToString()) + ".xml");
 				this.LoadPalettes();
@@ -384,9 +381,9 @@ namespace WpfEditorTest
 
 		private void ExecutedCopyFrameCommand( object sender, ExecutedRoutedEventArgs e )
 		{
-			if (SelectionLayer.frameSeletcionPanelList.Count == 1)
+			if (SelectionLayer.frameSelectionPanelList.Count == 1)
 			{
-				var selectedFrame = SelectionLayer.frameSeletcionPanelList.FirstOrDefault().Value.SelectedFrame;
+				var selectedFrame = SelectionLayer.frameSelectionPanelList.FirstOrDefault().Value.SelectedFrame;
 				if (selectedFrame != null)
 				{
 					xmlFrameBuffer = Fusion.Core.Utils.FrameSerializer.WriteToString(selectedFrame);
@@ -419,7 +416,7 @@ namespace WpfEditorTest
 				this.AddframeToScene(Fusion.Core.Utils.FrameSerializer.ReadFromString(xmlFrameBuffer),
 					System.Windows.Input.Mouse.GetPosition(this), commands);
 				var command = new CommandGroup(commands.ToArray());
-				CommandManager.Instance.Execute(command); 
+				CommandManager.Instance.Execute(command);
 			}
 		}
 
