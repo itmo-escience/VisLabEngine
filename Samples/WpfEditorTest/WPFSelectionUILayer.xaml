@@ -10,4 +10,5 @@
                        HorizontalAlignment="Left" VerticalAlignment="Top"
                        MinHeight="100" MaxHeight="10000"
                        MinWidth="100" MaxWidth="10000" />
+    <Canvas Name="VisualGrid" Visibility="Collapsed"/>
 </Grid>

@@ -163,6 +163,7 @@ namespace WpfEditorTest
 				_details.FrameDetailsControls.ItemsSource = null;
 			};
 			this.UpdateTitle();
+			rb1.IsChecked = true;
 		}
 
 
@@ -514,6 +515,19 @@ namespace WpfEditorTest
 			Window panel = (sender as MenuItem).Tag as Window;
 			panel.Visibility = Visibility.Visible;
 			panel.Focus();
+		}
+
+		private void CheckBox_Checked( object sender, RoutedEventArgs e )
+		{
+			var chbx = sender as CheckBox;
+
+			SelectionLayer.ToggleGridLines(chbx.IsChecked != null ? (bool)chbx.IsChecked : false);
+		}
+
+		private void rb_Checked( object sender, RoutedEventArgs e )
+		{
+			var rBtn = sender as RadioButton;
+			SelectionLayer.GridSizeMultiplier = SelectionLayer.GridScaleNumbers[rBtn.Content.ToString()];
 		}
 	}
 }

@@ -35,10 +35,22 @@ namespace WpfEditorTest
 		private int DeltaY = 0;
 		private Point InitMousePosition;
 
+		public int GridSizeMultiplier { get => _gridSizeMultiplier; set { _gridSizeMultiplier = value; DrawGridLines(); } }
+		public Dictionary<string, int> GridScaleNumbers = new Dictionary<string, int>
+		{
+			{ "1x", 1 },
+			{ "2x", 2 },
+			{ "3x", 3 },
+			{ "4x", 4 },
+			{ "5x", 5 },
+			{ "10x", 10 }
+		};
+
 		public FusionUI.UI.ScalableFrame DragFieldFrame => Window.DragFieldFrame;
 		public FusionUI.UI.ScalableFrame SceneFrame => Window.SceneFrame;
 		public FusionUI.UI.MainFrame RootFrame => Window.RootFrame;
 		public FramePalette paletteWindow;
+		private int _gridSizeMultiplier = ApplicationConfig.DefaultVisualGridSizeMultiplier;
 
 		public InterfaceEditor Window { get; set; }
 
@@ -51,6 +63,8 @@ namespace WpfEditorTest
 
 			_parentHighlightPanel = new ParentHighlightPanel();
 			Children.Add(_parentHighlightPanel);
+
+			DrawGridLines();
 
 			SelectionManager.Instance.FrameSelected += ( s, e ) =>
 			{
@@ -77,6 +91,45 @@ namespace WpfEditorTest
 					}
 				}
 			};
+		}
+
+		private void DrawGridLines()
+		{
+			ClearGridLines();
+			for (int i = 0; i < SystemParameters.VirtualScreenWidth; i += (int)(FusionUI.UI.ScalableFrame.ScaleMultiplier * GridSizeMultiplier))
+			{
+				DrawLine(i, i, 0, SystemParameters.VirtualScreenHeight, ApplicationConfig.DefaultGridLinesThickness, ApplicationConfig.DefaultGridLinesBrush);
+			}
+
+			for (int j = 0; j < SystemParameters.VirtualScreenHeight; j += (int)(FusionUI.UI.ScalableFrame.ScaleMultiplier * GridSizeMultiplier))
+			{
+				DrawLine(0, SystemParameters.VirtualScreenWidth, j, j, ApplicationConfig.DefaultGridLinesThickness, ApplicationConfig.DefaultGridLinesBrush);
+			}
+		}
+
+		private void ClearGridLines()
+		{
+			VisualGrid.Children.Clear();
+		}
+
+		private void DrawLine( double x1, double x2, double y1, double y2, double thickness, Brush brush )
+		{
+			// Add a Line Element
+			var myLine = new Line();
+			myLine.Stroke = brush;
+			myLine.X1 = x1;
+			myLine.X2 = x2;
+			myLine.Y1 = y1;
+			myLine.Y2 = y2;
+			myLine.HorizontalAlignment = HorizontalAlignment.Left;
+			myLine.VerticalAlignment = VerticalAlignment.Top;
+			myLine.StrokeThickness = thickness;
+			VisualGrid.Children.Add(myLine);
+		}
+
+		internal void ToggleGridLines( bool enable )
+		{
+			VisualGrid.Visibility = enable ? Visibility.Visible : Visibility.Collapsed;
 		}
 
 		private void SelectFrame( Frame frame )
@@ -258,8 +311,8 @@ namespace WpfEditorTest
 				FrameSelectionPanel panel;
 				frameSeletcionPanelList.TryGetValue(hovered, out panel);
 
-				if(panel!=null)
-				panel.StartFrameDragging(e.GetPosition(this));
+				if (panel != null)
+					panel.StartFrameDragging(e.GetPosition(this));
 
 			}
 			else

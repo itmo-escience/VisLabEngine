@@ -87,6 +87,21 @@
                     </MenuItem>
                 </Menu>
             </ToolBar>
+            <ToolBar>
+                <CheckBox IsChecked="False" Checked="CheckBox_Checked" Unchecked="CheckBox_Checked">
+                    <TextBlock Text="ShowGrid"></TextBlock>
+                </CheckBox>
+                <Menu>
+                    <MenuItem Header="GridSize">
+                        <RadioButton Name="rb1" GroupName="GridScale" Content="1x" Checked="rb_Checked"/>
+                        <RadioButton Name="rb2" GroupName="GridScale" Content="2x" Checked="rb_Checked"/>
+                        <RadioButton Name="rb3" GroupName="GridScale" Content="3x" Checked="rb_Checked"/>
+                        <RadioButton Name="rb4" GroupName="GridScale" Content="4x" Checked="rb_Checked"/>
+                        <RadioButton Name="rb5" GroupName="GridScale" Content="5x" Checked="rb_Checked"/>
+                        <RadioButton Name="rb10" GroupName="GridScale" Content="10x" Checked="rb_Checked"/>
+                    </MenuItem>
+                </Menu>
+            </ToolBar>
         </ToolBarTray>
         <local:WPFSelectionUILayer Grid.Row="1" x:Name="SelectionLayer">
         </local:WPFSelectionUILayer>
