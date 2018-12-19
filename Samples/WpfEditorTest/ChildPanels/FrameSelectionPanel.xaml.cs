@@ -171,6 +171,7 @@ namespace WpfEditorTest.ChildPanels
 
 		public Point InitFramePosition { get; internal set; }
 		public Fusion.Engine.Frames.Frame InitFrameParent { get; internal set; }
+		public Point InitPanelPosition { get; internal set; }
 
 		public FrameSelectionPanel( Grid interfaceEditor )
 		{

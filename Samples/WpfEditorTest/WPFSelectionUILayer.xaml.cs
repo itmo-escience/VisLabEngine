@@ -323,6 +323,8 @@ namespace WpfEditorTest
 				foreach (var frameAndPanel in frameSelectionPanelList)
 				{
 					frameAndPanel.Value.InitFramePosition = new Point(frameAndPanel.Key.X, frameAndPanel.Key.Y);
+					frameAndPanel.Value.InitPanelPosition = 
+						new Point(frameAndPanel.Value.RenderTransform.Value.OffsetX, frameAndPanel.Value.RenderTransform.Value.OffsetY);
 					frameAndPanel.Value.InitFrameParent = frameAndPanel.Key.Parent;
 				}
 
@@ -486,14 +488,23 @@ namespace WpfEditorTest
 				Point currentLocation = e.MouseDevice.GetPosition(this);
 
 				var delta = new TranslateTransform
+				//(currentLocation.X - movedPanel.PreviousMouseLocation.X, currentLocation.Y - movedPanel.PreviousMouseLocation.Y);
 				(currentLocation.X - movedPanel.PreviousMouseLocation.X, currentLocation.Y - movedPanel.PreviousMouseLocation.Y);
 
 				foreach (var panel in frameSelectionPanelList.Values)
 				{
-					var group = new TransformGroup();
-					group.Children.Add(panel.PreviousTransform);
-					group.Children.Add(delta);
-					panel.RenderTransform = group;
+					var delta2 = new TranslateTransform
+						//(currentLocation.X - movedPanel.PreviousMouseLocation.X, currentLocation.Y - movedPanel.PreviousMouseLocation.Y);
+						(panel.InitPanelPosition.X-DeltaX, panel.InitPanelPosition.Y - DeltaY);
+					if (VisualGrid.Visibility == Visibility.Visible)
+					{
+						delta2.X -= delta2.X % (int)(FusionUI.UI.ScalableFrame.ScaleMultiplier * GridSizeMultiplier);
+						delta2.Y -= delta2.Y % (int)(FusionUI.UI.ScalableFrame.ScaleMultiplier * GridSizeMultiplier);
+					}
+					//var group = new TransformGroup();
+					//group.Children.Add(panel.PreviousTransform);
+					//group.Children.Add(delta);
+					panel.RenderTransform = delta2;//;
 					panel.PreviousTransform = panel.RenderTransform;
 
 				}
