@@ -250,8 +250,6 @@ namespace Fusion.Engine.Graphics {
 				viewLayer.Render( gameTime, stereoEye );
 			}
 
-            SpriteEngineD2D.DrawSprites(gameTime);
-
 			if (ShowCounters) {
 				Counters.PrintCounters();
 			}

@@ -1,9 +1,6 @@
 ﻿using System.Collections.Generic;
 using Fusion.Drivers.Graphics;
 using Fusion.Engine.Common;
-using SharpDX.Direct2D1;
-using SharpDX.Direct3D11;
-using SharpDX.DXGI;
 using BlendState = Fusion.Drivers.Graphics.BlendState;
 using DepthStencilState = Fusion.Drivers.Graphics.DepthStencilState;
 using RasterizerState = Fusion.Drivers.Graphics.RasterizerState;
@@ -13,7 +10,7 @@ namespace Fusion.Engine.Graphics.SpritesD2D
 {
     public class SpriteEngineD2D : GameModule
     {
-        enum Flags
+        private enum Flags
         {
             OPAQUE = 0x0001,
             ALPHA_BLEND = 0x0002,
@@ -30,12 +27,6 @@ namespace Fusion.Engine.Graphics.SpritesD2D
         private Ubershader _shader;
         private StateFactory _factory;
 
-        private RenderTarget _renderTargetD2D;
-        private RenderTarget2D _renderTargetFusion;
-        private ShaderResource _shaderResource;
-
-        private readonly List<SpriteLayerD2D> _layers = new List<SpriteLayerD2D>();
-
         public SpriteEngineD2D(RenderSystem rs) : base(rs.Game)
         {
             _rs = rs;
@@ -49,47 +40,13 @@ namespace Fusion.Engine.Graphics.SpritesD2D
             Game.Reloading += (s, e) => LoadContent();
         }
 
-        void LoadContent()
+        private void LoadContent()
         {
-            var w = _rs.DisplayBounds.Width;
-            var h = _rs.DisplayBounds.Height;
-
             _shader = _device.Game.Content.Load<Ubershader>("spriteD2D");
             _factory = _shader.CreateFactory(typeof(Flags), (ps, i) => StateEnum(ps, (Flags)i));
-
-            _renderTargetFusion = new RenderTarget2D(_device, ColorFormat.Bgra8, w, h, false, false, true);
-
-            var shaderResourceView = new ShaderResourceView(_device.Device, _renderTargetFusion.Surface.Resource);
-            _shaderResource = new ShaderResource(_device, shaderResourceView, w, h, 1);
-
-            var factory = new SharpDX.Direct2D1.Factory();
-
-
-            using (var res = _renderTargetFusion.Surface.RTV.Resource)
-            using (var surface = res.QueryInterface<Surface>())
-            {
-                _renderTargetD2D = new RenderTarget(
-                    factory,
-                    surface,
-                    new RenderTargetProperties(new PixelFormat(Format.Unknown, SharpDX.Direct2D1.AlphaMode.Premultiplied))
-                );
-                surface.Dispose();
-            }
-
-            _layers.Add(CreateSpriteLayerD2D());
         }
 
-        internal SpriteLayerD2D CreateSpriteLayerD2D()
-        {
-            return new SpriteLayerD2D(_renderTargetD2D);
-        }
-
-        /// <summary>
-        ///
-        /// </summary>
-        /// <param name="ps"></param>
-        /// <param name="flags"></param>
-        void StateEnum(PipelineState ps, Flags flags)
+        private void StateEnum(PipelineState ps, Flags flags)
         {
             switch (flags)
             {
@@ -109,34 +66,25 @@ namespace Fusion.Engine.Graphics.SpritesD2D
             ps.VertexInputElements = VertexInputElement.FromStructure(typeof(SpriteVertex));
         }
 
-
-        /// <summary>
-        /// Draws sprite layers
-        /// </summary>
-        /// <param name="gameTime"></param>
-        public void DrawSprites(GameTime gameTime)
+        internal void DrawSprites(GameTime gameTime, RenderTargetSurface targetSurface, IList<SpriteLayerD2D> layers)
         {
             _device.ResetStates();
-            _device.SetTargets(null, _renderTargetFusion);
 
-            DrawSpritesRecursive(gameTime, _layers);
+            DrawSprites2D(gameTime, layers);
 
-            _device.SetTargets(null, _device.BackbufferColor.Surface);
-            _device.PipelineState = _factory[(int)Flags.ADDITIVE];
+            _device.SetTargets(null, targetSurface);
+            _device.PipelineState = _factory[(int)Flags.ALPHA_BLEND];
             _device.PixelShaderSamplers[0] = SamplerState.PointClamp;
-            _device.PixelShaderResources[0] = _shaderResource;
-            _device.Draw(4, 0);
+
+            foreach (var layer in layers)
+            {
+                _device.PixelShaderResources[0] = layer.ShaderResource;
+                _device.Draw(4, 0);
+            }
         }
 
-        /// <summary>
-        /// Draw sprite layers
-        /// </summary>
-        /// <param name="gameTime"></param>
-        /// <param name="stereoEye"></param>
-        /// <param name="layers"></param>
-        void DrawSpritesRecursive(GameTime gameTime, IEnumerable<SpriteLayerD2D> layers)
+        private void DrawSprites2D(GameTime gameTime, IEnumerable<SpriteLayerD2D> layers)
         {
-            _renderTargetD2D.BeginDraw();
             foreach (var layer in layers)
             {
                 using (new PixEvent("SpriteLayerD2D"))
@@ -144,7 +92,6 @@ namespace Fusion.Engine.Graphics.SpritesD2D
                     layer.Draw(gameTime);
                 }
             }
-            _renderTargetD2D.EndDraw();
         }
     }
 }

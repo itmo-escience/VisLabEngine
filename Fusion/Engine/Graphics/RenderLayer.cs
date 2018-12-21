@@ -10,6 +10,7 @@ using Fusion.Engine.Common;
 using Fusion.Engine.Graphics.GIS;
 using Fusion.Engine.Graphics.GIS.DataSystem.MapSources.Projections;
 using Fusion.Engine.Graphics.Graph;
+using Fusion.Engine.Graphics.SpritesD2D;
 
 
 namespace Fusion.Engine.Graphics {
@@ -18,7 +19,7 @@ namespace Fusion.Engine.Graphics {
 	/// Represents entire visible world.
 	/// </summary>
 	public class RenderLayer : DisposableBase {
-		
+
 		protected readonly Game		Game;
 		protected readonly RenderSystem	rs;
 
@@ -57,7 +58,7 @@ namespace Fusion.Engine.Graphics {
 		/// <summary>
 		/// Indicated whether target buffer should be cleared before rendering.
 		/// </summary>
-		public bool Clear {	
+		public bool Clear {
 			get; set;
 		}
 
@@ -75,10 +76,12 @@ namespace Fusion.Engine.Graphics {
 			get; private set;
 		}
 
-		/// <summary>
-		/// Gets collection of GIS layers.
-		/// </summary>
-		public ICollection<Gis.GisLayer> GisLayers {
+	    public IList<SpriteLayerD2D> SpriteLayersD2D { get; } = new List<SpriteLayerD2D>();
+
+        /// <summary>
+        /// Gets collection of GIS layers.
+        /// </summary>
+        public ICollection<Gis.GisLayer> GisLayers {
 			get; private set;
 		}
 
@@ -126,7 +129,7 @@ namespace Fusion.Engine.Graphics {
 
 
 		/// <summary>
-		/// 
+		///
 		/// </summary>
 		/// <param name="disposing"></param>
 		protected override void Dispose ( bool disposing )
@@ -138,9 +141,9 @@ namespace Fusion.Engine.Graphics {
 		}
 
 		/*-----------------------------------------------------------------------------------------
-		 * 
+		 *
 		 *	Rendering :
-		 * 
+		 *
 		-----------------------------------------------------------------------------------------*/
 
 
@@ -173,6 +176,8 @@ namespace Fusion.Engine.Graphics {
 			//	draw sprites :
 			rs.SpriteEngine.DrawSprites( gameTime, stereoEye, targetSurface, SpriteLayers );
 
+            rs.SpriteEngineD2D.DrawSprites(gameTime, targetSurface, SpriteLayersD2D);
+
 			rs.Filter.FillAlphaOne( targetSurface );
 		}
 
@@ -183,7 +188,7 @@ namespace Fusion.Engine.Graphics {
 				GlobeDepthStencil = new DepthStencil2D(Game.GraphicsDevice, DepthFormat.D24S8, targetSurface.Width, targetSurface.Height, targetSurface.SampleCount);
 			}
 			else if (GlobeDepthStencil.Width != targetSurface.Width || GlobeDepthStencil.Height != targetSurface.Height) {
-				
+
 				GlobeDepthStencil.Dispose();
 				GlobeDepthStencil = new DepthStencil2D(Game.GraphicsDevice, DepthFormat.D24S8, targetSurface.Width, targetSurface.Height, targetSurface.SampleCount);
 			}
@@ -201,7 +206,7 @@ namespace Fusion.Engine.Graphics {
 
 
 		/// <summary>
-		/// 
+		///
 		/// </summary>
 		/// <param name="gameTime"></param>
 		/// <param name="stereoEye"></param>
@@ -210,7 +215,7 @@ namespace Fusion.Engine.Graphics {
 		protected void RenderGIS ( GameTime gameTime, StereoEye stereoEye, Viewport viewport, RenderTargetSurface targetSurface )
 		{
 			if (!GisLayers.Any()) return;
-			
+
 			GlobeCamera.Viewport = viewport;
 			GlobeCamera.Update(gameTime);
 
