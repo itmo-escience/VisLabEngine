@@ -388,7 +388,14 @@ namespace WpfEditorTest
 				Point currentLocation = e.MouseDevice.GetPosition(this);
 				var deltaX = currentLocation.X - draggedPanel.PreviousMouseLocation.X;
 				var deltaY = currentLocation.Y - draggedPanel.PreviousMouseLocation.Y;
-				TranslateTransform delta = null;// = new TranslateTransform (deltaX, deltaY);
+				//if (Keyboard.IsKeyDown(Key.LeftShift) || Keyboard.IsKeyDown(Key.LeftShift))
+				//{
+				//	var ratio = deltaX > deltaY ? 
+				//		draggedPanel.SelectedFrame.Width / draggedPanel.SelectedFrameInitSize.Width :
+				//		draggedPanel.SelectedFrame.Height / draggedPanel.SelectedFrameInitSize.Height;
+
+				//}
+				TranslateTransform delta = null;
 				double HeightBufferDelta = 0;
 				double WidthBufferDelta = 0;
 

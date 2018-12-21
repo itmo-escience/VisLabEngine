@@ -45,6 +45,7 @@ namespace WpfEditorTest
 		public static RoutedCommand CutFrameCmd = new RoutedCommand();
 		public static RoutedCommand MoveFrameCmd = new RoutedCommand();
 		public static RoutedCommand DeleteFrameCmd = new RoutedCommand();
+		public static RoutedCommand AlignFrameCmd = new RoutedCommand();
 
 		//private Point InitFramePosition;
 		//private Frame InitFrameParent;
@@ -76,6 +77,8 @@ namespace WpfEditorTest
 			{ "left", new Point(-1,0) },
 			{ "right", new Point(1,0) },
 		};
+
+		
 
 		public InterfaceEditor()
 		{
@@ -399,6 +402,112 @@ namespace WpfEditorTest
 			}
 			var command = new CommandGroup(commands.ToArray());
 			CommandManager.Instance.Execute(command);
+		}
+
+		private void ExecutedAlignFrameCommand( object sender, ExecutedRoutedEventArgs e )
+		{
+			if (SelectionLayer.frameSelectionPanelList.Count>0)
+			{
+				List<IEditorCommand> commands = new List<IEditorCommand>();
+				int minX,maxX,minY,maxY;
+				minX = SelectionLayer.frameSelectionPanelList.First().Key.X;
+				minY = SelectionLayer.frameSelectionPanelList.First().Key.Y;
+				maxX = minX + SelectionLayer.frameSelectionPanelList.First().Key.Width;
+				maxY = minY + SelectionLayer.frameSelectionPanelList.First().Key.Height;
+
+				switch (e.Parameter.ToString())
+				{
+					case "up":
+						{
+							foreach (Frame frame in SelectionLayer.frameSelectionPanelList.Keys)
+							{
+								minY = Math.Min(minY, frame.Y);
+							}
+							break;
+						}
+					case "down":
+						{
+							foreach (Frame frame in SelectionLayer.frameSelectionPanelList.Keys)
+							{
+								maxY = Math.Max(maxY, frame.Y+frame.Height);
+							}
+							break;
+						}
+					case "left":
+						{
+							foreach (Frame frame in SelectionLayer.frameSelectionPanelList.Keys)
+							{
+								minX = Math.Min(minX, frame.X);
+							}
+							break;
+						}
+					case "right":
+						{
+							foreach (Frame frame in SelectionLayer.frameSelectionPanelList.Keys)
+							{
+								maxX = Math.Max(maxX, frame.X + frame.Width);
+							}
+							break;
+						}
+					case "vertical":
+						{
+							foreach (Frame frame in SelectionLayer.frameSelectionPanelList.Keys)
+							{
+								minX = Math.Min(minX, frame.X);
+								maxX = Math.Max(maxX, frame.X + frame.Width);
+							}
+							break;
+						}
+					case "horizontal":
+						{
+							foreach (Frame frame in SelectionLayer.frameSelectionPanelList.Keys)
+							{
+								minY = Math.Min(minY, frame.Y);
+								maxY = Math.Max(maxY, frame.Y + frame.Height);
+							}
+							break;
+						}
+				}
+				foreach (Frame frame in SelectionLayer.frameSelectionPanelList.Keys)
+				{
+					switch (e.Parameter.ToString())
+					{
+						case "up":
+							{
+								commands.Add(new FramePropertyChangeCommand(frame, "Y",minY));
+								break;
+							}
+						case "down":
+							{
+								commands.Add(new FramePropertyChangeCommand(frame, "Y",maxY-frame.Height));
+								break;
+							}
+						case "left":
+							{
+								commands.Add(new FramePropertyChangeCommand(frame, "X",minX));
+								break;
+							}
+						case "right":
+							{
+								commands.Add(new FramePropertyChangeCommand(frame, "X", maxX - frame.Width));
+								break;
+							}
+						case "vertical":
+							{
+								commands.Add(new FramePropertyChangeCommand(frame, "X", (minX+maxX-frame.Width)/2));
+								break;
+							}
+						case "horizontal":
+							{
+								commands.Add(new FramePropertyChangeCommand(frame, "Y", (minY + maxY - frame.Height) / 2));
+								break;
+							}
+					}
+				}
+
+				var command = new CommandGroup(commands.ToArray());
+				CommandManager.Instance.Execute(command); 
+			}
 		}
 
 		private void ExecutedCopyFrameCommand( object sender, ExecutedRoutedEventArgs e )

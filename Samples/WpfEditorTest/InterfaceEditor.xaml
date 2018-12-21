@@ -55,6 +55,9 @@
         <CommandBinding Command="{x:Static local:InterfaceEditor.MoveFrameCmd}"
                         Executed="ExecutedMoveFrameCommand"
                         CanExecute="AlwaysCanExecute" />
+        <CommandBinding Command="{x:Static local:InterfaceEditor.AlignFrameCmd}"
+                        Executed="ExecutedAlignFrameCommand"
+                        CanExecute="AlwaysCanExecute" />
     </Window.CommandBindings>
     <Window.InputBindings>
         <KeyBinding Command="{x:Static local:InterfaceEditor.UndoChangeCmd}" Key="Z" Modifiers="Ctrl"/>
@@ -114,6 +117,16 @@
                         <RadioButton Name="rb4" GroupName="GridScale" Content="4x" Checked="rb_Checked"/>
                         <RadioButton Name="rb5" GroupName="GridScale" Content="5x" Checked="rb_Checked"/>
                         <RadioButton Name="rb10" GroupName="GridScale" Content="10x" Checked="rb_Checked"/>
+                    </MenuItem>
+                </Menu>
+                <Menu>
+                    <MenuItem Header="Alignment" Background="#FFEEF5FD">
+                        <MenuItem Command="{x:Static local:InterfaceEditor.AlignFrameCmd}" CommandParameter="up" Header="Align top" ToolTip=""/>
+                        <MenuItem Command="{x:Static local:InterfaceEditor.AlignFrameCmd}" CommandParameter="down" Header="Align bottom" ToolTip=""/>
+                        <MenuItem Command="{x:Static local:InterfaceEditor.AlignFrameCmd}" CommandParameter="left" Header="Align left" ToolTip=""/>
+                        <MenuItem Command="{x:Static local:InterfaceEditor.AlignFrameCmd}" CommandParameter="right" Header="Align right" ToolTip=""/>
+                        <MenuItem Command="{x:Static local:InterfaceEditor.AlignFrameCmd}" CommandParameter="vertical" Header="Align vertically" ToolTip=""/>
+                        <MenuItem Command="{x:Static local:InterfaceEditor.AlignFrameCmd}" CommandParameter="horizontal" Header="Align horizontally" ToolTip=""/>
                     </MenuItem>
                 </Menu>
             </ToolBar>
