@@ -43,6 +43,8 @@ namespace WpfEditorTest
 		public static RoutedCommand CopyFrameCmd = new RoutedCommand();
 		public static RoutedCommand PasteFrameCmd = new RoutedCommand();
 		public static RoutedCommand CutFrameCmd = new RoutedCommand();
+		public static RoutedCommand MoveFrameCmd = new RoutedCommand();
+		public static RoutedCommand DeleteFrameCmd = new RoutedCommand();
 
 		//private Point InitFramePosition;
 		//private Frame InitFrameParent;
@@ -67,8 +69,15 @@ namespace WpfEditorTest
 		public string CurrentSceneFile { get => currentSceneFile; set { currentSceneFile = value; this.UpdateTitle(); } }
 		public string SceneChangedIndicator { get => sceneChangedIndicator; set { sceneChangedIndicator = value; this.UpdateTitle(); } }
 
+		public Dictionary<string, Point> KeyboardArrowsSteps = new Dictionary<string, Point>
+		{
+			{ "up", new Point(0,-1) },
+			{ "down", new Point(0,1) },
+			{ "left", new Point(-1,0) },
+			{ "right", new Point(1,0) },
+		};
 
-        public InterfaceEditor()
+		public InterfaceEditor()
 		{
 			InitializeComponent();
 
@@ -173,14 +182,6 @@ namespace WpfEditorTest
 		private void UpdateTitle()
 		{
 			this.Title = ApplicationConfig.BaseTitle + " - " + (!string.IsNullOrEmpty(currentSceneFile) ? CurrentSceneFile : ApplicationConfig.BaseSceneName) + SceneChangedIndicator;
-		}
-
-		private void Window_KeyDown( object sender, KeyEventArgs e )
-		{
-			if (e.Key == Key.Delete)
-			{
-				this.TryDeleteSelectedFrame();
-			}
 		}
 
 		private void TryDeleteSelectedFrame()
@@ -377,6 +378,27 @@ namespace WpfEditorTest
 		private void ExecutedRedoChangeCommand( object sender, ExecutedRoutedEventArgs e )
 		{
 			CommandManager.Instance.TryRedoCommand();
+		}
+
+		private void ExecutedDeleteFrameCommand( object sender, ExecutedRoutedEventArgs e )
+		{
+			this.TryDeleteSelectedFrame();
+		}
+
+		private void ExecutedMoveFrameCommand( object sender, ExecutedRoutedEventArgs e )
+		{
+			var step = GridToggle.IsChecked != null && (bool)GridToggle.IsChecked? 
+				(int)(FusionUI.UI.ScalableFrame.ScaleMultiplier * SelectionLayer.GridSizeMultiplier) : 1;
+			List<IEditorCommand> commands = new List<IEditorCommand>();
+			var delta = KeyboardArrowsSteps[e.Parameter.ToString()];
+			foreach (Frame frame in SelectionLayer.frameSelectionPanelList.Keys)
+			{
+				commands.Add(new CommandGroup(
+					new FramePropertyChangeCommand(frame, "X", frame.X + (int)delta.X* step),
+					new FramePropertyChangeCommand(frame, "Y", frame.Y + (int)delta.Y* step)));
+			}
+			var command = new CommandGroup(commands.ToArray());
+			CommandManager.Instance.Execute(command);
 		}
 
 		private void ExecutedCopyFrameCommand( object sender, ExecutedRoutedEventArgs e )

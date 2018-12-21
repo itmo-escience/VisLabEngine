@@ -14,7 +14,7 @@
         Width="800" Height="600"
         MinWidth="400" MinHeight="300"
         WindowStartupLocation="CenterScreen"
-        KeyDown="Window_KeyDown" Closing="Window_Closing">
+        Closing="Window_Closing">
     <Window.Resources>
         <conv:ButtonEnableConverter x:Key="btnEnableConverter"/>
     </Window.Resources>
@@ -49,6 +49,12 @@
         <CommandBinding Command="{x:Static local:InterfaceEditor.NewSceneCmd}"
                         Executed="ExecutedNewSceneCommand"
                         CanExecute="AlwaysCanExecute" />
+        <CommandBinding Command="{x:Static local:InterfaceEditor.DeleteFrameCmd}"
+                        Executed="ExecutedDeleteFrameCommand"
+                        CanExecute="AlwaysCanExecute" />
+        <CommandBinding Command="{x:Static local:InterfaceEditor.MoveFrameCmd}"
+                        Executed="ExecutedMoveFrameCommand"
+                        CanExecute="AlwaysCanExecute" />
     </Window.CommandBindings>
     <Window.InputBindings>
         <KeyBinding Command="{x:Static local:InterfaceEditor.UndoChangeCmd}" Key="Z" Modifiers="Ctrl"/>
@@ -60,6 +66,12 @@
         <KeyBinding Command="{x:Static local:InterfaceEditor.CopyFrameCmd}" Key="C" Modifiers="Ctrl"/>
         <KeyBinding Command="{x:Static local:InterfaceEditor.PasteFrameCmd}" Key="V" Modifiers="Ctrl"/>
         <KeyBinding Command="{x:Static local:InterfaceEditor.CutFrameCmd}" Key="X" Modifiers="Ctrl"/>
+        <KeyBinding Command="{x:Static local:InterfaceEditor.DeleteFrameCmd}" Key="Delete"/>
+
+        <KeyBinding Command="{x:Static local:InterfaceEditor.MoveFrameCmd}" CommandParameter="up" Key="Up"/>
+        <KeyBinding Command="{x:Static local:InterfaceEditor.MoveFrameCmd}" CommandParameter="down" Key="Down"/>
+        <KeyBinding Command="{x:Static local:InterfaceEditor.MoveFrameCmd}" CommandParameter="left" Key="Left"/>
+        <KeyBinding Command="{x:Static local:InterfaceEditor.MoveFrameCmd}" CommandParameter="right" Key="Right"/>
     </Window.InputBindings>
     <Grid MaxWidth="10000" MaxHeight="10000">
         <Grid.RowDefinitions>
@@ -68,31 +80,34 @@
         </Grid.RowDefinitions>
         <ToolBarTray Grid.Row="0" IsLocked="True" >
             <ToolBar>
-                <Button Command="{x:Static local:InterfaceEditor.NewSceneCmd}" Content="New scene" ToolTip="Create new empty scene"/>
-                <Button Command="{x:Static local:InterfaceEditor.SaveSceneCmd}" Content="Save scene" ToolTip="Save scene to file..."/>
-                <Button Command="{x:Static local:InterfaceEditor.LoadSceneCmd}" Content="Load scene" ToolTip="Load scene rom file..."/>
-                <Button Command="{x:Static local:InterfaceEditor.SaveFrameCmd}" Content="Save template" ToolTip="Save selected frame as template..."/>
-
-                <Button Name="UndoButton" Command="{x:Static local:InterfaceEditor.UndoChangeCmd}" Content="Undo change" ToolTip="Revert last change to frame"
-                        IsEnabled="{Binding UndoStackIsNotEmpty}"/>
-                <Button Name="RedoButton" Command="{x:Static local:InterfaceEditor.RedoChangeCmd}" Content="Redo change" ToolTip="Repeat reverted change to frame"
-                        IsEnabled="{Binding RedoStackIsNotEmpty}"/>
-            </ToolBar>
-            <ToolBar>
                 <Menu>
-                    <MenuItem Header="Panels">
-                        <MenuItem Name="miFrameProperties" Header="Frame Properties" Click="MenuItem_Click"/>
-                        <MenuItem Name="miSceneTreeView" Header="Scene TreeView" Click="MenuItem_Click"/>
-                        <MenuItem Name="miFrameTemplates" Header="Frame Templates" Click="MenuItem_Click"/>
-                    </MenuItem>
+                <MenuItem Header="File" Background="#FFEEF5FD">
+                    <MenuItem Command="{x:Static local:InterfaceEditor.NewSceneCmd}" Header="New scene" ToolTip="Create new empty scene"/>
+                    <MenuItem Command="{x:Static local:InterfaceEditor.SaveSceneCmd}" Header="Save scene" ToolTip="Save scene to file..."/>
+                    <MenuItem Command="{x:Static local:InterfaceEditor.LoadSceneCmd}" Header="Load scene" ToolTip="Load scene rom file..."/>
+                    <MenuItem Command="{x:Static local:InterfaceEditor.SaveFrameCmd}" Header="Save template" ToolTip="Save selected frame as template..."/>
+                </MenuItem>
                 </Menu>
-            </ToolBar>
-            <ToolBar>
-                <CheckBox IsChecked="False" Checked="CheckBox_Checked" Unchecked="CheckBox_Checked">
-                    <TextBlock Text="ShowGrid"></TextBlock>
+                <Menu>
+                    <MenuItem Header="Commands" Background="#FFEEF5FD">
+                    <MenuItem Name="UndoButton" Command="{x:Static local:InterfaceEditor.UndoChangeCmd}" Header="Undo change" ToolTip="Revert last change to frame"
+                        IsEnabled="{Binding UndoStackIsNotEmpty}"/>
+                    <MenuItem Name="RedoButton" Command="{x:Static local:InterfaceEditor.RedoChangeCmd}" Header="Redo change" ToolTip="Repeat reverted change to frame"
+                        IsEnabled="{Binding RedoStackIsNotEmpty}"/>
+                </MenuItem>
+                </Menu>
+                <Menu>
+                    <MenuItem Header="Windows" Background="#FFEEF5FD">
+                    <MenuItem Name="miFrameProperties" Header="Frame Properties" Click="MenuItem_Click"/>
+                    <MenuItem Name="miSceneTreeView" Header="Scene TreeView" Click="MenuItem_Click"/>
+                    <MenuItem Name="miFrameTemplates" Header="Frame Templates" Click="MenuItem_Click"/>
+                </MenuItem>
+                </Menu>
+                <CheckBox Name="GridToggle" IsChecked="False" Background="#FFEEF5FD" Checked="CheckBox_Checked" Unchecked="CheckBox_Checked">
+                    <TextBlock Text="ShowGrid" Background="#FFEEF5FD"></TextBlock>
                 </CheckBox>
                 <Menu>
-                    <MenuItem Header="GridSize">
+                    <MenuItem Header="GridSize" Background="#FFEEF5FD">
                         <RadioButton Name="rb1" GroupName="GridScale" Content="1x" Checked="rb_Checked"/>
                         <RadioButton Name="rb2" GroupName="GridScale" Content="2x" Checked="rb_Checked"/>
                         <RadioButton Name="rb3" GroupName="GridScale" Content="3x" Checked="rb_Checked"/>

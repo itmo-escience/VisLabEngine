@@ -295,7 +295,7 @@ namespace WpfEditorTest
 			{
 				//SelectFrame(hovered);
 				IEditorCommand command = null;
-				if (Keyboard.IsKeyDown(Key.LeftShift))
+				if (Keyboard.IsKeyDown(Key.LeftShift)|| Keyboard.IsKeyDown(Key.RightShift))
 				{
 					var framesToSelect = new List<Frame>(SelectionManager.Instance.SelectedFrames);
 					if (framesToSelect.Contains(hovered))
@@ -515,7 +515,7 @@ namespace WpfEditorTest
 
 		private bool NeedSnapping()
 		{
-			return VisualGrid.Visibility == Visibility.Visible && !Keyboard.IsKeyDown(Key.LeftAlt);
+			return VisualGrid.Visibility == Visibility.Visible && !Keyboard.IsKeyDown(Key.LeftAlt) || Keyboard.IsKeyDown(Key.RightAlt);
 		}
 	}
 }
