@@ -89,7 +89,7 @@ namespace Fusion.Engine.Graphics.SpritesD2D
             {
                 using (new PixEvent("SpriteLayerD2D"))
                 {
-                    layer.Draw(gameTime);
+                    layer.Render(gameTime);
                 }
             }
         }
