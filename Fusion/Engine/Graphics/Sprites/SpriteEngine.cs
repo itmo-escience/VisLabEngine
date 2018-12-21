@@ -13,12 +13,12 @@ namespace Fusion.Engine.Graphics {
 	public class SpriteEngine : GameModule {
 
 		enum Flags {
-			OPAQUE				=	0x0001, 
-			ALPHA_BLEND			=	0x0002, 
-			ALPHA_BLEND_PREMUL	=	0x0004, 
-			ADDITIVE			=	0x0008, 
-			SCREEN				=	0x0010, 
-			MULTIPLY			=	0x0020, 
+			OPAQUE				=	0x0001,
+			ALPHA_BLEND			=	0x0002,
+			ALPHA_BLEND_PREMUL	=	0x0004,
+			ADDITIVE			=	0x0008,
+			SCREEN				=	0x0010,
+			MULTIPLY			=	0x0020,
 			NEG_MULTIPLY		=	0x0040,
 			ALPHA_ONLY			=	0x0080,
 		}
@@ -38,7 +38,7 @@ namespace Fusion.Engine.Graphics {
 		ConstantBuffer	constBuffer;
 
 		/// <summary>
-		/// 
+		///
 		/// </summary>
 		/// <param name="rs"></param>
 		public SpriteEngine( RenderSystem rs ) : base(rs.Game)
@@ -49,7 +49,7 @@ namespace Fusion.Engine.Graphics {
 
 
 		/// <summary>
-		/// 
+		///
 		/// </summary>
 		public override void Initialize()
 		{
@@ -70,13 +70,13 @@ namespace Fusion.Engine.Graphics {
 
 
 		/// <summary>
-		/// 
+		///
 		/// </summary>
 		/// <param name="ps"></param>
 		/// <param name="flags"></param>
 		void StateEnum ( PipelineState ps, Flags flags )
 		{
-			switch ( flags ) {																			   
+			switch ( flags ) {
 				case Flags.OPAQUE				: ps.BlendState		=	BlendState.Opaque			; break;
 				case Flags.ALPHA_BLEND			: ps.BlendState		=	BlendState.AlphaBlend		; break;
 				case Flags.ALPHA_BLEND_PREMUL	: ps.BlendState		=	BlendState.AlphaBlendPremul	; break;
@@ -97,7 +97,7 @@ namespace Fusion.Engine.Graphics {
 
 
 		/// <summary>
-		/// 
+		///
 		/// </summary>
 		/// <param name="disposing"></param>
 		protected override void Dispose ( bool disposing )
@@ -142,7 +142,7 @@ namespace Fusion.Engine.Graphics {
 			var orderedLayers	=	layers.Where( layer0 => layer0!=null ).OrderBy( layer1 => layer1.Order );
 
 			foreach ( var layer in orderedLayers ) {
-				
+
 				if (!layer.Visible) {
 					continue;
 				}
@@ -168,7 +168,7 @@ namespace Fusion.Engine.Graphics {
 
 					device.VertexShaderConstants[0]	=	constBuffer;
 					device.PixelShaderConstants[0]	=	constBuffer;
-				
+
 					PipelineState ps = null;
 					SamplerState ss = null;
 
@@ -194,7 +194,7 @@ namespace Fusion.Engine.Graphics {
 
 					device.PipelineState			=	ps;
 					device.PixelShaderSamplers[0]	=	ss;
-					
+
 
 					layer.Draw( gameTime, stereoEye );
 

@@ -63,11 +63,11 @@
       <Name>Native.Fbx</Name>
     </ProjectReference>
   </ItemGroup>
-	<ItemGroup Condition=" '$(Configuration)' == 'Release' ">
-		<Content Include="..\SDKs\FbxSdk\lib\x64\release\libfbxsdk.dll">
-			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-		</Content>
-	</ItemGroup>
+  <ItemGroup Condition=" '$(Configuration)' == 'Release' ">
+    <Content Include="..\SDKs\FbxSdk\lib\x64\release\libfbxsdk.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
   <ItemGroup Condition=" '$(Configuration)' == 'Debug' ">
     <Content Include="..\SDKs\FbxSdk\lib\x64\debug\libfbxsdk.dll">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>

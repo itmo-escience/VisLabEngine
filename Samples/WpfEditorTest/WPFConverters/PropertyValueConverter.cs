@@ -9,7 +9,7 @@ using System.Windows;
 using System.Windows.Data;
 using Fusion.Engine.Frames;
 
-namespace WpfEditorTest
+namespace WpfEditorTest.WPFConverters
 {
 	public class PropertyValueConverter : IValueConverter
 	{

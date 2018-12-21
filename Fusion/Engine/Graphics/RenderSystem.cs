@@ -10,14 +10,18 @@ using Fusion.Core.Configuration;
 using Fusion.Engine.Common;
 using Fusion.Drivers.Graphics;
 using Fusion.Engine.Graphics.GIS;
+using Fusion.Engine.Graphics.SpritesD2D;
 
 namespace Fusion.Engine.Graphics {
 
 	public partial class RenderSystem : GameModule {
 
 		internal readonly GraphicsDevice Device;
+	    [GameModule("SpritesD2D", "spriteD2D", InitOrder.After)]
+	    public SpriteEngineD2D SpriteEngineD2D { get { return spriteEngineD2D; } }
+        private SpriteEngineD2D spriteEngineD2D;
 
-		[GameModule("Sprites", "sprite", InitOrder.After)]
+        [GameModule("Sprites", "sprite", InitOrder.After)]
 		public SpriteEngine	SpriteEngine { get { return spriteEngine; } }
 		SpriteEngine	spriteEngine;
 
@@ -40,19 +44,19 @@ namespace Fusion.Engine.Graphics {
 		[GameModule("HdrFilter", "hdr", InitOrder.After)]
 		public HdrFilter HdrFilter { get{ return hdrFilter; } }
 		public HdrFilter hdrFilter;
-		
+
 		[GameModule("DofFilter", "dof", InitOrder.After)]
 		public DofFilter DofFilter { get{ return dofFilter; } }
 		public DofFilter dofFilter;
-		
+
 		[GameModule("LightRenderer", "rs", InitOrder.Before)]
 		public LightRenderer	LightRenderer { get { return lightRenderer; } }
 		public LightRenderer	lightRenderer;
-		
+
 		[GameModule("SceneRendere", "scene", InitOrder.Before)]
 		public SceneRenderer	SceneRenderer { get { return sceneRenderer; } }
 		public SceneRenderer	sceneRenderer;
-		
+
 		[GameModule("Sky", "sky", InitOrder.After)]
 		public Sky	Sky { get { return sky; } }
 		public Sky	sky;
@@ -67,11 +71,11 @@ namespace Fusion.Engine.Graphics {
 		/// Fullscreen
 		/// </summary>
 		[Config]
-		public bool Fullscreen { 
-			get { 
+		public bool Fullscreen {
+			get {
 				return isFullscreen;
 			}
-			set { 
+			set {
 				if (isFullscreen!=value) {
 					isFullscreen = value;
 					if (Device!=null) {
@@ -114,7 +118,7 @@ namespace Fusion.Engine.Graphics {
 
 
 		/// <summary>
-		/// 
+		///
 		/// </summary>
 		/// <param name="engine"></param>
 		public RenderSystem ( Game Game ) : base(Game)
@@ -135,6 +139,7 @@ namespace Fusion.Engine.Graphics {
 
 			viewLayers	=	new List<RenderLayer>();
 			spriteEngine	=	new SpriteEngine( this );
+		    spriteEngineD2D =   new SpriteEngineD2D(this);
 			gis				=	new Gis(Game);
 			filter			=	new Filter( Game );
 			ssaoFilter		=	new SsaoFilter( Game );
@@ -151,7 +156,7 @@ namespace Fusion.Engine.Graphics {
 		}
 
 
-										  
+
 		/// <summary>
 		/// Applies graphics parameters.
 		/// </summary>
@@ -176,7 +181,7 @@ namespace Fusion.Engine.Graphics {
 		{
 			whiteTexture	=	new DynamicTexture( this, 4,4, typeof(Color), false, false );
 			whiteTexture.SetData( Enumerable.Range(0,16).Select( i => Color.White ).ToArray() );
-			
+
 			grayTexture		=	new DynamicTexture( this, 4,4, typeof(Color), false, false );
 			grayTexture.SetData( Enumerable.Range(0,16).Select( i => Color.Gray ).ToArray() );
 
@@ -197,7 +202,7 @@ namespace Fusion.Engine.Graphics {
 
 
 		/// <summary>
-		/// 
+		///
 		/// </summary>
 		/// <param name="disposing"></param>
 		protected override void Dispose ( bool disposing )
@@ -221,7 +226,7 @@ namespace Fusion.Engine.Graphics {
 
 
 		/// <summary>
-		/// 
+		///
 		/// </summary>
 		/// <param name="gameTime"></param>
 		/// <param name="stereoEye"></param>
@@ -244,6 +249,8 @@ namespace Fusion.Engine.Graphics {
 			foreach ( var viewLayer in layersToDraw ) {
 				viewLayer.Render( gameTime, stereoEye );
 			}
+
+            SpriteEngineD2D.DrawSprites(gameTime);
 
 			if (ShowCounters) {
 				Counters.PrintCounters();
@@ -290,22 +297,21 @@ namespace Fusion.Engine.Graphics {
 		readonly ICollection<RenderLayer> viewLayers = new List<RenderLayer>();
 
 
-
-		/*-----------------------------------------------------------------------------------------
-		 * 
+	    /*-----------------------------------------------------------------------------------------
+		 *
 		 *	Display stuff :
-		 * 
+		 *
 		-----------------------------------------------------------------------------------------*/
 
 		/// <summary>
-		/// 
+		///
 		/// </summary>
 		/// <param name="path"></param>
 		public void Screenshot ( string path = null )
 		{
 			Device.Screenshot(path);
 		}
-		
+
 
 		/// <summary>
 		/// Gets display bounds.

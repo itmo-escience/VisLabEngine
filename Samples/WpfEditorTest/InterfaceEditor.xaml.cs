@@ -20,6 +20,13 @@ using WpfEditorTest.ChildPanels;
 using Frame = Fusion.Engine.Frames.Frame;
 using KeyEventArgs = System.Windows.Input.KeyEventArgs;
 using CommandManager = WpfEditorTest.UndoRedo.CommandManager;
+using WpfEditorTest.UndoRedo;
+using System.Windows.Media.Imaging;
+using Bitmap = System.Drawing.Bitmap;
+using System.Windows.Interop;
+using System.Configuration;
+using WpfEditorTest.FrameSelection;
+using ZWpfLib;
 
 namespace WpfEditorTest
 {
@@ -29,85 +36,91 @@ namespace WpfEditorTest
 	public partial class InterfaceEditor : Window
 	{
 		public static RoutedCommand SaveFrameCmd = new RoutedCommand();
-	    public static RoutedCommand SaveSceneCmd = new RoutedCommand();
-	    public static RoutedCommand LoadSceneCmd = new RoutedCommand();
+		public static RoutedCommand SaveSceneCmd = new RoutedCommand();
+		public static RoutedCommand QuickSaveSceneCmd = new RoutedCommand();
+		public static RoutedCommand NewSceneCmd = new RoutedCommand();
+		public static RoutedCommand LoadSceneCmd = new RoutedCommand();
 		public static RoutedCommand RedoChangeCmd = new RoutedCommand();
 		public static RoutedCommand UndoChangeCmd = new RoutedCommand();
+		public static RoutedCommand CopyFrameCmd = new RoutedCommand();
+		public static RoutedCommand PasteFrameCmd = new RoutedCommand();
+		public static RoutedCommand CutFrameCmd = new RoutedCommand();
 
-		private int DeltaX = 0;
-		private int DeltaY = 0;
-		private Point InitMousePosition;
+		//private Point InitFramePosition;
+		//private Frame InitFrameParent;
 
 		private readonly FrameDetails _details;
 		private readonly FramePalette _palette;
 		private readonly FrameTreeView _treeView;
-		private readonly FrameSelectionPanel _frameSelectionPanel;
-		private readonly ParentHighlightPanel _parentHighlightPanel;
-		private readonly List<IDraggablePanel> _panels = new List<IDraggablePanel>();
+		//private readonly FrameSelectionPanel _frameSelectionPanel;
 
-	    public string TemplatesPath = Path.GetFullPath(Path.Combine(Directory.GetParent(Assembly.GetEntryAssembly().Location).FullName, "..\\..\\..\\FramesXML"));
-	    Binding childrenBinding;
-        private readonly Game _engine;
+		Binding childrenBinding;
+		private readonly Game _engine;
 
 		public FusionUI.UI.ScalableFrame DragFieldFrame;
 		public FusionUI.UI.ScalableFrame SceneFrame;
 		public FusionUI.UI.MainFrame RootFrame;
-	    private readonly CancellationTokenSource _tokenSource;
 
-	    public InterfaceEditor()
-        {
-            InitializeComponent();
+		private string currentSceneFile;
+		private string sceneChangedIndicator;
+		private string titleWithFileName = ApplicationConfig.BaseTitle + " - " + ApplicationConfig.BaseSceneName;
+		private string xmlFrameBuffer;
+		private Frame frameBuffer;
 
-            _engine = new Game("TestGame");
-            _engine.Mouse = new DummyMouse(_engine);
-            _engine.Keyboard = new DummyKeyboard(_engine);
-            _engine.Touch = new DummyTouch(_engine);
+		public string CurrentSceneFile { get => currentSceneFile; set { currentSceneFile = value; this.UpdateTitle(); } }
+		public string SceneChangedIndicator { get => sceneChangedIndicator; set { sceneChangedIndicator = value; this.UpdateTitle(); } }
 
-            _engine.GameServer = new CustomGameServer(_engine);
-            _engine.GameClient = new CustomGameClient(_engine);
-            _engine.GameInterface = new CustomGameInterface(_engine);
-            _engine.LoadConfiguration("Config.ini");
 
-            _engine.RenderSystem.StereoMode = Fusion.Engine.Graphics.StereoMode.WpfEditor;
-            _engine.RenderSystem.Width = 1920;
-            _engine.RenderSystem.Height = 1080;
-            _engine.RenderSystem.VSyncInterval = 1;
+        public InterfaceEditor()
+		{
+			InitializeComponent();
 
-            Directory.SetCurrentDirectory(@"..\..\..\..\GISTest\bin\x64\Debug");
-            _engine.OnInitialized += OnEngineInitialized;
+			_engine = new Game("TestGame");
+			_engine.Mouse = new DummyMouse(_engine);
+			_engine.Keyboard = new DummyKeyboard(_engine);
+			_engine.Touch = new DummyTouch(_engine);
 
-            _tokenSource = new CancellationTokenSource();
-            Closing += (sender, args) => { _tokenSource.Cancel(); };
+			_engine.GameServer = new CustomGameServer(_engine);
+			_engine.GameClient = new CustomGameClient(_engine);
+			_engine.GameInterface = new CustomGameInterface(_engine);
+			_engine.LoadConfiguration("Config.ini");
 
-            var runner = new Thread(() =>
-            {
-                Thread.CurrentThread.IsBackground = true;
-                _engine.RunExternal(_tokenSource.Token);
-            }) {Name = "Engine runner"};
-            runner.Start();
+			_engine.RenderSystem.StereoMode = Fusion.Engine.Graphics.StereoMode.WpfEditor;
+			_engine.RenderSystem.Width = 1920;
+			_engine.RenderSystem.Height = 1080;
+			_engine.RenderSystem.VSyncInterval = 1;
 
-            _parentHighlightPanel = new ParentHighlightPanel();
-			LocalGrid.Children.Add(_parentHighlightPanel);
+			Directory.SetCurrentDirectory(@"..\..\..\..\GISTest\bin\x64\Debug");
+			_engine.InitExternal();
 
-			_frameSelectionPanel = new FrameSelectionPanel(this);
-			LocalGrid.Children.Add(_frameSelectionPanel);
-			_panels.Add(_frameSelectionPanel);
 
-			_details = new FrameDetails();
-            _treeView = new FrameTreeView();
-            _palette = new FramePalette();
+            //_frameSelectionPanel = new FrameSelectionPanel(this);
+            //LocalGrid.Children.Add(_frameSelectionPanel);
 
-            SourceInitialized += (_, args) =>
-            {
-                _details.Owner = this;
-                _details.Show();
-                _treeView.Owner = this;
-                _treeView.Show();
+            _details = new FrameDetails();
+			_treeView = new FrameTreeView();
+			_palette = new FramePalette();
+
+			miFrameProperties.Tag = _details;
+			miFrameTemplates.Tag = _palette;
+			miSceneTreeView.Tag = _treeView;
+
+
+			SourceInitialized += ( _, args ) =>
+			{
+				_details.Owner = this;
+				_details.Show();
+				_treeView.Owner = this;
+				_treeView.Show();
 				_palette.Owner = this;
 				_palette.Show();
-			};
+            };
 
-            _treeView.SelectedFrameChangedInUI += (_, frame) => SelectFrame(frame);
+			_treeView.SelectedFrameChangedInUI += ( _, frame ) =>
+			{
+				var command = new SelectFrameCommand(new List<Frame> { frame });
+				CommandManager.Instance.Execute(command);
+			}; //SelectFrame(frame);
 			_treeView.RequestFrameDeletionInUI += ( _, __ ) => TryDeleteSelectedFrame();
         }
 
@@ -115,19 +128,22 @@ namespace WpfEditorTest
 	    {
 	        Dispatcher.Invoke(() =>
 	        {
-                DxElem.Renderer = _engine;
-
-	            var templates = Directory.GetFiles(TemplatesPath, "*.xml").ToList();
+	            var templates = Directory.GetFiles(ApplicationConfig.TemplatesPath, "*.xml").ToList();
 	            _palette.AvailableFrames.ItemsSource = templates.Select(t => t.Split('\\').Last().Split('.').First());
 
 	            RootFrame = ApplicationInterface.Instance.rootFrame;
-	            SceneFrame = (FusionUI.UI.ScalableFrame)RootFrame.Children.FirstOrDefault();
-	            DragFieldFrame = new FusionUI.UI.ScalableFrame(0, 0, RootFrame.UnitWidth, RootFrame.UnitHeight, "DragFieldFrame", Fusion.Core.Mathematics.Color.Zero)
+	            SceneFrame = (FusionUI.UI.ScalableFrame) RootFrame.Children.FirstOrDefault();
+	            DragFieldFrame = new FusionUI.UI.ScalableFrame(0, 0, RootFrame.UnitWidth, RootFrame.UnitHeight,
+	                "DragFieldFrame", Fusion.Core.Mathematics.Color.Zero)
 	            {
 	                Anchor = FrameAnchor.All,
 	                ZOrder = 1000000,
 	            };
 	            RootFrame.Add(DragFieldFrame);
+
+	            SelectionLayer.Window = this;
+	            SelectionLayer.paletteWindow = _palette;
+	            SelectionLayer.DxElem.Renderer = _engine;
 
 	            var b = new Binding("Children")
 	            {
@@ -136,374 +152,229 @@ namespace WpfEditorTest
 	                Mode = BindingMode.OneWay
 	            };
 	            _treeView.ElementHierarchyView.SetBinding(TreeView.ItemsSourceProperty, b);
-            });
-        }
 
-	    protected override void OnSourceInitialized(EventArgs e)
-	    {
-	        base.OnSourceInitialized(e);
-	        DxElem.HandleInput(this);
+
+	            UndoButton.DataContext = CommandManager.Instance;
+	            RedoButton.DataContext = CommandManager.Instance;
+
+
+	            CommandManager.Instance.ChangedDirty += (s, e) => { this.SceneChangedIndicator = e ? "*" : ""; };
+
+	            SelectionLayer.FrameSelected += (s, selection) =>
+	            {
+	                _details.SetSelectFrame(selection.Frame);
+	                _treeView.SelectedFrame = selection.Frame;
+	            };
+	            SelectionLayer.FramesDeselected += (s, e) => { _details.FrameDetailsControls.ItemsSource = null; };
+	            this.UpdateTitle();
+	        });
 	    }
 
-		private void LocalGrid_MouseMove( object sender, MouseEventArgs e )
+
+	    protected override void OnSourceInitialized( EventArgs e )
 		{
-			if (_frameSelectionPanel.DragMousePressed)
-			{
-				var drag = _frameSelectionPanel.CurrentDrag;
-
-				Point currentLocation = e.MouseDevice.GetPosition(this);
-				var deltaX = currentLocation.X - _frameSelectionPanel.PreviousMouseLocation.X;
-				var deltaY = currentLocation.Y - _frameSelectionPanel.PreviousMouseLocation.Y;
-				TranslateTransform delta = null;// = new TranslateTransform (deltaX, deltaY);
-
-
-
-				switch (_frameSelectionPanel.Drags.IndexOf(drag))
-				{
-					case 0:
-						{
-							delta = new TranslateTransform(deltaX, deltaY);
-							_frameSelectionPanel.HeightBuffer -= deltaY;
-							_frameSelectionPanel.WidthBuffer -= deltaX;
-							break;
-						}
-					case 1:
-						{
-							delta = new TranslateTransform(0, deltaY);
-							_frameSelectionPanel.HeightBuffer -= deltaY;
-							break;
-						}
-					case 2:
-						{
-							delta = new TranslateTransform(0, deltaY);
-							_frameSelectionPanel.HeightBuffer -= deltaY;
-							_frameSelectionPanel.WidthBuffer += deltaX;
-							break;
-						}
-					case 3:
-						{
-							delta = new TranslateTransform(deltaX, 0);
-							_frameSelectionPanel.WidthBuffer -= deltaX;
-							break;
-						}
-					case 4:
-						{
-							delta = new TranslateTransform(0, 0);
-							_frameSelectionPanel.WidthBuffer += deltaX;
-							break;
-						}
-					case 5:
-						{
-							delta = new TranslateTransform(deltaX, 0);
-							_frameSelectionPanel.HeightBuffer += deltaY;
-							_frameSelectionPanel.WidthBuffer -= deltaX;
-							break;
-						}
-					case 6:
-						{
-							delta = new TranslateTransform(0, 0);
-							_frameSelectionPanel.HeightBuffer += deltaY;
-							break;
-						}
-					case 7:
-						{
-							delta = new TranslateTransform(0, 0);
-							_frameSelectionPanel.HeightBuffer += deltaY;
-							_frameSelectionPanel.WidthBuffer += deltaX;
-							break;
-						}
-				}
-
-				var group = new TransformGroup();
-				group.Children.Add(_frameSelectionPanel.PreviousTransform);
-				group.Children.Add(delta);
-				_frameSelectionPanel.RenderTransform = group;
-				_frameSelectionPanel.PreviousTransform = _frameSelectionPanel.RenderTransform;
-				_frameSelectionPanel.PreviousMouseLocation = currentLocation;
-
-			}
-			else if (_frameSelectionPanel.MousePressed)
-			{
-				this.GetMouseDeltaAfterFrameMouseDown(e);
-				if (!_frameSelectionPanel.IsMoved && (DeltaX!=0 || DeltaY!=0))
-				{
-					this.MoveFrameToDragField(_frameSelectionPanel.SelectedFrame);
-					_frameSelectionPanel.IsMoved = true;
-				}
-
-				if (_frameSelectionPanel.IsMoved || _palette._selectedFrameTemplate != null)
-				{
-					var hovered = GetHoveredFrameOnScene(e.GetPosition(DxElem), true);
-					_parentHighlightPanel.SelectedFrame = hovered;
-				}
-
-				Point currentLocation = e.MouseDevice.GetPosition(this);
-
-				var delta = new TranslateTransform
-				(currentLocation.X - _frameSelectionPanel.PreviousMouseLocation.X, currentLocation.Y - _frameSelectionPanel.PreviousMouseLocation.Y);
-
-				var group = new TransformGroup();
-				group.Children.Add(_frameSelectionPanel.PreviousTransform);
-				group.Children.Add(delta);
-
-				((UserControl)_frameSelectionPanel).RenderTransform = group;
-				_frameSelectionPanel.PreviousTransform = ((UserControl)_frameSelectionPanel).RenderTransform;
-				_frameSelectionPanel.PreviousMouseLocation = currentLocation;
-			}
-			else if (_palette._selectedFrameTemplate != null)
-			{
-				var hovered = GetHoveredFrameOnScene(e.GetPosition(DxElem), true);
-				_parentHighlightPanel.SelectedFrame = hovered;
-			}
+			base.OnSourceInitialized(e);
+			SelectionLayer.DxElem.HandleInput(this);
 		}
 
-		private void GetMouseDeltaAfterFrameMouseDown( MouseEventArgs e )
+		private void UpdateTitle()
 		{
-			var currentMousePosition = e.GetPosition(this);
-			DeltaX = (int)InitMousePosition.X - (int)currentMousePosition.X;
-			DeltaY = (int)InitMousePosition.Y - (int)currentMousePosition.Y;
+			this.Title = ApplicationConfig.BaseTitle + " - " + (!string.IsNullOrEmpty(currentSceneFile) ? CurrentSceneFile : ApplicationConfig.BaseSceneName) + SceneChangedIndicator;
 		}
 
-		private void LocalGrid_MouseLeftButtonUp( object sender, MouseButtonEventArgs e )
+		private void Window_KeyDown( object sender, KeyEventArgs e )
 		{
-			this.ReleaseFrame(e.GetPosition(this));
-
-			if (_palette._selectedFrameTemplate != null)
+			if (e.Key == Key.Delete)
 			{
-				var createdFrame = CreateFrameFromFile(Path.Combine(TemplatesPath, _palette._selectedFrameTemplate) + ".xml");
-
-                if (createdFrame != null)
-				{
-
-					createdFrame.X = (int)e.MouseDevice.GetPosition(this).X - createdFrame.Width / 2;
-					createdFrame.Y = (int)e.MouseDevice.GetPosition(this).Y - createdFrame.Height / 2;
-					LandFrameOnScene(createdFrame, e.GetPosition(this));
-					SelectFrame(createdFrame);
-
-					var delta = new TranslateTransform();
-					_frameSelectionPanel.RenderTransform = delta;
-					delta.X = createdFrame.X;
-					delta.Y = createdFrame.Y;
-					_frameSelectionPanel.PreviousTransform = _frameSelectionPanel.RenderTransform;
-					_frameSelectionPanel.UpdateSelectedFramePosition();
-					//createdFrame.X -= createdFrame.Parent.X;
-					//createdFrame.Y -= createdFrame.Parent.Y;
-				}
-				_palette._selectedFrameTemplate = null;
-				_parentHighlightPanel.SelectedFrame = null;
-			}
-		}
-
-		private void LocalGrid_MouseLeftButtonDown( object sender, MouseButtonEventArgs e )
-		{
-			var hovered = GetHoveredFrameOnScene(e.GetPosition(DxElem), true);
-
-		    if (hovered != null)
-		    {
-		        SelectFrame(hovered);
-				InitMousePosition = e.GetPosition(this);
-				_frameSelectionPanel.StartFrameDragging(e.GetPosition(this));
-				//if (hovered != _frameSelectionPanel.SelectedFrame)
-				//{
-				//	ResetSelectedFrame();
-				//}
-				//else
-				//{
-				//
-				//}
-			}
-			else
-			{
-				ResetSelectedFrame(e.GetPosition(this));
-			}
-		}
-
-	    private void Window_KeyDown(object sender, KeyEventArgs e)
-	    {
-	        if (e.Key == Key.Delete)
-	        {
 				this.TryDeleteSelectedFrame();
-	        }
-	    }
+			}
+		}
 
 		private void TryDeleteSelectedFrame()
 		{
-			if (_frameSelectionPanel.SelectedFrame != null)
+			if (SelectionLayer.frameSelectionPanelList.Count >= 0)
 			{
-				var selected = _frameSelectionPanel.SelectedFrame;
-				selected.Parent?.Remove(selected);
-
-				ResetSelectedFrame(new Point(0, 0));
+				List<IEditorCommand> commands = new List<IEditorCommand>();
+				commands.Add(new SelectFrameCommand(new List<Frame> { }));
+				foreach (var frame in SelectionLayer.frameSelectionPanelList.Keys)
+				{
+					commands.Add(new FrameParentChangeCommand(frame, null));
+				}
+				var command = new CommandGroup(commands.ToArray());
+				CommandManager.Instance.Execute(command);
 			}
 		}
 
-		private void SelectFrame(Frame frame)
-	    {
-            _details.SetSelectFrame(frame);
-			_treeView.SelectedFrame = frame;
-			_frameSelectionPanel.SelectedFrame = frame;
-            _frameSelectionPanel.Visibility = Visibility.Visible;
-	    }
+		#region Save/load stuff
 
-        private void ResetSelectedFrame( Point point )
+		internal void TryLoadSceneAsTemplate()
 		{
-			this.ReleaseFrame(point);
+			if (!this.CheckForChanges())
+				return;
 
-			_details.FrameDetailsControls.ItemsSource = null;
-			_frameSelectionPanel.SelectedFrame = null;
-		    _frameSelectionPanel.DragMousePressed = false;
-		    _frameSelectionPanel.CurrentDrag = null;
-		    _frameSelectionPanel.Visibility = Visibility.Collapsed;
-        }
-
-		private void ReleaseFrame( Point point )
-		{
-			if (_frameSelectionPanel.SelectedFrame != null)
+			var startPath = Path.GetFullPath(Path.Combine(ApplicationConfig.TemplatesPath, ".."));
+			var filter = "XML files(*.xml)| *.xml";
+			using (var dialog = new System.Windows.Forms.OpenFileDialog() { InitialDirectory = startPath, Multiselect = false, Filter = filter })
 			{
-				if (_frameSelectionPanel.DragMousePressed)
-					_frameSelectionPanel.DragMousePressed = false;
-				else if (_frameSelectionPanel.IsMoved)
-				{
-					_frameSelectionPanel.IsMoved = false;
-					_parentHighlightPanel.SelectedFrame = null;
+				if (dialog.ShowDialog() != System.Windows.Forms.DialogResult.OK) return;
 
-					LandFrameOnScene(_frameSelectionPanel.SelectedFrame, point);
-					SelectFrame(_frameSelectionPanel.SelectedFrame);
-					_frameSelectionPanel.UpdateSelectedFramePosition();
+				var createdFrame = CreateFrameFromFile(dialog.FileName);
+				if (createdFrame != null && createdFrame.GetType() == typeof(FusionUI.UI.ScalableFrame))
+				{
+					RootFrame.Remove(SceneFrame);
+					foreach (var panel in SelectionLayer.frameSelectionPanelList.Values)
+					{
+						var commands = SelectionLayer.ResetSelectedFrame(new Point(0, 0), panel);
+						var command = new CommandGroup(commands.ToArray());
+						CommandManager.Instance.ExecuteWithoutMemorising(command);
+					}
+					SceneFrame = (FusionUI.UI.ScalableFrame)createdFrame;
+					RootFrame.Add(SceneFrame);
+					DragFieldFrame.ZOrder = 1000000;
+
+					childrenBinding = new Binding("Children")
+					{
+						Source = SceneFrame,
+					};
+					_treeView.ElementHierarchyView.SetBinding(TreeView.ItemsSourceProperty, childrenBinding);
+
+					this.CurrentSceneFile = dialog.FileName;
+					CommandManager.Instance.SetNotDirty();
+					CommandManager.Instance.Reset();
 				}
 			}
-			_frameSelectionPanel.MousePressed = false;
 		}
 
-		public Frame GetHoveredFrameOnScene(Point mousePos, bool ignoreScene)
-	    {
-	        var hoveredFrames = FrameProcessor.GetFramesAt(SceneFrame, (int)mousePos.X, (int)mousePos.Y);
-
-	        if (ignoreScene)
-	        {
-	            if (hoveredFrames.Count > 1) // if something is there and it's not SceneFrame
-	            {
-	                return hoveredFrames.Pop();
-	            }
-
-	            return null;
-	        }
-	        else
-	        {
-	            if (hoveredFrames.Any()) // if something is there
-	            {
-	                return hoveredFrames.Pop();
-	            }
-
-	            return null;
-	        }
-	    }
-
-        public void MoveFrameToDragField(Frame frame)
+		private void TrySetNewScene()
 		{
-			frame.Parent?.Remove(frame);
+			if (!this.CheckForChanges())
+				return;
+			RootFrame.Remove(SceneFrame);
+			foreach (var panel in SelectionLayer.frameSelectionPanelList.Values)
+			{
+				var commands = SelectionLayer.ResetSelectedFrame(new Point(0, 0), panel);
+				var command = new CommandGroup(commands.ToArray());
+				CommandManager.Instance.ExecuteWithoutMemorising(command);
+			}
+			SceneFrame = new FusionUI.UI.ScalableFrame(0, 0, this.RootFrame.UnitWidth, this.RootFrame.UnitHeight, "Scene", Fusion.Core.Mathematics.Color.Zero) { Anchor = FrameAnchor.All };
+			RootFrame.Add(SceneFrame);
+			DragFieldFrame.ZOrder = 1000000;
 
-			DragFieldFrame.Add(frame);
-			_frameSelectionPanel.UpdateSelectedFramePosition();
+			childrenBinding = new Binding("Children")
+			{
+				Source = SceneFrame,
+			};
+			_treeView.ElementHierarchyView.SetBinding(TreeView.ItemsSourceProperty, childrenBinding);
+			this.CurrentSceneFile = null;
+			CommandManager.Instance.SetNotDirty();
+			CommandManager.Instance.Reset();
 		}
 
-	    public void LandFrameOnScene(Frame frame, Point mousePosition)
-	    {
-	        frame.Parent?.Remove(frame);
-
-            // If we can't find where to land it (that's weird) just try attach to the scene
-	        var hoveredFrame = GetHoveredFrameOnScene(mousePosition, false) ?? SceneFrame;
-
-	        hoveredFrame.Add(frame);
-
-			//_treeView.ElementHierarcyView.SetSelectedItem(frame);
+		internal void TrySaveSceneAsTemplate()
+		{
+			var startPath = Path.GetFullPath(Path.Combine(ApplicationConfig.TemplatesPath, ".."));
+			var filter = "XML files(*.xml)| *.xml";
+			using (var dialog = new System.Windows.Forms.SaveFileDialog() { InitialDirectory = startPath, Filter = filter })
+			{
+				if (dialog.ShowDialog() == System.Windows.Forms.DialogResult.OK)
+				{
+					Fusion.Core.Utils.FrameSerializer.Write(SceneFrame, dialog.FileName);
+					this.CurrentSceneFile = dialog.FileName;
+					CommandManager.Instance.SetNotDirty();
+				}
+			}
 		}
 
-        #region Save/load stuff
+		internal List<IEditorCommand> AddframeToScene( Frame createdFrame, Point point, List<IEditorCommand> commands )
+		{
+			var hoveredFrame = SelectionLayer.GetHoveredFrameOnScene(point, false) ?? SceneFrame;
 
-        internal void TryLoadSceneAsTemplate()
-        {
-            var startPath = Path.GetFullPath(Path.Combine(TemplatesPath, ".."));
-            var filter = "XML files(*.xml)| *.xml";
-            using (var dialog = new System.Windows.Forms.OpenFileDialog() { InitialDirectory = startPath, Multiselect = false, Filter = filter })
-            {
-                if (dialog.ShowDialog() != System.Windows.Forms.DialogResult.OK) return;
+			commands.Add(new CommandGroup(
+				new FrameParentChangeCommand(createdFrame, hoveredFrame),
+				new FramePropertyChangeCommand(createdFrame, "X", (int)point.X - hoveredFrame.GlobalRectangle.X - createdFrame.Width / 2),
+				new FramePropertyChangeCommand(createdFrame, "Y", (int)point.Y - hoveredFrame.GlobalRectangle.Y - createdFrame.Height / 2),
+				new SelectFrameCommand(new List<Frame> { createdFrame })
+			));
 
-                var createdFrame = CreateFrameFromFile(dialog.FileName);
-                if (createdFrame != null && createdFrame.GetType() == typeof(FusionUI.UI.ScalableFrame))
-                {
-                    RootFrame.Remove(SceneFrame);
-                    ResetSelectedFrame(new Point(0,0));
-                    SceneFrame = (FusionUI.UI.ScalableFrame)createdFrame;
-                    RootFrame.Add(SceneFrame);
-                    DragFieldFrame.ZOrder = 1000000;
+			return commands;
+		}
 
-                    childrenBinding = new Binding("Children")
-                    {
-                        Source = SceneFrame,
-                    };
-                    _treeView.ElementHierarchyView.SetBinding(TreeView.ItemsSourceProperty, childrenBinding);
-                }
-            }
-        }
+		internal void TrySaveScene()
+		{
+			if (!String.IsNullOrEmpty(this.CurrentSceneFile))
+			{
+				Fusion.Core.Utils.FrameSerializer.Write(SceneFrame, this.CurrentSceneFile);
+				CommandManager.Instance.SetNotDirty();
+			}
+			else
+			{
+				TrySaveSceneAsTemplate();
+			}
+		}
 
-        internal void TrySaveSceneAsTemplate()
-        {
-            var startPath = Path.GetFullPath(Path.Combine(TemplatesPath, ".."));
-            var filter = "XML files(*.xml)| *.xml";
-            using (var dialog = new System.Windows.Forms.SaveFileDialog() { InitialDirectory = startPath, Filter = filter })
-            {
-                if (dialog.ShowDialog() == System.Windows.Forms.DialogResult.OK)
-                {
-                    Fusion.Core.Utils.FrameSerializer.Write(SceneFrame, dialog.FileName);
-                }
-            }
-        }
+		internal void TrySaveFrameAsTemplate()
+		{
+			if (SelectionLayer.frameSelectionPanelList.Count == 1)
+			{
+				if (!Directory.Exists(ApplicationConfig.TemplatesPath))
+				{
+					Directory.CreateDirectory(ApplicationConfig.TemplatesPath);
+				}
+				var selectedFrame = SelectionLayer.frameSelectionPanelList.FirstOrDefault().Value.SelectedFrame;
 
-        internal void TrySaveFrameAsTemplate()
-        {
-            if (_frameSelectionPanel.SelectedFrame != null)
-            {
-                if (!Directory.Exists(TemplatesPath))
-                {
-                    Directory.CreateDirectory(TemplatesPath);
-                }
-                var selectedFrame = _frameSelectionPanel.SelectedFrame;
+				Fusion.Core.Utils.FrameSerializer.Write(selectedFrame, ApplicationConfig.TemplatesPath + "\\" + (selectedFrame.Text ?? selectedFrame.GetType().ToString()) + ".xml");
+				this.LoadPalettes();
+			}
+		}
 
-                Fusion.Core.Utils.FrameSerializer.Write(selectedFrame, TemplatesPath + "\\" + (selectedFrame.Text ?? selectedFrame.GetType().ToString()) + ".xml");
-                this.LoadPalettes();
-            }
-        }
+		public void LoadPalettes()
+		{
+			if (Directory.Exists(ApplicationConfig.TemplatesPath))
+			{
+				var templates = Directory.GetFiles(ApplicationConfig.TemplatesPath, "*.xml").ToList();
+				_palette.AvailableFrames.ItemsSource = templates.Select(t => t.Split('\\').Last().Split('.').First());
+			}
+		}
 
-        public void LoadPalettes()
-        {
-            if (Directory.Exists(TemplatesPath))
-            {
-                var templates = Directory.GetFiles(TemplatesPath, "*.xml").ToList();
-                _palette.AvailableFrames.ItemsSource = templates.Select(t => t.Split('\\').Last().Split('.').First());
-            }
-        }
+		public Frame CreateFrameFromFile( string filePath )
+		{
+			Frame createdFrame;
+			try
+			{
+				Fusion.Core.Utils.FrameSerializer.Read(filePath, out createdFrame);
+			}
+			catch (Exception)
+			{
 
-        private Frame CreateFrameFromFile(string filePath)
-        {
-            Fusion.Core.Utils.FrameSerializer.Read(filePath, out var createdFrame);
-            return createdFrame;
-        }
+				throw;
+			}
+			return createdFrame;
+		}
 
-        private void ExecutedSaveFrameCommand(object sender, ExecutedRoutedEventArgs e)
-	    {
-	        TrySaveFrameAsTemplate();
-	    }
+		private void ExecutedSaveFrameCommand( object sender, ExecutedRoutedEventArgs e )
+		{
+			TrySaveFrameAsTemplate();
+		}
 
-	    private void ExecutedSaveSceneCommand(object sender, ExecutedRoutedEventArgs e)
-	    {
-	        TrySaveSceneAsTemplate();
-	    }
+		private void ExecutedSaveSceneCommand( object sender, ExecutedRoutedEventArgs e )
+		{
+			TrySaveSceneAsTemplate();
+		}
 
-	    private void ExecutedLoadSceneCommand(object sender, ExecutedRoutedEventArgs e)
-	    {
-	        TryLoadSceneAsTemplate();
-	    }
+		private void ExecutedQuickSaveSceneCommand( object sender, ExecutedRoutedEventArgs e )
+		{
+			TrySaveScene();
+		}
+
+		private void ExecutedNewSceneCommand( object sender, ExecutedRoutedEventArgs e )
+		{
+			TrySetNewScene();
+		}
+
+		private void ExecutedLoadSceneCommand( object sender, ExecutedRoutedEventArgs e )
+		{
+			TryLoadSceneAsTemplate();
+		}
 
 		private void ExecutedUndoChangeCommand( object sender, ExecutedRoutedEventArgs e )
 		{
@@ -515,11 +386,139 @@ namespace WpfEditorTest
 			CommandManager.Instance.TryRedoCommand();
 		}
 
-		private void AlwaysCanExecute(object sender, CanExecuteRoutedEventArgs e)
-	    {
-	        e.CanExecute = true;
-	    }
+		private void ExecutedCopyFrameCommand( object sender, ExecutedRoutedEventArgs e )
+		{
+			if (SelectionLayer.frameSelectionPanelList.Count == 1)
+			{
+				var selectedFrame = SelectionLayer.frameSelectionPanelList.FirstOrDefault().Value.SelectedFrame;
+				if (selectedFrame != null)
+				{
+					xmlFrameBuffer = Fusion.Core.Utils.FrameSerializer.WriteToString(selectedFrame);
+					//Clipboard.SetData(DataFormats.Text, (Object)xmlFrame);
+					var upperLeft = this.PointToScreen(new Point(selectedFrame.X, selectedFrame.Y));
+					var lowerRight = this.PointToScreen(new Point(selectedFrame.X + selectedFrame.Width, selectedFrame.Y + selectedFrame.Height));
 
-	    #endregion
-    }
+					var img = this.CopyScreen(
+						(int)upperLeft.X,
+						(int)upperLeft.Y + (int)SystemParameters.WindowCaptionHeight + 9,
+						(int)lowerRight.X,
+						(int)lowerRight.Y + (int)SystemParameters.WindowCaptionHeight + 9
+						);
+					Clipboard.SetData(DataFormats.Bitmap, (Object)img);
+				}
+			}
+		}
+
+		private void ExecutedCutFrameCommand( object sender, ExecutedRoutedEventArgs e )
+		{
+			ExecutedCopyFrameCommand(sender, e);
+			TryDeleteSelectedFrame();
+		}
+
+		private void ExecutedPasteFrameCmdCommand( object sender, ExecutedRoutedEventArgs e )
+		{
+			if (!string.IsNullOrEmpty(xmlFrameBuffer))
+			{
+				List<IEditorCommand> commands = new List<IEditorCommand>();
+				this.AddframeToScene(Fusion.Core.Utils.FrameSerializer.ReadFromString(xmlFrameBuffer),
+					System.Windows.Input.Mouse.GetPosition(this), commands);
+				var command = new CommandGroup(commands.ToArray());
+				CommandManager.Instance.Execute(command);
+			}
+		}
+
+		private void AlwaysCanExecute( object sender, CanExecuteRoutedEventArgs e )
+		{
+			e.CanExecute = true;
+		}
+
+		#endregion
+
+		#region ImageDrawing
+		private BitmapSource CopyScreen( int left, int top, int right, int bottom )
+		{
+			using (var screenBmp = new Bitmap(
+				right - left,
+				bottom - top
+				))
+			{
+				using (var bmpGraphics = System.Drawing.Graphics.FromImage(screenBmp))
+				{
+					bmpGraphics.CopyFromScreen(left, top, 0, 0, screenBmp.Size);
+					return Imaging.CreateBitmapSourceFromHBitmap(
+						screenBmp.GetHbitmap(),
+						IntPtr.Zero,
+						Int32Rect.Empty,
+						BitmapSizeOptions.FromEmptyOptions());
+				}
+			}
+		}
+		#endregion
+
+		private void Window_Closing( object sender, CancelEventArgs e )
+		{
+
+			if (!this.CheckForChanges())
+			{
+				e.Cancel = true;
+				return;
+			}
+
+
+			var configFile = ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.None);
+			var settings = configFile.AppSettings.Settings;
+			settings["DetailsPanelX"].Value = _details.Left.ToString();
+			settings["DetailsPanelY"].Value = _details.Top.ToString();
+			settings["TreeViewPanelX"].Value = _treeView.Left.ToString();
+			settings["TreeViewPanelY"].Value = _treeView.Top.ToString();
+			settings["PalettePanelX"].Value = _palette.Left.ToString();
+			settings["PalettePanelY"].Value = _palette.Top.ToString();
+			settings["DetailsPanelVisibility"].Value = _details.Visibility.ToString();
+			settings["PalettePanelVisibility"].Value = _palette.Visibility.ToString();
+			settings["TreeViewPanelVisibility"].Value = _treeView.Visibility.ToString();
+
+			configFile.Save(ConfigurationSaveMode.Modified);
+			ConfigurationManager.RefreshSection(configFile.AppSettings.SectionInformation.Name);
+		}
+
+		private bool CheckForChanges()
+		{
+			if (CommandManager.Instance.IsDirty)
+			{
+				var result = MessageBox.Show(@"There are unsaved changes in the current scene.
+								Do you want to save them?", "Attention", MessageBoxButton.YesNoCancel);
+				switch (result)
+				{
+					case MessageBoxResult.Yes:
+						{
+							this.TrySaveScene();
+							return true;
+						}
+					case MessageBoxResult.No:
+						{
+							return true;
+						}
+					case MessageBoxResult.Cancel:
+						{
+							return false;
+						}
+					default:
+						{
+							return true;
+						}
+				}
+			}
+			else
+			{
+				return true;
+			}
+		}
+
+		private void MenuItem_Click( object sender, RoutedEventArgs e )
+		{
+			Window panel = (sender as MenuItem).Tag as Window;
+			panel.Visibility = Visibility.Visible;
+			panel.Focus();
+		}
+	}
 }

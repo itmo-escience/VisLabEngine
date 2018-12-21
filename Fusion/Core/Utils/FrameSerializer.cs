@@ -35,6 +35,24 @@ namespace Fusion.Core.Utils
 			}
 		}
 
+		public static string WriteToString( Frame src )
+		{
+			GetChildTypes(src);
+
+			SeralizableObjectHolder holder = new SeralizableObjectHolder(src);
+
+			// передаем в конструктор тип класса
+			XmlSerializer formatter = new XmlSerializer(typeof(SeralizableObjectHolder));
+
+			// получаем поток, куда будем записывать сериализованный объект
+			using (StringWriter sw = new StringWriter())
+			{
+				formatter.Serialize(sw, holder);
+				Console.WriteLine("Объект сериализован в строку");
+				return sw.ToString();
+			}
+		}
+
 		private static void GetChildTypes( Frame src )
 		{
 			if (!frameTypes.Contains(src.GetType()))
@@ -73,6 +91,33 @@ namespace Fusion.Core.Utils
 				//if (version == FrameSerializer.SerializerVersion)
 				//{
 				var holder = (SeralizableObjectHolder)formatter.Deserialize(fs);
+
+				destination = holder.SerializableFrame;
+
+				destination.RestoreParents();
+				//}
+				//else
+				//{
+				//	return destination;
+				//}
+			}
+
+			return destination;
+		}
+
+		public static Frame ReadFromString(string xmlFrame)
+		{
+			Frame destination = null;
+			//XmlSerializer versionFormatter = new XmlSerializer(typeof(string));
+			XmlSerializer formatter = new XmlSerializer(typeof(SeralizableObjectHolder));
+			// десериализация
+			using (StringReader sr = new StringReader(xmlFrame))
+			{
+				//var version = (string)versionFormatter.Deserialize(fs);
+
+				//if (version == FrameSerializer.SerializerVersion)
+				//{
+				var holder = (SeralizableObjectHolder)formatter.Deserialize(sr);
 
 				destination = holder.SerializableFrame;
 

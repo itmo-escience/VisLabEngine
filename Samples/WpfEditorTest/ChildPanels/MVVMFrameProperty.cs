@@ -8,11 +8,11 @@ using System.Text;
 using System.Threading.Tasks;
 using WpfEditorTest.UndoRedo;
 
-namespace WpfEditorTest
+namespace WpfEditorTest.ChildPanels
 {
-	public class Propsy : INotifyPropertyChanged
+	public class MVVMFrameProperty : INotifyPropertyChanged
 	{
-		public Propsy( PropertyInfo prop, Frame obj )
+		public MVVMFrameProperty( PropertyInfo prop, Frame obj )
 		{
 			Obj = obj;
 			PropName = prop.Name;
@@ -46,9 +46,15 @@ namespace WpfEditorTest
 					var val = PropInfo.GetValue(Obj);
 					if (!Prop.Equals(val))
 					{
+<<<<<<< HEAD:Samples/WpfEditorTest/Property.cs
 					    _prop = PropInfo.GetValue(Obj);
 					    OnPropertyChanged(nameof(Prop));
                     }
+=======
+						_prop = PropInfo.GetValue(Obj);
+						OnPropertyChanged(nameof(Prop));
+					}
+>>>>>>> InterfaceEditor:Samples/WpfEditorTest/ChildPanels/MVVMFrameProperty.cs
 				}
 			};
 		}
@@ -59,13 +65,22 @@ namespace WpfEditorTest
 			get => _prop;
 			set
 			{
+<<<<<<< HEAD:Samples/WpfEditorTest/Property.cs
                 var convertedValue = Convert.ChangeType(value, PropInfo.PropertyType);
+=======
+				var convertedValue = Convert.ChangeType(value, PropInfo.PropertyType);
+>>>>>>> InterfaceEditor:Samples/WpfEditorTest/ChildPanels/MVVMFrameProperty.cs
 				//PropInfo.SetValue(Obj, convertedValue);
-				var command = new FramePropertyChangeCommand(Obj,PropName,value);
+				var command = new FramePropertyChangeCommand(Obj, PropName, value);
 				CommandManager.Instance.Execute(command);
 
+<<<<<<< HEAD:Samples/WpfEditorTest/Property.cs
 			    OnPropertyChanged();
             }
+=======
+				OnPropertyChanged();
+			}
+>>>>>>> InterfaceEditor:Samples/WpfEditorTest/ChildPanels/MVVMFrameProperty.cs
 		}
 
 		public Frame Obj { get; set; }

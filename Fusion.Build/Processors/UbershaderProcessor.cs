@@ -22,7 +22,7 @@ namespace Fusion.Build.Processors {
 
 	[AssetProcessor("Shaders","")]
 	public partial class UbershaderProcessor : AssetProcessor {
-			
+
 		public enum ShaderMatrixPacking {
 			RowMajor,
 			ColumnMajor,
@@ -31,7 +31,7 @@ namespace Fusion.Build.Processors {
 
 		[CommandLineParser.Name("nopt", "disable optimization (fxc:/Od)")]
 		public bool DisableOptimization { get; set; }
-			
+
 		[CommandLineParser.Name("opt", "optimization level 0..3. (fxc:/O)")]
 		public int OptimizationLevel { get { return optimizationLevel; } set { optimizationLevel = MathUtil.Clamp( value, 0, 3 ); } }
 		int optimizationLevel = 1;
@@ -41,12 +41,12 @@ namespace Fusion.Build.Processors {
 
 		[CommandLineParser.Name("fp", "prefer flow control constructs. (fxc:/Gfp)")]
 		public bool PreferFlowControl { get; set; }
-			
+
 		[CommandLineParser.Name("usp", "show ubershader permutations")]
 		public bool ShowPemutations { get; set; }
-			
+
 		public ShaderMatrixPacking	MatrixPacking { get; set; }
-			
+
 		const string	PSEntryPoint	= "PSMain";
 		const string	VSEntryPoint	= "VSMain";
 		const string	GSEntryPoint	= "GSMain";
@@ -74,7 +74,7 @@ namespace Fusion.Build.Processors {
 			public byte[] DSBytecode;
 			public byte[] CSBytecode;
 
-			public UsdbEntry ( string defines, byte[] ps, byte[] vs, byte[] gs, byte[] hs, byte[] ds, byte[] cs ) 
+			public UsdbEntry ( string defines, byte[] ps, byte[] vs, byte[] gs, byte[] hs, byte[] ds, byte[] cs )
 			{
 				this.Defines	=	defines;
 				this.PSBytecode	=	ps;
@@ -88,7 +88,7 @@ namespace Fusion.Build.Processors {
 
 
 		/// <summary>
-		/// 
+		///
 		/// </summary>
 		/// <param name="buildContext"></param>
 		public override void Process ( AssetSource assetFile, BuildContext buildContext )
@@ -110,11 +110,11 @@ namespace Fusion.Build.Processors {
 				defineList.AddRange( ue.DefineList );
 			}
 
-			
+
 
 			//
 			//	Start listing builder :
-			//	
+			//
 			ListingPath	=	buildContext.GetTempFileName( assetFile.KeyPath, ".html" );
 			var htmlBuilder = new StringBuilder();
 
@@ -134,7 +134,7 @@ namespace Fusion.Build.Processors {
 			}
 			htmlBuilder.AppendLine("");
 
-			
+
 
 			var usdb = new List<UsdbEntry>();
 
@@ -154,7 +154,7 @@ namespace Fusion.Build.Processors {
 				var hsbc	=	buildContext.GetTempFileName( assetFile.KeyPath, "." + id.ToString("D8") + ".HS.dxbc" );
 				var dsbc	=	buildContext.GetTempFileName( assetFile.KeyPath, "." + id.ToString("D8") + ".DS.dxbc" );
 				var csbc	=	buildContext.GetTempFileName( assetFile.KeyPath, "." + id.ToString("D8") + ".CS.dxbc" );
-															  
+
 				var pshtm	=	buildContext.GetTempFileName( assetFile.KeyPath, "." + id.ToString("D8") + ".PS.html" );
 				var vshtm	=	buildContext.GetTempFileName( assetFile.KeyPath, "." + id.ToString("D8") + ".VS.html" );
 				var gshtm	=	buildContext.GetTempFileName( assetFile.KeyPath, "." + id.ToString("D8") + ".GS.html" );
@@ -168,7 +168,7 @@ namespace Fusion.Build.Processors {
 				var hs = Compile( buildContext, include, shaderSource, assetFile.FullSourcePath, "hs_5_0", HSEntryPoint, defines, hsbc, hshtm );
 				var ds = Compile( buildContext, include, shaderSource, assetFile.FullSourcePath, "ds_5_0", DSEntryPoint, defines, dsbc, dshtm );
 				var cs = Compile( buildContext, include, shaderSource, assetFile.FullSourcePath, "cs_5_0", CSEntryPoint, defines, csbc, cshtm );
-				
+
 
 				htmlBuilder.AppendFormat( (vs.Length==0) ? ".. " : "<a href=\"{0}\">vs</a> ",	Path.GetFileName(vshtm) );
 				htmlBuilder.AppendFormat( (ps.Length==0) ? ".. " : "<a href=\"{0}\">ps</a> ",	Path.GetFileName(pshtm) );
@@ -183,8 +183,8 @@ namespace Fusion.Build.Processors {
 			}
 
 
-			htmlBuilder.Insert( includeInsert, 
-				"<b>Includes:</b>\r\n" 
+			htmlBuilder.Insert( includeInsert,
+				"<b>Includes:</b>\r\n"
 				+ string.Join("", include.Includes.Select(s=>"  <i>" + s + "</i>\r\n") )
 				+ "\r\n");
 
@@ -244,7 +244,7 @@ namespace Fusion.Build.Processors {
 			public readonly HashSet<string> Includes = new HashSet<string>();
 
 			readonly BuildContext buildContext;
-		
+
 			public IncludeHandler ( BuildContext buildContext )
 			{
 				this.buildContext	=	buildContext;
@@ -274,9 +274,9 @@ namespace Fusion.Build.Processors {
 
 			public void Dispose ()
 			{
-				
+
 			}
-				
+
 		}
 
 
@@ -293,10 +293,10 @@ namespace Fusion.Build.Processors {
 		{
 			defines = defines + " _UBERSHADER";
 
-			var defs = defines.Split(new[]{' ','\t'}, StringSplitOptions.RemoveEmptyEntries)	
+			var defs = defines.Split(new[]{' ','\t'}, StringSplitOptions.RemoveEmptyEntries)
 						.Select( entry => new SharpDX.Direct3D.ShaderMacro( entry, "1" ) )
 						.ToArray();
-			
+
 			string errors		=	null;
 			var preprocessed	=	FX.ShaderBytecode.Preprocess( shaderSource, defs, include, out errors, sourceFile );
 
@@ -336,12 +336,12 @@ namespace Fusion.Build.Processors {
 							.DistinctBy( s0 => s0.Key )
 							.ToList();
 
- 
+
 			var html = "<pre>"
 				+ "<b>Pipeline States:</b>\r\n\r\n"
 				+ string.Join("\r\n", stateList.Select( s => string.Format("{0,-20} = <i>{1}</i>", s.Key, s.Value ) ) )
 				+ "</pre>";
-			
+
 			File.WriteAllText( listing, html );
 
 			return stateList.ToArray();
@@ -350,7 +350,7 @@ namespace Fusion.Build.Processors {
 
 
 		/// <summary>
-		/// 
+		///
 		/// </summary>
 		/// <param name="buildContext"></param>
 		/// <param name="sourceFile"></param>
@@ -374,12 +374,12 @@ namespace Fusion.Build.Processors {
 			if ( MatrixPacking==ShaderMatrixPacking.ColumnMajor )	flags |= FX.ShaderFlags.PackMatrixColumnMajor;
 			if ( MatrixPacking==ShaderMatrixPacking.RowMajor )		flags |= FX.ShaderFlags.PackMatrixRowMajor;
 
-			var defs = defines.Split(new[]{' ','\t'}, StringSplitOptions.RemoveEmptyEntries)	
+			var defs = defines.Split(new[]{' ','\t'}, StringSplitOptions.RemoveEmptyEntries)
 						.Select( entry => new SharpDX.Direct3D.ShaderMacro( entry, "1" ) )
 						.ToArray();
 
 			try {
-			
+
 				var sourceBytes = Encoding.UTF8.GetBytes(shaderSource);
 				var result = FX.ShaderBytecode.Compile( sourceBytes, entryPoint, profile, flags, FX.EffectFlags.None, defs, include, sourceFile );
 
@@ -405,7 +405,7 @@ namespace Fusion.Build.Processors {
 
 
 		/// <summary>
-		/// 
+		///
 		/// </summary>
 		/// <param name="sourceFile"></param>
 		/// <param name="profile"></param>
@@ -438,7 +438,7 @@ namespace Fusion.Build.Processors {
 			sb.Append("\"" + sourceFile + "\"");
 
 			try {
-				
+
 				buildContext.RunTool("fxc_1.exe", sb.ToString());
 
 			} catch ( ToolException tx ) {

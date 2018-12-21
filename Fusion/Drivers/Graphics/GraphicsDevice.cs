@@ -19,6 +19,8 @@ using Fusion.Drivers.Graphics.Display;
 using Fusion.Core;
 using Fusion.Core.Mathematics;
 using Fusion.Engine.Common;
+using SharpDX.Direct2D1;
+using SharpDX.Mathematics.Interop;
 
 
 namespace Fusion.Drivers.Graphics {
@@ -209,12 +211,12 @@ namespace Fusion.Drivers.Graphics {
 		HashSet<IDisposable>	toDispose = new HashSet<IDisposable>();
 
 		internal Device			Device			{ get { return device; } }
-		internal DeviceContext	DeviceContext	{ get { return deviceContext; } }
+		internal D3D.DeviceContext	DeviceContext	{ get { return deviceContext; } }
 		public BaseDisplay	Display			{ get { return display; } }
 
 		BaseDisplay				display			=	null;
 		Device					device			=	null;
-		DeviceContext			deviceContext	=	null;
+		D3D.DeviceContext			deviceContext	=	null;
 
 
 		/// <summary>
@@ -267,11 +269,10 @@ namespace Fusion.Drivers.Graphics {
 
 			display.CreateDisplayResources();
 
-
-			//
-			//	create color buffer :
-			//
-			PixelShaderResources	=	new ShaderResourceCollection( this, DeviceContext.PixelShader		);
+            //
+            //	create color buffer :
+            //
+            PixelShaderResources	=	new ShaderResourceCollection( this, DeviceContext.PixelShader		);
 			VertexShaderResources 	=	new ShaderResourceCollection( this, DeviceContext.VertexShader		);
 			GeometryShaderResources =	new ShaderResourceCollection( this, DeviceContext.GeometryShader	);
 			ComputeShaderResources 	=	new ShaderResourceCollection( this, DeviceContext.ComputeShader		);
@@ -297,9 +298,10 @@ namespace Fusion.Drivers.Graphics {
 			FullScreen	=	parameters.FullScreen;
 		}
 
+	    public SolidColorBrush brush { get; set; }
 
 
-		/// <summary>
+	    /// <summary>
 		///
 		/// </summary>
 		protected override void Dispose ( bool disposing )
@@ -665,9 +667,10 @@ namespace Fusion.Drivers.Graphics {
 
 		RenderTargetSurface[]	renderTargetSurfaces	=	new RenderTargetSurface[8];
 		DepthStencilSurface		depthStencilSurface		=	null;
+	    private RenderTarget _target2D;
 
 
-		/// <summary>
+	    /// <summary>
 		///
 		/// </summary>
 		public void RestoreBackbuffer ()

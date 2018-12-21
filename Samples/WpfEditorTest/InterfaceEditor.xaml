@@ -8,14 +8,15 @@
         xmlns:system ="clr-namespace:System;assembly=mscorlib"
         xmlns:math ="clr-namespace:Fusion.Core.Mathematics;assembly=Fusion"
         xmlns:panels ="clr-namespace:WpfEditorTest.ChildPanels"
+        xmlns:conv="clr-namespace:WpfEditorTest.WPFConverters"
         mc:Ignorable="d"
         Title="InterfaceEditor"
         Width="800" Height="600"
         MinWidth="400" MinHeight="300"
         WindowStartupLocation="CenterScreen"
-        KeyDown="Window_KeyDown">
+        KeyDown="Window_KeyDown" Closing="Window_Closing">
     <Window.Resources>
-        <local:PropertyValueConverter x:Key="propValueConverter" />
+        <conv:ButtonEnableConverter x:Key="btnEnableConverter"/>
     </Window.Resources>
     <Window.CommandBindings>
         <CommandBinding Command="{x:Static local:InterfaceEditor.LoadSceneCmd}"
@@ -33,7 +34,33 @@
         <CommandBinding Command="{x:Static local:InterfaceEditor.UndoChangeCmd}"
                         Executed="ExecutedUndoChangeCommand"
                         CanExecute="AlwaysCanExecute" />
+        <CommandBinding Command="{x:Static local:InterfaceEditor.CopyFrameCmd}"
+                        Executed="ExecutedCopyFrameCommand"
+                        CanExecute="AlwaysCanExecute" />
+        <CommandBinding Command="{x:Static local:InterfaceEditor.PasteFrameCmd}"
+                        Executed="ExecutedPasteFrameCmdCommand"
+                        CanExecute="AlwaysCanExecute" />
+        <CommandBinding Command="{x:Static local:InterfaceEditor.CutFrameCmd}"
+                        Executed="ExecutedCutFrameCommand"
+                        CanExecute="AlwaysCanExecute" />
+        <CommandBinding Command="{x:Static local:InterfaceEditor.QuickSaveSceneCmd}"
+                        Executed="ExecutedQuickSaveSceneCommand"
+                        CanExecute="AlwaysCanExecute" />
+        <CommandBinding Command="{x:Static local:InterfaceEditor.NewSceneCmd}"
+                        Executed="ExecutedNewSceneCommand"
+                        CanExecute="AlwaysCanExecute" />
     </Window.CommandBindings>
+    <Window.InputBindings>
+        <KeyBinding Command="{x:Static local:InterfaceEditor.UndoChangeCmd}" Key="Z" Modifiers="Ctrl"/>
+        <KeyBinding Command="{x:Static local:InterfaceEditor.RedoChangeCmd}" Key="Y" Modifiers="Ctrl"/>
+        <KeyBinding Command="{x:Static local:InterfaceEditor.SaveSceneCmd}" Key="S" Modifiers="Ctrl+Shift"/>
+        <KeyBinding Command="{x:Static local:InterfaceEditor.QuickSaveSceneCmd}" Key="S" Modifiers="Ctrl"/>
+        <KeyBinding Command="{x:Static local:InterfaceEditor.NewSceneCmd}" Key="N" Modifiers="Ctrl"/>
+        <KeyBinding Command="{x:Static local:InterfaceEditor.LoadSceneCmd}" Key="O" Modifiers="Ctrl"/>
+        <KeyBinding Command="{x:Static local:InterfaceEditor.CopyFrameCmd}" Key="C" Modifiers="Ctrl"/>
+        <KeyBinding Command="{x:Static local:InterfaceEditor.PasteFrameCmd}" Key="V" Modifiers="Ctrl"/>
+        <KeyBinding Command="{x:Static local:InterfaceEditor.CutFrameCmd}" Key="X" Modifiers="Ctrl"/>
+    </Window.InputBindings>
     <Grid MaxWidth="10000" MaxHeight="10000">
         <Grid.RowDefinitions>
             <RowDefinition Height="32"/>
@@ -41,25 +68,28 @@
         </Grid.RowDefinitions>
         <ToolBarTray Grid.Row="0" IsLocked="True" >
             <ToolBar>
-                <Button Command="{x:Static local:InterfaceEditor.SaveSceneCmd}" Content="Save scene" />
-                <Button Command="{x:Static local:InterfaceEditor.LoadSceneCmd}" Content="Load scene" />
-                <Button Command="{x:Static local:InterfaceEditor.SaveFrameCmd}" Content="Save frame" />
+                <Button Command="{x:Static local:InterfaceEditor.NewSceneCmd}" Content="New scene" ToolTip="Create new empty scene"/>
+                <Button Command="{x:Static local:InterfaceEditor.SaveSceneCmd}" Content="Save scene" ToolTip="Save scene to file..."/>
+                <Button Command="{x:Static local:InterfaceEditor.LoadSceneCmd}" Content="Load scene" ToolTip="Load scene rom file..."/>
+                <Button Command="{x:Static local:InterfaceEditor.SaveFrameCmd}" Content="Save template" ToolTip="Save selected frame as template..."/>
 
-                <Button Command="{x:Static local:InterfaceEditor.UndoChangeCmd}" Content="Undo change" />
-                <Button Command="{x:Static local:InterfaceEditor.RedoChangeCmd}" Content="Redo change" />
+                <Button Name="UndoButton" Command="{x:Static local:InterfaceEditor.UndoChangeCmd}" Content="Undo change" ToolTip="Revert last change to frame"
+                        IsEnabled="{Binding UndoStackIsNotEmpty}"/>
+                <Button Name="RedoButton" Command="{x:Static local:InterfaceEditor.RedoChangeCmd}" Content="Redo change" ToolTip="Repeat reverted change to frame"
+                        IsEnabled="{Binding RedoStackIsNotEmpty}"/>
+            </ToolBar>
+            <ToolBar>
+                <Menu>
+                    <MenuItem Header="Panels">
+                        <MenuItem Name="miFrameProperties" Header="Frame Properties" Click="MenuItem_Click"/>
+                        <MenuItem Name="miSceneTreeView" Header="Scene TreeView" Click="MenuItem_Click"/>
+                        <MenuItem Name="miFrameTemplates" Header="Frame Templates" Click="MenuItem_Click"/>
+                    </MenuItem>
+                </Menu>
             </ToolBar>
         </ToolBarTray>
-        <Grid Grid.Row="1" Name="LocalGrid"
-              MouseMove="LocalGrid_MouseMove"
-              MouseLeftButtonUp="LocalGrid_MouseLeftButtonUp"
-              MouseLeftButtonDown="LocalGrid_MouseLeftButtonDown"
-              Background="Chartreuse"
-            >
-            <ZWpfLib:DXElement x:Name="DxElem"
-                               HorizontalAlignment="Left" VerticalAlignment="Top"
-                               MinHeight="100" MaxHeight="10000"
-                               MinWidth="100" MaxWidth="10000"
-                               />
-        </Grid>
+        <local:WPFSelectionUILayer Grid.Row="1" x:Name="SelectionLayer">
+        </local:WPFSelectionUILayer>
     </Grid>
 </Window>
+

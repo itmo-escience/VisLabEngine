@@ -6,13 +6,15 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
+using WpfEditorTest.UndoRedo;
+using CommandManager = WpfEditorTest.UndoRedo.CommandManager;
 
 namespace WpfEditorTest.ChildPanels
 {
 	/// <summary>
 	/// Interaction logic for SelectedFramePanel.xaml
 	/// </summary>
-	public partial class FrameSelectionPanel : UserControl, IDraggablePanel
+	public partial class FrameSelectionPanel : UserControl
 	{
 		private Fusion.Engine.Frames.Frame _selectedFrame;
 		private double _widthBuffer;
@@ -58,6 +60,7 @@ namespace WpfEditorTest.ChildPanels
 
 		private void FrameDimensionsChange( object sender, PropertyChangedEventArgs args )
 		{
+<<<<<<< HEAD
 		    Dispatcher.Invoke(() =>
 		    {
 		        if (_locked) return;
@@ -95,6 +98,44 @@ namespace WpfEditorTest.ChildPanels
 		            }
 		        }
 		    });
+=======
+			if (_locked) return;
+
+			switch (args.PropertyName)
+			{
+				case "Width":
+				case "UnitWidth":
+					{
+						WidthBuffer = _selectedFrame.Width;
+						break;
+					}
+				case "Height":
+				case "UnitHeight":
+					{
+						HeightBuffer = _selectedFrame.Height;
+						break;
+					}
+				//case "X":
+				//case "Y":
+				case "GlobalRectangle":
+					{
+						var frameDelta = new TranslateTransform();
+						RenderTransform = frameDelta;
+						frameDelta.X = _selectedFrame.GlobalRectangle.X;
+						frameDelta.Y = _selectedFrame.GlobalRectangle.Y;
+						PreviousTransform = RenderTransform;
+
+						_oldX = RenderTransform.Value.OffsetX;
+						_oldY = RenderTransform.Value.OffsetY;
+						break;
+					}
+				case "Anchor":
+					{
+						UpdateVisualAnchors(_selectedFrame.Anchor);
+						break;
+					}
+			}
+>>>>>>> InterfaceEditor
 		}
 
 		private void UpdateVisualAnchors( FrameAnchor anchor )
@@ -132,8 +173,10 @@ namespace WpfEditorTest.ChildPanels
 			}
 		}
 		public Border CurrentDrag { get; set; }
+		public Size SelectedFrameInitSize { get; private set; }
+		public Point SelectedFrameInitPosition { get; private set; }
 		public bool DragMousePressed { get; set; }
-		public InterfaceEditor Window { get; set; }
+		public Grid Grid { get; set; }
 		public List<Border> Drags { get; private set; }
 		public List<Border> VisualAnchors { get; private set; }
 
@@ -166,14 +209,17 @@ namespace WpfEditorTest.ChildPanels
 			}
 		}
 
-		public FrameSelectionPanel( InterfaceEditor interfaceEditor )
+		public Point InitFramePosition { get; internal set; }
+		public Fusion.Engine.Frames.Frame InitFrameParent { get; internal set; }
+
+		public FrameSelectionPanel( Grid interfaceEditor )
 		{
 			InitializeComponent();
 
 			PreviousTransform = RenderTransform;
-			Window = interfaceEditor;
+			Grid = interfaceEditor;
 
-			Height = StaticData.OptionsWindowSize; Width = StaticData.OptionsWindowSize;
+			Height = ApplicationConfig.OptionsWindowSize; Width = ApplicationConfig.OptionsWindowSize;
 
 			Drags = new List<Border>
 			{
@@ -264,15 +310,10 @@ namespace WpfEditorTest.ChildPanels
 			return (int)_oldX != (int)RenderTransform.Value.OffsetX || (int)_oldY != (int)RenderTransform.Value.OffsetY;
 		}
 
-		public void Border_MouseDown( object sender, MouseButtonEventArgs e )
-		{
-			//throw new NotImplementedException();
-		}
-
 		private void UserControl_MouseLeftButtonDown( object sender, MouseButtonEventArgs e )
 		{
 			e.Handled = false;
-			StartFrameDragging(e.MouseDevice.GetPosition(Window));
+			StartFrameDragging(e.MouseDevice.GetPosition(Grid));
 		}
 
 		public void StartFrameDragging( Point mousePosition )
@@ -288,15 +329,19 @@ namespace WpfEditorTest.ChildPanels
 			e.Handled = true;
 
 			CurrentDrag = sender as Border;
+			SelectedFrameInitSize = new Size(SelectedFrame.Width,SelectedFrame.Height);
+			SelectedFrameInitPosition = new Point(SelectedFrame.X, SelectedFrame.Y);
 			DragMousePressed = true;
-			PreviousMouseLocation = e.MouseDevice.GetPosition(Window);
+			PreviousMouseLocation = e.MouseDevice.GetPosition(Grid);
 			PreviousDragTransform = CurrentDrag.RenderTransform;
 		}
 
 		private void Drag_MouseRightButtonDown( object sender, MouseButtonEventArgs e )
 		{
 			FrameAnchor changedAnchor = (FrameAnchor)Enum.Parse(typeof(FrameAnchor), (sender as Border).Tag as string);
-			_selectedFrame.Anchor ^= changedAnchor;
+			var initialAnchor = _selectedFrame.Anchor;
+			var command = new FramePropertyChangeCommand(_selectedFrame, "Anchor", initialAnchor ^= changedAnchor);
+			CommandManager.Instance.Execute(command);
 			this.UpdateVisualAnchors(_selectedFrame.Anchor);
 		}
 	}

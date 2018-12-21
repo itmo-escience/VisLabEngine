@@ -1,6 +1,9 @@
-﻿using System.Linq;
+﻿using System;
+using System.Configuration;
+using System.Linq;
 using System.Reflection;
 using System.Windows;
+using System.Windows.Media;
 using Fusion.Engine.Frames;
 
 namespace WpfEditorTest.ChildPanels
@@ -13,12 +16,16 @@ namespace WpfEditorTest.ChildPanels
 		public FrameDetails()
 		{
 			InitializeComponent();
-			Height = StaticData.OptionsWindowSize; Width = StaticData.OptionsWindowSize;
+			Height = ApplicationConfig.OptionsWindowSize; Width = ApplicationConfig.OptionsWindowSize;
+
+			Left = int.Parse(ConfigurationManager.AppSettings.Get("DetailsPanelX"));
+			Top = int.Parse(ConfigurationManager.AppSettings.Get("DetailsPanelY"));
+			Visibility = (Visibility)Enum.Parse(typeof(Visibility), ConfigurationManager.AppSettings.Get("DetailsPanelVisibility"));
 
 			HorizontalAlignment = HorizontalAlignment.Right;
 			VerticalAlignment = VerticalAlignment.Center;
 
-            Closing += (s, e) => e.Cancel = true;
+            Closing += (s, e) => {Visibility= Visibility.Collapsed; e.Cancel = true; };
 		}
 
 	    public void SetSelectFrame(Frame frame)
@@ -28,7 +35,7 @@ namespace WpfEditorTest.ChildPanels
 	        var propsies = (
 	            from property in publicProperties
 	            where property.GetMethod != null && property.SetMethod != null && !property.CustomAttributes.Any(ca => ca.AttributeType.Name == "XmlIgnoreAttribute")
-	            select new Propsy(property, frame)
+	            select new MVVMFrameProperty(property, frame)
 	        ).ToList();
 
 	        FrameDetailsControls.ItemsSource = propsies.OrderBy(p => p.PropName).ToList();
