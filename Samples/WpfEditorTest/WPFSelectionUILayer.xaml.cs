@@ -19,6 +19,7 @@ using CommandManager = WpfEditorTest.UndoRedo.CommandManager;
 using WpfEditorTest.FrameSelection;
 using WpfEditorTest.ChildPanels;
 using Fusion.Engine.Frames;
+using MathUtil = Fusion.Core.Mathematics.MathUtil;
 
 namespace WpfEditorTest
 {
@@ -35,6 +36,8 @@ namespace WpfEditorTest
 		private int DeltaX = 0;
 		private int DeltaY = 0;
 		private Point InitMousePosition;
+
+		private Rectangle SelectionRectangle;
 
 		public int GridSizeMultiplier { get => _gridSizeMultiplier; set { _gridSizeMultiplier = value; DrawGridLines(); } }
 		public Dictionary<string, int> GridScaleNumbers = new Dictionary<string, int>
@@ -54,8 +57,10 @@ namespace WpfEditorTest
 		private int _gridSizeMultiplier = ApplicationConfig.DefaultVisualGridSizeMultiplier;
 
 		public InterfaceEditor Window { get; set; }
+		public bool AreaSelectionEnabled { get; private set; } = false;
+		public Rectangle SelectionRectangleBlack { get; private set; }
 
-	    public struct FrameSelectionPair
+		public struct FrameSelectionPair
 	    {
 	        public Frame Frame;
 	        public FrameSelectionPanel Panel;
@@ -124,15 +129,55 @@ namespace WpfEditorTest
 			}
 		}
 
+		private void DrawSelectionRectangle(Point startPoint, Point endPoint)
+		{
+			var width = Math.Abs(startPoint.X - endPoint.X);
+			var height = Math.Abs(startPoint.Y - endPoint.Y);
+			var top = Math.Min(startPoint.Y, endPoint.Y);
+			var left = Math.Min(startPoint.X, endPoint.X);
+
+			//if (SelectionRectangle!=null)
+			//{
+			//	if (HasSelectionAreaChanged(width,height,top,left))
+			//	{
+					ClearSelectionRectangle();
+					DrawSelectionRectangle(width, height, top, left, ApplicationConfig.DefaultGridLinesThickness,
+						ApplicationConfig.DefaultSelectionRectanglePrimaryBrush, ApplicationConfig.DefaultSelectionRectangleSecondaryBrush);
+			//	}
+			//}
+			//else
+			//{
+			//	DrawSelectionRectangle(width, height, top, left, ApplicationConfig.DefaultGridLinesThickness, ApplicationConfig.DefaultSelectionRectangleBrush);
+			//}
+		}
+
+		private bool HasSelectionAreaChanged( double width, double height, double top, double left )
+		{
+			return (int)width != (int)SelectionRectangle.Width &&
+				(int)height != (int)SelectionRectangle.Height &&
+				(int)top != (int)Canvas.GetTop(SelectionRectangle) &&
+				(int)left != (int)Canvas.GetLeft(SelectionRectangle);
+		}
+
 		private void ClearGridLines()
 		{
 			VisualGrid.Children.Clear();
 		}
 
+		private void ClearSelectionRectangle()
+		{
+			if (AreaSelection.Children.Contains(SelectionRectangle))
+			{
+				AreaSelection.Children.Remove(SelectionRectangle);
+				AreaSelection.Children.Remove(SelectionRectangleBlack);
+				SelectionRectangle = null;
+			}
+		}
+
 		private void DrawLine( double x1, double x2, double y1, double y2, double thickness, Brush brush )
 		{
 			// Add a Line Element
-			var myLine = new Line();
+			var myLine = new Line() { IsHitTestVisible = false };
 			myLine.Stroke = brush;
 			myLine.X1 = x1;
 			myLine.X2 = x2;
@@ -142,6 +187,35 @@ namespace WpfEditorTest
 			myLine.VerticalAlignment = VerticalAlignment.Top;
 			myLine.StrokeThickness = thickness;
 			VisualGrid.Children.Add(myLine);
+		}
+
+		private void DrawSelectionRectangle( double width, double height, double top, double left, double thickness, Brush brush, Brush secondBrush )
+		{
+			// Add a Rectangle Element
+			SelectionRectangle = new Rectangle() { IsHitTestVisible=false };
+			SelectionRectangle.Stroke = brush;
+			SelectionRectangle.StrokeDashArray = new DoubleCollection { 4,4 };
+			SelectionRectangle.Width = width;
+			SelectionRectangle.Height = height;
+			Canvas.SetLeft(SelectionRectangle, left);
+			Canvas.SetTop(SelectionRectangle, top);
+			SelectionRectangle.HorizontalAlignment = HorizontalAlignment.Left;
+			SelectionRectangle.VerticalAlignment = VerticalAlignment.Top;
+			SelectionRectangle.StrokeThickness = thickness;
+			AreaSelection.Children.Add(SelectionRectangle);
+
+			SelectionRectangleBlack = new Rectangle() { IsHitTestVisible = false };
+			SelectionRectangleBlack.Stroke = secondBrush;
+			SelectionRectangleBlack.StrokeDashArray = new DoubleCollection { 4, 4 };
+			SelectionRectangleBlack.StrokeDashOffset = 4;
+			SelectionRectangleBlack.Width = width;
+			SelectionRectangleBlack.Height = height;
+			Canvas.SetLeft(SelectionRectangleBlack, left);
+			Canvas.SetTop(SelectionRectangleBlack, top);
+			SelectionRectangleBlack.HorizontalAlignment = HorizontalAlignment.Left;
+			SelectionRectangleBlack.VerticalAlignment = VerticalAlignment.Top;
+			SelectionRectangleBlack.StrokeThickness = thickness;
+			AreaSelection.Children.Add(SelectionRectangleBlack);
 		}
 
 		internal void ToggleGridLines( bool enable )
@@ -290,6 +364,7 @@ namespace WpfEditorTest
 		private void LocalGrid_MouseLeftButtonDown( object sender, MouseButtonEventArgs e )
 		{
 			var hovered = GetHoveredFrameOnScene(e.GetPosition(this), true);
+			InitMousePosition = e.GetPosition(this);
 
 			if (hovered != null)
 			{
@@ -328,8 +403,6 @@ namespace WpfEditorTest
 					frameAndPanel.Value.InitFrameParent = frameAndPanel.Key.Parent;
 				}
 
-				InitMousePosition = e.GetPosition(this);
-
 				FrameSelectionPanel panel;
 				frameSelectionPanelList.TryGetValue(hovered, out panel);
 
@@ -339,8 +412,13 @@ namespace WpfEditorTest
 			}
 			else
 			{
-				var command = new SelectFrameCommand(new List<Frame> { });
-				CommandManager.Instance.Execute(command);
+				if (!Keyboard.IsKeyDown(Key.LeftShift) && !Keyboard.IsKeyDown(Key.RightShift))
+				{
+					var command = new SelectFrameCommand(new List<Frame> { });
+					CommandManager.Instance.Execute(command); 
+				}
+
+				AreaSelectionStart();
 			}
 		}
 
@@ -376,10 +454,13 @@ namespace WpfEditorTest
 					CommandManager.Instance.Execute(command);
 				}
 			}
+
+			AreaSelectionEnd(SelectionManager.Instance.SelectedFrames);
 		}
 
 		private void LocalGrid_MouseMove( object sender, MouseEventArgs e )
 		{
+			
 
 			if (frameSelectionPanelList.Any(fsp => fsp.Value.DragMousePressed)  /*_frameSelectionPanel.DragMousePressed*/)
 			{
@@ -520,9 +601,54 @@ namespace WpfEditorTest
 			}
 		}
 
+		private void NeedToSelectionRectangle( bool areaSelectionEnabled, MouseEventArgs e )
+		{
+			if (areaSelectionEnabled)
+			{
+				this.GetMouseDeltaAfterFrameMouseDown(e);
+				DrawSelectionRectangle(InitMousePosition, new Point(InitMousePosition.X - DeltaX, InitMousePosition.Y - DeltaY));
+			}
+		}
+
 		private bool NeedSnapping()
 		{
 			return VisualGrid.Visibility == Visibility.Visible && !Keyboard.IsKeyDown(Key.LeftAlt) || Keyboard.IsKeyDown(Key.RightAlt);
+		}
+
+		private void AreaSelectionStart()
+		{
+			AreaSelectionEnabled = true;
+		}
+
+		private void AreaSelectionEnd( List<Frame> selectedFrames )
+		{
+			AreaSelectionEnabled = false;
+			if (SelectionRectangle!=null)
+			{
+				List<Frame> selectedframes = new List<Frame>(selectedFrames);
+				Fusion.Core.Mathematics.Rectangle selectedArea =
+					new Fusion.Core.Mathematics.Rectangle(
+						(int)Canvas.GetLeft(SelectionRectangle),
+						(int)Canvas.GetTop(SelectionRectangle),
+						(int)SelectionRectangle.Width,
+						(int)SelectionRectangle.Height
+					);
+				foreach (Frame frame in SceneFrame.Children)
+				{
+					if (selectedArea.Contains(frame.GlobalRectangle) && !selectedframes.Contains(frame))
+					{
+						selectedframes.Add(frame);
+					}
+				}
+				ClearSelectionRectangle();
+				var command = new SelectFrameCommand(selectedframes);
+				CommandManager.Instance.Execute(command);
+			}
+		}
+
+		private void VisualSelection_MouseMove( object sender, MouseEventArgs e )
+		{
+			NeedToSelectionRectangle(AreaSelectionEnabled, e);
 		}
 	}
 }

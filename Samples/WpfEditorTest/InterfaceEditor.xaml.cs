@@ -449,7 +449,7 @@ namespace WpfEditorTest
 							}
 							break;
 						}
-					case "vertical":
+					case "horizontal":
 						{
 							foreach (Frame frame in SelectionLayer.frameSelectionPanelList.Keys)
 							{
@@ -458,7 +458,7 @@ namespace WpfEditorTest
 							}
 							break;
 						}
-					case "horizontal":
+					case "vertical":
 						{
 							foreach (Frame frame in SelectionLayer.frameSelectionPanelList.Keys)
 							{
@@ -492,12 +492,12 @@ namespace WpfEditorTest
 								commands.Add(new FramePropertyChangeCommand(frame, "X", maxX - frame.Width));
 								break;
 							}
-						case "vertical":
+						case "horizontal":
 							{
 								commands.Add(new FramePropertyChangeCommand(frame, "X", (minX+maxX-frame.Width)/2));
 								break;
 							}
-						case "horizontal":
+						case "vertical":
 							{
 								commands.Add(new FramePropertyChangeCommand(frame, "Y", (minY + maxY - frame.Height) / 2));
 								break;

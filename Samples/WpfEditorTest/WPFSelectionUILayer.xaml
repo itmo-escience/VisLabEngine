@@ -11,4 +11,5 @@
                        MinHeight="100" MaxHeight="10000"
                        MinWidth="100" MaxWidth="10000" />
     <Canvas Name="VisualGrid" Visibility="Collapsed"/>
+    <Canvas Name="AreaSelection" Background="Transparent" MouseMove="VisualSelection_MouseMove"/>
 </Grid>
