@@ -657,5 +657,13 @@ namespace WpfEditorTest
 			var rBtn = sender as RadioButton;
 			SelectionLayer.GridSizeMultiplier = SelectionLayer.GridScaleNumbers[rBtn.Content.ToString()];
 		}
+
+		private void Window_KeyUp( object sender, KeyEventArgs e )
+		{
+			if (e.Key == Key.System && e.OriginalSource is InterfaceEditor)
+			{
+				e.Handled = true;
+			}
+		}
 	}
 }
