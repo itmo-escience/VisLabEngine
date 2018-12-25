@@ -1,15 +1,15 @@
 ﻿// Copyright (c) 2010-2014 SharpDX - Alexandre Mutel
-// 
+//
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
 // in the Software without restriction, including without limitation the rights
 // to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
 // copies of the Software, and to permit persons to whom the Software is
 // furnished to do so, subject to the following conditions:
-// 
+//
 // The above copyright notice and this permission notice shall be included in
 // all copies or substantial portions of the Software.
-// 
+//
 // THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
 // IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
 // FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -23,17 +23,17 @@
 // -----------------------------------------------------------------------------
 /*
 * Copyright (c) 2007-2011 SlimDX Group
-* 
+*
 * Permission is hereby granted, free of charge, to any person obtaining a copy
 * of this software and associated documentation files (the "Software"), to deal
 * in the Software without restriction, including without limitation the rights
 * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
 * copies of the Software, and to permit persons to whom the Software is
 * furnished to do so, subject to the following conditions:
-* 
+*
 * The above copyright notice and this permission notice shall be included in
 * all copies or substantial portions of the Software.
-* 
+*
 * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
 * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
 * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -198,7 +198,7 @@ namespace Fusion.Core.Mathematics
           Blue = color.Blue;
           Alpha = 1.0f;
         }
-        
+
         /// <summary>
         /// Initializes a new instance of the <see cref="Color4"/> struct.
         /// </summary>
@@ -509,7 +509,7 @@ namespace Fusion.Core.Mathematics
         /// <param name="amount">Value between 0 and 1 indicating the weight of <paramref name="end"/>.</param>
         /// <param name="result">When the method completes, contains the linear interpolation of the two colors.</param>
         /// <remarks>
-        /// Passing <paramref name="amount"/> a value of 0 will cause <paramref name="start"/> to be returned; a value of 1 will cause <paramref name="end"/> to be returned. 
+        /// Passing <paramref name="amount"/> a value of 0 will cause <paramref name="start"/> to be returned; a value of 1 will cause <paramref name="end"/> to be returned.
         /// </remarks>
         public static void Lerp(ref Color4 start, ref Color4 end, float amount, out Color4 result)
         {
@@ -527,7 +527,7 @@ namespace Fusion.Core.Mathematics
         /// <param name="amount">Value between 0 and 1 indicating the weight of <paramref name="end"/>.</param>
         /// <returns>The linear interpolation of the two colors.</returns>
         /// <remarks>
-        /// Passing <paramref name="amount"/> a value of 0 will cause <paramref name="start"/> to be returned; a value of 1 will cause <paramref name="end"/> to be returned. 
+        /// Passing <paramref name="amount"/> a value of 0 will cause <paramref name="start"/> to be returned; a value of 1 will cause <paramref name="end"/> to be returned.
         /// </remarks>
         public static Color4 Lerp(Color4 start, Color4 end, float amount)
         {
@@ -639,7 +639,7 @@ namespace Fusion.Core.Mathematics
         /// <returns>The adjusted color.</returns>
         public static Color4 AdjustContrast(Color4 value, float contrast)
         {
-            return new Color4(                
+            return new Color4(
                 0.5f + contrast * (value.Red - 0.5f),
                 0.5f + contrast * (value.Green - 0.5f),
                 0.5f + contrast * (value.Blue - 0.5f),
@@ -672,7 +672,7 @@ namespace Fusion.Core.Mathematics
         {
             float grey = value.Red * 0.2125f + value.Green * 0.7154f + value.Blue * 0.0721f;
 
-            return new Color4(                
+            return new Color4(
                 grey + saturation * (value.Red - grey),
                 grey + saturation * (value.Green - grey),
                 grey + saturation * (value.Blue - grey),
@@ -955,7 +955,7 @@ namespace Fusion.Core.Mathematics
         /// Returns a hash code for this instance.
         /// </summary>
         /// <returns>
-        /// A hash code for this instance, suitable for use in hashing algorithms and data structures like a hash table. 
+        /// A hash code for this instance, suitable for use in hashing algorithms and data structures like a hash table.
         /// </returns>
         public override int GetHashCode()
         {
@@ -1017,7 +1017,7 @@ namespace Fusion.Core.Mathematics
         /// Scales a vector by the given value.
         /// </summary>
         /// <param name="scale">The amount by which to scale the vector.</param>
-        /// <param name="value">The vector to scale.</param>        
+        /// <param name="value">The vector to scale.</param>
         /// <returns>The scaled vector.</returns>
         public static Color4 operator /(float scale,Color4 value)
         {

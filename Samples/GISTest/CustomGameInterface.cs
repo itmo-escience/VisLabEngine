@@ -24,6 +24,7 @@ using FusionUI.UI;
 using FusionUI.UI.Factories;
 using FusionUI.UI.Elements;
 using Fusion.Core.Utils;
+using Fusion.Engine.Graphics.SpritesD2D;
 
 namespace GISTest
 {
@@ -154,7 +155,25 @@ namespace GISTest
 			viewLayer.SpriteLayers.Add(console.ConsoleSpriteLayer);
 			viewLayer.SpriteLayers.Add(uiLayer);
 
-			userInterface.RootFrame = this.rootFrame = new MainFrame(FrameProcessor);
+		    _random = new Random();
+            _spriteLayer = new SpriteLayerD2D(Game.RenderSystem);
+		    viewLayer.SpriteLayersD2D.Add(_spriteLayer);
+
+		    Game.Keyboard.KeyUp += (sender, args) =>
+		    {
+		        if (args.Key == Keys.LeftButton)
+		        {
+		            _spriteLayer.DrawEllipse(50 + _random.Next(400), 450 + _random.Next(400), 5 + _random.Next(50), 5 + _random.Next(50), Color4.White);
+                }
+
+		        if (args.Key == Keys.RightButton)
+		        {
+                    _spriteLayer.Clear();
+		        }
+            };
+
+
+            userInterface.RootFrame = this.rootFrame = new MainFrame(FrameProcessor);
 			viewLayer.SpriteLayers.Add(userInterface.FramesSpriteLayer);
 
 			var testWindow = CreateStartFrame();
@@ -352,12 +371,19 @@ namespace GISTest
 			}
 			messages.Clear();
 
-        }
-
+            _spriteLayer.Clear();
+		    for (var i = 0; i < 10000; i++)
+		    {
+		        _spriteLayer.DrawRectangle(50 + i, 50 + i, 25, 145, Color4.White);
+		    }
+		}
 
 		SpriteFont textFont;
 		List<string> messages = new List<string>();
-		public void PrintMessage(string message)
+	    private SpriteLayerD2D _spriteLayer;
+	    private Random _random;
+
+	    public void PrintMessage(string message)
 		{
 			messages.Add(message);
 		}

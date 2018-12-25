@@ -1,21 +1,24 @@
 ﻿using System.Collections.Generic;
 using Fusion.Core;
+using Fusion.Core.Mathematics;
 using Fusion.Drivers.Graphics;
 using Fusion.Engine.Common;
 using SharpDX.Direct2D1;
 using SharpDX.Direct3D11;
 using SharpDX.DXGI;
-using SharpDX.Mathematics.Interop;
 
 namespace Fusion.Engine.Graphics.SpritesD2D
 {
     public class SpriteLayerD2D : DisposableBase
     {
         private readonly RenderSystem _rs;
-        private SolidColorBrush _brush;
         private RenderTarget _target;
         private RenderTarget2D _renderTargetFusion;
         private bool _isDirty = false;
+
+        public RenderTargetD2D WrapperTarget { get; private set; }
+
+        public BrushD2DFactory BrushFactory { get; private set; }
 
         public ShaderResource ShaderResource { get; private set; }
 
@@ -48,8 +51,9 @@ namespace Fusion.Engine.Graphics.SpritesD2D
                     new RenderTargetProperties(new PixelFormat(Format.Unknown, SharpDX.Direct2D1.AlphaMode.Premultiplied))
                 );
             }
+            WrapperTarget = new RenderTargetD2D(_target);
+            BrushFactory = new BrushD2DFactory(_target);
 
-            _brush = new SolidColorBrush(_target, SharpDX.Color.White);
             _isDirty = true;
         }
 
@@ -63,7 +67,7 @@ namespace Fusion.Engine.Graphics.SpritesD2D
 
             foreach (var command in _drawCommands)
             {
-                command.Apply(_target);
+                command.Apply(WrapperTarget);
             }
 
             _target.EndDraw();
@@ -72,6 +76,12 @@ namespace Fusion.Engine.Graphics.SpritesD2D
         }
 
         private readonly List<IDrawCommand> _drawCommands = new List<IDrawCommand>();
+
+        public void Draw(IDrawCommand command)
+        {
+            _isDirty = true;
+            _drawCommands.Add(command);
+        }
 
         public void Clear()
         {
@@ -82,35 +92,87 @@ namespace Fusion.Engine.Graphics.SpritesD2D
             _target.EndDraw();
         }
 
-        public void DrawEllipse(float x, float y, float r1, float r2)
+        public void DrawEllipse(float x, float y, float r1, float r2, Color4 color)
         {
             _isDirty = true;
-            _drawCommands.Add(new Ellipse(x, y, r1, r2, _brush));
+            Draw(new Ellipse(x, y, r1, r2, BrushFactory.GetOrCreateSolidBrush(color)));
+        }
+
+        public void DrawRectangle(float x, float y, float w, float h, Color4 color)
+        {
+            _isDirty = true;
+            Draw(new Rect(x, y, w, h, BrushFactory.GetOrCreateSolidBrush(color)));
+        }
+
+        public void DrawCircle(float x, float y, float r, Color4 color)
+        {
+            _isDirty = true;
+            Draw(new Ellipse(x, y, r, r, BrushFactory.GetOrCreateSolidBrush(color)));
         }
     }
 
-    internal interface IDrawCommand
+    public interface IDrawCommand
     {
-        void Apply(RenderTarget target);
+        void Apply(RenderTargetD2D target);
     }
 
-    internal class Ellipse : IDrawCommand
+    public class Ellipse : IDrawCommand
     {
-        private readonly float _x, _y, _r1, _r2;
-        private readonly Brush _brush;
+        protected readonly float X, Y, R1, R2;
+        protected readonly BrushD2D Brush;
 
-        public Ellipse(float x, float y, float r1, float r2, Brush brush)
+        public Ellipse(float x, float y, float r1, float r2, BrushD2D brush)
         {
-            _x = x;
-            _y = y;
-            _r1 = r1;
-            _r2 = r2;
-            _brush = brush;
+            X = x;
+            Y = y;
+            R1 = r1;
+            R2 = r2;
+            Brush = brush;
         }
 
-        public void Apply(RenderTarget target)
+        public void Apply(RenderTargetD2D target)
         {
-            target.DrawEllipse(new SharpDX.Direct2D1.Ellipse(new RawVector2(_x, _y), _r1, _r2), _brush);
+            target.DrawEllipse(new Vector2(X, Y), R1, R2, Brush, 5);
+        }
+
+        public override string ToString()
+        {
+            return $"Ellipse({X}, {Y}, {R1}, {R2})";
+        }
+    }
+
+    public class Rect : IDrawCommand
+    {
+        protected readonly float X, Y, W, H;
+        protected readonly BrushD2D Brush;
+
+        public Rect(float x, float y, float w, float h, BrushD2D brush)
+        {
+            X = x;
+            Y = y;
+            W = w;
+            H = h;
+            Brush = brush;
+        }
+
+        public void Apply(RenderTargetD2D target)
+        {
+            target.DrawRect(new RectangleF(X, Y, W, H), Brush);
+        }
+
+        public override string ToString()
+        {
+            return $"Rectangle ({X}, {Y}, {W}, {H})";
+        }
+    }
+
+    public class Circle : Ellipse
+    {
+        public Circle(float x, float y, float r, BrushD2D brush) : base(x, y, r, r, brush) { }
+
+        public override string ToString()
+        {
+            return $"Circle({X}, {Y}, {R1})";
         }
     }
 }
