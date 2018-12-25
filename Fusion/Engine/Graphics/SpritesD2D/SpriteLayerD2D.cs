@@ -20,6 +20,8 @@ namespace Fusion.Engine.Graphics.SpritesD2D
 
         public BrushD2DFactory BrushFactory { get; private set; }
 
+        public TextFormatD2DFactory TextFormatFactory { get; private set; }
+
         public ShaderResource ShaderResource { get; private set; }
 
         public SpriteLayerD2D(RenderSystem rs)
@@ -53,6 +55,7 @@ namespace Fusion.Engine.Graphics.SpritesD2D
             }
             WrapperTarget = new RenderTargetD2D(_target);
             BrushFactory = new BrushD2DFactory(_target);
+            TextFormatFactory = new TextFormatD2DFactory(_rs.SpriteEngineD2D.DWriteFactory);
 
             _isDirty = true;
         }
@@ -173,6 +176,27 @@ namespace Fusion.Engine.Graphics.SpritesD2D
         public override string ToString()
         {
             return $"Circle({X}, {Y}, {R1})";
+        }
+    }
+
+    public class Label : IDrawCommand
+    {
+        public readonly string Text;
+        public readonly TextFormatD2D Format;
+        public readonly BrushD2D Brush;
+        public readonly RectangleF Location;
+
+        public Label(string text, RectangleF location, TextFormatD2D format, BrushD2D brush)
+        {
+            Text = text;
+            Format = format;
+            Brush = brush;
+            Location = location;
+        }
+
+        public void Apply(RenderTargetD2D target)
+        {
+            target.DrawText(Text, Format, Location, Brush);
         }
     }
 }

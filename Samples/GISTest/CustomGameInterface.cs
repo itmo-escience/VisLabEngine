@@ -25,6 +25,7 @@ using FusionUI.UI.Factories;
 using FusionUI.UI.Elements;
 using Fusion.Core.Utils;
 using Fusion.Engine.Graphics.SpritesD2D;
+using Label = Fusion.Engine.Graphics.SpritesD2D.Label;
 
 namespace GISTest
 {
@@ -157,7 +158,11 @@ namespace GISTest
 
 		    _random = new Random();
             _spriteLayer = new SpriteLayerD2D(Game.RenderSystem);
-		    viewLayer.SpriteLayersD2D.Add(_spriteLayer);
+
+		    _textFormat = _spriteLayer.TextFormatFactory.CreateTextFormat("Calibri", 10);
+		    _brush = _spriteLayer.BrushFactory.GetOrCreateSolidBrush(Color4.White);
+
+            viewLayer.SpriteLayersD2D.Add(_spriteLayer);
 
 		    Game.Keyboard.KeyUp += (sender, args) =>
 		    {
@@ -176,14 +181,11 @@ namespace GISTest
             userInterface.RootFrame = this.rootFrame = new MainFrame(FrameProcessor);
 			viewLayer.SpriteLayers.Add(userInterface.FramesSpriteLayer);
 
-			var testWindow = CreateStartFrame();
 			Scene = new ScalableFrame(0, 0, this.rootFrame.UnitWidth, this.rootFrame.UnitHeight, "Scene", Color.Zero) { Anchor= FrameAnchor.All };
-			//DragFieldFrame = new ScalableFrame(this.rootFrame.ui, 0, 0, this.rootFrame.UnitWidth, this.rootFrame.UnitHeight, "DragFieldFrame", Color.Zero) { Anchor = FrameAnchor.All };
-			//Scene.Add(testWindow);
 			Scene.Visible = true;
 			Scene.Ghost = false;
-			//this.rootFrame.Add(DragFieldFrame);
-			this.rootFrame.Add(Scene);
+
+			rootFrame.Add(Scene);
 		}
 
 		public Window CreateStartFrame()
@@ -372,9 +374,9 @@ namespace GISTest
 			messages.Clear();
 
             _spriteLayer.Clear();
-		    for (var i = 0; i < 10000; i++)
+		    for (var i = 0; i < 1000; i++)
 		    {
-		        _spriteLayer.DrawRectangle(50 + i, 50 + i, 25, 145, Color4.White);
+		        _spriteLayer.Draw(new Label("Hello, world!", new RectangleF(50 + i % 749, 50 + i % 1354, 150, 300), _textFormat, _brush));
 		    }
 		}
 
@@ -382,6 +384,8 @@ namespace GISTest
 		List<string> messages = new List<string>();
 	    private SpriteLayerD2D _spriteLayer;
 	    private Random _random;
+	    private TextFormatD2D _textFormat;
+	    private BrushD2D _brush;
 
 	    public void PrintMessage(string message)
 		{

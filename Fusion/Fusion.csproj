@@ -354,6 +354,7 @@
     <Compile Include="Engine\Graphics\SpritesD2D\RenderTargetD2D.cs" />
     <Compile Include="Engine\Graphics\SpritesD2D\SpriteEngineD2D.cs" />
     <Compile Include="Engine\Graphics\SpritesD2D\SpriteLayerD2D.cs" />
+    <Compile Include="Engine\Graphics\SpritesD2D\TextFormatD2D.cs" />
     <Compile Include="Engine\Graphics\Sprites\SpriteFrame.cs" />
     <Compile Include="Engine\Graphics\Sprites\SpriteDrawer.cs" />
     <Compile Include="Engine\Graphics\Sprites\SpriteLayerCollection.cs" />

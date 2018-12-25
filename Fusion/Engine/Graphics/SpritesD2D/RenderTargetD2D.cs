@@ -89,15 +89,6 @@ namespace Fusion.Engine.Graphics.SpritesD2D
         PerPrimitive
     }
 
-    public class TextFormatD2D
-    {
-        internal TextFormat Format { get; }
-        internal TextFormatD2D(TextFormat format)
-        {
-            Format = format;
-        }
-    }
-
     internal static class D2DExtensions
     {
         public static RawColor4 ToRawColor4(this Color4 c) => new RawColor4(c.Red, c.Green, c.Blue, c.Alpha);
