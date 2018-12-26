@@ -81,8 +81,10 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="ChildPanels\FrameDragsPanel.xaml.cs">
+      <DependentUpon>FrameDragsPanel.xaml</DependentUpon>
+    </Compile>
     <Compile Include="FrameSelection\SelectionManager.cs" />
-    <Compile Include="UndoRedo\DeselectFrameCommand.cs" />
     <Compile Include="UndoRedo\SelectFrameCommand.cs" />
     <Compile Include="WPFConverters\BoolToIndexConverter.cs" />
     <Compile Include="ChildPanels\FrameDetails.xaml.cs">
@@ -114,6 +116,10 @@
       <DependentUpon>WPFSelectionUILayer.xaml</DependentUpon>
     </Compile>
     <Page Include="ChildPanels\FrameDetails.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="ChildPanels\FrameDragsPanel.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

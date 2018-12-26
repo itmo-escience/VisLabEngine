@@ -2,6 +2,7 @@
       x:Class="WpfEditorTest.WPFSelectionUILayer"
       xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
       xmlns:zWpfLib="clr-namespace:ZWpfLib;assembly=ZWpfLib"
+      xmlns:panels ="clr-namespace:WpfEditorTest.ChildPanels"
       MouseMove="LocalGrid_MouseMove"
                 MouseLeftButtonUp="LocalGrid_MouseLeftButtonUp"
                 MouseLeftButtonDown="LocalGrid_MouseLeftButtonDown">
@@ -11,5 +12,8 @@
                        MinHeight="100" MaxHeight="10000"
                        MinWidth="100" MaxWidth="10000" />
     <Canvas Name="VisualGrid" Visibility="Collapsed"/>
+    <panels:ParentHighlightPanel x:Name="_parentHighlightPanel"></panels:ParentHighlightPanel>
     <Canvas Name="AreaSelection" Background="Transparent" MouseMove="VisualSelection_MouseMove"/>
+    <Grid Name="HighlightPanelsContainer"></Grid>
+    <panels:FrameDragsPanel x:Name="_frameDragsPanel"></panels:FrameDragsPanel>
 </Grid>
