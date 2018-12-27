@@ -4,8 +4,9 @@
       xmlns:zWpfLib="clr-namespace:ZWpfLib;assembly=ZWpfLib"
       xmlns:panels ="clr-namespace:WpfEditorTest.ChildPanels"
       MouseMove="LocalGrid_MouseMove"
-                MouseLeftButtonUp="LocalGrid_MouseLeftButtonUp"
-                MouseLeftButtonDown="LocalGrid_MouseLeftButtonDown">
+      MouseLeftButtonUp="LocalGrid_MouseLeftButtonUp"
+      MouseLeftButtonDown="LocalGrid_MouseLeftButtonDown"
+      >
 
     <zWpfLib:DXElement Grid.Row="1" Name="DxElem"
                        HorizontalAlignment="Left" VerticalAlignment="Top"

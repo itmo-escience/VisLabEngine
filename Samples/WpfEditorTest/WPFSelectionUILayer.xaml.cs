@@ -454,53 +454,9 @@ namespace WpfEditorTest
 
 		private void LocalGrid_MouseMove( object sender, MouseEventArgs e )
 		{
-			
-
 			if (_frameDragsPanel.DragMousePressed)
 			{
-				Point currentLocation = e.MouseDevice.GetPosition(this);
-				if (_frameDragsPanel.InitMouseLocation==null)
-				{
-					_frameDragsPanel.InitMouseLocation = currentLocation;
-				}
-				var deltaX = currentLocation.X - _frameDragsPanel.InitMouseLocation.Value.X;
-				var deltaY = currentLocation.Y - _frameDragsPanel.InitMouseLocation.Value.Y;
-				//if (Keyboard.IsKeyDown(Key.LeftShift) || Keyboard.IsKeyDown(Key.LeftShift))
-				//{
-				//	var ratio = deltaX > deltaY ? 
-				//		draggedPanel.SelectedFrame.Width / draggedPanel.SelectedFrameInitSize.Width :
-				//		draggedPanel.SelectedFrame.Height / draggedPanel.SelectedFrameInitSize.Height;
-
-				//}
-
-				var calculateTransform = _frameDragsPanel.DragActions[_frameDragsPanel.CurrentDrag];
-				calculateTransform.Invoke(deltaX, deltaY, out TranslateTransform delta, out double heightMult, out double widthMult);
-
-				var tGroup = new TranslateTransform(
-					_frameDragsPanel.SelectedGroupInitPosition.X + delta.X,
-					_frameDragsPanel.SelectedGroupInitPosition.Y + delta.Y
-					);
-				_frameDragsPanel.RenderTransform = tGroup;
-
-				foreach (var panel in frameSelectionPanelList.Values)
-				{
-					panel.HeightBuffer = _frameDragsPanel.InitialFramesRectangles[panel.SelectedFrame].Item2.Height * heightMult;
-					panel.WidthBuffer = _frameDragsPanel.InitialFramesRectangles[panel.SelectedFrame].Item2.Width * widthMult;
-					TranslateTransform multedTransform = new TranslateTransform
-					{
-						X = _frameDragsPanel.RenderTransform.Value.OffsetX
-						+ _frameDragsPanel.InitialFramesRectangles[panel.SelectedFrame].Item1.X * widthMult,
-						Y = _frameDragsPanel.RenderTransform.Value.OffsetY
-						+ _frameDragsPanel.InitialFramesRectangles[panel.SelectedFrame].Item1.Y * heightMult
-					};
-
-					var group = new TransformGroup();
-					group.Children.Add(multedTransform);
-					//group.Children.Add(delta);
-					panel.RenderTransform = group;
-					panel.PreviousTransform = panel.RenderTransform;
-
-				}
+				CalculateSelectionSize(e.MouseDevice.GetPosition(this));
 			}
 			else if (frameSelectionPanelList.Any(fsp => fsp.Value.MousePressed))
 			{
@@ -513,9 +469,7 @@ namespace WpfEditorTest
 						this.MoveFrameToDragField(panel.SelectedFrame);
 						panel.IsMoved = true;
 					}
-
 				}
-
 				if (movedPanel.IsMoved || paletteWindow._selectedFrameTemplate != null)
 				{
 					var hovered = GetHoveredFrameOnScene(e.GetPosition(this), true);
@@ -539,7 +493,6 @@ namespace WpfEditorTest
 					var delta2 = new TranslateTransform(panel.InitPanelPosition.X + dX, panel.InitPanelPosition.Y + dY);
 					panel.RenderTransform = delta2;
 					panel.PreviousTransform = panel.RenderTransform;
-
 				}
 				movedPanel.PreviousMouseLocation = currentLocation;
 			}
@@ -547,6 +500,64 @@ namespace WpfEditorTest
 			{
 				var hovered = GetHoveredFrameOnScene(e.GetPosition(this), true);
 				_parentHighlightPanel.SelectedFrame = hovered;
+			}
+		}
+
+		public void CalculateSelectionSize( Point currentLocation )
+		{
+			if (_frameDragsPanel.InitMouseLocation == null)
+			{
+				_frameDragsPanel.InitMouseLocation = currentLocation;
+			}
+			var deltaX = currentLocation.X - _frameDragsPanel.InitMouseLocation.Value.X;
+			var deltaY = currentLocation.Y - _frameDragsPanel.InitMouseLocation.Value.Y;
+
+			if (Keyboard.IsKeyDown(Key.LeftShift) || Keyboard.IsKeyDown(Key.RightShift))
+			{
+				var ratio = Math.Max(deltaX / _frameDragsPanel.SelectedGroupInitSize.Width, deltaY / _frameDragsPanel.SelectedGroupInitSize.Height);
+				deltaX = _frameDragsPanel.SelectedGroupInitSize.Width * ratio;
+				deltaY = _frameDragsPanel.SelectedGroupInitSize.Height * ratio;
+			}
+
+			if (Keyboard.IsKeyDown(Key.LeftCtrl) || Keyboard.IsKeyDown(Key.RightCtrl))
+			{
+				//_frameDragsPanel.Margin.Left = _frameDragsPanel.RenderTransform.Value.OffsetX;
+				//_frameDragsPanel.Margin.Top = ;
+				_frameDragsPanel.VerticalAlignment = VerticalAlignment.Center;
+				_frameDragsPanel.HorizontalAlignment = HorizontalAlignment.Center;
+			}
+			else
+			{
+				_frameDragsPanel.VerticalAlignment = VerticalAlignment.Top;
+				_frameDragsPanel.HorizontalAlignment = HorizontalAlignment.Left;
+			}
+
+			var calculateTransform = _frameDragsPanel.DragActions[_frameDragsPanel.CurrentDrag];
+			calculateTransform.Invoke(deltaX, deltaY, out TranslateTransform delta, out double heightMult, out double widthMult);
+
+			var dragsPanelTransform = new TranslateTransform(
+				_frameDragsPanel.SelectedGroupInitPosition.X + delta.X,
+				_frameDragsPanel.SelectedGroupInitPosition.Y + delta.Y
+				);
+			_frameDragsPanel.RenderTransform = dragsPanelTransform;
+
+			foreach (var panel in frameSelectionPanelList.Values)
+			{
+				panel.HeightBuffer = _frameDragsPanel.InitialFramesRectangles[panel.SelectedFrame].Item2.Height * heightMult;
+				panel.WidthBuffer = _frameDragsPanel.InitialFramesRectangles[panel.SelectedFrame].Item2.Width * widthMult;
+				TranslateTransform multedTransform = new TranslateTransform
+				{
+					X = _frameDragsPanel.RenderTransform.Value.OffsetX
+					+ _frameDragsPanel.InitialFramesRectangles[panel.SelectedFrame].Item1.X * widthMult,
+					Y = _frameDragsPanel.RenderTransform.Value.OffsetY
+					+ _frameDragsPanel.InitialFramesRectangles[panel.SelectedFrame].Item1.Y * heightMult
+				};
+
+				var group = new TransformGroup();
+				group.Children.Add(multedTransform);
+				panel.RenderTransform = group;
+				panel.PreviousTransform = panel.RenderTransform;
+
 			}
 		}
 
