@@ -7,13 +7,11 @@ using System.ComponentModel;
 using System.IO;
 using System.Linq;
 using System.Reflection;
-using System.Threading;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
 using System.Windows.Input;
 using System.Windows.Media;
-using Fusion.Drivers.Graphics.Display;
 using Fusion.Engine.Frames;
 using Fusion.Engine.Input;
 using WpfEditorTest.ChildPanels;
@@ -45,6 +43,9 @@ namespace WpfEditorTest
 		public static RoutedCommand CopyFrameCmd = new RoutedCommand();
 		public static RoutedCommand PasteFrameCmd = new RoutedCommand();
 		public static RoutedCommand CutFrameCmd = new RoutedCommand();
+		public static RoutedCommand MoveFrameCmd = new RoutedCommand();
+		public static RoutedCommand DeleteFrameCmd = new RoutedCommand();
+		public static RoutedCommand AlignFrameCmd = new RoutedCommand();
 
 		//private Point InitFramePosition;
 		//private Frame InitFrameParent;
@@ -60,7 +61,6 @@ namespace WpfEditorTest
 		public FusionUI.UI.ScalableFrame DragFieldFrame;
 		public FusionUI.UI.ScalableFrame SceneFrame;
 		public FusionUI.UI.MainFrame RootFrame;
-
 		private string currentSceneFile;
 		private string sceneChangedIndicator;
 		private string titleWithFileName = ApplicationConfig.BaseTitle + " - " + ApplicationConfig.BaseSceneName;
@@ -70,8 +70,17 @@ namespace WpfEditorTest
 		public string CurrentSceneFile { get => currentSceneFile; set { currentSceneFile = value; this.UpdateTitle(); } }
 		public string SceneChangedIndicator { get => sceneChangedIndicator; set { sceneChangedIndicator = value; this.UpdateTitle(); } }
 
+		public Dictionary<string, Point> KeyboardArrowsSteps = new Dictionary<string, Point>
+		{
+			{ "up", new Point(0,-1) },
+			{ "down", new Point(0,1) },
+			{ "left", new Point(-1,0) },
+			{ "right", new Point(1,0) },
+		};
 
-        public InterfaceEditor()
+		
+
+		public InterfaceEditor()
 		{
 			InitializeComponent();
 
@@ -122,53 +131,49 @@ namespace WpfEditorTest
 				CommandManager.Instance.Execute(command);
 			}; //SelectFrame(frame);
 			_treeView.RequestFrameDeletionInUI += ( _, __ ) => TryDeleteSelectedFrame();
-        }
 
-	    private void OnEngineInitialized()
-	    {
-	        Dispatcher.Invoke(() =>
-	        {
-	            var templates = Directory.GetFiles(ApplicationConfig.TemplatesPath, "*.xml").ToList();
-	            _palette.AvailableFrames.ItemsSource = templates.Select(t => t.Split('\\').Last().Split('.').First());
+			var templates = Directory.GetFiles(ApplicationConfig.TemplatesPath, "*.xml").ToList();
+			_palette.AvailableFrames.ItemsSource = templates.Select(t => t.Split('\\').Last().Split('.').First());
 
-	            RootFrame = ApplicationInterface.Instance.rootFrame;
-	            SceneFrame = (FusionUI.UI.ScalableFrame) RootFrame.Children.FirstOrDefault();
-	            DragFieldFrame = new FusionUI.UI.ScalableFrame(0, 0, RootFrame.UnitWidth, RootFrame.UnitHeight,
-	                "DragFieldFrame", Fusion.Core.Mathematics.Color.Zero)
-	            {
-	                Anchor = FrameAnchor.All,
-	                ZOrder = 1000000,
-	            };
-	            RootFrame.Add(DragFieldFrame);
+			RootFrame = ApplicationInterface.Instance.rootFrame;
+			SceneFrame = (FusionUI.UI.ScalableFrame)RootFrame.Children.FirstOrDefault();
+			DragFieldFrame = new FusionUI.UI.ScalableFrame(0, 0, RootFrame.UnitWidth, RootFrame.UnitHeight, "DragFieldFrame", Fusion.Core.Mathematics.Color.Zero)
+			{
+				Anchor = FrameAnchor.All,
+				ZOrder = 1000000,
+			};
+			RootFrame.Add(DragFieldFrame);
 
-	            SelectionLayer.Window = this;
-	            SelectionLayer.paletteWindow = _palette;
-	            SelectionLayer.DxElem.Renderer = _engine;
+			SelectionLayer.Window = this;
+			SelectionLayer.paletteWindow = _palette;
+		    SelectionLayer.DxElem.Renderer = _engine;
 
-	            var b = new Binding("Children")
-	            {
-	                Source = SceneFrame,
-	                UpdateSourceTrigger = UpdateSourceTrigger.PropertyChanged,
-	                Mode = BindingMode.OneWay
-	            };
-	            _treeView.ElementHierarchyView.SetBinding(TreeView.ItemsSourceProperty, b);
+            var b = new Binding("Children")
+			{
+				Source = SceneFrame,
+				UpdateSourceTrigger = UpdateSourceTrigger.PropertyChanged,
+				Mode = BindingMode.OneWay
+			};
+			_treeView.ElementHierarchyView.SetBinding(TreeView.ItemsSourceProperty, b);
+
+			UndoButton.DataContext = CommandManager.Instance;
+			RedoButton.DataContext = CommandManager.Instance;
 
 
-	            UndoButton.DataContext = CommandManager.Instance;
-	            RedoButton.DataContext = CommandManager.Instance;
+			CommandManager.Instance.ChangedDirty += ( s, e ) => {
+				this.SceneChangedIndicator = e ? "*" : "";
+			};
 
-
-	            CommandManager.Instance.ChangedDirty += (s, e) => { this.SceneChangedIndicator = e ? "*" : ""; };
-
-	            SelectionLayer.FrameSelected += (s, selection) =>
-	            {
-	                _details.SetSelectFrame(selection.Frame);
-	                _treeView.SelectedFrame = selection.Frame;
-	            };
-	            SelectionLayer.FramesDeselected += (s, e) => { _details.FrameDetailsControls.ItemsSource = null; };
-	            this.UpdateTitle();
-	        });
-	    }
+			SelectionLayer.FrameSelected += ( s, selection ) => {
+				_details.SetSelectFrame(selection.Frame);
+				_treeView.SelectedFrame = selection.Frame;
+			};
+			SelectionLayer.FramesDeselected += ( s, e ) => {
+				_details.FrameDetailsControls.ItemsSource = null;
+			};
+			this.UpdateTitle();
+			rb1.IsChecked = true;
+		}
 
 
 	    protected override void OnSourceInitialized( EventArgs e )
@@ -180,14 +185,6 @@ namespace WpfEditorTest
 		private void UpdateTitle()
 		{
 			this.Title = ApplicationConfig.BaseTitle + " - " + (!string.IsNullOrEmpty(currentSceneFile) ? CurrentSceneFile : ApplicationConfig.BaseSceneName) + SceneChangedIndicator;
-		}
-
-		private void Window_KeyDown( object sender, KeyEventArgs e )
-		{
-			if (e.Key == Key.Delete)
-			{
-				this.TryDeleteSelectedFrame();
-			}
 		}
 
 		private void TryDeleteSelectedFrame()
@@ -386,6 +383,133 @@ namespace WpfEditorTest
 			CommandManager.Instance.TryRedoCommand();
 		}
 
+		private void ExecutedDeleteFrameCommand( object sender, ExecutedRoutedEventArgs e )
+		{
+			this.TryDeleteSelectedFrame();
+		}
+
+		private void ExecutedMoveFrameCommand( object sender, ExecutedRoutedEventArgs e )
+		{
+			var step = GridToggle.IsChecked != null && (bool)GridToggle.IsChecked? 
+				(int)(FusionUI.UI.ScalableFrame.ScaleMultiplier * SelectionLayer.GridSizeMultiplier) : 1;
+			List<IEditorCommand> commands = new List<IEditorCommand>();
+			var delta = KeyboardArrowsSteps[e.Parameter.ToString()];
+			foreach (Frame frame in SelectionLayer.frameSelectionPanelList.Keys)
+			{
+				commands.Add(new CommandGroup(
+					new FramePropertyChangeCommand(frame, "X", frame.X + (int)delta.X* step),
+					new FramePropertyChangeCommand(frame, "Y", frame.Y + (int)delta.Y* step)));
+			}
+			var command = new CommandGroup(commands.ToArray());
+			CommandManager.Instance.Execute(command);
+		}
+
+		private void ExecutedAlignFrameCommand( object sender, ExecutedRoutedEventArgs e )
+		{
+			if (SelectionLayer.frameSelectionPanelList.Count>0)
+			{
+				List<IEditorCommand> commands = new List<IEditorCommand>();
+				int minX,maxX,minY,maxY;
+				minX = SelectionLayer.frameSelectionPanelList.First().Key.X;
+				minY = SelectionLayer.frameSelectionPanelList.First().Key.Y;
+				maxX = minX + SelectionLayer.frameSelectionPanelList.First().Key.Width;
+				maxY = minY + SelectionLayer.frameSelectionPanelList.First().Key.Height;
+
+				switch (e.Parameter.ToString())
+				{
+					case "up":
+						{
+							foreach (Frame frame in SelectionLayer.frameSelectionPanelList.Keys)
+							{
+								minY = Math.Min(minY, frame.Y);
+							}
+							break;
+						}
+					case "down":
+						{
+							foreach (Frame frame in SelectionLayer.frameSelectionPanelList.Keys)
+							{
+								maxY = Math.Max(maxY, frame.Y+frame.Height);
+							}
+							break;
+						}
+					case "left":
+						{
+							foreach (Frame frame in SelectionLayer.frameSelectionPanelList.Keys)
+							{
+								minX = Math.Min(minX, frame.X);
+							}
+							break;
+						}
+					case "right":
+						{
+							foreach (Frame frame in SelectionLayer.frameSelectionPanelList.Keys)
+							{
+								maxX = Math.Max(maxX, frame.X + frame.Width);
+							}
+							break;
+						}
+					case "horizontal":
+						{
+							foreach (Frame frame in SelectionLayer.frameSelectionPanelList.Keys)
+							{
+								minX = Math.Min(minX, frame.X);
+								maxX = Math.Max(maxX, frame.X + frame.Width);
+							}
+							break;
+						}
+					case "vertical":
+						{
+							foreach (Frame frame in SelectionLayer.frameSelectionPanelList.Keys)
+							{
+								minY = Math.Min(minY, frame.Y);
+								maxY = Math.Max(maxY, frame.Y + frame.Height);
+							}
+							break;
+						}
+				}
+				foreach (Frame frame in SelectionLayer.frameSelectionPanelList.Keys)
+				{
+					switch (e.Parameter.ToString())
+					{
+						case "up":
+							{
+								commands.Add(new FramePropertyChangeCommand(frame, "Y",minY));
+								break;
+							}
+						case "down":
+							{
+								commands.Add(new FramePropertyChangeCommand(frame, "Y",maxY-frame.Height));
+								break;
+							}
+						case "left":
+							{
+								commands.Add(new FramePropertyChangeCommand(frame, "X",minX));
+								break;
+							}
+						case "right":
+							{
+								commands.Add(new FramePropertyChangeCommand(frame, "X", maxX - frame.Width));
+								break;
+							}
+						case "horizontal":
+							{
+								commands.Add(new FramePropertyChangeCommand(frame, "X", (minX+maxX-frame.Width)/2));
+								break;
+							}
+						case "vertical":
+							{
+								commands.Add(new FramePropertyChangeCommand(frame, "Y", (minY + maxY - frame.Height) / 2));
+								break;
+							}
+					}
+				}
+
+				var command = new CommandGroup(commands.ToArray());
+				CommandManager.Instance.Execute(command); 
+			}
+		}
+
 		private void ExecutedCopyFrameCommand( object sender, ExecutedRoutedEventArgs e )
 		{
 			if (SelectionLayer.frameSelectionPanelList.Count == 1)
@@ -519,6 +643,27 @@ namespace WpfEditorTest
 			Window panel = (sender as MenuItem).Tag as Window;
 			panel.Visibility = Visibility.Visible;
 			panel.Focus();
+		}
+
+		private void CheckBox_Checked( object sender, RoutedEventArgs e )
+		{
+			var chbx = sender as CheckBox;
+
+			SelectionLayer.ToggleGridLines(chbx.IsChecked != null ? (bool)chbx.IsChecked : false);
+		}
+
+		private void rb_Checked( object sender, RoutedEventArgs e )
+		{
+			var rBtn = sender as RadioButton;
+			SelectionLayer.GridSizeMultiplier = SelectionLayer.GridScaleNumbers[rBtn.Content.ToString()];
+		}
+
+		private void Window_KeyUp( object sender, KeyEventArgs e )
+		{
+			if (e.Key == Key.System && e.OriginalSource is InterfaceEditor)
+			{
+				e.Handled = true;
+			}
 		}
 	}
 }

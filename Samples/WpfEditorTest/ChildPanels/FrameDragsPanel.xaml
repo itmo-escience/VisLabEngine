@@ -1,0 +1,64 @@
+﻿<Grid x:Name="userControl" x:Class="WpfEditorTest.ChildPanels.FrameDragsPanel"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:WpfEditorTest.ChildPanels"
+             mc:Ignorable="d" 
+             d:DesignHeight="100" d:DesignWidth="100" HorizontalAlignment="Left" VerticalAlignment="Top" Visibility="Collapsed">
+    <Grid.RowDefinitions>
+        <RowDefinition Height="9"/>
+        <RowDefinition Height="1*"/>
+        <RowDefinition Height="9"/>
+    </Grid.RowDefinitions>
+    <Grid.ColumnDefinitions>
+        <ColumnDefinition Width="9"/>
+        <ColumnDefinition Width="1*"/>
+        <ColumnDefinition Width="9"/>
+    </Grid.ColumnDefinitions>
+    <Border Grid.Column="0" Grid.Row="0" Grid.ColumnSpan="3" Grid.RowSpan="3" BorderThickness="2" BorderBrush="White"/>
+    <Border Name="PositionInfo" BorderThickness="0,0,0,1" BorderBrush="White" Grid.Column="0" Height="28" Grid.Row="0" 
+                Width="40" Margin="-40,-27,9,8">
+        <StackPanel>
+            <StackPanel Orientation="Horizontal">
+                <TextBlock Foreground="White" FontFamily="Consolas" TextAlignment ="Left" FontSize="12" Text="X:"></TextBlock>
+                <TextBlock x:Name="textBlock1" Foreground="White" FontFamily="Consolas" TextAlignment ="Right" FontSize="12" Text="{Binding RenderTransform.Value.OffsetX, ElementName=userControl}" Width="27"></TextBlock>
+            </StackPanel>
+            <StackPanel  Orientation="Horizontal">
+                <TextBlock Foreground="White" FontFamily="Consolas" TextAlignment ="Left" FontSize="12" Text="Y:"></TextBlock>
+                <TextBlock Foreground="White" FontFamily="Consolas" TextAlignment ="Right" FontSize="12" Text="{Binding RenderTransform.Value.OffsetY, ElementName=userControl}" Width="27"></TextBlock>
+            </StackPanel>
+        </StackPanel>
+    </Border>
+    <Border Name="SizeInfo" BorderThickness="0,1,0,0" BorderBrush="White" Grid.Column="2" Height="28" Grid.Row="2" 
+                Width="40" Margin="9,8,-40,-27">
+        <StackPanel>
+            <StackPanel Orientation="Horizontal">
+                <TextBlock Foreground="White" FontFamily="Consolas" TextAlignment ="Left" FontSize="12" Text="W:"></TextBlock>
+                <TextBlock Foreground="White" FontFamily="Consolas" TextAlignment ="Right" FontSize="12" Text="{Binding Width, ElementName=userControl}" Width="27"></TextBlock>
+            </StackPanel>
+            <StackPanel Orientation="Horizontal">
+                <TextBlock Foreground="White" FontFamily="Consolas" TextAlignment ="Left" FontSize="12" Text="H:"></TextBlock>
+                <TextBlock x:Name="textBlock" Foreground="White" FontFamily="Consolas" TextAlignment ="Right" FontSize="12" Text="{Binding Height, ElementName=userControl}" Width="27"></TextBlock>
+            </StackPanel>
+        </StackPanel>
+    </Border>
+
+    <Border Name="BottomDrag" BorderBrush="Black" Background="White" BorderThickness="1" Grid.Column="1" HorizontalAlignment="Center" Tag="Bottom"
+                Height="9" Grid.Row="2" Width="20" MouseLeftButtonDown="Drag_MouseLeftButtonDown" Cursor="SizeNS" MouseRightButtonDown="Drag_MouseRightButtonDown"/>
+    <Border Name="TopDrag" BorderBrush="Black" Background="White" BorderThickness="1" Grid.Column="1" HorizontalAlignment="Center" Tag="Top"
+                Height="9" Grid.Row="0" Width="20" MouseLeftButtonDown="Drag_MouseLeftButtonDown" Cursor="SizeNS" MouseRightButtonDown="Drag_MouseRightButtonDown"/>
+    <Border Name="LeftDrag" BorderBrush="Black" Background="White" BorderThickness="1" Grid.Column="0" Height="20" Grid.Row="1" Tag="Left"
+                VerticalAlignment="Center" Width="9" MouseLeftButtonDown="Drag_MouseLeftButtonDown" Cursor="SizeWE" MouseRightButtonDown="Drag_MouseRightButtonDown"/>
+    <Border Name="RightDrag" BorderBrush="Black" Background="White" BorderThickness="1" Grid.Column="2" Height="20" Grid.Row="1" Tag="Right"
+                VerticalAlignment="Center" Width="9" MouseLeftButtonDown="Drag_MouseLeftButtonDown" Cursor="SizeWE" MouseRightButtonDown="Drag_MouseRightButtonDown"/>
+
+    <Border Name="BottomLeftDrag" BorderBrush="Black" Background="White" BorderThickness="1" Grid.Column="0" Height="9" Grid.Row="2" 
+                Width="9" MouseLeftButtonDown="Drag_MouseLeftButtonDown" Cursor="SizeNESW"/>
+    <Border Name="BottomRightDrag" BorderBrush="Black" Background="White" BorderThickness="1" Grid.Column="2" Height="9" Grid.Row="2" 
+                Width="9" MouseLeftButtonDown="Drag_MouseLeftButtonDown" Cursor="SizeNWSE"/>
+    <Border Name="TopLeftDrag" BorderBrush="Black" Background="White" BorderThickness="1" Grid.Column="0" Height="9" Grid.Row="0" 
+                Width="9" MouseLeftButtonDown="Drag_MouseLeftButtonDown" Cursor="SizeNWSE"/>
+    <Border Name="TopRightDrag" BorderBrush="Black" Background="White" BorderThickness="1" Grid.Column="2" Height="9" Grid.Row="0" 
+                Width="9" MouseLeftButtonDown="Drag_MouseLeftButtonDown" Cursor="SizeNESW"/>
+</Grid>

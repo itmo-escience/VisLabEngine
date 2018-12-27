@@ -14,10 +14,10 @@ namespace Fusion.Core.Configuration {
 
 	/// <summary>
 	/// Saves and loads configuration to file.
-	/// 
+	///
 	/// Note on multi-threading:
-	///		Be sure that all structure properties 
-	///		larger than 4 (32-bit) or 8 (64-bit) bytes in config classes 
+	///		Be sure that all structure properties
+	///		larger than 4 (32-bit) or 8 (64-bit) bytes in config classes
 	///		have lock on set and get.
 	/// </summary>
 	internal static class ConfigSerializer {
@@ -26,8 +26,8 @@ namespace Fusion.Core.Configuration {
 		public static void SaveToStream ( IEnumerable<GameModule.ModuleBinding> bindings, Stream stream )
 		{
 			try {
-		
-				//	prepare ini data :			
+
+				//	prepare ini data :
 				IniData iniData = new IniData();
 				iniData.Configuration.CommentString	=	"# ";
 
@@ -40,7 +40,7 @@ namespace Fusion.Core.Configuration {
 
 					var sectionData	=	iniData.Sections.GetSectionData( sectionName );
 
-					foreach ( var key in config ) { 
+					foreach ( var key in config ) {
 						if (sectionData.Keys.ContainsKey(key.KeyName)) {
 							sectionData.Keys.RemoveKey(key.KeyName);
 						}
@@ -64,14 +64,14 @@ namespace Fusion.Core.Configuration {
 
 
 		/// <summary>
-		/// 
+		///
 		/// </summary>
 		/// <param name="bindings"></param>
 		/// <param name="path"></param>
 		public static void LoadFromStream	( IEnumerable<GameModule.ModuleBinding> bindings, Stream stream )
 		{
 			try {
-		
+
 				var iniData = new IniData();
 				var parser = new StreamIniDataParser();
 
@@ -80,7 +80,7 @@ namespace Fusion.Core.Configuration {
 				using ( var sw = new StreamReader(stream) ) {
 					iniData	= parser.ReadData( sw );
 				}
-			
+
 
 				//	read data :
 				foreach ( var section in iniData.Sections ) {
@@ -92,8 +92,10 @@ namespace Fusion.Core.Configuration {
 					if (bind==null) {
 						Log.Warning("Module {0} does not exist. Section ignored.", section.SectionName );
 					}
-
-					bind.Module.SetConfiguration( section.Keys );
+				    else
+				    {
+				        bind.Module.SetConfiguration(section.Keys);
+				    }
 				}
 
 			} catch (IniParser.Exceptions.ParsingException e) {
@@ -104,7 +106,7 @@ namespace Fusion.Core.Configuration {
 
 
 		/// <summary>
-		/// 
+		///
 		/// </summary>
 		/// <param name="fileName"></param>
 		/// <returns></returns>
@@ -118,7 +120,7 @@ namespace Fusion.Core.Configuration {
 
 
 		/// <summary>
-		/// 
+		///
 		/// </summary>
 		/// <param name="obj"></param>
 		/// <returns></returns>
@@ -138,8 +140,8 @@ namespace Fusion.Core.Configuration {
 				foreach ( var prop in configObject.GetConfigurationProperties() ) {
 
 					var cfgVar	=	new ConfigVariable( prefix, prop.Name, prop, configObject );
-					
-					list.Add( cfgVar ); 
+
+					list.Add( cfgVar );
 				}
 			}
 

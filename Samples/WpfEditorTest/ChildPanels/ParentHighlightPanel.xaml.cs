@@ -18,7 +18,7 @@ namespace WpfEditorTest.ChildPanels
 	/// <summary>
 	/// Interaction logic for ParentHighlightPanel.xaml
 	/// </summary>
-	public partial class ParentHighlightPanel : UserControl
+	public partial class ParentHighlightPanel : Border
 	{
 
 		private Fusion.Engine.Frames.Frame _selectedFrame;

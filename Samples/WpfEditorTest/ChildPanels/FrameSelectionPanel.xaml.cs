@@ -45,60 +45,22 @@ namespace WpfEditorTest.ChildPanels
 				delta.Y = _selectedFrame.GlobalRectangle.Y;// == _selectedFrame.Y ? _selectedFrame.GlobalRectangle.Y : _selectedFrame.Y;
 				PreviousTransform = RenderTransform;
 
-				foreach (var drag in Drags)
-				{
-					drag.RenderTransform = new TranslateTransform(0, 0);
-				}
+				_oldX = RenderTransform.Value.OffsetX;
+				_oldY = RenderTransform.Value.OffsetY;
+
+				//foreach (var drag in Drags)
+				//{
+				//	drag.RenderTransform = new TranslateTransform(0, 0);
+				//}
 
 				UpdateVisualAnchors(_selectedFrame.Anchor);
 
 				_selectedFrame.PropertyChanged += FrameDimensionsChange;
-
-				this.PositionInfo.DataContext = this.SizeInfo.DataContext = _selectedFrame;
 			}
 		}
 
 		private void FrameDimensionsChange( object sender, PropertyChangedEventArgs args )
 		{
-<<<<<<< HEAD
-		    Dispatcher.Invoke(() =>
-		    {
-		        if (_locked) return;
-
-		        switch (args.PropertyName)
-		        {
-		            case "Width":
-		            {
-		                WidthBuffer = _selectedFrame.Width;
-		                break;
-		            }
-		            case "Height":
-		            {
-		                HeightBuffer = _selectedFrame.Height;
-		                break;
-		            }
-		            //case "X":
-		            //case "Y":
-		            case "GlobalRectangle":
-		            {
-		                var frameDelta = new TranslateTransform();
-		                RenderTransform = frameDelta;
-		                frameDelta.X = _selectedFrame.GlobalRectangle.X;
-		                frameDelta.Y = _selectedFrame.GlobalRectangle.Y;
-		                PreviousTransform = RenderTransform;
-
-		                _oldX = RenderTransform.Value.OffsetX;
-		                _oldY = RenderTransform.Value.OffsetY;
-		                break;
-		            }
-		            case "Anchor":
-		            {
-		                UpdateVisualAnchors(_selectedFrame.Anchor);
-		                break;
-		            }
-		        }
-		    });
-=======
 			if (_locked) return;
 
 			switch (args.PropertyName)
@@ -135,26 +97,24 @@ namespace WpfEditorTest.ChildPanels
 						break;
 					}
 			}
->>>>>>> InterfaceEditor
 		}
 
 		private void UpdateVisualAnchors( FrameAnchor anchor )
 		{
-			void UpdateAnchor( bool isActive, Border drag, Border line )
+			void UpdateAnchor( bool isActive, /*Border drag,*/ Border line )
 			{
-				drag.Background = isActive ? Brushes.Black : Brushes.White;
-				drag.BorderBrush = isActive ? Brushes.White : Brushes.Black;
+				//drag.Background = isActive ? Brushes.Black : Brushes.White;
+				//drag.BorderBrush = isActive ? Brushes.White : Brushes.Black;
 				line.Visibility = isActive ? Visibility.Visible : Visibility.Collapsed;
 			}
 
-			UpdateAnchor((FrameAnchor.Top & anchor) != 0, TopDrag, TopAnchorLine);
-			UpdateAnchor((FrameAnchor.Bottom & anchor) != 0, BottomDrag, BottomAnchorLine);
-			UpdateAnchor((FrameAnchor.Left & anchor) != 0, LeftDrag, LeftAnchorLine);
-			UpdateAnchor((FrameAnchor.Right & anchor) != 0, RightDrag, RightAnchorLine);
+			UpdateAnchor((FrameAnchor.Top & anchor) != 0, /*TopDrag,*/ TopAnchorLine);
+			UpdateAnchor((FrameAnchor.Bottom & anchor) != 0, /*BottomDrag,*/ BottomAnchorLine);
+			UpdateAnchor((FrameAnchor.Left & anchor) != 0, /*LeftDrag,*/ LeftAnchorLine);
+			UpdateAnchor((FrameAnchor.Right & anchor) != 0, /*RightDrag,*/ RightAnchorLine);
 		}
 
 		public Point PreviousMouseLocation { get; set; }
-		public Transform PreviousDragTransform { get; set; }
 		public Transform PreviousTransform { get; set; }
 		public bool MousePressed { get; set; }
 		public bool IsMoved {
@@ -172,12 +132,7 @@ namespace WpfEditorTest.ChildPanels
 				}
 			}
 		}
-		public Border CurrentDrag { get; set; }
-		public Size SelectedFrameInitSize { get; private set; }
-		public Point SelectedFrameInitPosition { get; private set; }
-		public bool DragMousePressed { get; set; }
 		public Grid Grid { get; set; }
-		public List<Border> Drags { get; private set; }
 		public List<Border> VisualAnchors { get; private set; }
 
 		public double WidthBuffer
@@ -211,6 +166,7 @@ namespace WpfEditorTest.ChildPanels
 
 		public Point InitFramePosition { get; internal set; }
 		public Fusion.Engine.Frames.Frame InitFrameParent { get; internal set; }
+		public Point InitPanelPosition { get; internal set; }
 
 		public FrameSelectionPanel( Grid interfaceEditor )
 		{
@@ -221,12 +177,7 @@ namespace WpfEditorTest.ChildPanels
 
 			Height = ApplicationConfig.OptionsWindowSize; Width = ApplicationConfig.OptionsWindowSize;
 
-			Drags = new List<Border>
-			{
-				TopLeftDrag, TopDrag, TopRightDrag,
-				LeftDrag, RightDrag,
-				BottomLeftDrag, BottomDrag, BottomRightDrag
-			};
+
 
 			VisualAnchors = new List<Border>
 			{
@@ -322,27 +273,6 @@ namespace WpfEditorTest.ChildPanels
 			PreviousMouseLocation = mousePosition;
 			PreviousTransform = RenderTransform;
 			//Window.MoveFrameToDragField(_selectedFrame);
-		}
-
-		private void Drag_MouseLeftButtonDown( object sender, MouseButtonEventArgs e )
-		{
-			e.Handled = true;
-
-			CurrentDrag = sender as Border;
-			SelectedFrameInitSize = new Size(SelectedFrame.Width,SelectedFrame.Height);
-			SelectedFrameInitPosition = new Point(SelectedFrame.X, SelectedFrame.Y);
-			DragMousePressed = true;
-			PreviousMouseLocation = e.MouseDevice.GetPosition(Grid);
-			PreviousDragTransform = CurrentDrag.RenderTransform;
-		}
-
-		private void Drag_MouseRightButtonDown( object sender, MouseButtonEventArgs e )
-		{
-			FrameAnchor changedAnchor = (FrameAnchor)Enum.Parse(typeof(FrameAnchor), (sender as Border).Tag as string);
-			var initialAnchor = _selectedFrame.Anchor;
-			var command = new FramePropertyChangeCommand(_selectedFrame, "Anchor", initialAnchor ^= changedAnchor);
-			CommandManager.Instance.Execute(command);
-			this.UpdateVisualAnchors(_selectedFrame.Anchor);
 		}
 	}
 }
