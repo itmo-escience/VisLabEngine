@@ -24,6 +24,8 @@ using FusionUI.UI;
 using FusionUI.UI.Factories;
 using FusionUI.UI.Elements;
 using Fusion.Core.Utils;
+using Fusion.Engine.Frames2.Components;
+using Fusion.Engine.Frames2.Managing;
 using Fusion.Engine.Graphics.SpritesD2D;
 using Label = Fusion.Engine.Graphics.SpritesD2D.Label;
 
@@ -159,8 +161,8 @@ namespace GISTest
 		    _random = new Random();
             _spriteLayer = new SpriteLayerD2D(Game.RenderSystem);
 
-		    _textFormat = _spriteLayer.TextFormatFactory.CreateTextFormat("Calibri", 10);
-		    _brush = _spriteLayer.BrushFactory.GetOrCreateSolidBrush(Color4.White);
+		    _textFormat = new TextFormatD2D("Calibri", 10);
+		    _brush = new SolidBrushD2D(Color4.White);
 
             viewLayer.SpriteLayersD2D.Add(_spriteLayer);
 
@@ -177,6 +179,15 @@ namespace GISTest
 		        }
             };
 
+		    _userInterface2 = new UIManager(Game.RenderSystem);
+
+		    var img = new Image(10, 50, 100, 200);
+		    var txt = new Fusion.Engine.Frames2.Components.Label("I'm Label!", 100, 50, 100, 80);
+		    var border = new Border(200, 50, 150, 260);
+
+            _userInterface2.Root.Add(img);
+            _userInterface2.Root.Add(txt);
+            _userInterface2.Root.Add(border);
 
             userInterface.RootFrame = this.rootFrame = new MainFrame(FrameProcessor);
 			viewLayer.SpriteLayers.Add(userInterface.FramesSpriteLayer);
@@ -373,11 +384,16 @@ namespace GISTest
 			}
 			messages.Clear();
 
-            _spriteLayer.Clear();
-		    for (var i = 0; i < 1000; i++)
+            _userInterface2.Update(gameTime);
+		    _userInterface2.Draw(_spriteLayer);
+
+            /*_spriteLayer.Clear();
+		    for (var i = 0; i < 10000; i++)
 		    {
 		        _spriteLayer.Draw(new Label("Hello, world!", new RectangleF(50 + i % 749, 50 + i % 1354, 150, 300), _textFormat, _brush));
 		    }
+            */
+
 		}
 
 		SpriteFont textFont;
@@ -385,7 +401,8 @@ namespace GISTest
 	    private SpriteLayerD2D _spriteLayer;
 	    private Random _random;
 	    private TextFormatD2D _textFormat;
-	    private BrushD2D _brush;
+	    private SolidBrushD2D _brush;
+	    private UIManager _userInterface2;
 
 	    public void PrintMessage(string message)
 		{

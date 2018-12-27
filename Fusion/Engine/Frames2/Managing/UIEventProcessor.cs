@@ -22,6 +22,7 @@ namespace Fusion.Engine.Frames2.Managing
 
         public void Update(GameTime time)
         {
+            /*
             var stack = new Stack<UIComponent>();
 
             stack.Push(_root);
@@ -35,6 +36,7 @@ namespace Fusion.Engine.Frames2.Managing
 
                 }
             }
+            */
         }
     }
 }

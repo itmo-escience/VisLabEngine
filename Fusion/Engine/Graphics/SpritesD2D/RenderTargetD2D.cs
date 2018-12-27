@@ -1,7 +1,5 @@
-﻿using System;
-using Fusion.Core.Mathematics;
+﻿using Fusion.Core.Mathematics;
 using SharpDX.Direct2D1;
-using SharpDX.DirectWrite;
 using SharpDX.Mathematics.Interop;
 
 namespace Fusion.Engine.Graphics.SpritesD2D
@@ -12,11 +10,15 @@ namespace Fusion.Engine.Graphics.SpritesD2D
     public sealed class RenderTargetD2D
     {
         private readonly RenderTarget _target;
+        private readonly BrushFactory _brushFactory;
+        private readonly TextFormatFactory _dwFactory;
 
         /// <remarks>This constructor must be internal in order to encapsulate Direct2D dependency.</remarks>
         internal RenderTargetD2D(RenderTarget renderTarget)
         {
             _target = renderTarget;
+            _brushFactory = new BrushFactory(_target);
+            _dwFactory = new TextFormatFactory();
         }
 
         /// <inheritdoc cref="RenderTarget.BeginDraw()"/>
@@ -47,36 +49,39 @@ namespace Fusion.Engine.Graphics.SpritesD2D
         /// <inheritdoc cref="RenderTarget.PopAxisAlignedClip()"/>
         public void PopAxisAlignedClip() => _target.PopAxisAlignedClip();
 
-        public void DrawEllipse(Vector2 center, float rX, float rY, BrushD2D brush) =>
-            _target.DrawEllipse(new SharpDX.Direct2D1.Ellipse(center.ToRawVector2(), rX, rY), brush.Brush);
+        public void DrawEllipse(Vector2 center, float rX, float rY, IBrushD2D brush) =>
+            _target.DrawEllipse(new SharpDX.Direct2D1.Ellipse(center.ToRawVector2(), rX, rY), _brushFactory.GetOrCreateBrush(brush));
 
-        public void DrawEllipse(Vector2 center, float rX, float rY, BrushD2D brush, float strokeWidth) =>
-            _target.DrawEllipse(new SharpDX.Direct2D1.Ellipse(center.ToRawVector2(), rX, rY), brush.Brush, strokeWidth);
+        public void DrawEllipse(Vector2 center, float rX, float rY, IBrushD2D brush, float strokeWidth) =>
+            _target.DrawEllipse(new SharpDX.Direct2D1.Ellipse(center.ToRawVector2(), rX, rY), _brushFactory.GetOrCreateBrush(brush), strokeWidth);
 
-        public void DrawLine(Vector2 p0, Vector2 p1, BrushD2D brush) =>
-            _target.DrawLine(p0.ToRawVector2(), p1.ToRawVector2(), brush.Brush);
+        public void DrawLine(Vector2 p0, Vector2 p1, IBrushD2D brush) =>
+            _target.DrawLine(p0.ToRawVector2(), p1.ToRawVector2(), _brushFactory.GetOrCreateBrush(brush));
 
-        public void DrawLine(Vector2 p0, Vector2 p1, BrushD2D brush, float strokeWidth) =>
-            _target.DrawLine(p0.ToRawVector2(), p1.ToRawVector2(), brush.Brush, strokeWidth);
+        public void DrawLine(Vector2 p0, Vector2 p1, IBrushD2D brush, float strokeWidth) =>
+            _target.DrawLine(p0.ToRawVector2(), p1.ToRawVector2(), _brushFactory.GetOrCreateBrush(brush), strokeWidth);
 
-        public void DrawRect(RectangleF rectangle, BrushD2D brush) =>
-            _target.DrawRectangle(rectangle.ToRawRectangleF(), brush.Brush);
+        public void DrawRect(RectangleF rectangle, IBrushD2D brush) =>
+            _target.DrawRectangle(rectangle.ToRawRectangleF(), _brushFactory.GetOrCreateBrush(brush));
 
-        public void DrawRect(RectangleF rectangle, BrushD2D brush, float strokeWidth) =>
-            _target.DrawRectangle(rectangle.ToRawRectangleF(), brush.Brush, strokeWidth);
+        public void DrawRect(RectangleF rectangle, IBrushD2D brush, float strokeWidth) =>
+            _target.DrawRectangle(rectangle.ToRawRectangleF(), _brushFactory.GetOrCreateBrush(brush), strokeWidth);
 
-        public void FillEllipse(Vector2 center, float rX, float rY, BrushD2D brush) =>
-            _target.FillEllipse(new SharpDX.Direct2D1.Ellipse(center.ToRawVector2(), rX, rY), brush.Brush);
+        public void FillEllipse(Vector2 center, float rX, float rY, IBrushD2D brush) =>
+            _target.FillEllipse(new SharpDX.Direct2D1.Ellipse(center.ToRawVector2(), rX, rY), _brushFactory.GetOrCreateBrush(brush));
 
-        public void FillRect(RectangleF rectangle, BrushD2D brush) =>
-            _target.FillRectangle(rectangle.ToRawRectangleF(), brush.Brush);
+        public void FillRect(RectangleF rectangle, IBrushD2D brush) =>
+            _target.FillRectangle(rectangle.ToRawRectangleF(), _brushFactory.GetOrCreateBrush(brush));
 
-        public void DrawText(string text, TextFormatD2D textFormat, RectangleF rectangleF, BrushD2D brush) =>
-            _target.DrawText(text, textFormat.Format, rectangleF.ToRawRectangleF(), brush.Brush);
+        public void DrawText(string text, TextFormatD2D textFormat, RectangleF rectangleF, IBrushD2D brush) =>
+            _target.DrawText(text, _dwFactory.CreateTextFormat(textFormat), rectangleF.ToRawRectangleF(), _brushFactory.GetOrCreateBrush(brush));
+
+        public void DrawTextLayout(Vector2 origin, TextLayoutD2D layout, IBrushD2D brush) =>
+            _target.DrawTextLayout(origin.ToRawVector2(), layout.Layout, _brushFactory.GetOrCreateBrush(brush));
 
         private void ZZZ()
         {
-
+            //_target.Transform
         }
     }
 

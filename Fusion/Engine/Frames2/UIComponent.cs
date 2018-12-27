@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using Fusion.Core.Mathematics;
 using Fusion.Engine.Common;
-using Fusion.Engine.Graphics;
+using Fusion.Engine.Graphics.SpritesD2D;
 
 namespace Fusion.Engine.Frames2
 {
@@ -18,9 +18,13 @@ namespace Fusion.Engine.Frames2
         public object Tag { get; set; }
         public string Name { get; }
 
-        protected UIComponent()
+        protected UIComponent(float x, float y, float width, float height)
         {
             Name = GenerateName(GetType());
+            X = x;
+            Y = y;
+            Width = width;
+            Height = height;
         }
 
         public UIContainer Parent { get; internal set; }
@@ -40,7 +44,7 @@ namespace Fusion.Engine.Frames2
         public IList<IUIController> Controllers { get; } = new List<IUIController>();
 
         public abstract void Update(GameTime gameTime);
-        public abstract void Draw(SpriteLayer layer);
+        public abstract void Draw(SpriteLayerD2D layer);
 
         private static readonly Dictionary<Type, int> GeneratedCountOfType = new Dictionary<Type, int>();
         private static string GenerateName(Type type)

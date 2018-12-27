@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using Fusion.Core.Mathematics;
-using Fusion.Engine.Graphics;
+using Fusion.Engine.Graphics.SpritesD2D;
 
 namespace Fusion.Engine.Frames2
 {
@@ -17,7 +17,9 @@ namespace Fusion.Engine.Frames2
                     (bb, child) => RectangleF.Union(child.BoundingBox, bb)
                 );
 
-        public void Add(UIComponent child)
+        protected UIContainer(float x, float y, float width, float height) : base(x, y, width, height) { }
+
+        public virtual void Add(UIComponent child)
         {
             if(_children.Contains(child))
                 return;
@@ -26,7 +28,7 @@ namespace Fusion.Engine.Frames2
             _children.Add(child);
         }
 
-        public bool Remove(UIComponent child)
+        public virtual bool Remove(UIComponent child)
         {
             if(!Children.Contains(child))
                 return false;
@@ -36,6 +38,6 @@ namespace Fusion.Engine.Frames2
             return true;
         }
 
-        public override void Draw(SpriteLayer layer) { }
+        public override void Draw(SpriteLayerD2D layer) { }
     }
 }

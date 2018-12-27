@@ -4,37 +4,49 @@ using SharpDX.Direct2D1;
 
 namespace Fusion.Engine.Graphics.SpritesD2D
 {
-    public class BrushD2D
+    public interface IBrushD2D
     {
-        internal Brush Brush { get; }
+        Color4 Color { get; }
+    }
 
-        internal BrushD2D(Brush brush)
+    public class SolidBrushD2D : IBrushD2D
+    {
+        public Color4 Color { get; }
+        public SolidBrushD2D(Color4 color)
         {
-            Brush = brush;
+            Color = color;
         }
     }
 
-    public class BrushD2DFactory
+    public class BrushFactory
     {
         internal RenderTarget Target { get; }
 
-        private readonly Dictionary<Color4, BrushD2D> _cachedBrushes = new Dictionary<Color4, BrushD2D>();
+        private readonly Dictionary<IBrushD2D, Brush> _cachedBrushes = new Dictionary<IBrushD2D, Brush>();
 
-        internal BrushD2DFactory(RenderTarget target)
+        internal BrushFactory(RenderTarget target)
         {
             Target = target;
         }
 
-        public BrushD2D GetOrCreateSolidBrush(Color4 color)
+        public Brush GetOrCreateBrush(IBrushD2D brush)
         {
-            if (_cachedBrushes.TryGetValue(color, out var brush))
+            if (_cachedBrushes.TryGetValue(brush, out var result))
             {
-                return brush;
+                return result;
             }
 
-            brush = new BrushD2D(new SolidColorBrush(Target, color.ToRawColor4()));
-            _cachedBrushes[color] = brush;
-            return brush;
+            if (brush is SolidBrushD2D solid)
+            {
+                result = new SolidColorBrush(Target, solid.Color.ToRawColor4());
+            }
+            else // TODO: other options
+            {
+                result = new SolidColorBrush(Target, brush.Color.ToRawColor4());
+            }
+
+            _cachedBrushes[brush] = result;
+            return result;
         }
     }
 }

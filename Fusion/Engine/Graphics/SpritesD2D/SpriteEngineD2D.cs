@@ -28,8 +28,6 @@ namespace Fusion.Engine.Graphics.SpritesD2D
         private Ubershader _shader;
         private StateFactory _factory;
 
-        internal Factory DWriteFactory { get; private set; }
-
         public SpriteEngineD2D(RenderSystem rs) : base(rs.Game)
         {
             _rs = rs;
@@ -47,8 +45,6 @@ namespace Fusion.Engine.Graphics.SpritesD2D
         {
             _shader = _device.Game.Content.Load<Ubershader>("spriteD2D");
             _factory = _shader.CreateFactory(typeof(Flags), (ps, i) => StateEnum(ps, (Flags)i));
-
-            DWriteFactory = new SharpDX.DirectWrite.Factory();
         }
 
         private void StateEnum(PipelineState ps, Flags flags)

@@ -4,27 +4,27 @@ namespace Fusion.Engine.Graphics.SpritesD2D
 {
     public class TextFormatD2D
     {
-        internal TextFormat Format { get; }
-        internal TextFormatD2D(TextFormat format)
+        public string FontFamily { get; }
+        public float Size { get; }
+        public TextFormatD2D(string fontFamilyName, float fontSize)
         {
-            Format = format;
+            FontFamily = fontFamilyName;
+            Size = fontSize;
         }
     }
 
-    public class TextFormatD2DFactory
+    internal class TextFormatFactory
     {
         private readonly Factory _factory;
 
-        internal TextFormatD2DFactory(Factory dwFactory)
+        public TextFormatFactory()
         {
-            _factory = dwFactory;
+            _factory = new Factory();
         }
 
-        public TextFormatD2D CreateTextFormat(string fontFamilyName, float fontSize)
+        public TextFormat CreateTextFormat(TextFormatD2D format)
         {
-            var format = new TextFormat(_factory, fontFamilyName, fontSize);
-
-            return new TextFormatD2D(format);
+            return new TextFormat(_factory, format.FontFamily, format.Size);
         }
     }
 }

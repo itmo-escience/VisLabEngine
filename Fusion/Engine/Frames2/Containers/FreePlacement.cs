@@ -8,5 +8,9 @@ namespace Fusion.Engine.Frames2.Containers
         {
 
         }
+
+        public FreePlacement(float x, float y, float width, float height) : base(x, y, width, height)
+        {
+        }
     }
 }
