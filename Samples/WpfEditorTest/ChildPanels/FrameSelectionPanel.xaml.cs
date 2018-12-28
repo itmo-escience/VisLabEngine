@@ -23,7 +23,7 @@ namespace WpfEditorTest.ChildPanels
 		private double _oldX;
 		private double _oldY;
 		private bool _locked = false;
-		private bool _isMoved;
+		private bool _isInDragField;
 
 		public Fusion.Engine.Frames.Frame SelectedFrame
 		{
@@ -43,7 +43,6 @@ namespace WpfEditorTest.ChildPanels
 				RenderTransform = delta;
 				delta.X = _selectedFrame.GlobalRectangle.X;// == _selectedFrame.X ? _selectedFrame.GlobalRectangle.X : _selectedFrame.X;
 				delta.Y = _selectedFrame.GlobalRectangle.Y;// == _selectedFrame.Y ? _selectedFrame.GlobalRectangle.Y : _selectedFrame.Y;
-				PreviousTransform = RenderTransform;
 
 				_oldX = RenderTransform.Value.OffsetX;
 				_oldY = RenderTransform.Value.OffsetY;
@@ -85,7 +84,6 @@ namespace WpfEditorTest.ChildPanels
 						RenderTransform = frameDelta;
 						frameDelta.X = _selectedFrame.GlobalRectangle.X;
 						frameDelta.Y = _selectedFrame.GlobalRectangle.Y;
-						PreviousTransform = RenderTransform;
 
 						_oldX = RenderTransform.Value.OffsetX;
 						_oldY = RenderTransform.Value.OffsetY;
@@ -115,12 +113,11 @@ namespace WpfEditorTest.ChildPanels
 		}
 
 		public Point PreviousMouseLocation { get; set; }
-		public Transform PreviousTransform { get; set; }
 		public bool MousePressed { get; set; }
-		public bool IsMoved {
-			get => _isMoved;
+		public bool IsInDragField {
+			get => _isInDragField;
 			set {
-				_isMoved = value;
+				_isInDragField = value;
 				this.Cursor = value ? Cursors.Cross : Cursors.Arrow;
 				if (value)
 				{
@@ -164,7 +161,7 @@ namespace WpfEditorTest.ChildPanels
 			}
 		}
 
-		public Point InitFramePosition { get; internal set; }
+		public Fusion.Core.Mathematics.Rectangle InitialGlobalRectangle { get; internal set; }
 		public Fusion.Engine.Frames.Frame InitFrameParent { get; internal set; }
 		public Point InitPanelPosition { get; internal set; }
 
@@ -172,7 +169,6 @@ namespace WpfEditorTest.ChildPanels
 		{
 			InitializeComponent();
 
-			PreviousTransform = RenderTransform;
 			Grid = interfaceEditor;
 
 			Height = ApplicationConfig.OptionsWindowSize; Width = ApplicationConfig.OptionsWindowSize;
@@ -191,8 +187,8 @@ namespace WpfEditorTest.ChildPanels
 				if (_selectedFrame == null) return;
 
 				_locked = true;
-				_selectedFrame.Width = (int)(Width + Math.Min(0, WidthBuffer));
-				_selectedFrame.Height = (int)(Height + Math.Min(0, HeightBuffer));
+				_selectedFrame.Width = (int)(Width + Math.Min(0, WidthBuffer)+0.5d);
+				_selectedFrame.Height = (int)(Height + Math.Min(0, HeightBuffer)+0.5d);
 				_locked = false;
 
 			};
@@ -271,8 +267,6 @@ namespace WpfEditorTest.ChildPanels
 		{
 			MousePressed = true;
 			PreviousMouseLocation = mousePosition;
-			PreviousTransform = RenderTransform;
-			//Window.MoveFrameToDragField(_selectedFrame);
 		}
 	}
 }
