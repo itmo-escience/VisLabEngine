@@ -19,7 +19,9 @@
 // THE SOFTWARE.
 
 using System;
+using System.Collections.Generic;
 using System.Globalization;
+using System.Linq;
 using System.Runtime.InteropServices;
 
 
@@ -427,6 +429,24 @@ namespace Fusion.Core.Mathematics
             var top = Math.Min(value1.Top, value2.Top);
             var bottom = Math.Max(value1.Bottom, value2.Bottom);
             result = new RectangleF(left, top, right - left, bottom - top);
+        }
+
+
+        /// <summary>
+        /// Creates minimal bounding rectangle containing all provided points.
+        /// </summary>
+        /// <returns><see cref="Empty"/> if there are no points provided, minimal bounding rectangle otherwise.</returns>
+        public static RectangleF Bounding(ICollection<Vector2> points)
+        {
+            if(points == null || points.Count == 0)
+                return Empty;
+
+            var left = points.Select(p => p.X).Min();
+            var right = points.Select(p => p.X).Max();
+            var top = points.Select(p => p.Y).Min();
+            var bottom = points.Select(p => p.Y).Max();
+
+            return new RectangleF(left, top, right - left, bottom - top);
         }
 
         /// <summary>

@@ -8,11 +8,37 @@ namespace Fusion.Engine.Frames2
 {
     public abstract class UIComponent
     {
+        protected bool BoundingBoxChanged;
         public float X { get; set; }
         public float Y { get; set; }
         public float Width { get; set; }
         public float Height { get; set; }
-        public virtual RectangleF BoundingBox => new RectangleF(X, Y, Width, Height);
+
+        public RectangleF BoundingBox { get; private set; }
+
+        private Matrix _globalTransform = Matrix.Identity;
+        private UIContainer _parent;
+        public UIContainer Parent
+        {
+            get => _parent;
+            internal set
+            {
+                _parent = value;
+                RecalculateGlobalTransform();
+            }
+        }
+
+        protected void RecalculateGlobalTransform()
+        {
+            _globalTransform = Transform;
+            foreach (var ancestor in Ancestors())
+            {
+                _globalTransform = ancestor.Transform * _globalTransform;
+            }
+
+
+        }
+
         public bool Visible { get; set; }
         public Matrix Transform { get; set; }
         public object Tag { get; set; }
@@ -26,8 +52,6 @@ namespace Fusion.Engine.Frames2
             Width = width;
             Height = height;
         }
-
-        public UIContainer Parent { get; internal set; }
 
         public IEnumerable<UIContainer> Ancestors()
         {
