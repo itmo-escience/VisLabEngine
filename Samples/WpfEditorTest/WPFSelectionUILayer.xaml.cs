@@ -20,14 +20,13 @@ namespace WpfEditorTest
 	/// </summary>
 	public partial class WPFSelectionUILayer : Grid
 	{
-		public Dictionary<Frame, FrameSelectionPanel> frameSelectionPanelList = new Dictionary<Frame, FrameSelectionPanel>();
+		public Dictionary<Frame, FrameSelectionPanel> FrameSelectionPanelList = new Dictionary<Frame, FrameSelectionPanel>();
 
+		private int _deltaX = 0;
+		private int _deltaY = 0;
+		private Point _initMousePosition;
 
-		private int DeltaX = 0;
-		private int DeltaY = 0;
-		private Point InitMousePosition;
-
-		private Rectangle SelectionRectangle;
+		private Rectangle _selectionRectangle;
 
 		public int GridSizeMultiplier { get => _gridSizeMultiplier; set { _gridSizeMultiplier = value; DrawGridLines(); } }
 		public Dictionary<string, int> GridScaleNumbers = new Dictionary<string, int>
@@ -43,7 +42,7 @@ namespace WpfEditorTest
 		public FusionUI.UI.ScalableFrame DragFieldFrame => Window.DragFieldFrame;
 		public FusionUI.UI.ScalableFrame SceneFrame => Window.SceneFrame;
 		public FusionUI.UI.MainFrame RootFrame => Window.RootFrame;
-		public FramePalette paletteWindow;
+		public FramePalette PaletteWindow;
 		private int _gridSizeMultiplier = ApplicationConfig.DefaultVisualGridSizeMultiplier;
 
 		public InterfaceEditor Window { get; set; }
@@ -64,35 +63,33 @@ namespace WpfEditorTest
 		{
 			InitializeComponent();
 
-			//_parentHighlightPanel = new ParentHighlightPanel();
-			//Children.Add(_parentHighlightPanel);
-			//_frameDragsPanel = new FrameDragsPanel();
-			//Children.Add(_frameDragsPanel);
-
 			DrawGridLines();
 
 			SelectionManager.Instance.FrameSelected += ( s, selectedFrames ) =>
 			{
-				foreach (var frameAndPanel in frameSelectionPanelList)
+				foreach (var frameAndPanel in FrameSelectionPanelList)
 				{
-					var commands = this.ResetSelectedFrame(new Point(frameAndPanel.Key.GlobalRectangle.X, frameAndPanel.Key.GlobalRectangle.Y), frameAndPanel.Value);
+					var frame = frameAndPanel.Key;
+					var selectionPanel = frameAndPanel.Value;
+
+					var commands = this.ResetSelectedFrame(new Point(frame.GlobalRectangle.X, frame.GlobalRectangle.Y), selectionPanel);
 					var command = new CommandGroup(commands.ToArray());
 					CommandManager.Instance.ExecuteWithoutMemorising(command);
 
-				    frameAndPanel.Value.SelectedFrame = null;
-                    _selectionPanelPool.Push(frameAndPanel.Value);
+					selectionPanel.SelectedFrame = null;
+                    _selectionPanelPool.Push(selectionPanel);
 				}
 
 				HighlightPanelsContainer.Children.Clear();
-                frameSelectionPanelList.Clear();
+                FrameSelectionPanelList.Clear();
 
 				if (selectedFrames.Count > 0)
 				{
 					foreach (var frame in selectedFrames)
 					{
-					    var frameSelectionPanel = _selectionPanelPool.Count > 0 ? _selectionPanelPool.Pop() : new FrameSelectionPanel(this);
+					    var frameSelectionPanel = _selectionPanelPool.Count > 0 ? _selectionPanelPool.Pop() : new FrameSelectionPanel();
 
-						frameSelectionPanelList.Add(frame, frameSelectionPanel);
+						FrameSelectionPanelList.Add(frame, frameSelectionPanel);
 
 					    frameSelectionPanel.SelectedFrame = frame;
 					    frameSelectionPanel.Visibility = Visibility.Visible;
@@ -134,10 +131,10 @@ namespace WpfEditorTest
 
 		private bool HasSelectionAreaChanged( double width, double height, double top, double left )
 		{
-			return (int)width != (int)SelectionRectangle.Width &&
-				(int)height != (int)SelectionRectangle.Height &&
-				(int)top != (int)Canvas.GetTop(SelectionRectangle) &&
-				(int)left != (int)Canvas.GetLeft(SelectionRectangle);
+			return (int)width != (int)_selectionRectangle.Width &&
+				(int)height != (int)_selectionRectangle.Height &&
+				(int)top != (int)Canvas.GetTop(_selectionRectangle) &&
+				(int)left != (int)Canvas.GetLeft(_selectionRectangle);
 		}
 
 		private void ClearGridLines()
@@ -147,11 +144,11 @@ namespace WpfEditorTest
 
 		private void ClearSelectionRectangle()
 		{
-			if (AreaSelection.Children.Contains(SelectionRectangle))
+			if (AreaSelection.Children.Contains(_selectionRectangle))
 			{
-				AreaSelection.Children.Remove(SelectionRectangle);
+				AreaSelection.Children.Remove(_selectionRectangle);
 				AreaSelection.Children.Remove(SelectionRectangleBlack);
-				SelectionRectangle = null;
+				_selectionRectangle = null;
 			}
 		}
 
@@ -166,6 +163,7 @@ namespace WpfEditorTest
 				HorizontalAlignment = HorizontalAlignment.Left,
 				VerticalAlignment = VerticalAlignment.Top,
 				StrokeThickness = thickness,
+				SnapsToDevicePixels = true,
 			};
 			VisualGrid.Children.Add(myLine);
 		}
@@ -173,7 +171,7 @@ namespace WpfEditorTest
 		private void DrawSelectionRectangle( double width, double height, double top, double left, double thickness, Brush brush, Brush secondBrush )
 		{
 			// Add a Rectangle Element
-			SelectionRectangle = new Rectangle() {
+			_selectionRectangle = new Rectangle() {
 				IsHitTestVisible = false,
 				Stroke = brush,
 				StrokeDashArray = new DoubleCollection { 4, 4 },
@@ -183,10 +181,10 @@ namespace WpfEditorTest
 				HorizontalAlignment = HorizontalAlignment.Left,
 				VerticalAlignment = VerticalAlignment.Top,
 			};
-			AreaSelection.Children.Add(SelectionRectangle);
+			AreaSelection.Children.Add(_selectionRectangle);
 
-			Canvas.SetLeft(SelectionRectangle, left);
-			Canvas.SetTop(SelectionRectangle, top);
+			Canvas.SetLeft(_selectionRectangle, left);
+			Canvas.SetTop(_selectionRectangle, top);
 			
 			SelectionRectangleBlack = new Rectangle() {
 				IsHitTestVisible = false,
@@ -212,7 +210,7 @@ namespace WpfEditorTest
 
 		private void SelectFrame( Frame frame )
 		{
-		    if (frameSelectionPanelList.TryGetValue(frame, out var panel))
+		    if (FrameSelectionPanelList.TryGetValue(frame, out var panel))
 		    {
 		        FrameSelected?.Invoke(this, new FrameSelectionPair { Frame = frame, Panel = panel});
             }
@@ -221,8 +219,8 @@ namespace WpfEditorTest
 		private void RecalcMouseDelta( MouseEventArgs e )
 		{
 			var currentMousePosition = e.GetPosition(this);
-			DeltaX = (int)(currentMousePosition.X - InitMousePosition.X);
-			DeltaY = (int)(currentMousePosition.Y - InitMousePosition.Y);
+			_deltaX = (int)(currentMousePosition.X - _initMousePosition.X);
+			_deltaY = (int)(currentMousePosition.Y - _initMousePosition.Y);
 		}
 
 		public List<IEditorCommand> ResetSelectedFrame( Point point, FrameSelectionPanel panel )
@@ -274,7 +272,7 @@ namespace WpfEditorTest
 
 			DragFieldFrame.Add(frame);
 
-			frameSelectionPanelList.TryGetValue(frame, out FrameSelectionPanel panel);
+			var panel = FrameSelectionPanelList[frame];
 
 			panel.UpdateSelectedFramePosition();
 		}
@@ -287,8 +285,6 @@ namespace WpfEditorTest
 			var hoveredFrame = GetHoveredFrameOnScene(mousePosition, false) ?? SceneFrame;
 
 			hoveredFrame.Add(frame);
-
-			//_treeView.ElementHierarcyView.SetSelectedItem(frame);
 		}
 
 		private List<IEditorCommand> ReleaseFrame( Point point, FrameSelectionPanel panel )
@@ -300,7 +296,7 @@ namespace WpfEditorTest
 				if (panel.IsInDragField)
 				{
 					panel.IsInDragField = false;
-					_parentHighlightPanel.SelectedFrame = null;
+					ParentHighlightPanel.SelectedFrame = null;
 
 					var hoveredFrame = GetHoveredFrameOnScene(point, false) ?? SceneFrame;
 					panel.SelectedFrame.Parent?.Remove(panel.SelectedFrame);
@@ -336,7 +332,7 @@ namespace WpfEditorTest
 		private void LocalGrid_MouseLeftButtonDown( object sender, MouseButtonEventArgs e )
 		{
 			var hovered = GetHoveredFrameOnScene(e.GetPosition(this), true);
-			InitMousePosition = e.GetPosition(this);
+			_initMousePosition = e.GetPosition(this);
 
 			if (!_frameDragsPanel.DragMousePressed)
 			{
@@ -380,7 +376,7 @@ namespace WpfEditorTest
 				}
 			}
 
-			foreach (var frameAndPanel in frameSelectionPanelList)
+			foreach (var frameAndPanel in FrameSelectionPanelList)
 			{
 				var frame = frameAndPanel.Key;
 				var selectionPanel = frameAndPanel.Value;
@@ -390,12 +386,12 @@ namespace WpfEditorTest
 				selectionPanel.InitFrameParent = frame.Parent;
 			}
 
-			if (hovered != null)
+			if (hovered != null && FrameSelectionPanelList.ContainsKey(hovered))
 			{
-				var panel = frameSelectionPanelList[hovered];
+				var panel = FrameSelectionPanelList[hovered];
 
 				if (panel != null)
-					panel.StartFrameDragging(e.GetPosition(this));
+					panel.MousePressed = true;
 			}
 		}
 
@@ -403,27 +399,26 @@ namespace WpfEditorTest
 		{
 			List<IEditorCommand> commands = new List<IEditorCommand>();
 
-			foreach (var panel in frameSelectionPanelList.Values)
+			foreach (var panel in FrameSelectionPanelList.Values)
 			{
 				commands.AddRange(this.ReleaseFrame(e.GetPosition(this), panel));
 			}
 
 			_frameDragsPanel.DragMousePressed = false;
 
-			if (paletteWindow._selectedFrameTemplate != null)
+			if (PaletteWindow.SelectedFrameTemplate != null)
 			{
-
-				var createdFrame = Window.CreateFrameFromFile(System.IO.Path.Combine(ApplicationConfig.TemplatesPath, paletteWindow._selectedFrameTemplate) + ".xml");
+				var createdFrame = Window.CreateFrameFromFile(System.IO.Path.Combine(ApplicationConfig.TemplatesPath, PaletteWindow.SelectedFrameTemplate) + ".xml");
 
 				if (createdFrame != null)
 				{
-					commands = Window.AddframeToScene(createdFrame, e.GetPosition(this), commands);
+					commands = Window.AddFrameToScene(createdFrame, e.GetPosition(this), commands);
 
 					var command = new CommandGroup(commands.ToArray());
 					CommandManager.Instance.Execute(command);
 				}
-				paletteWindow._selectedFrameTemplate = null;
-				_parentHighlightPanel.SelectedFrame = null;
+				PaletteWindow.SelectedFrameTemplate = null;
+				ParentHighlightPanel.SelectedFrame = null;
 			}
 			else
 			{
@@ -433,7 +428,6 @@ namespace WpfEditorTest
 					CommandManager.Instance.Execute(command);
 				}
 			}
-
 			AreaSelectionEnd(SelectionManager.Instance.SelectedFrames);
 		}
 
@@ -444,28 +438,28 @@ namespace WpfEditorTest
 			{
 				RecalculateSelectionSize(e.MouseDevice.GetPosition(this));
 			}
-			else if (frameSelectionPanelList.Any(fsp => fsp.Value.MousePressed))
+			else if (FrameSelectionPanelList.Any(fsp => fsp.Value.MousePressed))
 			{
-				var movedPanel = frameSelectionPanelList.FirstOrDefault(fsp => fsp.Value.MousePressed).Value;				
-				if (!movedPanel.IsInDragField && (DeltaX != 0 || DeltaY != 0))
+				var movedPanel = FrameSelectionPanelList.FirstOrDefault(fsp => fsp.Value.MousePressed).Value;				
+				if (!movedPanel.IsInDragField && (_deltaX != 0 || _deltaY != 0))
 				{
-					foreach (var panel in frameSelectionPanelList.Values)
+					foreach (var panel in FrameSelectionPanelList.Values)
 					{
 						this.MoveFrameToDragField(panel.SelectedFrame);
 						panel.IsInDragField = true;
 					}
 				}
-				if (movedPanel.IsInDragField || paletteWindow._selectedFrameTemplate != null)
+				if (movedPanel.IsInDragField || PaletteWindow.SelectedFrameTemplate != null)
 				{
 					var hovered = GetHoveredFrameOnScene(e.GetPosition(this), true);
-					_parentHighlightPanel.SelectedFrame = hovered;
+					ParentHighlightPanel.SelectedFrame = hovered;
 				}
 
 				Point currentLocation = e.MouseDevice.GetPosition(this);
 
 				var step = (int)(FusionUI.UI.ScalableFrame.ScaleMultiplier * GridSizeMultiplier);
-				var newX = movedPanel.InitPanelPosition.X + DeltaX;
-				var newY = movedPanel.InitPanelPosition.Y + DeltaY;
+				var newX = movedPanel.InitPanelPosition.X + _deltaX;
+				var newY = movedPanel.InitPanelPosition.Y + _deltaY;
 				var dX = newX - movedPanel.InitPanelPosition.X;
 				var dY = newY - movedPanel.InitPanelPosition.Y;
 				if (NeedSnapping())
@@ -473,17 +467,16 @@ namespace WpfEditorTest
 					dX -= -step / 2 + (newX + step / 2) % step;
 					dY -= -step / 2 + (newY + step / 2) % step;
 				}
-				foreach (var panel in frameSelectionPanelList.Values)
+				foreach (var panel in FrameSelectionPanelList.Values)
 				{
-					var delta2 = new TranslateTransform(panel.InitPanelPosition.X + dX, panel.InitPanelPosition.Y + dY);
-					panel.RenderTransform = delta2;
+					var transformDelta = new TranslateTransform(panel.InitPanelPosition.X + dX, panel.InitPanelPosition.Y + dY);
+					panel.RenderTransform = transformDelta;
 				}
-				movedPanel.PreviousMouseLocation = currentLocation;
 			}
-			else if (paletteWindow._selectedFrameTemplate != null)
+			else if (PaletteWindow.SelectedFrameTemplate != null)
 			{
 				var hovered = GetHoveredFrameOnScene(e.GetPosition(this), true);
-				_parentHighlightPanel.SelectedFrame = hovered;
+				ParentHighlightPanel.SelectedFrame = hovered;
 			}
 		}
 
@@ -492,11 +485,11 @@ namespace WpfEditorTest
 			var isShiftPressed = Keyboard.IsKeyDown(Key.LeftShift) || Keyboard.IsKeyDown(Key.RightShift);
 			var isControlPressed = Keyboard.IsKeyDown(Key.LeftCtrl) || Keyboard.IsKeyDown(Key.RightCtrl);
 
-			_frameDragsPanel.Resize(DeltaX, DeltaY, isShiftPressed, isControlPressed, out double heightMult, out double widthMult);
+			_frameDragsPanel.Resize(_deltaX, _deltaY, isShiftPressed, isControlPressed, out double heightMult, out double widthMult);
 
 			var dragsPanelX = _frameDragsPanel.RenderTransform.Value.OffsetX;
 			var dragsPanelY = _frameDragsPanel.RenderTransform.Value.OffsetY;
-			foreach (var panel in frameSelectionPanelList.Values)
+			foreach (var panel in FrameSelectionPanelList.Values)
 			{
 				var initRect = _frameDragsPanel.InitialFramesRectangles[panel.SelectedFrame];
 				panel.HeightBuffer = initRect.Height * heightMult;
@@ -518,14 +511,14 @@ namespace WpfEditorTest
 		private void AreaSelectionEnd( List<Frame> selectedFrames )
 		{
 			AreaSelectionEnabled = false;
-			if (SelectionRectangle != null)
+			if (_selectionRectangle != null)
 			{
 				var selectedframes = new List<Frame>(selectedFrames);
 				Fusion.Core.Mathematics.Rectangle selectedArea = new Fusion.Core.Mathematics.Rectangle(
-						(int)Canvas.GetLeft(SelectionRectangle),
-						(int)Canvas.GetTop(SelectionRectangle),
-						(int)SelectionRectangle.Width,
-						(int)SelectionRectangle.Height
+						(int)Canvas.GetLeft(_selectionRectangle),
+						(int)Canvas.GetTop(_selectionRectangle),
+						(int)_selectionRectangle.Width,
+						(int)_selectionRectangle.Height
 					);
 				foreach (Frame frame in SceneFrame.Children)
 				{
@@ -543,7 +536,7 @@ namespace WpfEditorTest
 		private void VisualSelection_MouseMove( object sender, MouseEventArgs e )
 		{
 			if(AreaSelectionEnabled)
-				DrawSelectionRectangle(InitMousePosition, e.GetPosition(this));
+				DrawSelectionRectangle(_initMousePosition, e.GetPosition(this));
 		}
 	}
 }

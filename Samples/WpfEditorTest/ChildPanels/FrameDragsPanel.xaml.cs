@@ -18,7 +18,7 @@ namespace WpfEditorTest.ChildPanels
 	/// <summary>
 	/// Interaction logic for FrameDragsPanel.xaml
 	/// </summary>
-	public partial class FrameDragsPanel : Grid, INotifyPropertyChanged
+	public partial class FrameDragsPanel : Grid
 	{
 		public Border CurrentDrag { get; set; }
 		public Point CurrentPivot { get; private set; }
@@ -41,8 +41,6 @@ namespace WpfEditorTest.ChildPanels
 		public Dictionary<Frame, Rectangle> InitialFramesRectangles { get; private set; }
 
 		private bool _dragMousePressed;
-
-		public event PropertyChangedEventHandler PropertyChanged;
 
 		public Dictionary<Border, Border> DragPivots { get; private set; }
 
@@ -79,18 +77,10 @@ namespace WpfEditorTest.ChildPanels
 			{
 				this.UpdateBoundingBox();
 			};
-
-			this.LayoutUpdated += ( s, e ) =>
-			{
-				Vector offset = VisualTreeHelper.GetOffset(this);
-				double XPosValue = offset.X;
-				double YPosValue = offset.Y;
-			};
 		}
 
 		private void UpdateBoundingBox()
 		{
-
 			var frames = SelectionManager.Instance.SelectedFrames;
 			if (frames.Count > 0)
 			{
@@ -129,11 +119,6 @@ namespace WpfEditorTest.ChildPanels
 			}
 		}
 
-		protected void OnPropertyChanged( [System.Runtime.CompilerServices.CallerMemberName] string changedProperty = "" )
-		{
-			PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(changedProperty));
-		}
-
 		private void Drag_MouseLeftButtonDown( object sender, MouseButtonEventArgs e )
 		{
 			e.Handled = false;
@@ -141,7 +126,6 @@ namespace WpfEditorTest.ChildPanels
 			CurrentDrag = sender as Border;
 			CurrentPivot = GetPosition(DragPivots[CurrentDrag]);
 			CurrentDragInitPosition = GetPosition(CurrentDrag);
-
 
 			SelectedGroupInitSize = new Size(Width, Height);
 			SelectedGroupInitPosition = new Point(RenderTransform.Value.OffsetX, RenderTransform.Value.OffsetY);

@@ -23,6 +23,7 @@ namespace WpfEditorTest
 
 		public static int DefaultVisualGridSizeMultiplier = 1;
 		public static double DefaultGridLinesThickness = 1;
+
 		public static SolidColorBrush DefaultGridLinesBrush = new SolidColorBrush(Colors.LightSteelBlue) { Opacity=0.5d };
 		public static SolidColorBrush DefaultSelectionRectanglePrimaryBrush = new SolidColorBrush(Colors.White) { Opacity = 1d };
 		public static SolidColorBrush DefaultSelectionRectangleSecondaryBrush = new SolidColorBrush(Colors.Black) { Opacity = 1d };

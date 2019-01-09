@@ -21,7 +21,7 @@ namespace WpfEditorTest.ChildPanels
 	/// </summary>
 	public partial class FramePalette : Window
 	{
-		public string _selectedFrameTemplate;
+		public string SelectedFrameTemplate;
 
 		public Point PreviousMouseLocation { get; set; }
 		public Transform PreviousTransform { get; set; }
@@ -47,7 +47,7 @@ namespace WpfEditorTest.ChildPanels
 
 		private void Border_MouseDown_1( object sender, MouseButtonEventArgs e )
 		{
-			this._selectedFrameTemplate = (string)(sender as Border).Tag;
+			this.SelectedFrameTemplate = (string)(sender as Border).Tag;
 		}
 	}
 }

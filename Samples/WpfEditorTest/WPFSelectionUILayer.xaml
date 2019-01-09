@@ -13,7 +13,7 @@
                        MinHeight="100" MaxHeight="10000"
                        MinWidth="100" MaxWidth="10000" />
     <Canvas Name="VisualGrid" Visibility="Collapsed"/>
-    <panels:ParentHighlightPanel x:Name="_parentHighlightPanel"></panels:ParentHighlightPanel>
+    <panels:ParentHighlightPanel x:Name="ParentHighlightPanel"></panels:ParentHighlightPanel>
     <Canvas Name="AreaSelection" Background="Transparent" MouseMove="VisualSelection_MouseMove"/>
     <Grid Name="HighlightPanelsContainer"></Grid>
     <panels:FrameDragsPanel x:Name="_frameDragsPanel"></panels:FrameDragsPanel>

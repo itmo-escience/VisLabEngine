@@ -11,16 +11,13 @@ namespace WpfEditorTest.WPFConverters
 {
 	public class DataTemplateSelectorOfProperty : DataTemplateSelector
 	{
-		public override DataTemplate
-			SelectTemplate( object item, DependencyObject container )
+		public override DataTemplate SelectTemplate( object item, DependencyObject container )
 		{
 			FrameworkElement element = container as FrameworkElement;
 
 			if (element != null && item != null && item is MVVMFrameProperty)
 			{
 				MVVMFrameProperty Prop = item as MVVMFrameProperty;
-
-
 
 				if (Prop.PropType == typeof(Fusion.Core.Mathematics.Color))
 					return
