@@ -219,7 +219,7 @@ void GSMain ( point VS_OUTPUT inputArray[1], inout TriangleStream<GS_OUTPUT> str
 	float zLerp = 0;
 	float zInd = 0;
 	
-	[unroll(32)]
+	[unroll(128)]
 	for (uint i = 1; i < Field.Dimension.w; i++) {
 		if (FieldDepths[i] > vz) {
 			zLerp = ilerp(FieldDepths[i - 1], FieldDepths[i], vz);			
@@ -306,6 +306,7 @@ float4 PSMain (GS_OUTPUT  input ) : SV_Target
 	float a = pow(saturate(1 - l), Config.Transp_MulPowerDD.y) * input.Color.a * Config.Transp_MulPowerDD.x;
 	//clip(a > 0.00000001f);
 	return float4(input.Color.xyz, a);
+	//return float4(1.0f, 1.0f, 1.0f, a);
 }
 #endif
 
@@ -379,7 +380,7 @@ void TransposeSort(uint index, uint inLevel)
 		if (inIndex < inLevel / 2) CompareAndSwap(index, pIndex);
 		
 		if (inLevel <= BITONIC_BLOCK_SIZE) {	
-			[unroll(12)]
+			[unroll(16)]
 			for (inLevel = inLevel / 2; inLevel > 1; inLevel >>= 1)
 			{	
 				AllMemoryBarrierWithGroupSync();	
@@ -410,7 +411,7 @@ void CSMain(uint3 groupID : SV_GroupID, uint groupIndex : SV_GroupIndex)
 	if (index < pIndex) CompareAndSwap(index, pIndex);
 	
 	if (inLevel <= BITONIC_BLOCK_SIZE) {
-		[unroll(12)]
+		[unroll(16)]
 		for (inLevel = inLevel / 2; inLevel > 1; inLevel >>= 1)
 		{					
 			AllMemoryBarrierWithGroupSync();	

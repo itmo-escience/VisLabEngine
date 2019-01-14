@@ -119,7 +119,7 @@ namespace FusionUI.UI
 
                 base.Add(HatPanel);
             }
-            holder = new LayoutFrame(ui, 0, drawHat ? UIConfig.UnitHatHeight : 0, (int)UnitWidth, 0, Color.Zero)
+            holder = new LayoutFrame(ui, 0, drawHat ? UIConfig.UnitHatHeight : 0, (int)UnitWidth - UnitPaddingLeft - UnitPaddingRight, 0, Color.Zero)
             {
                 AutoHeight = true,
                 Anchor = FrameAnchor.All,

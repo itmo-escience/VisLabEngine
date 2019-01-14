@@ -7,7 +7,10 @@ namespace FusionUI.UI.Elements.DropDown
     {
         public DropDownSelectorRow() : base(ApplicationInterface.Instance.FrameProcessor, 0, 0, 0, 0, "", Color.Zero)
         {
-
+            this.ActionClick += (ControlActionArgs args, ref bool flag) =>
+            {
+                if (args.IsClick) ActionSelect?.Invoke();
+            };
         }      
 
         public virtual void Initialize(float x, float y, float w, float h, string text, Color backColor)
@@ -19,6 +22,8 @@ namespace FusionUI.UI.Elements.DropDown
             Value = text;
             BackColor = backColor;
         }
+
+        public Action ActionSelect;
 
         public abstract String Value { get; set; }
     }

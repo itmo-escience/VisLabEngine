@@ -55,7 +55,7 @@ namespace FusionUI.UI
 
         public override void UpdateAnchors(int oldW, int oldH, int newW, int newH)
         {
-            if (newH != oldH)
+            if (newH != oldH && !(parent is LayoutFrame) )
             {
                 HeightLimit += (newH - oldH) / ScaleMultiplier;
             }
@@ -100,7 +100,7 @@ namespace FusionUI.UI
         public bool AllowShrink = true;
 		public bool ResizedManually = false;
 
-		private ScalableFrame scrollHolder;
+		protected ScalableFrame scrollHolder;
         public WindowScroll(FrameProcessor ui, float x, float y, float w, float h, string text, Color backColor,
             bool drawHat = true, bool drawCross = true)
             : base(ui, x, y, w, h, text, backColor, drawHat, drawCross)
@@ -116,7 +116,7 @@ namespace FusionUI.UI
             {   
                 //Border = 1,
                 //BorderColor = Color.Violet,
-                Anchor = FrameAnchor.Left | FrameAnchor.Right | FrameAnchor.Top,
+                Anchor = FrameAnchor.Left | FrameAnchor.Right | FrameAnchor.Top,                
             };            
             if (BasementPanel != null)
             {
