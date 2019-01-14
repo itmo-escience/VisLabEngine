@@ -1,48 +1,130 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
+using System.Runtime.CompilerServices;
 using Fusion.Core.Mathematics;
 using Fusion.Engine.Common;
 using Fusion.Engine.Graphics.SpritesD2D;
 
 namespace Fusion.Engine.Frames2
 {
-    public abstract class UIComponent
+    public abstract class UIComponent : INotifyPropertyChanged
     {
-        protected bool BoundingBoxChanged;
-        public float X { get; set; }
-        public float Y { get; set; }
-        public float Width { get; set; }
-        public float Height { get; set; }
+        #region Position and bounds properties
+        private float _x;
+        public float X
+        {
+            get => _x;
+            set
+            {
+                if (SetAndNotify(ref _x, value))
+                    _isTransformDirty = true;
+            }
+        }
 
-        public RectangleF BoundingBox { get; private set; }
+        private float _y;
+        public float Y
+        {
+            get => _y;
+            set
+            {
+                if (SetAndNotify(ref _y, value))
+                    _isTransformDirty = true;
+            }
+        }
 
-        private Matrix _globalTransform = Matrix.Identity;
+        private float _width;
+        public float Width
+        {
+            get => _width;
+            set => SetAndNotify(ref _width, value);
+        }
+
+        private float _height;
+        public float Height
+        {
+            get => _height;
+            set => SetAndNotify(ref _height, value);
+        }
+
+        private bool _isTransformDirty = true;
+
+        private Matrix3x2 _localTransform = Matrix3x2.Identity;
+        internal Matrix3x2 LocalTransform
+        {
+            get
+            {
+                if (_isTransformDirty)
+                    UpdateTransforms();
+
+                return _localTransform;
+            }
+        }
+
+        private Matrix3x2 _globalTransform = Matrix3x2.Identity;
+        public Matrix3x2 GlobalTransform
+        {
+            get
+            {
+                if(_isTransformDirty)
+                    UpdateTransforms();
+
+                return _globalTransform;
+            }
+        }
+
+        private Matrix3x2 _transform = Matrix3x2.Identity;
+        public Matrix3x2 Transform
+        {
+            get => _transform;
+            set
+            {
+                if (SetAndNotify(ref _transform, value))
+                    _isTransformDirty = true;
+            }
+        }
+
+        private void UpdateTransforms()
+        {
+            _localTransform = Matrix3x2.Translation(X, Y);
+
+            var pTransform = Parent?.GlobalTransform ?? Matrix.Identity;
+            _globalTransform = Transform * LocalTransform * pTransform;
+        }
+
+        #endregion
+
         private UIContainer _parent;
         public UIContainer Parent
         {
             get => _parent;
             internal set
             {
-                _parent = value;
-                RecalculateGlobalTransform();
+                if (SetAndNotify(ref _parent, value))
+                    _isTransformDirty = true;
             }
         }
 
-        protected void RecalculateGlobalTransform()
+        private bool _visible = true;
+        public bool Visible
         {
-            _globalTransform = Transform;
-            foreach (var ancestor in Ancestors())
-            {
-                _globalTransform = ancestor.Transform * _globalTransform;
-            }
-
-
+            get => _visible;
+            set => SetAndNotify(ref _visible, value);
         }
 
-        public bool Visible { get; set; }
-        public Matrix Transform { get; set; }
-        public object Tag { get; set; }
-        public string Name { get; }
+        private object _tag;
+        public object Tag
+        {
+            get => _tag;
+            set => SetAndNotify(ref _tag, value);
+        }
+
+        private string _name;
+        public string Name
+        {
+            get => _name;
+            set => SetAndNotify(ref _name, value);
+        }
 
         protected UIComponent(float x, float y, float width, float height)
         {
@@ -70,6 +152,8 @@ namespace Fusion.Engine.Frames2
         public abstract void Update(GameTime gameTime);
         public abstract void Draw(SpriteLayerD2D layer);
 
+        #region Naming
+
         private static readonly Dictionary<Type, int> GeneratedCountOfType = new Dictionary<Type, int>();
         private static string GenerateName(Type type)
         {
@@ -84,5 +168,37 @@ namespace Fusion.Engine.Frames2
 
             return $"{type.Name}_{value}";
         }
+
+        #endregion Naming
+
+        #region PropertyChanges
+
+        public event PropertyChangedEventHandler PropertyChanged;
+
+        /// <summary>
+        /// Sets field with new value and fires <seealso cref="PropertyChanged"/> event if provided value is different from the old one.
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="field">Private field to set.</param>
+        /// <param name="value">New value.</param>
+        /// <param name="propertyName">Name that will be passed in a PropertyChanged event.</param>
+        /// <returns>True if new value is different and PropertyChanged event was fired, false otherwise.</returns>
+        protected bool SetAndNotify<T>(ref T field, T value, [CallerMemberName] string propertyName = null)
+        {
+            if (EqualityComparer<T>.Default.Equals(field, value))
+                return false;
+
+            field = value;
+            NotifyPropertyChanged(propertyName);
+
+            return true;
+        }
+
+        protected void NotifyPropertyChanged([CallerMemberName] string propertyName = null)
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+        }
+
+        #endregion PropertyChanges
     }
 }

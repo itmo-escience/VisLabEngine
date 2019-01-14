@@ -25,6 +25,7 @@ using FusionUI.UI.Factories;
 using FusionUI.UI.Elements;
 using Fusion.Core.Utils;
 using Fusion.Engine.Frames2.Components;
+using Fusion.Engine.Frames2.Containers;
 using Fusion.Engine.Frames2.Managing;
 using Fusion.Engine.Graphics.SpritesD2D;
 using Label = Fusion.Engine.Graphics.SpritesD2D.Label;
@@ -181,13 +182,26 @@ namespace GISTest
 
 		    _userInterface2 = new UIManager(Game.RenderSystem);
 
-		    var img = new Image(10, 50, 100, 200);
-		    var txt = new Fusion.Engine.Frames2.Components.Label("I'm Label!", 100, 50, 100, 80);
-		    var border = new Border(200, 50, 150, 260);
+		    var img = new Image(25, 5, 100, 100);
+		    img.Transform = Matrix3x2.Rotation(3.14f / 4, new Vector2(50, 50));
 
-            _userInterface2.Root.Add(img);
-            _userInterface2.Root.Add(txt);
-            _userInterface2.Root.Add(border);
+		    var img1 = new Image(25, 5, 100, 100);
+
+            txt = new Fusion.Engine.Frames2.Components.Label("I'm Label!", 10, 200, 100, 80);
+		    var border = new Border(3, 3, 150, 260);
+
+		    var c1 = new FreePlacement(10, 100, 1, 1);
+            var c2 = new FreePlacement(10, 10, 1, 1);
+            var c3 = new FreePlacement(200, 10, 1, 1);
+
+            c1.Add(txt);
+            c1.Add(c2);
+            c2.Add(img);
+            c2.Add(img1);
+            c3.Add(border);
+            c1.Add(c3);
+
+            _userInterface2.Root.Add(c1);
 
             userInterface.RootFrame = this.rootFrame = new MainFrame(FrameProcessor);
 			viewLayer.SpriteLayers.Add(userInterface.FramesSpriteLayer);
@@ -197,122 +211,6 @@ namespace GISTest
 			Scene.Ghost = false;
 
 			rootFrame.Add(Scene);
-		}
-
-		public Window CreateStartFrame()
-		{
-			var rootFrame = this.rootFrame;
-
-
-			Window mainFrame = new Window(50, 5, 200, 250, "TestWindow", Color.Zero)
-			{
-				ImageColor = Color.White,
-				ImageMode = FrameImageMode.Fitted,
-				//Anchor = FrameAnchor.All,
-				HatColor = Color.Coral,
-				BasementColor = Color.Crimson,
-				Border = 5,
-				BorderColor = Color.White
-			};
-
-			ScalableFrame mainLayout = new ScalableFrame(200, 20, 20, 80, "TestLayout", Color.Zero)
-			{
-
-			};
-
-			mainFrame.Add(mainLayout);
-
-			Color buf = UIConfig.ActiveColor;
-
-			UIConfig.ActiveColor = Color.Red;
-			Window smallWindow = new Window(0, 10, 256 / ApplicationInterface.gridUnitDefault, 256 / ApplicationInterface.gridUnitDefault,
-				"SomethingNew", Color.SandyBrown, fixedSize: true)
-			{ HatColor = Color.Blue };
-			smallWindow.Anchor = FrameAnchor.Bottom | FrameAnchor.Left | FrameAnchor.Right;
-
-			smallWindow.Click += ( s, e ) =>
-			{
-				//smallWindow.BackColor = new Color3();
-			};
-
-			UIConfig.ActiveColor = buf;
-
-			buf = UIConfig.ButtonColor;
-			UIConfig.ButtonColor = Color.Gray;
-
-			Button next;
-			//    = new Button(smallWindow.ui, 0, 10, 10, 10, "Next", UIConfig.ButtonColor, UIConfig.ActiveColor, 50,
-			//    () =>
-			//    {
-			//        System.Console.WriteLine("You've just performed a button press action: " + next.ToString());
-			//    }, Color.White, Color.White)
-			//{
-			//    Anchor = FrameAnchor.None,
-			//    FontHolder = UIConfig.FontSubtitle,
-			//    TextAlignment = Alignment.MiddleCenter,
-			//};
-
-			UIConfig.ButtonColor = buf;
-
-
-			//next.Visible = true;
-			var holder = ButtonFactory.CenterButtonHolder(0, 10, mainLayout, 30, "Next_2",
-								() =>
-								{
-									System.Console.WriteLine("You've just performed a button press action: "/* + next.ToString()*/);
-								}, out next);
-			holder.Text = "ButtonHolder";
-			holder.Height = 40;
-			mainLayout.Add(next);
-			smallWindow.Visible = true;
-			mainLayout.Add(smallWindow);
-
-			var t = "testSerialization.xml";
-
-			Frame ser = new Frame(10, 20, 190, 220, "Fram", Color.Red)
-			{
-				Image = Game.Content.Load<DiscTexture>(@"UI-new\fv-icons_close-window")
-			};
-			ControllableFrame ser2 = new ControllableFrame(11, 21, 60, 60, "ContrF", Color.Blue)
-			{
-				Image = Game.Content.Load<DiscTexture>(@"UI-new\fv-icons_radio-on")
-			};
-			ScalableFrame ser3 = new ScalableFrame(20, 6, 25, 15, "Scales", Color.Green)
-			{
-				Image = Game.Content.Load<DiscTexture>(@"UI-new\fv-icons_switcher-on")
-			};
-			FreeFrame ser4 = new FreeFrame(30, 20, 15, 15, "FreeFr", Color.Gray)
-			{
-				Image = Game.Content.Load<DiscTexture>(@"UI-new\fv-icons_checkbox-big-on")
-			};
-
-			ScalableFrame sHolder = new ScalableFrame(50, 35, 55, 15, "Scales", Color.Green);
-
-		    SliderFactory.SliderHorizontalHolderNew(5, 35, 5, 15, ser3, "mySlider", 10, null, 0, 1, 0.3f, out var slider);
-
-			slider.Text = slider.Name = "Sliderser";
-
-			//dynamic frame = new ScalableFrame(ui, 0, 0, 100, 100, "ScalableFrame", Color.Gray);
-			//FrameSerializer.Write(frame, "Frames\\" + frame.GetType().Name + ".xml");
-			//frame = new ControllableFrame(ui, 0, 0, 100, 100, "ControllableFrame", Color.Gray);
-			//FrameSerializer.Write(frame, "Frames\\" + frame.GetType().Name + ".xml");
-			//frame = new FreeFrame(ui, 0, 0, 100, 100, "FreeFrame", Color.Gray);
-			//FrameSerializer.Write(frame, "Frames\\" + frame.GetType().Name + ".xml");
-
-
-
-			ser.Add(ser3);
-			ser.Add(ser4);
-			ser.Add(ser2);
-			ser.Add(slider);
-
-			mainLayout.Add(ser);
-
-			//FrameSerializer.Write(mainFrame, "Frames\\" + "TestWindow" + ".xml");
-
-			//FrameSerializer.Write(ser, "Frames\\" + "Fram" + ".xml");
-
-			return mainFrame;
 		}
 
 		void LoadContent ()
@@ -365,16 +263,9 @@ namespace GISTest
 #if DEBUG
 		    PrintMessage("Tiles to render count: " + tiles.GetTilesToRenderCount());
 #endif
-
 			console.Update( gameTime );
 			tiles.Update(gameTime);
 			userInterface.Update(gameTime);
-
-			DVector2 pos;// = new DVector2();
-            pos = GeoHelper.CartesianToSpherical(new DVector3(10, 10, 0));
-		    //GlobeCamera.Instance.ScreenToSpherical(10, 10, out pos);
-            var cartPos = GeoHelper.SphericalToCartesian(pos, GeoHelper.EarthRadius);
-            var screenPos = GlobeCamera.Instance.CartesianToScreen(cartPos);
 
             uiLayer.Clear();
 			float yPos = 0;
@@ -383,6 +274,8 @@ namespace GISTest
 				textFont.DrawString(uiLayer, mess, 15, yPos, Color.White);
 			}
 			messages.Clear();
+
+		    txt.Text = Game.Mouse.Position.ToString();
 
             _userInterface2.Update(gameTime);
 		    _userInterface2.Draw(_spriteLayer);
@@ -403,6 +296,7 @@ namespace GISTest
 	    private TextFormatD2D _textFormat;
 	    private SolidBrushD2D _brush;
 	    private UIManager _userInterface2;
+	    private Fusion.Engine.Frames2.Components.Label txt;
 
 	    public void PrintMessage(string message)
 		{

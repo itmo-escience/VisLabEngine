@@ -79,9 +79,33 @@ namespace Fusion.Engine.Graphics.SpritesD2D
         public void DrawTextLayout(Vector2 origin, TextLayoutD2D layout, IBrushD2D brush) =>
             _target.DrawTextLayout(origin.ToRawVector2(), layout.Layout, _brushFactory.GetOrCreateBrush(brush));
 
+
+        public DrawingStateBlockD2D SaveDrawingState()
+        {
+            var s = new DrawingStateBlock(_target.Factory);
+            _target.SaveDrawingState(s);
+            return new DrawingStateBlockD2D(s);
+        }
+
+        public void RestoreDrawingState(DrawingStateBlockD2D state) => _target.RestoreDrawingState(state.State);
+
+        public Matrix3x2 Transform
+        {
+            get => _target.Transform.ToMatrix3x2();
+            set => _target.Transform = value.ToRawMatrix3X2();
+        }
+
         private void ZZZ()
         {
-            //_target.Transform
+        }
+    }
+
+    public class DrawingStateBlockD2D
+    {
+        internal DrawingStateBlock State;
+        internal DrawingStateBlockD2D(DrawingStateBlock state)
+        {
+            State = state;
         }
     }
 
@@ -99,6 +123,9 @@ namespace Fusion.Engine.Graphics.SpritesD2D
         public static RawColor4 ToRawColor4(this Color4 c) => new RawColor4(c.Red, c.Green, c.Blue, c.Alpha);
         public static RawRectangleF ToRawRectangleF(this RectangleF r) => new RawRectangleF(r.Left, r.Top, r.Right, r.Bottom);
         public static RawVector2 ToRawVector2(this Vector2 vec) => new RawVector2(vec.X, vec.Y);
+        public static RawMatrix3x2 ToRawMatrix3X2(this Matrix3x2 m) => new RawMatrix3x2(m.M11, m.M12, m.M21, m.M22, m.M31, m.M32);
+        public static Matrix3x2 ToMatrix3x2(this RawMatrix3x2 m) => new Matrix3x2(m.M11, m.M12, m.M21, m.M22, m.M31, m.M32);
+
 
         public static AntialiasMode ToAntialiasMode(this AntialiasModeD2D mode)
         {

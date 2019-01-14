@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+﻿using System.Collections.ObjectModel;
 using System.Linq;
 using Fusion.Core.Mathematics;
 using Fusion.Engine.Graphics.SpritesD2D;
@@ -7,17 +7,23 @@ namespace Fusion.Engine.Frames2
 {
     public abstract class UIContainer : UIComponent
     {
-        private readonly List<UIComponent> _children = new List<UIComponent>();
-        public IReadOnlyList<UIComponent> Children => _children;
+        private readonly ObservableCollection<UIComponent> _children;
+        private readonly ReadOnlyObservableCollection<UIComponent> _readonlyChildren;
+        public ReadOnlyObservableCollection<UIComponent> Children => _readonlyChildren;
 
-        public override RectangleF BoundingBox =>
+        /*public override RectangleF BoundingBox =>
                 Children.Where(c => c.Visible)
                 .Aggregate(
                     RectangleF.Empty,
                     (bb, child) => RectangleF.Union(child.BoundingBox, bb)
                 );
+                */
 
-        protected UIContainer(float x, float y, float width, float height) : base(x, y, width, height) { }
+        protected UIContainer(float x, float y, float width, float height) : base(x, y, width, height)
+        {
+            _children = new ObservableCollection<UIComponent>();
+            _readonlyChildren = new ReadOnlyObservableCollection<UIComponent>(_children);
+        }
 
         public virtual void Add(UIComponent child)
         {

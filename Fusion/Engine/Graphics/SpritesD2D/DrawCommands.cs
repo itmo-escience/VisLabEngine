@@ -8,6 +8,20 @@ namespace Fusion.Engine.Graphics.SpritesD2D
         void Apply(RenderTargetD2D target);
     }
 
+    public sealed class TransformCommand : IDrawCommand
+    {
+        private readonly Matrix3x2 _transform;
+        public TransformCommand(Matrix3x2 transform)
+        {
+            _transform = transform;
+        }
+
+        public void Apply(RenderTargetD2D target)
+        {
+            target.Transform = _transform;
+        }
+    }
+
     public class Line : IDrawCommand
     {
         public IBrushD2D Brush { get; }
