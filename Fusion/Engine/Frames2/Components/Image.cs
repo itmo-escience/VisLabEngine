@@ -16,9 +16,9 @@ namespace Fusion.Engine.Frames2.Components
 
         public override void Draw(SpriteLayerD2D layer)
         {
-            layer.Draw(new Rect(X, Y, Width, Height, _brush));
-            layer.Draw(new Line(new Vector2(X, Y), new Vector2(X + Width, Y + Height), _brush));
-            layer.Draw(new Line(new Vector2(X + Width, Y), new Vector2(X, Y + Height), _brush));
+            layer.Draw(new Rect(0, 0, Width, Height, _brush));
+            layer.Draw(new Line(new Vector2(), new Vector2(Width, Height), _brush));
+            layer.Draw(new Line(new Vector2(Width, 0), new Vector2(0, Height), _brush));
         }
 
         public event MouseEvent MouseIn;

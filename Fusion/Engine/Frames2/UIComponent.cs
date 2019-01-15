@@ -89,7 +89,9 @@ namespace Fusion.Engine.Frames2
             _localTransform = Matrix3x2.Translation(X, Y);
 
             var pTransform = Parent?.GlobalTransform ?? Matrix.Identity;
-            _globalTransform = Transform * LocalTransform * pTransform;
+            _globalTransform = _transform * _localTransform * pTransform;
+
+            _isTransformDirty = false;
         }
 
         #endregion

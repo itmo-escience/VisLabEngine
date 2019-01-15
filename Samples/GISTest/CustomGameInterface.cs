@@ -182,26 +182,16 @@ namespace GISTest
 
 		    _userInterface2 = new UIManager(Game.RenderSystem);
 
-		    var img = new Image(25, 5, 100, 100);
+		    txt = new Fusion.Engine.Frames2.Components.Label("z", 5, 450, 100, 100);
+		    _userInterface2.Root.Add(txt);
+
+
+            var img = new Image(50, 50, 100, 100);
 		    img.Transform = Matrix3x2.Rotation(3.14f / 4, new Vector2(50, 50));
+		    _userInterface2.Root.Add(img);
 
-		    var img1 = new Image(25, 5, 100, 100);
-
-            txt = new Fusion.Engine.Frames2.Components.Label("I'm Label!", 10, 200, 100, 80);
-		    var border = new Border(3, 3, 150, 260);
-
-		    var c1 = new FreePlacement(10, 100, 1, 1);
-            var c2 = new FreePlacement(10, 10, 1, 1);
-            var c3 = new FreePlacement(200, 10, 1, 1);
-
-            c1.Add(txt);
-            c1.Add(c2);
-            c2.Add(img);
-            c2.Add(img1);
-            c3.Add(border);
-            c1.Add(c3);
-
-            _userInterface2.Root.Add(c1);
+            var img1 = new Image(50, 50, 100, 100);
+            _userInterface2.Root.Add(img1);
 
             userInterface.RootFrame = this.rootFrame = new MainFrame(FrameProcessor);
 			viewLayer.SpriteLayers.Add(userInterface.FramesSpriteLayer);
