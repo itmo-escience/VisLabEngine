@@ -1,8 +1,8 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using Fusion.Core.Mathematics;
 using Fusion.Engine.Common;
 using Fusion.Engine.Frames2.Containers;
-using Fusion.Engine.Frames2.Drawing;
 using Fusion.Engine.Graphics;
 using Fusion.Engine.Graphics.SpritesD2D;
 
@@ -10,14 +10,16 @@ namespace Fusion.Engine.Frames2.Managing
 {
     public class UIManager
     {
-        public UIPainter UIPainter { get; }
         public UIEventProcessor UIEventProcessor { get; }
         public UIContainer Root;
+
+        public bool DebugEnabled { get; set; }
+        private readonly SolidBrushD2D _debugBrush = new SolidBrushD2D(new Color4(0, 1, 0, 1));
 
         public UIManager(RenderSystem rs)
         {
             Root = new FreePlacement(0, 0, rs.Width, rs.Height);
-            UIPainter = new UIPainter();
+
             UIEventProcessor = new UIEventProcessor(Root);
         }
 
@@ -76,8 +78,17 @@ namespace Fusion.Engine.Frames2.Managing
                 {
                     layer.Draw(new TransformCommand(c.GlobalTransform));
                     c.Draw(layer);
+
+                    if (DebugEnabled)
+                    {
+                        var b = c.BoundingBox;
+                        layer.Draw(TransformCommand.Empty());
+                        layer.Draw(new Rect(b.X, b.Y, b.Width, b.Height, _debugBrush));
+                    }
                 }
             }
+
+            layer.Draw(TransformCommand.Empty());
         }
     }
 }

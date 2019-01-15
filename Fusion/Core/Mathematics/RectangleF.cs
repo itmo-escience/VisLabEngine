@@ -436,9 +436,9 @@ namespace Fusion.Core.Mathematics
         /// Creates minimal bounding rectangle containing all provided points.
         /// </summary>
         /// <returns><see cref="Empty"/> if there are no points provided, minimal bounding rectangle otherwise.</returns>
-        public static RectangleF Bounding(ICollection<Vector2> points)
+        public static RectangleF Bounding(params Vector2[] points)
         {
-            if(points == null || points.Count == 0)
+            if(points == null || points.Length == 0)
                 return Empty;
 
             var left = points.Select(p => p.X).Min();

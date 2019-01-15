@@ -85,6 +85,7 @@ namespace Fusion.Engine.Graphics.SpritesD2D
 
             _target.BeginDraw();
             _target.Clear(null);
+            _target.Transform = Matrix3x2.Identity.ToRawMatrix3X2();
             _target.EndDraw();
         }
 

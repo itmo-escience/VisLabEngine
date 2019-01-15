@@ -16,6 +16,8 @@ namespace Fusion.Engine.Graphics.SpritesD2D
             _transform = transform;
         }
 
+        public static TransformCommand Empty() => new TransformCommand(Matrix3x2.Identity);
+
         public void Apply(RenderTargetD2D target)
         {
             target.Transform = _transform;

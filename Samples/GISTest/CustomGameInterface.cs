@@ -181,6 +181,7 @@ namespace GISTest
             };
 
 		    _userInterface2 = new UIManager(Game.RenderSystem);
+		    _userInterface2.DebugEnabled = true;
 
 		    txt = new Fusion.Engine.Frames2.Components.Label("z", 5, 450, 100, 100);
 		    _userInterface2.Root.Add(txt);

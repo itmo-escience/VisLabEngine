@@ -10,7 +10,7 @@ namespace Fusion.Engine.Frames2
 {
     public abstract class UIComponent : INotifyPropertyChanged
     {
-        #region Position and bounds properties
+        #region Position
         private float _x;
         public float X
         {
@@ -46,6 +46,10 @@ namespace Fusion.Engine.Frames2
             get => _height;
             set => SetAndNotify(ref _height, value);
         }
+
+        #endregion
+
+        #region Transforms
 
         private bool _isTransformDirty = true;
 
@@ -95,6 +99,19 @@ namespace Fusion.Engine.Frames2
         }
 
         #endregion
+
+        public RectangleF BoundingBox
+        {
+            get
+            {
+                var p0 = Matrix3x2.TransformPoint(GlobalTransform, Vector2.Zero);
+                var p1 = Matrix3x2.TransformPoint(GlobalTransform, new Vector2(0, Height));
+                var p2 = Matrix3x2.TransformPoint(GlobalTransform, new Vector2(Width, Height));
+                var p3 = Matrix3x2.TransformPoint(GlobalTransform, new Vector2(Width, 0));
+
+                return RectangleF.Bounding(p0, p1, p2, p3);
+            }
+        }
 
         private UIContainer _parent;
         public UIContainer Parent

@@ -29,7 +29,7 @@ namespace Fusion.Engine.Frames2.Components
             if (_isDirtyText)
                 _label = new Graphics.SpritesD2D.Label(
                     Text,
-                    new RectangleF(X, Y, Width, Height),
+                    new RectangleF(0, 0, Width, Height),
                     new TextFormatD2D("Calibri", 20),
                     new SolidBrushD2D(Color4.White)
                 );

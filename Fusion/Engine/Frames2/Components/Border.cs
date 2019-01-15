@@ -9,7 +9,7 @@ namespace Fusion.Engine.Frames2.Components
         private Rect _rect;
         public Border(float x, float y, float width, float height) : base(x, y, width, height)
         {
-            _rect = new Rect(x, y, width, height, new SolidBrushD2D(Color4.White));
+            _rect = new Rect(0, 0, width, height, new SolidBrushD2D(Color4.White));
         }
 
         public override void Update(GameTime gameTime)
