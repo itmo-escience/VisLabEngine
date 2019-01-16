@@ -183,12 +183,11 @@ namespace GISTest
 		    _userInterface2 = new UIManager(Game.RenderSystem);
 		    _userInterface2.DebugEnabled = true;
 
-		    txt = new Fusion.Engine.Frames2.Components.Label("z", 5, 450, 100, 100);
+		    txt = new Fusion.Engine.Frames2.Components.Label("z", 150, 450, 100, 100);
 		    _userInterface2.Root.Add(txt);
 
 
-            var img = new Image(50, 50, 100, 100);
-		    img.Transform = Matrix3x2.Rotation(3.14f / 4, new Vector2(50, 50));
+            img = new Image(250, 250, 100, 100);
 		    _userInterface2.Root.Add(img);
 
             var img1 = new Image(50, 50, 100, 100);
@@ -267,17 +266,15 @@ namespace GISTest
 			messages.Clear();
 
 		    txt.Text = Game.Mouse.Position.ToString();
+		    img.Angle = angle;
+		    txt.Angle = MathUtil.TwoPi - angle;
 
             _userInterface2.Update(gameTime);
 		    _userInterface2.Draw(_spriteLayer);
 
-            /*_spriteLayer.Clear();
-		    for (var i = 0; i < 10000; i++)
-		    {
-		        _spriteLayer.Draw(new Label("Hello, world!", new RectangleF(50 + i % 749, 50 + i % 1354, 150, 300), _textFormat, _brush));
-		    }
-            */
-
+		    angle += 0.01f;
+		    if (angle > MathUtil.TwoPi)
+		        angle -= MathUtil.TwoPi;
 		}
 
 		SpriteFont textFont;
@@ -287,7 +284,10 @@ namespace GISTest
 	    private TextFormatD2D _textFormat;
 	    private SolidBrushD2D _brush;
 	    private UIManager _userInterface2;
+
 	    private Fusion.Engine.Frames2.Components.Label txt;
+	    private float angle = 0;
+	    private Image img;
 
 	    public void PrintMessage(string message)
 		{

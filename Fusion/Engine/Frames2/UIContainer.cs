@@ -1,6 +1,4 @@
 ﻿using System.Collections.ObjectModel;
-using System.Linq;
-using Fusion.Core.Mathematics;
 using Fusion.Engine.Graphics.SpritesD2D;
 
 namespace Fusion.Engine.Frames2
@@ -11,13 +9,14 @@ namespace Fusion.Engine.Frames2
         private readonly ReadOnlyObservableCollection<UIComponent> _readonlyChildren;
         public ReadOnlyObservableCollection<UIComponent> Children => _readonlyChildren;
 
-        /*public override RectangleF BoundingBox =>
-                Children.Where(c => c.Visible)
-                .Aggregate(
-                    RectangleF.Empty,
-                    (bb, child) => RectangleF.Union(child.BoundingBox, bb)
-                );
-                */
+        public override void InvalidateTransform()
+        {
+            base.InvalidateTransform();
+            foreach (var child in Children)
+            {
+                child.InvalidateTransform();
+            }
+        }
 
         protected UIContainer(float x, float y, float width, float height) : base(x, y, width, height)
         {

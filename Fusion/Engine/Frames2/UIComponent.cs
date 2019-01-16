@@ -18,7 +18,7 @@ namespace Fusion.Engine.Frames2
             set
             {
                 if (SetAndNotify(ref _x, value))
-                    _isTransformDirty = true;
+                    InvalidateTransform();
             }
         }
 
@@ -29,7 +29,7 @@ namespace Fusion.Engine.Frames2
             set
             {
                 if (SetAndNotify(ref _y, value))
-                    _isTransformDirty = true;
+                    InvalidateTransform();
             }
         }
 
@@ -47,11 +47,27 @@ namespace Fusion.Engine.Frames2
             set => SetAndNotify(ref _height, value);
         }
 
+        private float _angle;
+        public float Angle
+        {
+            get => _angle;
+            set
+            {
+                if(SetAndNotify(ref _angle, value))
+                    InvalidateTransform();
+            }
+        }
+
         #endregion
 
         #region Transforms
 
         private bool _isTransformDirty = true;
+
+        public virtual void InvalidateTransform()
+        {
+            _isTransformDirty = true;
+        }
 
         private Matrix3x2 _localTransform = Matrix3x2.Identity;
         internal Matrix3x2 LocalTransform
@@ -84,13 +100,13 @@ namespace Fusion.Engine.Frames2
             set
             {
                 if (SetAndNotify(ref _transform, value))
-                    _isTransformDirty = true;
+                    InvalidateTransform();
             }
         }
 
         private void UpdateTransforms()
         {
-            _localTransform = Matrix3x2.Translation(X, Y);
+            _localTransform = Matrix3x2.Transformation(1, 1, _angle, X, Y);
 
             var pTransform = Parent?.GlobalTransform ?? Matrix.Identity;
             _globalTransform = _transform * _localTransform * pTransform;
@@ -120,7 +136,7 @@ namespace Fusion.Engine.Frames2
             internal set
             {
                 if (SetAndNotify(ref _parent, value))
-                    _isTransformDirty = true;
+                    InvalidateTransform();
             }
         }
 
