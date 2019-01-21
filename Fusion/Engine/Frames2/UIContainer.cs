@@ -1,4 +1,5 @@
 ﻿using System.Collections.ObjectModel;
+using Fusion.Core.Mathematics;
 using Fusion.Engine.Graphics.SpritesD2D;
 
 namespace Fusion.Engine.Frames2
@@ -6,8 +7,7 @@ namespace Fusion.Engine.Frames2
     public abstract class UIContainer : UIComponent
     {
         private readonly ObservableCollection<UIComponent> _children;
-        private readonly ReadOnlyObservableCollection<UIComponent> _readonlyChildren;
-        public ReadOnlyObservableCollection<UIComponent> Children => _readonlyChildren;
+        public ReadOnlyObservableCollection<UIComponent> Children { get; }
 
         public override void InvalidateTransform()
         {
@@ -18,10 +18,25 @@ namespace Fusion.Engine.Frames2
             }
         }
 
+        public override RectangleF BoundingBox
+        {
+            get
+            {
+                var b = base.BoundingBox;
+
+                foreach (var child in Children)
+                {
+                    b = RectangleF.Union(b, child.BoundingBox);
+                }
+
+                return b;
+            }
+        }
+
         protected UIContainer(float x, float y, float width, float height) : base(x, y, width, height)
         {
             _children = new ObservableCollection<UIComponent>();
-            _readonlyChildren = new ReadOnlyObservableCollection<UIComponent>(_children);
+            Children = new ReadOnlyObservableCollection<UIComponent>(_children);
         }
 
         public virtual void Add(UIComponent child)

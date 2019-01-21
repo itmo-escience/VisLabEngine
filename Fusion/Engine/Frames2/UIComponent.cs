@@ -106,6 +106,8 @@ namespace Fusion.Engine.Frames2
 
         private void UpdateTransforms()
         {
+            if(!_isTransformDirty) return;
+
             _localTransform = Matrix3x2.Transformation(1, 1, _angle, X, Y);
 
             var pTransform = Parent?.GlobalTransform ?? Matrix.Identity;
@@ -116,10 +118,15 @@ namespace Fusion.Engine.Frames2
 
         #endregion
 
-        public RectangleF BoundingBox
+        public virtual RectangleF BoundingBox
         {
             get
             {
+                if (!Visible)
+                {
+                    return new RectangleF(X, Y, 0, 0);
+                }
+
                 var p0 = Matrix3x2.TransformPoint(GlobalTransform, Vector2.Zero);
                 var p1 = Matrix3x2.TransformPoint(GlobalTransform, new Vector2(0, Height));
                 var p2 = Matrix3x2.TransformPoint(GlobalTransform, new Vector2(Width, Height));
@@ -183,6 +190,15 @@ namespace Fusion.Engine.Frames2
         // TODO: Anchors
 
         public IList<IUIController> Controllers { get; } = new List<IUIController>();
+
+        internal void InternalUpdate(GameTime gameTime)
+        {
+            UpdateTransforms();
+
+            Update(gameTime);
+
+            UpdateTransforms();
+        }
 
         public abstract void Update(GameTime gameTime);
         public abstract void Draw(SpriteLayerD2D layer);

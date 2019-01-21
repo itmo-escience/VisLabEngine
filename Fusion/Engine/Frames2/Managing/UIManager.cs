@@ -27,7 +27,10 @@ namespace Fusion.Engine.Frames2.Managing
         {
             UIEventProcessor.Update(gameTime);
 
-            UpdateDFS(Root, gameTime);
+            foreach (var c in DFSTraverse(Root).Where(c => typeof(UIContainer) != c.GetType()))
+            {
+                c.Update(gameTime);
+            }
         }
 
         public void Draw(SpriteLayerD2D layer)
@@ -35,27 +38,6 @@ namespace Fusion.Engine.Frames2.Managing
             layer.Clear();
 
             DrawBFS(layer, Root);
-        }
-
-        private void UpdateDFS(UIContainer root, GameTime gameTime)
-        {
-            var queue = new Stack<UIComponent>();
-            queue.Push(root);
-
-            while (queue.Any())
-            {
-                var c = queue.Pop();
-
-                c.Update(gameTime);
-
-                if (c is UIContainer container)
-                {
-                    foreach (var child in container.Children)
-                    {
-                        queue.Push(child);
-                    }
-                }
-            }
         }
 
         private void DrawBFS(SpriteLayerD2D layer, UIContainer root)
@@ -67,6 +49,8 @@ namespace Fusion.Engine.Frames2.Managing
             {
                 var c = queue.Dequeue();
 
+                if(!c.Visible) continue;
+
                 if (c is UIContainer container)
                 {
                     foreach (var child in container.Children)
@@ -74,21 +58,83 @@ namespace Fusion.Engine.Frames2.Managing
                         queue.Enqueue(child);
                     }
                 }
-                else if (c.Visible)
-                {
+                else {
                     layer.Draw(new TransformCommand(c.GlobalTransform));
                     c.Draw(layer);
 
                     if (DebugEnabled)
                     {
                         var b = c.BoundingBox;
-                        layer.Draw(TransformCommand.Empty());
+                        layer.Draw(TransformCommand.Identity);
                         layer.Draw(new Rect(b.X, b.Y, b.Width, b.Height, _debugBrush));
                     }
                 }
             }
 
-            layer.Draw(TransformCommand.Empty());
+            layer.Draw(TransformCommand.Identity);
+        }
+
+        public static IEnumerable<UIComponent> BFSTraverse(UIComponent root)
+        {
+            var queue = new Queue<UIComponent>();
+            queue.Enqueue(root);
+
+            while (queue.Any())
+            {
+                var c = queue.Dequeue();
+                yield return c;
+
+                if (c is UIContainer container)
+                {
+                    foreach (var child in container.Children)
+                    {
+                        queue.Enqueue(child);
+                    }
+                }
+            }
+        }
+
+        public static IEnumerable<UIComponent> DFSTraverse(UIComponent root)
+        {
+            var stack = new Stack<UIComponent>();
+            stack.Push(root);
+
+            while (stack.Any())
+            {
+                var c = stack.Pop();
+                yield return c;
+
+                if (c is UIContainer container)
+                {
+                    foreach (var child in container.Children)
+                    {
+                        stack.Push(child);
+                    }
+                }
+            }
+        }
+
+        public IEnumerable<UIComponent> ComponentsAt(Vector2 point, bool includeContainers = true)
+        {
+            if (!Root.BoundingBox.Contains(point))
+                yield break;
+
+            var stack = new Stack<UIComponent>();
+            stack.Push(Root);
+            while (true)
+            {
+                var current = stack.Pop();
+                yield return current;
+
+                if (current is UIContainer container)
+                {
+                    foreach (var child in container.Children.Where(c => c.BoundingBox.Contains(point)))
+                    {
+                        stack.Push(child);
+                    }
+                }
+                else break;
+            }
         }
     }
 }
