@@ -23,6 +23,7 @@ using System.Windows.Media.Imaging;
 using Bitmap = System.Drawing.Bitmap;
 using System.Windows.Interop;
 using System.Configuration;
+using System.Threading;
 using WpfEditorTest.FrameSelection;
 using ZWpfLib;
 
@@ -78,7 +79,7 @@ namespace WpfEditorTest
 			{ "right", new Point(1,0) },
 		};
 
-		
+
 
 		public InterfaceEditor()
 		{
@@ -100,7 +101,11 @@ namespace WpfEditorTest
 			_engine.RenderSystem.VSyncInterval = 1;
 
 			Directory.SetCurrentDirectory(@"..\..\..\..\GISTest\bin\x64\Debug");
-			_engine.InitExternal();
+			//_engine.InitExternal();
+
+		    var tokenSource = new CancellationTokenSource();
+
+            var thread = new Thread(() => _engine.RunExternal(tokenSource.Token));
 
 
             //_frameSelectionPanel = new FrameSelectionPanel(this);
@@ -135,26 +140,35 @@ namespace WpfEditorTest
 			var templates = Directory.GetFiles(ApplicationConfig.TemplatesPath, "*.xml").ToList();
 			_palette.AvailableFrames.ItemsSource = templates.Select(t => t.Split('\\').Last().Split('.').First());
 
-			RootFrame = ApplicationInterface.Instance.rootFrame;
-			SceneFrame = (FusionUI.UI.ScalableFrame)RootFrame.Children.FirstOrDefault();
-			DragFieldFrame = new FusionUI.UI.ScalableFrame(0, 0, RootFrame.UnitWidth, RootFrame.UnitHeight, "DragFieldFrame", Fusion.Core.Mathematics.Color.Zero)
-			{
-				Anchor = FrameAnchor.All,
-				ZOrder = 1000000,
-			};
-			RootFrame.Add(DragFieldFrame);
+		    SelectionLayer.Window = this;
+		    SelectionLayer.paletteWindow = _palette;
 
-			SelectionLayer.Window = this;
-			SelectionLayer.paletteWindow = _palette;
-		    SelectionLayer.DxElem.Renderer = _engine;
 
-            var b = new Binding("Children")
-			{
-				Source = SceneFrame,
-				UpdateSourceTrigger = UpdateSourceTrigger.PropertyChanged,
-				Mode = BindingMode.OneWay
-			};
-			_treeView.ElementHierarchyView.SetBinding(TreeView.ItemsSourceProperty, b);
+            _engine.OnInitialized += () =>
+		    {
+		        Application.Current.Dispatcher.Invoke(() =>
+		        {
+		            RootFrame = ApplicationInterface.Instance.rootFrame;
+		            SceneFrame = (FusionUI.UI.ScalableFrame) RootFrame.Children.FirstOrDefault();
+		            DragFieldFrame = new FusionUI.UI.ScalableFrame(0, 0, RootFrame.UnitWidth, RootFrame.UnitHeight,
+		                "DragFieldFrame", Fusion.Core.Mathematics.Color.Zero)
+		            {
+		                Anchor = FrameAnchor.All,
+		                ZOrder = 1000000,
+		            };
+		            RootFrame.Add(DragFieldFrame);
+
+		            SelectionLayer.DxElem.Renderer = _engine;
+
+		            var b = new Binding("Children")
+		            {
+		                Source = SceneFrame,
+		                UpdateSourceTrigger = UpdateSourceTrigger.PropertyChanged,
+		                Mode = BindingMode.OneWay
+		            };
+		            _treeView.ElementHierarchyView.SetBinding(TreeView.ItemsSourceProperty, b);
+		        });
+		    };
 
 			UndoButton.DataContext = CommandManager.Instance;
 			RedoButton.DataContext = CommandManager.Instance;
@@ -173,7 +187,10 @@ namespace WpfEditorTest
 			};
 			this.UpdateTitle();
 			rb1.IsChecked = true;
-		}
+
+
+		    thread.Start();
+        }
 
 
 	    protected override void OnSourceInitialized( EventArgs e )
@@ -390,7 +407,7 @@ namespace WpfEditorTest
 
 		private void ExecutedMoveFrameCommand( object sender, ExecutedRoutedEventArgs e )
 		{
-			var step = GridToggle.IsChecked != null && (bool)GridToggle.IsChecked? 
+			var step = GridToggle.IsChecked != null && (bool)GridToggle.IsChecked?
 				(int)(FusionUI.UI.ScalableFrame.ScaleMultiplier * SelectionLayer.GridSizeMultiplier) : 1;
 			List<IEditorCommand> commands = new List<IEditorCommand>();
 			var delta = KeyboardArrowsSteps[e.Parameter.ToString()];
@@ -506,7 +523,7 @@ namespace WpfEditorTest
 				}
 
 				var command = new CommandGroup(commands.ToArray());
-				CommandManager.Instance.Execute(command); 
+				CommandManager.Instance.Execute(command);
 			}
 		}
 
