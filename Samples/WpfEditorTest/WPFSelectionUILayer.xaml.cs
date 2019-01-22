@@ -22,6 +22,8 @@ namespace WpfEditorTest
 	public partial class WPFSelectionUILayer : Grid
 	{
 		public Dictionary<Frame, FrameSelectionPanel> FrameSelectionPanelList = new Dictionary<Frame, FrameSelectionPanel>();
+		private List<int> StickingCoordsY = new List<int>();
+		private List<int> StickingCoordsX = new List<int>();
 
 		private int _deltaX = 0;
 		private int _deltaY = 0;
@@ -30,6 +32,7 @@ namespace WpfEditorTest
 		private Rectangle _selectionRectangle;
 
 		public int GridSizeMultiplier { get => _gridSizeMultiplier; set { _gridSizeMultiplier = value; DrawGridLines(); } }
+		private int _gridSizeMultiplier = ApplicationConfig.DefaultVisualGridSizeMultiplier;
 		public Dictionary<string, int> GridScaleNumbers = new Dictionary<string, int>
 		{
 			{ "1x", 1 },
@@ -44,7 +47,6 @@ namespace WpfEditorTest
 		public FusionUI.UI.ScalableFrame SceneFrame => Window.SceneFrame;
 		public FusionUI.UI.MainFrame RootFrame => Window.RootFrame;
 		public FramePalette PaletteWindow;
-		private int _gridSizeMultiplier = ApplicationConfig.DefaultVisualGridSizeMultiplier;
 
 		public InterfaceEditor Window { get; set; }
 		public bool AreaSelectionEnabled { get; private set; } = false;
@@ -457,6 +459,11 @@ namespace WpfEditorTest
 						this.MoveFrameToDragField(panel.SelectedFrame);
 						panel.IsInDragField = true;
 					}
+					StickingCoordsX.Clear();
+					StickingCoordsY.Clear();
+					RememberStickingCoords(SceneFrame);
+					_frameDragsPanel.SelectedGroupInitSize = new Size(_frameDragsPanel.Width, _frameDragsPanel.Height);
+					_frameDragsPanel.SelectedGroupInitPosition = new Point(_frameDragsPanel.RenderTransform.Value.OffsetX, _frameDragsPanel.RenderTransform.Value.OffsetY);
 				}
 				if (movedPanel.IsInDragField || PaletteWindow.SelectedFrameTemplate != null)
 				{
@@ -464,28 +471,22 @@ namespace WpfEditorTest
 					ParentHighlightPanel.SelectedFrame = hovered;
 				}
 
-				Point currentLocation = e.MouseDevice.GetPosition(this);
-
-				var step = (int)(FusionUI.UI.ScalableFrame.ScaleMultiplier * GridSizeMultiplier);
-				var newX = movedPanel.InitPanelPosition.X + _deltaX;
-				var newY = movedPanel.InitPanelPosition.Y + _deltaY;
-				var dX = newX - movedPanel.InitPanelPosition.X;
-				var dY = newY - movedPanel.InitPanelPosition.Y;
-				if (NeedSnapping())
-				{
-					dX -= -step / 2 + (newX + step / 2) % step;
-					dY -= -step / 2 + (newY + step / 2) % step;
-				}
-				foreach (var panel in FrameSelectionPanelList.Values)
-				{
-					var transformDelta = new TranslateTransform(panel.InitPanelPosition.X + dX, panel.InitPanelPosition.Y + dY);
-					panel.RenderTransform = transformDelta;
-				}
+				RecalculateSelectionPosition(e.MouseDevice.GetPosition(this));
 			}
-			else if (PaletteWindow.SelectedFrameTemplate != null)
+		}
+
+		private void RememberStickingCoords( Frame frame )
+		{
+			if (!FrameSelectionPanelList.ContainsKey(frame))
 			{
-				//var hovered = GetHoveredFrameOnScene(e.GetPosition(this), true);
-				//ParentHighlightPanel.SelectedFrame = hovered;
+				StickingCoordsX.Add(frame.GlobalRectangle.X);
+				StickingCoordsX.Add(frame.GlobalRectangle.X + frame.GlobalRectangle.Width);
+				//StickingCoordsX.Add(frame.GlobalRectangle.X + frame.GlobalRectangle.Width/2);
+				StickingCoordsY.Add(frame.GlobalRectangle.Y);
+				StickingCoordsY.Add(frame.GlobalRectangle.Y + frame.GlobalRectangle.Height);
+				//StickingCoordsY.Add(frame.GlobalRectangle.Y + frame.GlobalRectangle.Height/2);
+
+				frame.ForEachChildren(c => RememberStickingCoords(c));
 			}
 		}
 
@@ -509,6 +510,21 @@ namespace WpfEditorTest
 					Y = dragsPanelY + initRect.Y * heightMult
 				};
 				panel.RenderTransform = multedTransform;
+			}
+		}
+
+		public void RecalculateSelectionPosition( Point currentLocation )
+		{
+			var isShiftPressed = Keyboard.IsKeyDown(Key.LeftShift) || Keyboard.IsKeyDown(Key.RightShift);
+			var isControlPressed = Keyboard.IsKeyDown(Key.LeftCtrl) || Keyboard.IsKeyDown(Key.RightCtrl);
+
+			_frameDragsPanel.Reposition(_deltaX, _deltaY, isShiftPressed, isControlPressed, GridSizeMultiplier, NeedSnapping(),
+				StickingCoordsX, StickingCoordsY, out double dX, out double dY);
+
+			foreach (var panel in FrameSelectionPanelList.Values)
+			{
+				var transformDelta = new TranslateTransform(panel.InitPanelPosition.X + dX, panel.InitPanelPosition.Y + dY);
+				panel.RenderTransform = transformDelta;
 			}
 		}
 

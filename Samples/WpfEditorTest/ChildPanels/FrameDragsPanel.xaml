@@ -16,7 +16,10 @@
         <ColumnDefinition Width="1*"/>
         <ColumnDefinition Width="9"/>
     </Grid.ColumnDefinitions>
-    <Border Grid.Column="0" Grid.Row="0" Grid.ColumnSpan="3" Grid.RowSpan="3" BorderThickness="2" BorderBrush="White"/>
+    <Border Name="LeftBorder" Grid.Column="0" Grid.Row="0" Grid.ColumnSpan="3" Grid.RowSpan="3" BorderThickness="2,0,0,0" BorderBrush="White"/>
+    <Border Name="TopBorder" Grid.Column="0" Grid.Row="0" Grid.ColumnSpan="3" Grid.RowSpan="3" BorderThickness="0,2,0,0" BorderBrush="White"/>
+    <Border Name="RightBorder" Grid.Column="0" Grid.Row="0" Grid.ColumnSpan="3" Grid.RowSpan="3" BorderThickness="0,0,2,0" BorderBrush="White"/>
+    <Border Name="BottomBorder" Grid.Column="0" Grid.Row="0" Grid.ColumnSpan="3" Grid.RowSpan="3" BorderThickness="0,0,0,2" BorderBrush="White"/>
     <Border Name="PositionInfo" BorderThickness="0,0,0,1" BorderBrush="White" Grid.Column="0" Height="28" Grid.Row="0" 
                 Width="40" Margin="-40,-27,9,8">
         <StackPanel>

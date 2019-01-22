@@ -30,5 +30,7 @@ namespace WpfEditorTest
 
 		public static double SceneLayerWidth = SystemParameters.MaximizedPrimaryScreenWidth - 20;
 		public static double SceneLayerHeight = SystemParameters.MaximizedPrimaryScreenHeight - 80;
+
+		public static int FrameStickingSensitivity = 8;
 	}
 }
