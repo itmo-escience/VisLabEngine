@@ -25,6 +25,8 @@ using System.Windows.Interop;
 using System.Configuration;
 using WpfEditorTest.FrameSelection;
 using ZWpfLib;
+using Keyboard = System.Windows.Input.Keyboard;
+using WpfEditorTest.DialogWindows;
 
 namespace WpfEditorTest
 {
@@ -46,6 +48,7 @@ namespace WpfEditorTest
 		public static RoutedCommand MoveFrameCmd = new RoutedCommand();
 		public static RoutedCommand DeleteFrameCmd = new RoutedCommand();
 		public static RoutedCommand AlignFrameCmd = new RoutedCommand();
+		public static RoutedCommand SceneConfigCmd = new RoutedCommand();
 
 		private readonly FrameDetails _details;
 		private readonly FramePalette _palette;
@@ -64,6 +67,10 @@ namespace WpfEditorTest
 
 		public string CurrentSceneFile { get => _currentSceneFile; set { _currentSceneFile = value; this.UpdateTitle(); } }
 		public string SceneChangedIndicator { get => _sceneChangedIndicator; set { _sceneChangedIndicator = value; this.UpdateTitle(); } }
+
+		public double DefaultSceneWidth { get; private set; }
+		public double DefaultSceneHeight { get; private set; }
+		private double sceneScale = 1;
 
 		public Dictionary<string, Point> KeyboardArrowsSteps = new Dictionary<string, Point>
 		{
@@ -107,10 +114,16 @@ namespace WpfEditorTest
 			{
 				_details.Owner = this;
 				_details.Show();
+				if (!bool.Parse(ConfigurationManager.AppSettings.Get("DetailsPanelVisibility")))
+					_details.Hide();
 				_treeView.Owner = this;
 				_treeView.Show();
+				if (!bool.Parse(ConfigurationManager.AppSettings.Get("TreeViewPanelVisibility")))
+					_treeView.Hide();
 				_palette.Owner = this;
 				_palette.Show();
+				if (!bool.Parse(ConfigurationManager.AppSettings.Get("PalettePanelVisibility")))
+					_palette.Hide();
             };
 
 			_treeView.SelectedFrameChangedInUI += ( _, frame ) =>
@@ -158,8 +171,24 @@ namespace WpfEditorTest
 			SelectionLayer.FramesDeselected += ( s, e ) => {
 				_details.FrameDetailsControls.ItemsSource = null;
 			};
+			SelectionLayer.SizeChanged += ( s, e ) =>
+			{
+				this.DefaultSceneWidth = e.NewSize.Width;
+				this.DefaultSceneHeight = e.NewSize.Height;
+				ZoomScene();
+			};
 			this.UpdateTitle();
-			rb1.IsChecked = true;
+
+			var loadedGridSize = ConfigurationManager.AppSettings.Get("GridSize");
+
+			foreach (RadioButton item in GridSizeMenuItem.Items)
+			{
+				if ((string)item.Content == loadedGridSize)
+				{
+					item.IsChecked = true;
+					break;
+				}
+			}
 		}
 
 	    protected override void OnSourceInitialized( EventArgs e )
@@ -204,6 +233,7 @@ namespace WpfEditorTest
 				var createdFrame = CreateFrameFromFile(openDialog.FileName);
 				if (createdFrame != null && createdFrame.GetType() == typeof(FusionUI.UI.ScalableFrame))
 				{
+					SelectionManager.Instance.SelectFrame(new List<Frame> { });
 					RootFrame.Remove(SceneFrame);
 					foreach (var panel in SelectionLayer.FrameSelectionPanelList.Values)
 					{
@@ -211,6 +241,7 @@ namespace WpfEditorTest
 						var command = new CommandGroup(commands.ToArray());
 						CommandManager.Instance.ExecuteWithoutMemorising(command);
 					}
+
 					SceneFrame = (FusionUI.UI.ScalableFrame)createdFrame;
 					RootFrame.Add(SceneFrame);
 					DragFieldFrame.ZOrder = 1000000;
@@ -224,6 +255,9 @@ namespace WpfEditorTest
 					this.CurrentSceneFile = openDialog.FileName;
 					CommandManager.Instance.SetNotDirty();
 					CommandManager.Instance.Reset();
+
+					SelectionLayer.Width = SceneFrame.Width;
+					SelectionLayer.Height = SceneFrame.Height;
 				}
 			}
 		}
@@ -232,6 +266,7 @@ namespace WpfEditorTest
 		{
 			if (!this.CheckForChanges())
 				return;
+			SelectionManager.Instance.SelectFrame(new List<Frame> { });
 			RootFrame.Remove(SceneFrame);
 			foreach (var panel in SelectionLayer.FrameSelectionPanelList.Values)
 			{
@@ -239,6 +274,7 @@ namespace WpfEditorTest
 				var command = new CommandGroup(commands.ToArray());
 				CommandManager.Instance.ExecuteWithoutMemorising(command);
 			}
+
 			SceneFrame = new FusionUI.UI.ScalableFrame(0, 0, this.RootFrame.UnitWidth, this.RootFrame.UnitHeight, "Scene", Fusion.Core.Mathematics.Color.Zero) { Anchor = FrameAnchor.All };
 			RootFrame.Add(SceneFrame);
 			DragFieldFrame.ZOrder = 1000000;
@@ -253,7 +289,7 @@ namespace WpfEditorTest
 			CommandManager.Instance.Reset();
 		}
 
-		internal void TrySaveSceneAsTemplate()
+		internal bool TrySaveSceneAsTemplate()
 		{
 			var startPath = Path.GetFullPath(Path.Combine(ApplicationConfig.TemplatesPath, ".."));
 			var filter = "XML files(*.xml)| *.xml";
@@ -264,6 +300,11 @@ namespace WpfEditorTest
 					Fusion.Core.Utils.FrameSerializer.Write(SceneFrame, saveDialog.FileName);
 					this.CurrentSceneFile = saveDialog.FileName;
 					CommandManager.Instance.SetNotDirty();
+					return true;
+				}
+				else
+				{
+					return false;
 				}
 			}
 		}
@@ -282,16 +323,17 @@ namespace WpfEditorTest
 			return commands;
 		}
 
-		internal void TrySaveScene()
+		internal bool TrySaveScene()
 		{
 			if (!String.IsNullOrEmpty(this.CurrentSceneFile))
 			{
 				Fusion.Core.Utils.FrameSerializer.Write(SceneFrame, this.CurrentSceneFile);
 				CommandManager.Instance.SetNotDirty();
+				return true;
 			}
 			else
 			{
-				TrySaveSceneAsTemplate();
+				return TrySaveSceneAsTemplate();
 			}
 		}
 
@@ -522,6 +564,22 @@ namespace WpfEditorTest
 			}
 		}
 
+		private void ExecutedSceneConfigCommand( object sender, ExecutedRoutedEventArgs e )
+		{
+			// Instantiate the dialog box
+			SceneConfigWindow dlg = new SceneConfigWindow(SelectionLayer.ActualWidth, SelectionLayer.ActualHeight);
+
+			// Configure the dialog box
+			dlg.Owner = this;
+
+			// Open the dialog box modally 
+			if (dlg.ShowDialog().Value)
+			{
+				SelectionLayer.Width = dlg.SceneWidth;
+				SelectionLayer.Height = dlg.SceneHeight;
+			};
+		}
+
 		private void AlwaysCanExecute( object sender, CanExecuteRoutedEventArgs e )
 		{
 			e.CanExecute = true;
@@ -562,13 +620,26 @@ namespace WpfEditorTest
 			var settings = configFile.AppSettings.Settings;
 			settings["DetailsPanelX"].Value = _details.Left.ToString();
 			settings["DetailsPanelY"].Value = _details.Top.ToString();
+			settings["DetailsPanelHeight"].Value = _details.Height.ToString();
 			settings["TreeViewPanelX"].Value = _treeView.Left.ToString();
 			settings["TreeViewPanelY"].Value = _treeView.Top.ToString();
+			settings["TreeViewPanelHeight"].Value = _treeView.Height.ToString();
 			settings["PalettePanelX"].Value = _palette.Left.ToString();
 			settings["PalettePanelY"].Value = _palette.Top.ToString();
-			settings["DetailsPanelVisibility"].Value = _details.Visibility.ToString();
-			settings["PalettePanelVisibility"].Value = _palette.Visibility.ToString();
-			settings["TreeViewPanelVisibility"].Value = _treeView.Visibility.ToString();
+			settings["PalettePanelHeight"].Value = _palette.Height.ToString();
+			settings["DetailsPanelVisibility"].Value = _details.Visibility == Visibility.Visible ? true.ToString() : false.ToString();
+			settings["PalettePanelVisibility"].Value = _palette.Visibility == Visibility.Visible ? true.ToString() : false.ToString();
+			settings["TreeViewPanelVisibility"].Value = _treeView.Visibility == Visibility.Visible ? true.ToString() : false.ToString();
+			settings["GridSize"].Value = SelectionLayer.GridSizeMultiplier.ToString() + "x";
+			settings["MainWindowX"].Value = this.Left.ToString();
+			settings["MainWindowY"].Value = this.Top.ToString();
+			settings["MainWindowWidth"].Value = this.Width.ToString();
+			settings["MainWindowHeight"].Value = this.Height.ToString();
+			settings["MainWindowFullscreen"].Value = this.WindowState.ToString();
+
+			settings["SceneZoom"].Value = this.ZoomerSlider.Value.ToString();
+			settings["SceneSizeWidth"].Value = this.DefaultSceneWidth.ToString();
+			settings["SceneSizeHeight"].Value = this.DefaultSceneHeight.ToString();
 
 			configFile.Save(ConfigurationSaveMode.Modified);
 			ConfigurationManager.RefreshSection(configFile.AppSettings.SectionInformation.Name);
@@ -584,8 +655,7 @@ namespace WpfEditorTest
 				{
 					case MessageBoxResult.Yes:
 						{
-							this.TrySaveScene();
-							return true;
+							return this.TrySaveScene();
 						}
 					case MessageBoxResult.No:
 						{
@@ -610,7 +680,7 @@ namespace WpfEditorTest
 		private void MenuItem_Click( object sender, RoutedEventArgs e )
 		{
 			Window panel = (sender as MenuItem).Tag as Window;
-			panel.Visibility = Visibility.Visible;
+			panel.Show();
 			panel.Focus();
 		}
 
@@ -629,9 +699,70 @@ namespace WpfEditorTest
 
 		private void Window_KeyUp( object sender, KeyEventArgs e )
 		{
-			if (e.Key == Key.System && e.OriginalSource is InterfaceEditor)
+			if (e.Key == Key.System && e.OriginalSource is ScrollViewer)
 			{
 				e.Handled = true;
+			}
+		}
+
+		private void Window_Loaded( object sender, RoutedEventArgs e )
+		{
+			Height = int.Parse(ConfigurationManager.AppSettings.Get("MainWindowHeight"));
+			Width = int.Parse(ConfigurationManager.AppSettings.Get("MainWindowWidth"));
+
+			Left = int.Parse(ConfigurationManager.AppSettings.Get("MainWindowX"));
+			Top = int.Parse(ConfigurationManager.AppSettings.Get("MainWindowY"));
+			WindowState = (WindowState)Enum.Parse(typeof(WindowState), ConfigurationManager.AppSettings.Get("MainWindowFullscreen"));
+
+			SelectionLayer.Width = int.Parse(ConfigurationManager.AppSettings.Get("SceneSizeWidth"));
+			SelectionLayer.Height = int.Parse(ConfigurationManager.AppSettings.Get("SceneSizeHeight"));
+
+			Zoomer.Width = SelectionLayer.Width;
+			Zoomer.Height = SelectionLayer.Height;
+			Zoomer.Stretch = Stretch.Uniform;
+			ZoomerSlider.Value = double.Parse(ConfigurationManager.AppSettings.Get("SceneZoom"));
+
+			this.DefaultSceneWidth = Zoomer.Width;
+			this.DefaultSceneHeight = Zoomer.Height;
+		}
+
+		private void Window_PreviewMouseWheel( object sender, MouseWheelEventArgs e )
+		{
+			if (Keyboard.IsKeyDown(Key.LeftCtrl) || Keyboard.IsKeyDown(Key.RightCtrl))
+			{
+				e.Handled = true;
+				this.sceneScale = Math.Min(Math.Max(this.sceneScale + (double)e.Delta/2000, ZoomerSlider.Minimum), ZoomerSlider.Maximum);
+				ZoomerSlider.Value = sceneScale;
+			}
+		}
+
+		private void Slider_ValueChanged( object sender, RoutedPropertyChangedEventArgs<double> e )
+		{
+			this.sceneScale = e.NewValue;
+			ZoomScene();
+		}
+
+		private void ZoomScene()
+		{
+			if (Zoomer!=null)
+			{
+				Zoomer.Height = DefaultSceneHeight * sceneScale;
+				Zoomer.Width = DefaultSceneWidth * sceneScale; 
+			}
+		}
+
+		private void ZoomerScroll_PreviewKeyDown( object sender, KeyEventArgs e )
+		{
+			switch (e.Key)
+			{
+				case Key.Up:
+				case Key.Down:
+				case Key.Left:
+				case Key.Right:
+					{
+						e.Handled = false;
+						break;
+					}
 			}
 		}
 	}

@@ -16,16 +16,16 @@ namespace WpfEditorTest.ChildPanels
 		public FrameDetails()
 		{
 			InitializeComponent();
-			Height = ApplicationConfig.OptionsWindowSize; Width = ApplicationConfig.OptionsWindowSize;
+			Height = int.Parse(ConfigurationManager.AppSettings.Get("DetailsPanelHeight"));
+			Width = ApplicationConfig.OptionsWindowSize;
 
 			Left = int.Parse(ConfigurationManager.AppSettings.Get("DetailsPanelX"));
 			Top = int.Parse(ConfigurationManager.AppSettings.Get("DetailsPanelY"));
-			Visibility = (Visibility)Enum.Parse(typeof(Visibility), ConfigurationManager.AppSettings.Get("DetailsPanelVisibility"));
 
 			HorizontalAlignment = HorizontalAlignment.Right;
 			VerticalAlignment = VerticalAlignment.Center;
 
-            Closing += (s, e) => {Visibility= Visibility.Collapsed; e.Cancel = true; };
+            Closing += (s, e) => {this.Hide(); e.Cancel = true; };
 		}
 
 	    public void SetSelectFrame(Frame frame)

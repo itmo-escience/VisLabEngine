@@ -34,17 +34,16 @@ namespace WpfEditorTest.ChildPanels
 		{
 			InitializeComponent();
 
-			Height = ApplicationConfig.OptionsWindowSize;
+			Height = int.Parse(ConfigurationManager.AppSettings.Get("TreeViewPanelHeight"));
 		    Width = ApplicationConfig.OptionsWindowSize;
 
 			Left = int.Parse(ConfigurationManager.AppSettings.Get("TreeViewPanelX"));
 			Top = int.Parse(ConfigurationManager.AppSettings.Get("TreeViewPanelY"));
-			Visibility = (Visibility)Enum.Parse(typeof(Visibility), ConfigurationManager.AppSettings.Get("TreeViewPanelVisibility"));
 
 			HorizontalAlignment = HorizontalAlignment.Right;
 			VerticalAlignment = VerticalAlignment.Bottom;
 
-            Closing += (s, e) => { Visibility = Visibility.Collapsed; e.Cancel = true; };
+            Closing += (s, e) => { this.Hide(); e.Cancel = true; };
 		}
 
 		private void TextBlock_MouseDown( object sender, MouseButtonEventArgs e )

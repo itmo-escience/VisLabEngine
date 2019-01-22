@@ -9,13 +9,15 @@
         xmlns:math ="clr-namespace:Fusion.Core.Mathematics;assembly=Fusion"
         xmlns:panels ="clr-namespace:WpfEditorTest.ChildPanels"
         xmlns:conv="clr-namespace:WpfEditorTest.WPFConverters"
+        xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
         mc:Ignorable="d"
         Title="InterfaceEditor"
         Width="800" Height="600"
         MinWidth="400" MinHeight="300"
         WindowStartupLocation="CenterScreen"
         Closing="Window_Closing"
-        KeyUp="Window_KeyUp">
+        KeyUp="Window_KeyUp"
+        Loaded="Window_Loaded" PreviewMouseWheel="Window_PreviewMouseWheel">
     <Window.Resources>
         <conv:ButtonEnableConverter x:Key="btnEnableConverter"/>
     </Window.Resources>
@@ -59,6 +61,9 @@
         <CommandBinding Command="{x:Static local:InterfaceEditor.AlignFrameCmd}"
                         Executed="ExecutedAlignFrameCommand"
                         CanExecute="AlwaysCanExecute" />
+        <CommandBinding Command="{x:Static local:InterfaceEditor.SceneConfigCmd}"
+                        Executed="ExecutedSceneConfigCommand"
+                        CanExecute="AlwaysCanExecute" />
     </Window.CommandBindings>
     <Window.InputBindings>
         <KeyBinding Command="{x:Static local:InterfaceEditor.UndoChangeCmd}" Key="Z" Modifiers="Ctrl"/>
@@ -77,12 +82,12 @@
         <KeyBinding Command="{x:Static local:InterfaceEditor.MoveFrameCmd}" CommandParameter="left" Key="Left"/>
         <KeyBinding Command="{x:Static local:InterfaceEditor.MoveFrameCmd}" CommandParameter="right" Key="Right"/>
     </Window.InputBindings>
-    <Grid MaxWidth="10000" MaxHeight="10000">
+    <Grid Name="GlobalGrid" MaxWidth="10000" MaxHeight="10000" AllowDrop="True">
         <Grid.RowDefinitions>
             <RowDefinition Height="32"/>
             <RowDefinition />
         </Grid.RowDefinitions>
-        <ToolBarTray Grid.Row="0" IsLocked="True" >
+        <ToolBarTray Name="MenuToolBar" Grid.Row="0" IsLocked="True" >
             <ToolBar>
                 <Menu>
                 <MenuItem Header="File" Background="#FFEEF5FD">
@@ -107,11 +112,11 @@
                     <MenuItem Name="miFrameTemplates" Header="Frame Templates" Click="MenuItem_Click"/>
                 </MenuItem>
                 </Menu>
-                <CheckBox Name="GridToggle" IsChecked="False" Background="#FFEEF5FD" Checked="CheckBox_Checked" Unchecked="CheckBox_Checked">
-                    <TextBlock Text="ShowGrid" Background="#FFEEF5FD"></TextBlock>
+                <CheckBox Name="GridToggle" IsChecked="False" Background="#FFEEF5FD" Checked="CheckBox_Checked" Unchecked="CheckBox_Checked" VerticalAlignment="Stretch">
+                    <TextBlock Text="ShowGrid" Background="#FFEEF5FD" VerticalAlignment="Center"/>
                 </CheckBox>
                 <Menu>
-                    <MenuItem Header="GridSize" Background="#FFEEF5FD">
+                    <MenuItem Name="GridSizeMenuItem" Header="GridSize" Background="#FFEEF5FD">
                         <RadioButton Name="rb1" GroupName="GridScale" Content="1x" Checked="rb_Checked"/>
                         <RadioButton Name="rb2" GroupName="GridScale" Content="2x" Checked="rb_Checked"/>
                         <RadioButton Name="rb3" GroupName="GridScale" Content="3x" Checked="rb_Checked"/>
@@ -130,10 +135,30 @@
                         <MenuItem Command="{x:Static local:InterfaceEditor.AlignFrameCmd}" CommandParameter="horizontal" Header="Align horizontally" ToolTip=""/>
                     </MenuItem>
                 </Menu>
+                <Menu>
+                    <MenuItem Header="Configuration" Background="#FFEEF5FD">
+                        <MenuItem Command="{x:Static local:InterfaceEditor.SceneConfigCmd}" CommandParameter="scene" Header="Scene options..." ToolTip=""/>
+                    </MenuItem>
+                </Menu>
+                <Separator></Separator>
+                <TextBlock Text="  Zoom:  " HorizontalAlignment="Center" VerticalAlignment="Center"></TextBlock>
+                <TextBlock Text="{Binding Value, StringFormat={}{0:0.00}, ElementName=ZoomerSlider}" HorizontalAlignment="Center" VerticalAlignment="Center" Width="28" TextAlignment="Right"></TextBlock>
+                <Slider Name="ZoomerSlider" TextBlock.TextAlignment="Center" Value="1" Minimum="0.1" Maximum="10" Width="200" VerticalAlignment="Bottom" 
+                        ValueChanged="Slider_ValueChanged" SmallChange="0.06"/>
+                <Separator></Separator>
+                <TextBlock Text="Scene Width:  " VerticalAlignment="Center"/>
+                <TextBlock Text="{Binding Width, ElementName=SelectionLayer}" VerticalAlignment="Center"/>
+                <TextBlock Text="  Scene Height:  " VerticalAlignment="Center"/>
+                <TextBlock Text="{Binding Height, ElementName=SelectionLayer}" VerticalAlignment="Center"/>
+                <Separator></Separator>
             </ToolBar>
         </ToolBarTray>
-        <local:WPFSelectionUILayer Grid.Row="1" x:Name="SelectionLayer">
-        </local:WPFSelectionUILayer>
+        <ScrollViewer Name="ZoomerScroll" Grid.Row="1" HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto" Background="#FFA0A0A0" PreviewKeyDown="ZoomerScroll_PreviewKeyDown">
+            <Viewbox Name="Zoomer" HorizontalAlignment="Left" VerticalAlignment="Top">
+                <local:WPFSelectionUILayer x:Name="SelectionLayer">
+                </local:WPFSelectionUILayer>
+            </Viewbox>
+        </ScrollViewer>
     </Grid>
 </Window>
 

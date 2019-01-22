@@ -7,7 +7,7 @@
         <string>Fusion.Engine.Frames.Frame</string>
       </key>
       <value>
-        <string>Fusion, Version=0.2.6897.34900, Culture=neutral, PublicKeyToken=null</string>
+        <string>Fusion, Version=0.2.6948.23302, Culture=neutral, PublicKeyToken=null</string>
       </value>
     </item>
     <item>
@@ -44,6 +44,7 @@
     </item>
   </dictionary>
   <Frame xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <Name>Frame_13</Name>
     <Visible>true</Visible>
     <Ghost>false</Ghost>
     <Enabled>true</Enabled>
@@ -85,8 +86,8 @@
       <X>0</X>
       <Y>0</Y>
     </ShadowOffset>
-    <X>10</X>
-    <Y>20</Y>
+    <X>601</X>
+    <Y>334</Y>
     <Width>190</Width>
     <Height>220</Height>
     <PaddingLeft>0</PaddingLeft>
@@ -115,6 +116,7 @@
     <ImageName>UI-new\fv-icons_close-window</ImageName>
     <Children>
       <Frame xsi:type="ScalableFrame">
+        <Name>ScalableFrame_16</Name>
         <Visible>true</Visible>
         <Ghost>false</Ghost>
         <Enabled>true</Enabled>
@@ -251,6 +253,7 @@
         <UnitImageOffsetY>0</UnitImageOffsetY>
       </Frame>
       <Frame xsi:type="FreeFrame">
+        <Name>FreeFrame_6</Name>
         <Visible>true</Visible>
         <Ghost>false</Ghost>
         <Enabled>true</Enabled>
@@ -390,6 +393,7 @@
         <ClampPos>true</ClampPos>
       </Frame>
       <Frame xsi:type="ControllableFrame">
+        <Name>ControllableFrame_7</Name>
         <Visible>true</Visible>
         <Ghost>false</Ghost>
         <Enabled>true</Enabled>
@@ -511,6 +515,7 @@
         <Selected>false</Selected>
       </Frame>
       <Frame xsi:type="Slider">
+        <Name>Slider_6</Name>
         <Visible>true</Visible>
         <Ghost>false</Ghost>
         <Enabled>true</Enabled>
@@ -660,6 +665,10 @@
           <B>128</B>
           <A>255</A>
         </backColorForSlider>
+        <PresetValues>
+          <float>0</float>
+          <float>1</float>
+        </PresetValues>
         <CurrentValue>0.3</CurrentValue>
         <HoverColor>
           <R>0</R>
@@ -675,6 +684,6 @@
         </HoverForeColor>
       </Frame>
     </Children>
-    <ZOrder>2</ZOrder>
+    <ZOrder>0</ZOrder>
   </Frame>
 </SeralizableObjectHolder>
