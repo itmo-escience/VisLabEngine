@@ -4,6 +4,7 @@ using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows;
 using Fusion.Engine.Frames;
 
 namespace WpfEditorTest.FrameSelection
@@ -38,7 +39,7 @@ namespace WpfEditorTest.FrameSelection
 
 		private void OnFrameUpdated( object frame, PropertyChangedEventArgs args)
 		{
-			FrameUpdated?.Invoke(this, (Frame)frame);
+		    Application.Current.Dispatcher.Invoke(() => FrameUpdated?.Invoke(this, (Frame)frame));
 		}
 	}
 }

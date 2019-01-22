@@ -31,7 +31,7 @@ namespace ZWpfLib
 
         public DXElement()
         {
-			base.SnapsToDevicePixels = true;
+			SnapsToDevicePixels = true;
 
             _renderTimer = new Stopwatch();
 
@@ -39,12 +39,13 @@ namespace ZWpfLib
 
             Surface.IsFrontBufferAvailableChanged += delegate {
 				UpdateReallyLoopRendering();
-				//if (!IsReallyLoopRendering && Surface.IsFrontBufferAvailable)
-					//Render();
+				if (!IsReallyLoopRendering && Surface.IsFrontBufferAvailable)
+					Render();
 			};
 
-
             IsVisibleChanged += delegate { UpdateReallyLoopRendering(); };
+
+
 		}
 
 		private IntPtr WndProc(IntPtr hwnd, int msg, IntPtr wParam, IntPtr lParam, ref bool handled)
@@ -79,43 +80,14 @@ namespace ZWpfLib
 				"Renderer",
 				typeof(Game),
 				typeof(DXElement),
-				new PropertyMetadata((d, e) => ((DXElement)d).OnRendererChanged((Game)e.OldValue, (Game)e.NewValue)));
+				new PropertyMetadata((d, e) => ((DXElement)d).OnRendererChanged()));
 
 
-        private void OnRendererChanged(Game oldValue, Game newValue)
+        private void OnRendererChanged()
 		{
 			UpdateSize();
 			UpdateReallyLoopRendering();
-
-		    if (oldValue != null)
-		    {
-		        var d = (WpfDisplay) oldValue.GraphicsDevice.Display;
-                d.UpdateReady -= SetReadyToRenderAgain;
-		    }
-
-		    if (newValue != null)
-		    {
-		        var d = (WpfDisplay) newValue.GraphicsDevice.Display;
-		        d.UpdateReady += SetReadyToRenderAgain;
-            }
 		}
-
-
-        private object _readyToRender = new object();
-        private void SetReadyToRenderAgain(object sender, EventArgs e)
-        {
-            /*
-            lock (_readyToRender)
-            {
-                var display = (WpfDisplay) sender;
-
-                if(_buf != null)
-                    display.ReturnBuffer();
-
-                _buf = display.ExtractBuffer();
-            }
-            */
-        }
 
         protected override void OnVisualParentChanged(DependencyObject oldParent)
 		{
@@ -143,13 +115,13 @@ namespace ZWpfLib
 			throw new ArgumentOutOfRangeException();
 		}
 
-		protected override int VisualChildrenCount { get { return 0; } }
+        protected override int VisualChildrenCount => 0;
 
         protected override void OnRender(DrawingContext dc)
 		{
+            base.OnRender(dc);
             dc.DrawImage(Surface, new Rect(RenderSize));
 		}
-
 
 		bool IsReallyLoopRendering { get; set; }
 
@@ -176,21 +148,20 @@ namespace ZWpfLib
 		}
 
 
-		void SetBackBuffer(RenderTarget2D target, DXImageSource sur)
-		{
-            sur.SetD3D11BackBuffer(target.Surface.Resource.QueryInterface<Texture2D>());
-		}
-
-
-		void OnLoopRendering(object sender, EventArgs e)
+        private TimeSpan _lastRenderingTime;
+        void OnLoopRendering(object sender, EventArgs e)
 		{
 		    var renderingTime = ((RenderingEventArgs) e).RenderingTime;
 
             if (!IsReallyLoopRendering)
 				return;
-			Render(renderingTime);
-		}
 
+            if (renderingTime == _lastRenderingTime)
+                return;
+
+		    _lastRenderingTime = renderingTime;
+            Render();
+		}
 
 
 		void UpdateSize()
@@ -199,39 +170,58 @@ namespace ZWpfLib
 				return;
 			Renderer.GraphicsDevice.Resize((int)DesiredSize.Width, (int)DesiredSize.Height);
 
-            //Render();
-
 			Console.WriteLine(DesiredSize);
 		}
 
+        private void SetBackBuffer(RenderTarget2D target, DXImageSource sur)
+        {
+            sur.SetD3D11BackBuffer(target.Surface.Resource.QueryInterface<Texture2D>());
+        }
+
+        private int frameCounter = 1;
         private RenderTarget2D _buf = null;
-		/// <summary>
+        /// <summary>
 		/// Will redraw the underlying surface once.
 		/// </summary>
-		public void Render(TimeSpan renderingTime)
+		public void Render()
 		{
-			if (Renderer == null || !Renderer.IsInitialized || IsInDesignMode || renderingTime == TimeSpan.Zero)
+			if (Renderer == null || !Renderer.IsInitialized || IsInDesignMode)
 				return;
-
 
 		    var display = (WpfDisplay) Renderer.GraphicsDevice.Display;
 
 		    if (_buf != null)
-		        display.ReturnBuffer();
+		    {
+		        display.ReturnBuffer(_buf);
+		        _buf = null;
+		        frameCounter = 0;
+		    }
 
-		    _buf = display.ExtractBuffer();
+		    if (_buf == null)
+		    {
+		        _buf = display.ExtractBuffer();
+                SetBackBuffer(_buf, Surface);
+            }
 
-            SetBackBuffer(_buf, Surface);
-        }
+		    frameCounter++;
+
+		    /*
+            if (_buf != null)
+                display.ReturnBuffer(_buf);
+
+            var b = display.ExtractBuffer();
+
+            SetBackBuffer(b, Surface);
+
+            _buf = b;
+            */
+		}
 
 
 		/// <summary>
 		/// Gets a value indicating whether the control is in design mode
 		/// (running in Blend or Visual Studio).
 		/// </summary>
-		public bool IsInDesignMode
-        {
-            get { return DesignerProperties.GetIsInDesignMode(this); }
-        }
+		public bool IsInDesignMode => DesignerProperties.GetIsInDesignMode(this);
 	}
 }

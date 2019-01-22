@@ -106,6 +106,7 @@ namespace WpfEditorTest
 		    var tokenSource = new CancellationTokenSource();
 
             var thread = new Thread(() => _engine.RunExternal(tokenSource.Token));
+		    thread.Name = "Fusion";
 
 
             //_frameSelectionPanel = new FrameSelectionPanel(this);

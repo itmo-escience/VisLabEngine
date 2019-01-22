@@ -61,42 +61,46 @@ namespace WpfEditorTest.ChildPanels
 
 		private void FrameDimensionsChange( object sender, PropertyChangedEventArgs args )
 		{
-			if (_locked) return;
+		    var selected = _selectedFrame;
+            if (_locked || selected == null) return;
 
-			switch (args.PropertyName)
-			{
-				case "Width":
-				case "UnitWidth":
-					{
-						WidthBuffer = _selectedFrame.Width;
-						break;
-					}
-				case "Height":
-				case "UnitHeight":
-					{
-						HeightBuffer = _selectedFrame.Height;
-						break;
-					}
-				//case "X":
-				//case "Y":
-				case "GlobalRectangle":
-					{
-						var frameDelta = new TranslateTransform();
-						RenderTransform = frameDelta;
-						frameDelta.X = _selectedFrame.GlobalRectangle.X;
-						frameDelta.Y = _selectedFrame.GlobalRectangle.Y;
-						PreviousTransform = RenderTransform;
+		    Application.Current.Dispatcher.Invoke(() =>
+		    {
+		        switch (args.PropertyName)
+		        {
+		            case "Width":
+		            case "UnitWidth":
+		            {
+		                WidthBuffer = selected.Width;
+		                break;
+		            }
+		            case "Height":
+		            case "UnitHeight":
+		            {
+		                HeightBuffer = selected.Height;
+		                break;
+		            }
+		            //case "X":
+		            //case "Y":
+		            case "GlobalRectangle":
+		            {
+		                var frameDelta = new TranslateTransform();
+		                RenderTransform = frameDelta;
+		                frameDelta.X = selected.GlobalRectangle.X;
+		                frameDelta.Y = selected.GlobalRectangle.Y;
+		                PreviousTransform = RenderTransform;
 
-						_oldX = RenderTransform.Value.OffsetX;
-						_oldY = RenderTransform.Value.OffsetY;
-						break;
-					}
-				case "Anchor":
-					{
-						UpdateVisualAnchors(_selectedFrame.Anchor);
-						break;
-					}
-			}
+		                _oldX = RenderTransform.Value.OffsetX;
+		                _oldY = RenderTransform.Value.OffsetY;
+		                break;
+		            }
+		            case "Anchor":
+		            {
+		                UpdateVisualAnchors(selected.Anchor);
+		                break;
+		            }
+		        }
+		    });
 		}
 
 		private void UpdateVisualAnchors( FrameAnchor anchor )
