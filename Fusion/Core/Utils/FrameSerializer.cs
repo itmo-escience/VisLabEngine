@@ -80,55 +80,28 @@ namespace Fusion.Core.Utils
 		public static Frame Read(string filename, out Frame destination )
 		{
 			destination = null;
-
-			//XmlSerializer versionFormatter = new XmlSerializer(typeof(string));
 			XmlSerializer formatter = new XmlSerializer(typeof(SeralizableObjectHolder));
 			// десериализация
 			using (FileStream fs = new FileStream(filename, FileMode.OpenOrCreate))
 			{
-				//var version = (string)versionFormatter.Deserialize(fs);
-
-				//if (version == FrameSerializer.SerializerVersion)
-				//{
 				var holder = (SeralizableObjectHolder)formatter.Deserialize(fs);
-
 				destination = holder.SerializableFrame;
-
 				destination.RestoreParents();
-				//}
-				//else
-				//{
-				//	return destination;
-				//}
 			}
-
 			return destination;
 		}
 
 		public static Frame ReadFromString(string xmlFrame)
 		{
 			Frame destination = null;
-			//XmlSerializer versionFormatter = new XmlSerializer(typeof(string));
 			XmlSerializer formatter = new XmlSerializer(typeof(SeralizableObjectHolder));
 			// десериализация
 			using (StringReader sr = new StringReader(xmlFrame))
 			{
-				//var version = (string)versionFormatter.Deserialize(fs);
-
-				//if (version == FrameSerializer.SerializerVersion)
-				//{
 				var holder = (SeralizableObjectHolder)formatter.Deserialize(sr);
-
 				destination = holder.SerializableFrame;
-
 				destination.RestoreParents();
-				//}
-				//else
-				//{
-				//	return destination;
-				//}
 			}
-
 			return destination;
 		}
 	}
@@ -145,11 +118,9 @@ namespace Fusion.Core.Utils
 		{
 			this.SerializableFrame = frame;
 			FrameSerializer.GetChildTypes(frame, FrameTypes);
-
 		}
 
 		public SeralizableObjectHolder() { }
-
 
 		public XmlSchema GetSchema()
 		{
@@ -204,21 +175,9 @@ namespace Fusion.Core.Utils
 			XmlSerializer frameSerializer = new XmlSerializer(typeof(Frame), frameTypes.ToArray());
 			XmlSerializer versionSerializer = new XmlSerializer(typeof(string));
 
-			//writer.WriteStartElement("holder");
-
-			//writer.WriteStartElement("version");
 			versionSerializer.Serialize(writer, this.Version);
-			//writer.WriteEndElement();
-
-			//writer.WriteStartElement("types");
 			typesSerializer.Serialize(writer, this.FrameTypes);
-			//writer.WriteEndElement();
-
-			//writer.WriteStartElement("serializableFrame");
 			frameSerializer.Serialize(writer, this.SerializableFrame);
-			//writer.WriteEndElement();
-
-			//writer.WriteEndElement();
 		}
 	}
 

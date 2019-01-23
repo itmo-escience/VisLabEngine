@@ -22,11 +22,12 @@
         <StackPanel>
             <StackPanel Orientation="Horizontal">
                 <TextBlock Foreground="White" FontFamily="Consolas" TextAlignment ="Left" FontSize="12" Text="X:"></TextBlock>
-                <!--<TextBlock x:Name="textBlock1" Foreground="White" FontFamily="Consolas" TextAlignment ="Right" FontSize="12" Text="{Binding RenderTransform.Value.OffsetX, ElementName=userControl}" Width="27"></TextBlock> -->
+                <TextBlock x:Name="textBlock1" Foreground="White" FontFamily="Consolas" TextAlignment ="Right" FontSize="12" Text="{Binding RenderTransform.Value.OffsetX, ElementName=userControl}" Width="27"></TextBlock>
+
             </StackPanel>
             <StackPanel  Orientation="Horizontal">
                 <TextBlock Foreground="White" FontFamily="Consolas" TextAlignment ="Left" FontSize="12" Text="Y:"></TextBlock>
-                <!--<TextBlock Foreground="White" FontFamily="Consolas" TextAlignment ="Right" FontSize="12" Text="{Binding RenderTransform.Value.OffsetY, ElementName=userControl}" Width="27"></TextBlock>-->
+                <TextBlock Foreground="White" FontFamily="Consolas" TextAlignment ="Right" FontSize="12" Text="{Binding RenderTransform.Value.OffsetY, ElementName=userControl}" Width="27"></TextBlock>
             </StackPanel>
         </StackPanel>
     </Border>
@@ -45,20 +46,20 @@
     </Border>
 
     <Border Name="BottomDrag" BorderBrush="Black" Background="White" BorderThickness="1" Grid.Column="1" HorizontalAlignment="Center" Tag="Bottom"
-                Height="9" Grid.Row="2" Width="20" MouseLeftButtonDown="Drag_MouseLeftButtonDown" Cursor="SizeNS" MouseRightButtonDown="Drag_MouseRightButtonDown"/>
+                Height="9" Grid.Row="2" Width="20" MouseLeftButtonDown="Drag_MouseLeftButtonDown" Cursor="SizeNS" MouseRightButtonDown="Drag_MouseRightButtonDown" RenderTransformOrigin="0.5,1"/>
     <Border Name="TopDrag" BorderBrush="Black" Background="White" BorderThickness="1" Grid.Column="1" HorizontalAlignment="Center" Tag="Top"
-                Height="9" Grid.Row="0" Width="20" MouseLeftButtonDown="Drag_MouseLeftButtonDown" Cursor="SizeNS" MouseRightButtonDown="Drag_MouseRightButtonDown"/>
+                Height="9" Grid.Row="0" Width="20" MouseLeftButtonDown="Drag_MouseLeftButtonDown" Cursor="SizeNS" MouseRightButtonDown="Drag_MouseRightButtonDown" RenderTransformOrigin="0.5,0"/>
     <Border Name="LeftDrag" BorderBrush="Black" Background="White" BorderThickness="1" Grid.Column="0" Height="20" Grid.Row="1" Tag="Left"
-                VerticalAlignment="Center" Width="9" MouseLeftButtonDown="Drag_MouseLeftButtonDown" Cursor="SizeWE" MouseRightButtonDown="Drag_MouseRightButtonDown"/>
+                VerticalAlignment="Center" Width="9" MouseLeftButtonDown="Drag_MouseLeftButtonDown" Cursor="SizeWE" MouseRightButtonDown="Drag_MouseRightButtonDown" RenderTransformOrigin="0,0.5"/>
     <Border Name="RightDrag" BorderBrush="Black" Background="White" BorderThickness="1" Grid.Column="2" Height="20" Grid.Row="1" Tag="Right"
-                VerticalAlignment="Center" Width="9" MouseLeftButtonDown="Drag_MouseLeftButtonDown" Cursor="SizeWE" MouseRightButtonDown="Drag_MouseRightButtonDown"/>
+                VerticalAlignment="Center" Width="9" MouseLeftButtonDown="Drag_MouseLeftButtonDown" Cursor="SizeWE" MouseRightButtonDown="Drag_MouseRightButtonDown" RenderTransformOrigin="1,0.5"/>
 
     <Border Name="BottomLeftDrag" BorderBrush="Black" Background="White" BorderThickness="1" Grid.Column="0" Height="9" Grid.Row="2"
-                Width="9" MouseLeftButtonDown="Drag_MouseLeftButtonDown" Cursor="SizeNESW"/>
+                Width="9" MouseLeftButtonDown="Drag_MouseLeftButtonDown" Cursor="SizeNESW" RenderTransformOrigin="0,1"/>
     <Border Name="BottomRightDrag" BorderBrush="Black" Background="White" BorderThickness="1" Grid.Column="2" Height="9" Grid.Row="2"
-                Width="9" MouseLeftButtonDown="Drag_MouseLeftButtonDown" Cursor="SizeNWSE"/>
+                Width="9" MouseLeftButtonDown="Drag_MouseLeftButtonDown" Cursor="SizeNWSE" RenderTransformOrigin="1,1"/>
     <Border Name="TopLeftDrag" BorderBrush="Black" Background="White" BorderThickness="1" Grid.Column="0" Height="9" Grid.Row="0"
-                Width="9" MouseLeftButtonDown="Drag_MouseLeftButtonDown" Cursor="SizeNWSE"/>
+                Width="9" MouseLeftButtonDown="Drag_MouseLeftButtonDown" Cursor="SizeNWSE" RenderTransformOrigin="0,0"/>
     <Border Name="TopRightDrag" BorderBrush="Black" Background="White" BorderThickness="1" Grid.Column="2" Height="9" Grid.Row="0"
-                Width="9" MouseLeftButtonDown="Drag_MouseLeftButtonDown" Cursor="SizeNESW"/>
+                Width="9" MouseLeftButtonDown="Drag_MouseLeftButtonDown" Cursor="SizeNESW" RenderTransformOrigin="1,0"/>
 </Grid>

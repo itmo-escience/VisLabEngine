@@ -12,13 +12,16 @@
         ResizeMode="CanResize"
         SizeToContent="Manual"
         MinWidth="350" MinHeight="150"
-        MaxWidth="350" MaxHeight="950">
+        MaxWidth="350" MaxHeight="950"
+        AllowDrop="True"
+        Drop="Window_Drop">
     <ScrollViewer Height="auto" Width="auto" Background="LightGray" Grid.Row="1">
         <StackPanel Height="auto" Width="auto">
             <ItemsControl Name="AvailableFrames">
                 <ItemsControl.ItemTemplate>
                     <DataTemplate>
-                        <Border BorderThickness="1" Tag="{Binding}" BorderBrush="Gray" MinHeight="32" Width="auto" MouseDown="Border_MouseDown_1">
+                        <Border BorderThickness="1" Tag="{Binding}" BorderBrush="Gray" MinHeight="32" Width="auto"
+                                MouseDown="Border_MouseDown_1">
                             <Border.Background>
                                 <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
                                     <GradientStop Color="LightGray" Offset="0"/>

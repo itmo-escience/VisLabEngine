@@ -60,7 +60,7 @@ namespace WpfEditorTest.ChildPanels
 			set
 			{
 				var convertedValue = Convert.ChangeType(value, PropInfo.PropertyType);
-				//PropInfo.SetValue(Obj, convertedValue);
+
 				var command = new FramePropertyChangeCommand(Obj, PropName, value);
 				CommandManager.Instance.Execute(command);
 

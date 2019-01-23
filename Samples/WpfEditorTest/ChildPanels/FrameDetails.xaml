@@ -201,15 +201,28 @@
                             </StackPanel>
                         </StackPanel>
                     </Border>
-
                 </StackPanel>
             </DockPanel>
         </DataTemplate>
     </Window.Resources>
-    <ScrollViewer Height="auto" Width="auto" Background="LightGray">
-        <StackPanel Height="auto" Width="auto">
-            <ItemsControl x:Name="FrameDetailsControls" ItemTemplateSelector="{StaticResource propTemplateSelector}">
-            </ItemsControl>
-        </StackPanel>
-    </ScrollViewer>
+    
+    <ItemsControl x:Name="FrameDetailsControls" ItemTemplateSelector="{StaticResource propTemplateSelector}" 
+                      VirtualizingStackPanel.IsVirtualizing="True">
+        <ItemsControl.ItemsPanel>
+            <ItemsPanelTemplate>
+                <VirtualizingStackPanel />
+            </ItemsPanelTemplate>
+        </ItemsControl.ItemsPanel>
+        <ItemsControl.Template>
+            <ControlTemplate>
+                <ScrollViewer
+                        Padding="{TemplateBinding Control.Padding}"
+                        Focusable="False"
+                        CanContentScroll="True">
+                    <ItemsPresenter
+                            SnapsToDevicePixels="{TemplateBinding UIElement.SnapsToDevicePixels}" />
+                </ScrollViewer>
+            </ControlTemplate>
+        </ItemsControl.Template>
+    </ItemsControl>
 </Window>

@@ -13,26 +13,14 @@ namespace WpfEditorTest.WPFConverters
 {
 	public class PropertyValueConverter : IValueConverter
 	{
-		private FrameAnchor target;
+		private FrameAnchor _target;
 
 		public object Convert( object value, Type targetType, object parameter, CultureInfo culture )
 		{
-			//object property = ((PropertyDependant)value).Prop;
-			//Frame owner = ((PropertyDependant)value).Obj;
-			//try
-			//{
-			//	return property!=null? property.ToString():null;
-			//}
-			//catch (Exception)
-			//{
-			//	var t = 0;
-			//	return null;
-			//}
 			if (value==null)
 			{
 				return targetType.ToString();
 			}
-
 
 			if (value.GetType() == typeof(Fusion.Core.Mathematics.Color))
 			{
@@ -52,12 +40,10 @@ namespace WpfEditorTest.WPFConverters
 					case "X":
 						{
 							return ((Fusion.Core.Mathematics.Vector2)value).X;
-							break;
 						}
 					case "Y":
 						{
 							return ((Fusion.Core.Mathematics.Vector2)value).Y;
-							break;
 						}
 				}
 			}
@@ -65,12 +51,11 @@ namespace WpfEditorTest.WPFConverters
 			if (value.GetType() == typeof(FrameAnchor))
 			{
 				FrameAnchor mask = (FrameAnchor)parameter;
-				this.target = (FrameAnchor)value;
-				return ((mask & this.target) != 0); 
+				this._target = (FrameAnchor)value;
+				return (mask & this._target) != 0; 
 			}
 
 			return value.ToString();
-
 		}
 
 		public object ConvertBack( object value, Type targetType, object parameter, CultureInfo culture )
@@ -87,19 +72,17 @@ namespace WpfEditorTest.WPFConverters
 				case "X":
 					{
 						return new Fusion.Core.Mathematics.Vector2((float)value, 0);
-						break;
 					}
 				case "Y":
 					{
 						return new Fusion.Core.Mathematics.Vector2(0, (float)value);
-						break;
 					}
 			}
 
 			if (parameter!=null && parameter.GetType() == typeof(FrameAnchor))
 			{
-				this.target ^= (FrameAnchor)parameter;
-				return this.target; 
+				this._target ^= (FrameAnchor)parameter;
+				return this._target; 
 			}
 
 			return value;

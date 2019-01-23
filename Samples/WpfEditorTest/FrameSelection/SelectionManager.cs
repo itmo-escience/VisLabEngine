@@ -13,9 +13,7 @@ namespace WpfEditorTest.FrameSelection
 	{
 		public static SelectionManager Instance { get; } = new SelectionManager();
 
-		private SelectionManager()
-		{
-		}
+		private SelectionManager() { }
 
 		public List<Frame> SelectedFrames { get; private set; } = new List<Frame>();
 
