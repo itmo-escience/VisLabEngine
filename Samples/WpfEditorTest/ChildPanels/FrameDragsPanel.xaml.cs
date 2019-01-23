@@ -285,10 +285,14 @@ namespace WpfEditorTest.ChildPanels
 			var newYHelper = (int)(newY + 0.5 * Math.Sign(newY));
 			var heightHelper = (int)(SelectedGroupInitSize.Height + 0.5);
 
-			var closestStickX1 = stickingCoordsX.Where(scX => Math.Abs(newXHelper - scX) == stickingCoordsX.Select(x => Math.Abs(newXHelper-x)).Min()).FirstOrDefault();
-			var closestStickX2 = stickingCoordsX.Where(scX => Math.Abs(newXHelper + widthHelper - scX) == stickingCoordsX.Select(x => Math.Abs(newXHelper + widthHelper - x)).Min()).FirstOrDefault();
-			var closestStickY1 = stickingCoordsY.Where(scY => Math.Abs(newYHelper - scY) == stickingCoordsY.Select(y => Math.Abs(newYHelper - y)).Min()).FirstOrDefault();
-			var closestStickY2 = stickingCoordsY.Where(scY => Math.Abs(newYHelper + heightHelper - scY) == stickingCoordsY.Select(y => Math.Abs(newYHelper + heightHelper - y)).Min()).FirstOrDefault();
+			var closestStickX1 = 
+				stickingCoordsX.Where(scX => Math.Abs(newXHelper - scX) == stickingCoordsX.Select(x => Math.Abs(newXHelper-x)).Min()).FirstOrDefault();
+			var closestStickX2 = 
+				stickingCoordsX.Where(scX => Math.Abs(newXHelper + widthHelper - scX) == stickingCoordsX.Select(x => Math.Abs(newXHelper + widthHelper - x)).Min()).FirstOrDefault();
+			var closestStickY1 = 
+				stickingCoordsY.Where(scY => Math.Abs(newYHelper - scY) == stickingCoordsY.Select(y => Math.Abs(newYHelper - y)).Min()).FirstOrDefault();
+			var closestStickY2 = 
+				stickingCoordsY.Where(scY => Math.Abs(newYHelper + heightHelper - scY) == stickingCoordsY.Select(y => Math.Abs(newYHelper + heightHelper - y)).Min()).FirstOrDefault();
 
 			var rangeX1 = Enumerable.Range(closestStickX1 - StickingCoordsSensitivity, StickingCoordsSensitivity * 2);
 			var rangeX2 = Enumerable.Range(closestStickX2 - StickingCoordsSensitivity, StickingCoordsSensitivity * 2);
