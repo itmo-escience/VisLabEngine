@@ -105,8 +105,8 @@ namespace WpfEditorTest
 
 		    var tokenSource = new CancellationTokenSource();
 
-            var thread = new Thread(() => _engine.RunExternal(tokenSource.Token));
-		    thread.Name = "Fusion";
+            var fusionThread = new Thread(() => _engine.RunExternal(tokenSource.Token));
+		    fusionThread.Name = "Fusion";
 
             _details = new FrameDetails();
 			_treeView = new FrameTreeView();
@@ -143,7 +143,7 @@ namespace WpfEditorTest
 			_palette.AvailableFrames.ItemsSource = templates.Select(t => t.Split('\\').Last().Split('.').First());
 
 		    SelectionLayer.Window = this;
-		    SelectionLayer.paletteWindow = _palette;
+		    SelectionLayer.PaletteWindow = _palette;
 
 
             _engine.OnInitialized += () =>
@@ -205,6 +205,8 @@ namespace WpfEditorTest
 					break;
 				}
 			}
+
+            fusionThread.Start();
 		}
 
 	    protected override void OnSourceInitialized( EventArgs e )

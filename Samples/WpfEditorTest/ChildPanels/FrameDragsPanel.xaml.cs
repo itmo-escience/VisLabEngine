@@ -25,7 +25,7 @@ namespace WpfEditorTest.ChildPanels
 		public Point CurrentDragInitPosition { get; private set; }
 
 		public Size SelectedGroupInitSize { get; set; }
-		public Point SelectedGroupInitPosition { get; private set; }
+		public Point SelectedGroupInitPosition { get; set; }
 		public Point CenteredPivot { get; private set; }
 
 		public bool DragMousePressed {
@@ -41,6 +41,8 @@ namespace WpfEditorTest.ChildPanels
 		public Dictionary<Frame, Rectangle> InitialFramesRectangles { get; private set; }
 
 		private bool _dragMousePressed;
+
+		private int StickingCoordsSensitivity = ApplicationConfig.FrameStickingSensitivity;
 
 		public Dictionary<Border, Border> DragPivots { get; private set; }
 
@@ -65,7 +67,6 @@ namespace WpfEditorTest.ChildPanels
 				{ BottomLeftDrag, TopRightDrag },
 				{ BottomDrag, TopDrag },
 				{ BottomRightDrag, TopLeftDrag }
-
 			};
 
 			SelectionManager.Instance.FrameSelected += ( s, e ) =>
@@ -99,6 +100,54 @@ namespace WpfEditorTest.ChildPanels
 			else
 			{
 				this.Visibility = Visibility.Collapsed;
+			}
+		}
+
+		public void StickToX( int x ) //TODO: Delete this
+		{
+			var frames = SelectionManager.Instance.SelectedFrames;
+			if (frames.Count > 0)
+			{
+				Frame minXFrame = frames.Where(fr => fr.GlobalRectangle.X == frames
+					.Select(f => f.GlobalRectangle.X).Min()).FirstOrDefault();
+				Frame maxXFrame = frames.Where(fr => fr.GlobalRectangle.X + fr.Width == frames
+					.Select(f => f.GlobalRectangle.X + f.Width).Max()).FirstOrDefault();
+
+				var rangeX = Enumerable.Range(x - StickingCoordsSensitivity, StickingCoordsSensitivity * 2);
+				if (rangeX.Contains(minXFrame.GlobalRectangle.X))
+				{
+					var stickingDelta = x - minXFrame.GlobalRectangle.X;
+					frames.ForEach(f => f.X += stickingDelta);
+				}
+				if (rangeX.Contains(maxXFrame.GlobalRectangle.X + maxXFrame.GlobalRectangle.Width))
+				{
+					var stickingDelta = x - (maxXFrame.GlobalRectangle.X + maxXFrame.GlobalRectangle.Width);
+					frames.ForEach(f => f.X += stickingDelta);
+				}
+			}
+		}
+
+		public void StickToY( int y ) //TODO: Delete this
+		{
+			var frames = SelectionManager.Instance.SelectedFrames;
+			if (frames.Count > 0)
+			{
+				Frame minYFrame = frames.Where(fr => fr.GlobalRectangle.Y == frames
+					.Select(f => f.GlobalRectangle.Y).Min()).FirstOrDefault();
+				Frame maxYFrame = frames.Where(fr => fr.GlobalRectangle.Y + fr.Height == frames
+					.Select(f => f.GlobalRectangle.Y + f.Height).Max()).FirstOrDefault();
+
+				var rangeY = Enumerable.Range(y - StickingCoordsSensitivity, StickingCoordsSensitivity * 2);
+				if (rangeY.Contains(minYFrame.GlobalRectangle.Y))
+				{
+					var stickingDelta = y - minYFrame.GlobalRectangle.Y;
+					frames.ForEach(f => f.Y += stickingDelta);
+				}
+				if (rangeY.Contains(maxYFrame.GlobalRectangle.Y + maxYFrame.GlobalRectangle.Height))
+				{
+					var stickingDelta = y - (maxYFrame.GlobalRectangle.Y + maxYFrame.GlobalRectangle.Height);
+					frames.ForEach(f => f.Y += stickingDelta);
+				}
 			}
 		}
 
@@ -213,6 +262,63 @@ namespace WpfEditorTest.ChildPanels
 
 			widthMultiplier = newWidth / SelectedGroupInitSize.Width;
 			heightMultiplier = newHeight / SelectedGroupInitSize.Height;
+		}
+
+		internal void Reposition( int deltaX, int deltaY, bool isShiftPressed, bool isControlPressed, int gridSizeMultiplier, bool needSnapping,
+			List<int> stickingCoordsX, List<int> stickingCoordsY, out double dX, out double dY )
+		{
+			var step = (int)(FusionUI.UI.ScalableFrame.ScaleMultiplier * gridSizeMultiplier);
+			var newX = SelectedGroupInitPosition.X + deltaX;
+			var newY = SelectedGroupInitPosition.Y + deltaY;
+			dX = newX - SelectedGroupInitPosition.X;
+			dY = newY - SelectedGroupInitPosition.Y;
+			if (needSnapping)
+			{
+				dX -= -step / 2 + (newX + step / 2) % step;
+				dY -= -step / 2 + (newY + step / 2) % step;
+			}
+
+			var stickingDelta = 0;
+
+			var newXHelper = (int)(newX + 0.5*Math.Sign(newX));
+			var widthHelper = (int)(SelectedGroupInitSize.Width + 0.5);
+			var newYHelper = (int)(newY + 0.5 * Math.Sign(newY));
+			var heightHelper = (int)(SelectedGroupInitSize.Height + 0.5);
+
+			var closestStickX1 = 
+				stickingCoordsX.Where(scX => Math.Abs(newXHelper - scX) == stickingCoordsX.Select(x => Math.Abs(newXHelper-x)).Min()).FirstOrDefault();
+			var closestStickX2 = 
+				stickingCoordsX.Where(scX => Math.Abs(newXHelper + widthHelper - scX) == stickingCoordsX.Select(x => Math.Abs(newXHelper + widthHelper - x)).Min()).FirstOrDefault();
+			var closestStickY1 = 
+				stickingCoordsY.Where(scY => Math.Abs(newYHelper - scY) == stickingCoordsY.Select(y => Math.Abs(newYHelper - y)).Min()).FirstOrDefault();
+			var closestStickY2 = 
+				stickingCoordsY.Where(scY => Math.Abs(newYHelper + heightHelper - scY) == stickingCoordsY.Select(y => Math.Abs(newYHelper + heightHelper - y)).Min()).FirstOrDefault();
+
+			var rangeX1 = Enumerable.Range(closestStickX1 - StickingCoordsSensitivity, StickingCoordsSensitivity * 2);
+			var rangeX2 = Enumerable.Range(closestStickX2 - StickingCoordsSensitivity, StickingCoordsSensitivity * 2);
+			var rangeY1 = Enumerable.Range(closestStickY1 - StickingCoordsSensitivity, StickingCoordsSensitivity * 2);
+			var rangeY2 = Enumerable.Range(closestStickY2 - StickingCoordsSensitivity, StickingCoordsSensitivity * 2);
+
+			if (rangeX1.Contains(newXHelper))
+			{
+				stickingDelta = closestStickX1 - newXHelper;
+			}
+			if (rangeX2.Contains(newXHelper + widthHelper))
+			{
+				stickingDelta = closestStickX2 - (newXHelper + widthHelper);
+			}
+			dX += stickingDelta;
+
+			stickingDelta = 0;
+			if (rangeY1.Contains(newYHelper))
+			{
+				stickingDelta = closestStickY1 - newYHelper;
+			}
+			if (rangeY2.Contains(newYHelper + heightHelper))
+			{
+				stickingDelta = closestStickY2 - (newYHelper + heightHelper);
+			}
+			dY += stickingDelta;
 		}
 	}
 }
