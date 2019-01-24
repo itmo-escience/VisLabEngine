@@ -4,20 +4,34 @@ namespace Fusion.Engine.Graphics.SpritesD2D
 {
     public class TextLayoutD2D
     {
-        public TextLayout Layout { get; }
+        private TextLayout _layout;
+        public float Width { get => _layout.Metrics.Width; }
+        public float Height { get => _layout.Metrics.Height; }
+        public float MaxWidth { get => _layout.MaxWidth; }
+        public float MaxHeight { get => _layout.MaxHeight; }
+        public readonly string text;
+        public readonly TextFormat textFormat;
 
-        internal TextLayoutD2D(TextLayout layout)
+        public TextLayoutD2D(string text, TextFormatD2D textFormat, float maxWidth, float maxHeight)
         {
-            Layout = layout;
+            this.text = text;
+            this.textFormat = new TextFormatFactory().CreateTextFormat(textFormat);
+            _layout = new TextLayout(new Factory(), text, this.textFormat, maxWidth, maxHeight);
         }
     }
 
-    public class TextLayoutD2DFactory
+    internal class TextLayoutFactory
     {
-        private Factory _factory;
-        internal TextLayoutD2DFactory(Factory factory)
+        private readonly Factory _factory;
+
+        public TextLayoutFactory()
         {
-            _factory = factory;
+            _factory = new Factory();
+        }
+
+        public TextLayout CreateTextLayout(TextLayoutD2D layout)
+        {
+            return new TextLayout(_factory, layout.text, layout.textFormat, layout.MaxWidth, layout.MaxHeight);
         }
     }
 }

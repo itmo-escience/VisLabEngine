@@ -183,7 +183,7 @@ namespace GISTest
 		    _userInterface2 = new UIManager(Game.RenderSystem);
 		    _userInterface2.DebugEnabled = true;
 
-		    txt = new Fusion.Engine.Frames2.Components.Label("z", 150, 450, 100, 100);
+		    txt = new Fusion.Engine.Frames2.Components.Label("z", new TextFormatD2D("Calibri", 20), 150, 450, 100, 100);
 		    _userInterface2.Root.Add(txt);
 
 
@@ -265,7 +265,7 @@ namespace GISTest
 			}
 			messages.Clear();
 
-		    txt.Text = Game.Mouse.Position.ToString();
+            txt.Text = Game.Mouse.Position.ToString();// + "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa";
 		    img.Angle = angle;
 		    txt.Angle = MathUtil.TwoPi - angle;
 

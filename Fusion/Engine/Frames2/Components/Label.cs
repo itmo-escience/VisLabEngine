@@ -8,6 +8,9 @@ namespace Fusion.Engine.Frames2.Components
     {
         private bool _isDirtyText;
         private string _text = "";
+        private TextFormatD2D _textFormat;
+        private float _maxWidth;
+        private float _maxHeight;
         public string Text
         {
             get => _text;
@@ -15,12 +18,20 @@ namespace Fusion.Engine.Frames2.Components
             {
                 _isDirtyText = true;
                 _text = value;
+
+                var layout = new TextLayoutD2D(_text, _textFormat, _maxWidth, _maxHeight);
+
+                Width = layout.Width < _maxWidth ? layout.Width : _maxWidth;
+                Height = layout.Height < _maxHeight ? layout.Height : _maxHeight;
             }
         }
         private Graphics.SpritesD2D.Label _label;
 
-        public Label(string text, float x, float y, float width, float height) : base(x, y, width, height)
+        public Label(string text, TextFormatD2D textFormat, float x, float y, float width, float height) : base(x, y, width, height)
         {
+            _textFormat = textFormat;
+            _maxWidth = width;
+            _maxHeight = height;
             Text = text;
         }
 
@@ -30,7 +41,7 @@ namespace Fusion.Engine.Frames2.Components
                 _label = new Graphics.SpritesD2D.Label(
                     Text,
                     new RectangleF(0, 0, Width, Height),
-                    new TextFormatD2D("Calibri", 20),
+                    _textFormat,
                     new SolidBrushD2D(Color4.White)
                 );
 

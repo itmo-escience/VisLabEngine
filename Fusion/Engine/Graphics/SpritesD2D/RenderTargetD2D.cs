@@ -12,6 +12,7 @@ namespace Fusion.Engine.Graphics.SpritesD2D
         private readonly RenderTarget _target;
         private readonly BrushFactory _brushFactory;
         private readonly TextFormatFactory _dwFactory;
+        private readonly TextLayoutFactory _layoutFactory;
 
         /// <remarks>This constructor must be internal in order to encapsulate Direct2D dependency.</remarks>
         internal RenderTargetD2D(RenderTarget renderTarget)
@@ -19,6 +20,7 @@ namespace Fusion.Engine.Graphics.SpritesD2D
             _target = renderTarget;
             _brushFactory = new BrushFactory(_target);
             _dwFactory = new TextFormatFactory();
+            _layoutFactory = new TextLayoutFactory();
         }
 
         /// <inheritdoc cref="RenderTarget.BeginDraw()"/>
@@ -77,7 +79,7 @@ namespace Fusion.Engine.Graphics.SpritesD2D
             _target.DrawText(text, _dwFactory.CreateTextFormat(textFormat), rectangleF.ToRawRectangleF(), _brushFactory.GetOrCreateBrush(brush));
 
         public void DrawTextLayout(Vector2 origin, TextLayoutD2D layout, IBrushD2D brush) =>
-            _target.DrawTextLayout(origin.ToRawVector2(), layout.Layout, _brushFactory.GetOrCreateBrush(brush));
+            _target.DrawTextLayout(origin.ToRawVector2(), _layoutFactory.CreateTextLayout(layout), _brushFactory.GetOrCreateBrush(brush));
 
 
         public DrawingStateBlockD2D SaveDrawingState()
