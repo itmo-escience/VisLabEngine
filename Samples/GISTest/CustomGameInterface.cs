@@ -184,14 +184,20 @@ namespace GISTest
 		    _userInterface2.DebugEnabled = true;
 
 		    txt = new Fusion.Engine.Frames2.Components.Label("z", new TextFormatD2D("Calibri", 20), 150, 450, 100, 100);
-		    _userInterface2.Root.Add(txt);
+		    //_userInterface2.Root.Add(txt);
 
 
             img = new Image(250, 250, 100, 100);
-		    _userInterface2.Root.Add(img);
+		    //_userInterface2.Root.Add(img);
 
             var img1 = new Image(50, 50, 100, 100);
-            _userInterface2.Root.Add(img1);
+            //_userInterface2.Root.Add(img1);
+
+            verticalBox = new VerticalBox(200, 200, 1, 1);
+            verticalBox.Add(txt);
+            verticalBox.Add(img);
+            verticalBox.Add(img1);
+            _userInterface2.Root.Add(verticalBox);
 
             userInterface.RootFrame = this.rootFrame = new MainFrame(FrameProcessor);
 			viewLayer.SpriteLayers.Add(userInterface.FramesSpriteLayer);
@@ -288,8 +294,9 @@ namespace GISTest
 	    private Fusion.Engine.Frames2.Components.Label txt;
 	    private float angle = 0;
 	    private Image img;
+        private VerticalBox verticalBox;
 
-	    public void PrintMessage(string message)
+        public void PrintMessage(string message)
 		{
 			messages.Add(message);
 		}

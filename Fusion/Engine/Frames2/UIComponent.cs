@@ -171,10 +171,11 @@ namespace Fusion.Engine.Frames2
         protected UIComponent(float x, float y, float width, float height)
         {
             Name = GenerateName(GetType());
-            X = x;
-            Y = y;
-            Width = width;
-            Height = height;
+            _x = x;
+            _y = y;
+            _width = width;
+            _height = height;
+            _isTransformDirty = true;
         }
 
         public IEnumerable<UIContainer> Ancestors()

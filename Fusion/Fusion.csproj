@@ -255,6 +255,7 @@
     <Compile Include="Engine\Frames2\Components\Image.cs" />
     <Compile Include="Engine\Frames2\Components\Border.cs" />
     <Compile Include="Engine\Frames2\Containers\FreePlacement.cs" />
+    <Compile Include="Engine\Frames2\Containers\VerticalBox.cs" />
     <Compile Include="Engine\Frames2\UIComponent.cs" />
     <Compile Include="Engine\Frames2\IUIController.cs" />
     <Compile Include="Engine\Frames2\IUIMouseAware.cs" />
