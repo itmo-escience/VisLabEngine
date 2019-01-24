@@ -24,6 +24,7 @@ using Bitmap = System.Drawing.Bitmap;
 using System.Windows.Interop;
 using System.Configuration;
 using System.Threading;
+using System.Windows.Media.Animation;
 using WpfEditorTest.FrameSelection;
 using ZWpfLib;
 using Keyboard = System.Windows.Input.Keyboard;
@@ -85,7 +86,9 @@ namespace WpfEditorTest
 		{
 			InitializeComponent();
 
-			_engine = new Game("TestGame");
+		    Timeline.DesiredFrameRateProperty.OverrideMetadata(typeof(Timeline), new FrameworkPropertyMetadata { DefaultValue = 40 });
+
+            _engine = new Game("TestGame");
 			_engine.Mouse = new DummyMouse(_engine);
 			_engine.Keyboard = new DummyKeyboard(_engine);
 			_engine.Touch = new DummyTouch(_engine);
@@ -101,12 +104,13 @@ namespace WpfEditorTest
 			_engine.RenderSystem.VSyncInterval = 1;
 
 			Directory.SetCurrentDirectory(@"..\..\..\..\GISTest\bin\x64\Debug");
-			//_engine.InitExternal();
 
 		    var tokenSource = new CancellationTokenSource();
 
             var fusionThread = new Thread(() => _engine.RunExternal(tokenSource.Token));
 		    fusionThread.Name = "Fusion";
+
+		    Closing += (sender, args) => tokenSource.Cancel();
 
             _details = new FrameDetails();
 			_treeView = new FrameTreeView();
