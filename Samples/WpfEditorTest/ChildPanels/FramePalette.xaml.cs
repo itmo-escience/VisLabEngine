@@ -21,33 +21,82 @@ namespace WpfEditorTest.ChildPanels
 	/// </summary>
 	public partial class FramePalette : Window
 	{
-		public string _selectedFrameTemplate;
+		private string selectedFrameTemplate;
 
 		public Point PreviousMouseLocation { get; set; }
 		public Transform PreviousTransform { get; set; }
 		public bool MousePressed { get; set; }
 
+		private Border templateHolder;
+		private Brush templateHolderInitColor;
+		private Brush templateHolderSelectedColor;
+
+		public string SelectedFrameTemplate
+		{
+			get => selectedFrameTemplate;
+			set {
+				selectedFrameTemplate = value;
+				this.templateHolder.Background = selectedFrameTemplate != null ? templateHolderSelectedColor : templateHolderInitColor;
+			}
+		}
+
 		public FramePalette()
 		{
 			InitializeComponent();
 
-			Height = ApplicationConfig.OptionsWindowSize;
+			Height = int.Parse(ConfigurationManager.AppSettings.Get("PalettePanelHeight"));
 			Width = ApplicationConfig.OptionsWindowSize;
 
 			Left = int.Parse(ConfigurationManager.AppSettings.Get("PalettePanelX"));
 			Top = int.Parse(ConfigurationManager.AppSettings.Get("PalettePanelY"));
-			Visibility = (Visibility)Enum.Parse(typeof(Visibility), ConfigurationManager.AppSettings.Get("PalettePanelVisibility"));
 
 			this.HorizontalAlignment = HorizontalAlignment.Right;
 			this.VerticalAlignment = VerticalAlignment.Top;
 
-			Closing += ( s, e ) => { Visibility = Visibility.Collapsed; e.Cancel = true; };
+			templateHolderSelectedColor = new LinearGradientBrush()
+			{
+				GradientStops = new GradientStopCollection {
+					new GradientStop(Colors.Green,0.0d),
+					new GradientStop(Colors.LightGreen,0.5d),
+					new GradientStop(Colors.Green,1.0d),
+				},
+				StartPoint = new Point(0.5, 0),
+				EndPoint = new Point(0.5,1),
+			};
+
+			Closing += ( s, e ) => { this.Hide(); e.Cancel = true; };
 		}
 
 
 		private void Border_MouseDown_1( object sender, MouseButtonEventArgs e )
 		{
-			this._selectedFrameTemplate = (string)(sender as Border).Tag;
+			if(this.templateHolder!=null)
+				this.templateHolder.Background = templateHolderInitColor;
+
+			this.templateHolder = sender as Border;
+			this.templateHolderInitColor = templateHolder.Background;
+			this.SelectedFrameTemplate = (string)this.templateHolder.Tag;
+
+			if (SelectedFrameTemplate != null)
+			{
+				DataObject dataObject = new DataObject();
+				dataObject.SetData(DataFormats.StringFormat, SelectedFrameTemplate);
+				DragDrop.DoDragDrop(templateHolder,
+									 dataObject,
+									 DragDropEffects.Move);
+			}
+		}
+
+		private void Window_Drop( object sender, DragEventArgs e )
+		{
+			if (e.Data.GetDataPresent(DataFormats.StringFormat))
+			{
+				string dataString = (string)e.Data.GetData(DataFormats.StringFormat);
+				if (!string.IsNullOrEmpty(dataString))
+				{
+					this.SelectedFrameTemplate = null;
+				}
+			}
 		}
 	}
 }

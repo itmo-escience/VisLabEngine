@@ -20,7 +20,6 @@ namespace Fusion.Drivers.Graphics.Display
 
         private ConcurrentQueue<RenderTarget2D> _frontBuffers = new ConcurrentQueue<RenderTarget2D>();
 	    private RenderTarget2D _currentBuffer;
-	    private RenderTarget2D _extractedBuffer;
 	    private readonly object _extractedBufferLockHolder = new object();
         public override RenderTarget2D BackbufferColor => _currentBuffer;
 
@@ -58,7 +57,7 @@ namespace Fusion.Drivers.Graphics.Display
 		{
 			base.CreateDisplayResources();
 
-            _extractedBuffer?.Dispose();
+            //_extractedBuffer?.Dispose();
             _currentBuffer?.Dispose();
             while(_frontBuffers.TryDequeue(out var buffer))
                 buffer.Dispose();
@@ -67,6 +66,7 @@ namespace Fusion.Drivers.Graphics.Display
 
 
 
+		    _frontBuffers.Enqueue(CreateBuffer());
 		    _frontBuffers.Enqueue(CreateBuffer());
 		    _frontBuffers.Enqueue(CreateBuffer());
 		    _currentBuffer = CreateBuffer();
@@ -112,36 +112,35 @@ namespace Fusion.Drivers.Graphics.Display
         /// <returns></returns>
 	    public RenderTarget2D ExtractBuffer()
 	    {
-	        lock (_extractedBufferLockHolder)
+	            //if (_extractedBuffer != null)
+	            //    throw new InvalidOperationException("Return extracted buffer before extracting again.");
+
+	        if (!_frontBuffers.TryDequeue(out var extractedBuffer))
 	        {
-	            if (_extractedBuffer != null)
-	                throw new InvalidOperationException("Return extracted buffer before extracting again.");
-
-	            if (!_frontBuffers.TryDequeue(out _extractedBuffer))
-	            {
-                    throw new InvalidOperationException("There is no backBuffer in the queue. What happened?");
-	            }
-
-	            return _extractedBuffer;
+                throw new InvalidOperationException("There is no backBuffer in the queue. What happened?");
 	        }
+
+	        return extractedBuffer;
 	    }
 
 	    /// <summary>
 	    /// Returns extracted buffer to front buffer collection
 	    /// </summary>
 	    /// <returns></returns>
-        public void ReturnBuffer()
+        public void ReturnBuffer(RenderTarget2D buffer)
 	    {
-	        lock (_extractedBufferLockHolder)
+	        if (buffer == null) throw new InvalidOperationException("There is nothing to return");
+
+	        if (buffer.IsDisposed || !(buffer.Width == _clientWidth && buffer.Height == _clientHeight))
 	        {
-	            if (_extractedBuffer == null)
-	                throw new InvalidOperationException("There is nothing to return");
+	            _frontBuffers.Enqueue(CreateBuffer());
 
-	            _frontBuffers.Enqueue(!_extractedBuffer.IsDisposed ? _extractedBuffer : CreateBuffer());
-
-
-	            _extractedBuffer = null;
-	        }
+                buffer.Dispose();
+            }
+	        else
+	        {
+                _frontBuffers.Enqueue(buffer);
+            }
 	    }
 
 

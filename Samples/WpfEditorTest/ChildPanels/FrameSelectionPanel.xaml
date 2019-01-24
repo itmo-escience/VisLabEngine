@@ -18,14 +18,13 @@
             <ColumnDefinition Width="9"/>
         </Grid.ColumnDefinitions>
 
-        <Border Name="BottomAnchorLine" Background="{DynamicResource {x:Static SystemColors.MenuHighlightBrushKey}}" Grid.Column="1" 
+        <Border Name="BottomAnchorLine" Background="{DynamicResource {x:Static SystemColors.MenuHighlightBrushKey}}" Grid.Column="1"
                 HorizontalAlignment="Center" Height="20" Grid.Row="2" Width="2" Margin="0,9,0,-20" Visibility="Collapsed"/>
-        <Border Name="TopAnchorLine" Background="{DynamicResource {x:Static SystemColors.MenuHighlightBrushKey}}" Grid.Column="1" 
+        <Border Name="TopAnchorLine" Background="{DynamicResource {x:Static SystemColors.MenuHighlightBrushKey}}" Grid.Column="1"
                 HorizontalAlignment="Center" Height="20" Grid.Row="0" Width="2" Margin="0,-20,0,9" Visibility="Collapsed"/>
-        <Border Name="LeftAnchorLine" Background="{DynamicResource {x:Static SystemColors.MenuHighlightBrushKey}}" Grid.Column="0" 
+        <Border Name="LeftAnchorLine" Background="{DynamicResource {x:Static SystemColors.MenuHighlightBrushKey}}" Grid.Column="0"
                 VerticalAlignment="Center" Height="2" Grid.Row="1" Width="20" Margin="-20,0,9,0" Visibility="Collapsed"/>
-        <Border Name="RightAnchorLine" Background="{DynamicResource {x:Static SystemColors.MenuHighlightBrushKey}}" Grid.Column="2" 
+        <Border Name="RightAnchorLine" Background="{DynamicResource {x:Static SystemColors.MenuHighlightBrushKey}}" Grid.Column="2"
                 VerticalAlignment="Center" Height="2" Grid.Row="1" Width="20" Margin="9,0,-20,0" Visibility="Collapsed"/>
-        
     </Grid>
 </UserControl>

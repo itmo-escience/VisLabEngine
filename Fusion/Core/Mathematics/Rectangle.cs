@@ -70,6 +70,14 @@ namespace Fusion.Core.Mathematics
             _bottom = bottomRight.Y;
         }
 
+		public Rectangle(Rectangle rectangle)
+		{
+			_left = rectangle.Left;
+			_top = rectangle.Top;
+			_right = rectangle.Right;
+			_bottom = rectangle.Bottom;
+		}
+
         /// <summary>
         /// Gets or sets the left.
         /// </summary>
