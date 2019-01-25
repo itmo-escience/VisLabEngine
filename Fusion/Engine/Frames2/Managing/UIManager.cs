@@ -94,12 +94,13 @@ namespace Fusion.Engine.Frames2.Managing
         public static IEnumerable<UIComponent> DFSTraverse(UIComponent root)
         {
             var stack = new Stack<UIComponent>();
+            var stack2 = new Stack<UIComponent>();
             stack.Push(root);
 
             while (stack.Any())
             {
                 var c = stack.Pop();
-                yield return c;
+                stack2.Push(c);
 
                 if (c is UIContainer container)
                 {
@@ -108,6 +109,12 @@ namespace Fusion.Engine.Frames2.Managing
                         stack.Push(child);
                     }
                 }
+            }
+
+            while (stack2.Any())
+            {
+                var c = stack2.Pop();
+                yield return c;
             }
         }
 
