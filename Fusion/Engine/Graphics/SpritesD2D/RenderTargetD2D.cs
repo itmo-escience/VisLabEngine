@@ -51,35 +51,45 @@ namespace Fusion.Engine.Graphics.SpritesD2D
         /// <inheritdoc cref="RenderTarget.PopAxisAlignedClip()"/>
         public void PopAxisAlignedClip() => _target.PopAxisAlignedClip();
 
+        private RawVector2 createAlignedVector(RawVector2 vector)
+        {
+            return new RawVector2(vector.X + 0.5f, vector.Y + 0.5f);
+        }
+
+        private RawRectangleF createAlignedRectangle(RawRectangleF rectangle)
+        {
+            return new RawRectangleF(rectangle.Left + 0.5f, rectangle.Top + 0.5f, rectangle.Right + 0.5f, rectangle.Bottom + 0.5f);
+        }
+
         public void DrawEllipse(Vector2 center, float rX, float rY, IBrushD2D brush) =>
-            _target.DrawEllipse(new SharpDX.Direct2D1.Ellipse(center.ToRawVector2(), rX, rY), _brushFactory.GetOrCreateBrush(brush));
+            _target.DrawEllipse(new SharpDX.Direct2D1.Ellipse(createAlignedVector(center.ToRawVector2()), rX, rY), _brushFactory.GetOrCreateBrush(brush));
 
         public void DrawEllipse(Vector2 center, float rX, float rY, IBrushD2D brush, float strokeWidth) =>
-            _target.DrawEllipse(new SharpDX.Direct2D1.Ellipse(center.ToRawVector2(), rX, rY), _brushFactory.GetOrCreateBrush(brush), strokeWidth);
+            _target.DrawEllipse(new SharpDX.Direct2D1.Ellipse(createAlignedVector(center.ToRawVector2()), rX, rY), _brushFactory.GetOrCreateBrush(brush), strokeWidth);
 
         public void DrawLine(Vector2 p0, Vector2 p1, IBrushD2D brush) =>
-            _target.DrawLine(p0.ToRawVector2(), p1.ToRawVector2(), _brushFactory.GetOrCreateBrush(brush));
+            _target.DrawLine(createAlignedVector(p0.ToRawVector2()), createAlignedVector(p1.ToRawVector2()), _brushFactory.GetOrCreateBrush(brush));
 
         public void DrawLine(Vector2 p0, Vector2 p1, IBrushD2D brush, float strokeWidth) =>
-            _target.DrawLine(p0.ToRawVector2(), p1.ToRawVector2(), _brushFactory.GetOrCreateBrush(brush), strokeWidth);
+            _target.DrawLine(createAlignedVector(p0.ToRawVector2()), createAlignedVector(p1.ToRawVector2()), _brushFactory.GetOrCreateBrush(brush), strokeWidth);
 
         public void DrawRect(RectangleF rectangle, IBrushD2D brush) =>
-            _target.DrawRectangle(rectangle.ToRawRectangleF(), _brushFactory.GetOrCreateBrush(brush));
+            _target.DrawRectangle(createAlignedRectangle(rectangle.ToRawRectangleF()), _brushFactory.GetOrCreateBrush(brush));
 
         public void DrawRect(RectangleF rectangle, IBrushD2D brush, float strokeWidth) =>
-            _target.DrawRectangle(rectangle.ToRawRectangleF(), _brushFactory.GetOrCreateBrush(brush), strokeWidth);
+            _target.DrawRectangle(createAlignedRectangle(rectangle.ToRawRectangleF()), _brushFactory.GetOrCreateBrush(brush), strokeWidth);
 
         public void FillEllipse(Vector2 center, float rX, float rY, IBrushD2D brush) =>
-            _target.FillEllipse(new SharpDX.Direct2D1.Ellipse(center.ToRawVector2(), rX, rY), _brushFactory.GetOrCreateBrush(brush));
+            _target.FillEllipse(new SharpDX.Direct2D1.Ellipse(createAlignedVector(center.ToRawVector2()), rX, rY), _brushFactory.GetOrCreateBrush(brush));
 
         public void FillRect(RectangleF rectangle, IBrushD2D brush) =>
-            _target.FillRectangle(rectangle.ToRawRectangleF(), _brushFactory.GetOrCreateBrush(brush));
+            _target.FillRectangle(createAlignedRectangle(rectangle.ToRawRectangleF()), _brushFactory.GetOrCreateBrush(brush));
 
         public void DrawText(string text, TextFormatD2D textFormat, RectangleF rectangleF, IBrushD2D brush) =>
-            _target.DrawText(text, _dwFactory.CreateTextFormat(textFormat), rectangleF.ToRawRectangleF(), _brushFactory.GetOrCreateBrush(brush));
+            _target.DrawText(text, _dwFactory.CreateTextFormat(textFormat), createAlignedRectangle(rectangleF.ToRawRectangleF()), _brushFactory.GetOrCreateBrush(brush));
 
         public void DrawTextLayout(Vector2 origin, TextLayoutD2D layout, IBrushD2D brush) =>
-            _target.DrawTextLayout(origin.ToRawVector2(), _layoutFactory.CreateTextLayout(layout), _brushFactory.GetOrCreateBrush(brush));
+            _target.DrawTextLayout(createAlignedVector(origin.ToRawVector2()), _layoutFactory.CreateTextLayout(layout), _brushFactory.GetOrCreateBrush(brush));
 
 
         public DrawingStateBlockD2D SaveDrawingState()
