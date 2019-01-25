@@ -184,20 +184,25 @@ namespace GISTest
 		    _userInterface2.DebugEnabled = true;
 
 		    txt = new Fusion.Engine.Frames2.Components.Label("z", new TextFormatD2D("Calibri", 20), 150, 450, 100, 100);
-		    //_userInterface2.Root.Add(txt);
+            img1 = new Image(50, 50, 100, 100);
+            img2 = new Image(50, 50, 100, 100);
+            img3 = new Image(50, 50, 100, 100);
+            img4 = new Image(50, 50, 100, 100);
 
+            verticalBox1 = new VerticalBox(200, 200, 1, 1);
+            //verticalBox1.Add(txt);
+            verticalBox1.Add(img1);
+            verticalBox1.Add(img2);
 
-            img = new Image(250, 250, 100, 100);
-		    //_userInterface2.Root.Add(img);
+            verticalBox2 = new VerticalBox(200, 200, 1, 1);
+            verticalBox2.Add(img3);
+            verticalBox2.Add(img4);
 
-            var img1 = new Image(50, 50, 100, 100);
-            //_userInterface2.Root.Add(img1);
+            verticalBox3 = new VerticalBox(200, 200, 1, 1);
+            verticalBox3.Add(verticalBox1);
+            verticalBox3.Add(verticalBox2);
 
-            verticalBox = new VerticalBox(200, 200, 1, 1);
-            verticalBox.Add(txt);
-            verticalBox.Add(img);
-            verticalBox.Add(img1);
-            _userInterface2.Root.Add(verticalBox);
+            _userInterface2.Root.Add(verticalBox3);
 
             userInterface.RootFrame = this.rootFrame = new MainFrame(FrameProcessor);
 			viewLayer.SpriteLayers.Add(userInterface.FramesSpriteLayer);
@@ -272,13 +277,14 @@ namespace GISTest
 			messages.Clear();
 
             txt.Text = Game.Mouse.Position.ToString();// + "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa";
-		    img.Angle = angle;
 		    txt.Angle = MathUtil.TwoPi - angle;
+            img1.Angle = angle;
+            img3.Angle = angle;
 
             _userInterface2.Update(gameTime);
 		    _userInterface2.Draw(_spriteLayer);
 
-		    angle += 0.01f;
+		    //angle += 0.01f;
 		    if (angle > MathUtil.TwoPi)
 		        angle -= MathUtil.TwoPi;
 		}
@@ -293,8 +299,13 @@ namespace GISTest
 
 	    private Fusion.Engine.Frames2.Components.Label txt;
 	    private float angle = 0;
-	    private Image img;
-        private VerticalBox verticalBox;
+	    private Image img1;
+        private Image img2;
+        private Image img3;
+        private Image img4;
+        private VerticalBox verticalBox1;
+        private VerticalBox verticalBox2;
+        private VerticalBox verticalBox3;
 
         public void PrintMessage(string message)
 		{
