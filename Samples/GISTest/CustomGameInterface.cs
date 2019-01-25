@@ -189,16 +189,16 @@ namespace GISTest
             img3 = new Image(50, 50, 100, 100);
             img4 = new Image(50, 50, 100, 100);
 
-            verticalBox1 = new VerticalBox(200, 200, 1, 1);
-            //verticalBox1.Add(txt);
+            verticalBox1 = new VerticalBox(200, 200, 0, 0);
+            verticalBox1.Add(txt);
             verticalBox1.Add(img1);
             verticalBox1.Add(img2);
 
-            verticalBox2 = new VerticalBox(200, 200, 1, 1);
+            verticalBox2 = new VerticalBox(200, 200, 0, 0);
             verticalBox2.Add(img3);
             verticalBox2.Add(img4);
 
-            verticalBox3 = new VerticalBox(200, 200, 1, 1);
+            verticalBox3 = new VerticalBox(200, 200, 0, 0);
             verticalBox3.Add(verticalBox1);
             verticalBox3.Add(verticalBox2);
 
@@ -276,7 +276,7 @@ namespace GISTest
 			}
 			messages.Clear();
 
-            txt.Text = Game.Mouse.Position.ToString();// + "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa";
+            txt.Text = Game.Mouse.Position.ToString();
 		    txt.Angle = MathUtil.TwoPi - angle;
             img1.Angle = angle;
             img3.Angle = angle;
@@ -284,7 +284,7 @@ namespace GISTest
             _userInterface2.Update(gameTime);
 		    _userInterface2.Draw(_spriteLayer);
 
-		    //angle += 0.01f;
+		    angle += 0.01f;
 		    if (angle > MathUtil.TwoPi)
 		        angle -= MathUtil.TwoPi;
 		}

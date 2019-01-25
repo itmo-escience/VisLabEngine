@@ -212,9 +212,9 @@ namespace Fusion.Engine.Frames2
             layer.Draw(TransformCommand.Identity);
             layer.Draw(new Rect(b.X, b.Y, b.Width, b.Height, debugBrush));
 
-            string debugText = Name;
+            string debugText = $"{Name} X:{b.X:0.00} Y:{b.Y:0.00} W:{b.Width:0.00} H:{b.Height:0.00}";
             TextLayoutD2D dtl = new TextLayoutD2D(debugText, debugTextFormat, float.MaxValue, float.MaxValue);
-            layer.Draw(new Label(debugText, new RectangleF(b.X, b.Y - dtl.Height, dtl.Width, dtl.Height), debugTextFormat, debugBrush));
+            layer.Draw(new Label(debugText, new RectangleF(b.X, b.Y - dtl.Height, dtl.Width + 1, dtl.Height), debugTextFormat, debugBrush));
         }
 
         #region Naming
