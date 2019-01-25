@@ -146,4 +146,66 @@ namespace Fusion.Engine.Graphics.SpritesD2D
             target.DrawText(Text, Format, Location, Brush);
         }
     }
+
+    public class FillEllipse : IDrawCommand
+    {
+        protected readonly float X, Y, R1, R2;
+        protected readonly IBrushD2D Brush;
+
+        public FillEllipse(float x, float y, float r1, float r2, IBrushD2D brush)
+        {
+            X = x;
+            Y = y;
+            R1 = r1;
+            R2 = r2;
+            Brush = brush;
+        }
+
+        public void Apply(RenderTargetD2D target)
+        {
+            target.FillEllipse(new Vector2(X, Y), R1, R2, Brush);
+        }
+
+        public override string ToString()
+        {
+            return $"FillEllipse({X}, {Y}, {R1}, {R2})";
+        }
+    }
+
+    public sealed class FillCircle : FillEllipse
+    {
+        public FillCircle(float x, float y, float r, IBrushD2D brush) : base(x, y, r, r, brush) { }
+
+        public override string ToString()
+        {
+            return $"FillCircle({X}, {Y}, {R1})";
+        }
+    }
+
+    public sealed class FillRect : IDrawCommand
+    {
+        protected readonly float X, Y, W, H;
+        private readonly IBrushD2D _brush;
+        private RectangleF _rect;
+
+        public FillRect(float x, float y, float w, float h, IBrushD2D brush)
+        {
+            X = x;
+            Y = y;
+            W = w;
+            H = h;
+            _brush = brush;
+            _rect = new RectangleF(x, y, w, h);
+        }
+
+        public void Apply(RenderTargetD2D target)
+        {
+            target.FillRect(_rect, _brush);
+        }
+
+        public override string ToString()
+        {
+            return $"FillRectangle ({X}, {Y}, {W}, {H})";
+        }
+    }
 }
