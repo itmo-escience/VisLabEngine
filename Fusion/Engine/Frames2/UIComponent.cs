@@ -204,6 +204,19 @@ namespace Fusion.Engine.Frames2
         public abstract void Update(GameTime gameTime);
         public abstract void Draw(SpriteLayerD2D layer);
 
+        protected SolidBrushD2D debugBrush = new SolidBrushD2D(new Color4(0, 1, 0, 1));
+        protected TextFormatD2D debugTextFormat = new TextFormatD2D("Consolas", 12);
+        public virtual void DebugDraw(SpriteLayerD2D layer)
+        {
+            var b = BoundingBox;
+            layer.Draw(TransformCommand.Identity);
+            layer.Draw(new Rect(b.X, b.Y, b.Width, b.Height, debugBrush));
+
+            string debugText = Name;
+            TextLayoutD2D dtl = new TextLayoutD2D(debugText, debugTextFormat, float.MaxValue, float.MaxValue);
+            layer.Draw(new Label(debugText, new RectangleF(b.X, b.Y - dtl.Height, dtl.Width, dtl.Height), debugTextFormat, debugBrush));
+        }
+
         #region Naming
 
         private static readonly Dictionary<Type, int> GeneratedCountOfType = new Dictionary<Type, int>();

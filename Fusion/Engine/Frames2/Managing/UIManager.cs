@@ -14,8 +14,6 @@ namespace Fusion.Engine.Frames2.Managing
         public UIContainer Root;
 
         public bool DebugEnabled { get; set; }
-        private readonly SolidBrushD2D _debugBrush = new SolidBrushD2D(new Color4(0, 1, 0, 1));
-        private readonly TextFormatD2D _debugTextFormat = new TextFormatD2D("Consolas", 12);
 
         public UIManager(RenderSystem rs)
         {
@@ -66,11 +64,7 @@ namespace Fusion.Engine.Frames2.Managing
 
                 if (DebugEnabled)
                 {
-                    var b = c.BoundingBox;
-                    layer.Draw(TransformCommand.Identity);
-                    layer.Draw(new Rect(b.X, b.Y, b.Width, b.Height, _debugBrush));
-                    TextLayoutD2D dtl = new TextLayoutD2D(c.Name, _debugTextFormat, float.MaxValue, float.MaxValue);
-                    layer.Draw(new Label(c.Name, new RectangleF(b.X, b.Y - dtl.Height, dtl.Width, dtl.Height), _debugTextFormat, _debugBrush));
+                    c.DebugDraw(layer);
                 }
             }
 
