@@ -189,16 +189,18 @@ namespace GISTest
             img3 = new Image(50, 50, 100, 100);
             img4 = new Image(50, 50, 100, 100);
 
-            verticalBox1 = new VerticalBox(200, 200, 0, 0);
+            verticalAlignment alignment = verticalAlignment.CENTER;
+
+            verticalBox1 = new VerticalBox(0, 0, 0, 0, alignment);
             verticalBox1.Add(txt);
             verticalBox1.Add(img1);
             verticalBox1.Add(img2);
 
-            verticalBox2 = new VerticalBox(200, 200, 0, 0);
+            verticalBox2 = new VerticalBox(0, 0, 0, 0, alignment);
             verticalBox2.Add(img3);
             verticalBox2.Add(img4);
 
-            verticalBox3 = new VerticalBox(200, 200, 0, 0);
+            verticalBox3 = new VerticalBox(200, 200, 0, 0, alignment);
             verticalBox3.Add(verticalBox1);
             verticalBox3.Add(verticalBox2);
 
