@@ -133,6 +133,12 @@ namespace Fusion.Engine.Frames2
             }
         }
 
+        public virtual bool IsInside(Vector2 point)
+        {
+            Vector2 truePoint = Matrix3x2.TransformPoint(Matrix3x2.Invert(_transform * _localTransform), point);
+            return new RectangleF(0, 0, Width, Height).Contains(truePoint);
+        }
+
         private UIContainer _parent;
         public UIContainer Parent
         {
