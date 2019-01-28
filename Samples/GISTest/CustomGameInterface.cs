@@ -183,7 +183,13 @@ namespace GISTest
 		    _userInterface2 = new UIManager(Game.RenderSystem);
 		    _userInterface2.DebugEnabled = true;
 
-		    txt = new Fusion.Engine.Frames2.Components.Label("z", new TextFormatD2D("Calibri", 20), 150, 450, 100, 100);
+            Game.Mouse.Press += (sender, e) =>
+            {
+                _userInterface2.Root.OnClick(e);
+            };
+
+
+            txt = new Fusion.Engine.Frames2.Components.Label("z", new TextFormatD2D("Calibri", 20), 150, 450, 100, 100);
             string fileName = @"E:\GitHub\image.png";
             img1 = new Image(50, 50, 100, 100, fileName, 1);
             img2 = new Image(50, 50, 100, 100, fileName, 0.66f);

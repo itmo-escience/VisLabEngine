@@ -59,5 +59,17 @@ namespace Fusion.Engine.Frames2
         }
 
         public override void Draw(SpriteLayerD2D layer) { }
+
+        public override void OnClick(Input.MousePressEventArgs e)
+        {
+            foreach (var child in Children)
+            {
+                e.Position = new Vector2(e.Position.X - X, e.Position.Y - Y);
+                if ((e.Position.X >= child.X) && (e.Position.X < child.X + child.Width) && (e.Position.Y >= child.Y) && (e.Position.Y < child.Y + child.Height))    //TODO take into account transformation
+                {
+                    child.OnClick(e);
+                }
+            }
+        }
     }
 }

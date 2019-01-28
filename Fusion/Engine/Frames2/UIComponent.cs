@@ -214,6 +214,8 @@ namespace Fusion.Engine.Frames2
             layer.Draw(new Label(debugText, new RectangleF(b.X, b.Y - dtl.Height, dtl.Width + 1, dtl.Height), debugTextFormat, debugBrush));
         }
 
+        public virtual void OnClick(Input.MousePressEventArgs e) { }
+
         #region Naming
 
         private static readonly Dictionary<Type, int> GeneratedCountOfType = new Dictionary<Type, int>();

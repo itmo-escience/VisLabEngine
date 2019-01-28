@@ -26,6 +26,9 @@ namespace Fusion.Engine.Frames2.Containers
                 if (maxChildWidth < child.BoundingBox.Width) maxChildWidth = child.BoundingBox.Width;
             }
 
+            Width = maxChildWidth;
+            Height = bottomBorder;
+
             float deltaXMultiplier = 0;
             switch (alignment)
             {
