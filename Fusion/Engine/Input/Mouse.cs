@@ -46,6 +46,7 @@ namespace Fusion.Engine.Input
 
         public event MouseMoveHandlerDelegate Move;
         public event MouseScrollEventHandler Scroll;
+        public event MousePressEventHandler Press;
 
         protected virtual void OnMove(object sender, MouseMoveEventArgs e)
         {
@@ -64,6 +65,15 @@ namespace Fusion.Engine.Input
             var handler = Scroll;
             handler?.Invoke(sender, e);
         }
+
+        protected virtual void OnPress(object sender, MousePressEventArgs e)
+        {
+            // Make a temporary copy of the event to avoid possibility of
+            // a race condition if the last subscriber unsubscribes
+            // immediately after the null check and before the event is raised.
+            var handler = Press;
+            handler?.Invoke(sender, e);
+        }
     }
 
 	public class ConcreteMouse : Mouse
@@ -80,6 +90,7 @@ namespace Fusion.Engine.Input
 
 			device.MouseScroll += DeviceMouseScroll;
 			device.MouseMove += DeviceMouseMove;
+            device.MousePress += DeviceMousePress;
 		}
 
 	    /// <inheritdoc cref="GameModule.Initialize"/>
@@ -91,7 +102,8 @@ namespace Fusion.Engine.Input
 			if (disposing) {
 				device.MouseScroll -= DeviceMouseScroll;
 				device.MouseMove -= DeviceMouseMove;
-			}
+                device.MousePress -= DeviceMousePress;
+            }
 
 			base.Dispose(disposing);
 		}
@@ -135,7 +147,12 @@ namespace Fusion.Engine.Input
 		{
             OnScroll(sender, new MouseScrollEventArgs { WheelDelta = e.WheelDelta });
 		}
-	}
+
+        private void DeviceMousePress(object sender, InputDevice.KeyEventArgs k, InputDevice.MouseMoveEventArgs m)
+        {
+            OnPress(sender, new MousePressEventArgs { Position = m.Position, Key = (Keys)k.Key});
+        }
+    }
 
     public class DummyMouse : Mouse
     {
