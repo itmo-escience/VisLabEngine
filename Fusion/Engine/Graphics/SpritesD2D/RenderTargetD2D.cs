@@ -1,6 +1,8 @@
 ﻿using Fusion.Core.Mathematics;
 using SharpDX.Direct2D1;
 using SharpDX.Mathematics.Interop;
+using System.Drawing.Imaging;
+using System.Runtime.InteropServices;
 
 namespace Fusion.Engine.Graphics.SpritesD2D
 {
@@ -91,6 +93,9 @@ namespace Fusion.Engine.Graphics.SpritesD2D
         public void DrawTextLayout(Vector2 origin, TextLayoutD2D layout, IBrushD2D brush) =>
             _target.DrawTextLayout(createAlignedVector(origin.ToRawVector2()), _layoutFactory.CreateTextLayout(layout), _brushFactory.GetOrCreateBrush(brush));
 
+        public void DrawBitmap(Bitmap bitmap, RectangleF destinationRectangle, float opacity, BitmapInterpolationMode interpolationMode, RectangleF sourceRectangle) =>
+            _target.DrawBitmap(bitmap, createAlignedRectangle(destinationRectangle.ToRawRectangleF()), opacity, interpolationMode, createAlignedRectangle(sourceRectangle.ToRawRectangleF()));
+
 
         public DrawingStateBlockD2D SaveDrawingState()
         {
@@ -105,6 +110,52 @@ namespace Fusion.Engine.Graphics.SpritesD2D
         {
             get => _target.Transform.ToMatrix3x2();
             set => _target.Transform = value.ToRawMatrix3X2();
+        }
+
+        /// <summary>
+        /// Loads a Direct2D Bitmap from a file using System.Drawing.Image.FromFile(...)
+        /// </summary>
+        /// <param name="renderTarget">The render target.</param>
+        /// <param name="file">The file.</param>
+        /// <returns>A D2D1 Bitmap</returns>
+        public static Bitmap LoadFromFile(RenderTargetD2D renderTarget, string file)
+        {
+            // Loads from file using System.Drawing.Image
+            using (var bitmap = (System.Drawing.Bitmap)System.Drawing.Image.FromFile(file))
+            {
+                var sourceArea = new System.Drawing.Rectangle(0, 0, bitmap.Width, bitmap.Height);
+                var bitmapProperties = new BitmapProperties(new SharpDX.Direct2D1.PixelFormat(SharpDX.DXGI.Format.R8G8B8A8_UNorm, AlphaMode.Premultiplied));
+                var size = new System.Drawing.Size(bitmap.Width, bitmap.Height);
+
+                // Transform pixels from BGRA to RGBA
+                int stride = bitmap.Width * sizeof(int);
+                using (var tempStream = new SharpDX.DataStream(bitmap.Height * stride, true, true))
+                {
+                    // Lock System.Drawing.Bitmap
+                    var bitmapData = bitmap.LockBits(sourceArea, ImageLockMode.ReadOnly, System.Drawing.Imaging.PixelFormat.Format32bppPArgb);
+
+                    // Convert all pixels 
+                    for (int y = 0; y < bitmap.Height; y++)
+                    {
+                        int offset = bitmapData.Stride * y;
+                        for (int x = 0; x < bitmap.Width; x++)
+                        {
+                            // Not optimized 
+                            byte B = Marshal.ReadByte(bitmapData.Scan0, offset++);
+                            byte G = Marshal.ReadByte(bitmapData.Scan0, offset++);
+                            byte R = Marshal.ReadByte(bitmapData.Scan0, offset++);
+                            byte A = Marshal.ReadByte(bitmapData.Scan0, offset++);
+                            int rgba = R | (G << 8) | (B << 16) | (A << 24);
+                            tempStream.Write(rgba);
+                        }
+
+                    }
+                    bitmap.UnlockBits(bitmapData);
+                    tempStream.Position = 0;
+
+                    return new Bitmap(renderTarget._target, new SharpDX.Size2(bitmap.Width, bitmap.Height), tempStream, stride, bitmapProperties);
+                }
+            }
         }
 
         private void ZZZ()

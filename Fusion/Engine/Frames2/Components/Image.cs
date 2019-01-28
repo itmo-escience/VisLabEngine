@@ -6,19 +6,19 @@ namespace Fusion.Engine.Frames2.Components
 {
     public sealed class Image : UIComponent, IUIMouseAware
     {
-        private IBrushD2D _brush = new SolidBrushD2D(Color4.White);
-        public Image(float x, float y, float width, float height) : base(x, y, width, height)
+        private string _file;
+        private float _opacity;
+        public Image(float x, float y, float width, float height, string file, float opacity = 1) : base(x, y, width, height)
         {
-
+            _file = file;
+            _opacity = opacity;
         }
 
         public override void Update(GameTime gameTime) { }
 
         public override void Draw(SpriteLayerD2D layer)
         {
-            layer.Draw(new Rect(0, 0, Width, Height, _brush));
-            layer.Draw(new Line(new Vector2(), new Vector2(Width, Height), _brush));
-            layer.Draw(new Line(new Vector2(Width, 0), new Vector2(0, Height), _brush));
+            layer.Draw(new DrawBitmap(0, 0, Width, Height, _file, _opacity));
         }
 
         public event MouseEvent MouseIn;

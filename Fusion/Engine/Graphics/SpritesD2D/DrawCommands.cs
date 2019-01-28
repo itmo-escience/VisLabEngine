@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using Fusion.Core.Mathematics;
+using SharpDX.Direct2D1;
 
 namespace Fusion.Engine.Graphics.SpritesD2D
 {
@@ -206,6 +207,36 @@ namespace Fusion.Engine.Graphics.SpritesD2D
         public override string ToString()
         {
             return $"FillRectangle ({X}, {Y}, {W}, {H})";
+        }
+    }
+
+    public sealed class DrawBitmap : IDrawCommand
+    {
+        private readonly float X, Y, W, H;
+        private RectangleF _rect;
+        private string _file;
+        private float _opacity;
+
+        public DrawBitmap(float x, float y, float w, float h, string file, float opacity = 1)
+        {
+            X = x;
+            Y = y;
+            W = w;
+            H = h;
+            _rect = new RectangleF(x, y, w, h);
+            _file = file;
+            _opacity = opacity;
+        }
+
+        public void Apply(RenderTargetD2D target)
+        {
+            Bitmap bitmap = RenderTargetD2D.LoadFromFile(target, _file);
+            target.DrawBitmap(bitmap, new RectangleF(0, 0, W, H), _opacity, BitmapInterpolationMode.NearestNeighbor, new RectangleF(0, 0, bitmap.Size.Width, bitmap.Size.Height));
+        }
+
+        public override string ToString()
+        {
+            return $"DrawBitmap ({X}, {Y}, {W}, {H}, {_file})";
         }
     }
 }
