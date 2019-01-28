@@ -9,6 +9,7 @@ using System.Windows.Input;
 using System.Windows.Media;
 using WpfEditorTest.FrameSelection;
 using WpfEditorTest.UndoRedo;
+using WpfEditorTest.Utility;
 using CommandManager = WpfEditorTest.UndoRedo.CommandManager;
 using Frame = Fusion.Engine.Frames.Frame;
 using Rectangle = Fusion.Core.Mathematics.Rectangle;
@@ -265,7 +266,7 @@ namespace WpfEditorTest.ChildPanels
 		}
 
 		internal void Reposition( int deltaX, int deltaY, bool isShiftPressed, bool isControlPressed, int gridSizeMultiplier, bool needSnapping,
-			List<int> stickingCoordsX, List<int> stickingCoordsY, out double dX, out double dY )
+			List<StickCoordinateX> stickingCoordsX, List<StickCoordinateY> stickingCoordsY, out double dX, out double dY )
 		{
 			var step = (int)(FusionUI.UI.ScalableFrame.ScaleMultiplier * gridSizeMultiplier);
 			var newX = SelectedGroupInitPosition.X + deltaX;
@@ -277,48 +278,84 @@ namespace WpfEditorTest.ChildPanels
 				dX -= -step / 2 + (newX + step / 2) % step;
 				dY -= -step / 2 + (newY + step / 2) % step;
 			}
-
-			var stickingDelta = 0;
-
-			var newXHelper = (int)(newX + 0.5*Math.Sign(newX));
-			var widthHelper = (int)(SelectedGroupInitSize.Width + 0.5);
-			var newYHelper = (int)(newY + 0.5 * Math.Sign(newY));
-			var heightHelper = (int)(SelectedGroupInitSize.Height + 0.5);
-
-			var closestStickX1 = 
-				stickingCoordsX.Where(scX => Math.Abs(newXHelper - scX) == stickingCoordsX.Select(x => Math.Abs(newXHelper-x)).Min()).FirstOrDefault();
-			var closestStickX2 = 
-				stickingCoordsX.Where(scX => Math.Abs(newXHelper + widthHelper - scX) == stickingCoordsX.Select(x => Math.Abs(newXHelper + widthHelper - x)).Min()).FirstOrDefault();
-			var closestStickY1 = 
-				stickingCoordsY.Where(scY => Math.Abs(newYHelper - scY) == stickingCoordsY.Select(y => Math.Abs(newYHelper - y)).Min()).FirstOrDefault();
-			var closestStickY2 = 
-				stickingCoordsY.Where(scY => Math.Abs(newYHelper + heightHelper - scY) == stickingCoordsY.Select(y => Math.Abs(newYHelper + heightHelper - y)).Min()).FirstOrDefault();
-
-			var rangeX1 = Enumerable.Range(closestStickX1 - StickingCoordsSensitivity, StickingCoordsSensitivity * 2);
-			var rangeX2 = Enumerable.Range(closestStickX2 - StickingCoordsSensitivity, StickingCoordsSensitivity * 2);
-			var rangeY1 = Enumerable.Range(closestStickY1 - StickingCoordsSensitivity, StickingCoordsSensitivity * 2);
-			var rangeY2 = Enumerable.Range(closestStickY2 - StickingCoordsSensitivity, StickingCoordsSensitivity * 2);
-
-			if (rangeX1.Contains(newXHelper))
+			else
 			{
-				stickingDelta = closestStickX1 - newXHelper;
-			}
-			if (rangeX2.Contains(newXHelper + widthHelper))
-			{
-				stickingDelta = closestStickX2 - (newXHelper + widthHelper);
-			}
-			dX += stickingDelta;
+				var stickingDelta = 0;
 
-			stickingDelta = 0;
-			if (rangeY1.Contains(newYHelper))
-			{
-				stickingDelta = closestStickY1 - newYHelper;
+				var newXHelper = (int)(newX + 0.5 * Math.Sign(newX));
+				var widthHelper = (int)(SelectedGroupInitSize.Width + 0.5);
+				var newYHelper = (int)(newY + 0.5 * Math.Sign(newY));
+				var heightHelper = (int)(SelectedGroupInitSize.Height + 0.5);
+
+				foreach (var x in stickingCoordsX)
+				{
+					x.IsActive = false;
+				}
+				foreach (var y in stickingCoordsY)
+				{
+					y.IsActive = false;
+				}
+
+				var closestStickX1 =
+					stickingCoordsX.Where(scX => Math.Abs(newXHelper - scX.X) == stickingCoordsX.Select(x => Math.Abs(newXHelper - x.X)).Min()).FirstOrDefault();
+				var closestStickX2 =
+					stickingCoordsX.Where(scX => Math.Abs(newXHelper + widthHelper - scX.X) == stickingCoordsX.Select(x => Math.Abs(newXHelper + widthHelper - x.X)).Min()).FirstOrDefault();
+				var closestStickX3 =
+					stickingCoordsX.Where(scX => Math.Abs(newXHelper + widthHelper/2 - scX.X) == stickingCoordsX.Select(x => Math.Abs(newXHelper + widthHelper/2 - x.X)).Min()).FirstOrDefault();
+				var closestStickY1 =
+					stickingCoordsY.Where(scY => Math.Abs(newYHelper - scY.Y) == stickingCoordsY.Select(y => Math.Abs(newYHelper - y.Y)).Min()).FirstOrDefault();
+				var closestStickY2 =
+					stickingCoordsY.Where(scY => Math.Abs(newYHelper + heightHelper - scY.Y) == stickingCoordsY.Select(y => Math.Abs(newYHelper + heightHelper - y.Y)).Min()).FirstOrDefault();
+				var closestStickY3 =
+					stickingCoordsY.Where(scY => Math.Abs(newYHelper + heightHelper/2 - scY.Y) == stickingCoordsY.Select(y => Math.Abs(newYHelper + heightHelper/2 - y.Y)).Min()).FirstOrDefault();
+
+				if (closestStickX1 == null || closestStickX2 == null ||
+					closestStickY1 == null || closestStickY2 == null ||
+					closestStickX3 == null || closestStickY3 == null)
+					return;
+
+				var rangeX1 = Enumerable.Range(closestStickX1.X - StickingCoordsSensitivity, StickingCoordsSensitivity * 2);
+				var rangeX2 = Enumerable.Range(closestStickX2.X - StickingCoordsSensitivity, StickingCoordsSensitivity * 2);
+				var rangeX3 = Enumerable.Range(closestStickX3.X - StickingCoordsSensitivity, StickingCoordsSensitivity * 2);
+				var rangeY1 = Enumerable.Range(closestStickY1.Y - StickingCoordsSensitivity, StickingCoordsSensitivity * 2);
+				var rangeY2 = Enumerable.Range(closestStickY2.Y - StickingCoordsSensitivity, StickingCoordsSensitivity * 2);
+				var rangeY3 = Enumerable.Range(closestStickY3.Y - StickingCoordsSensitivity, StickingCoordsSensitivity * 2);
+
+				if (rangeX1.Contains(newXHelper))
+				{
+					stickingDelta = closestStickX1.X - newXHelper;
+					closestStickX1.IsActive = true;
+				}
+				if (rangeX2.Contains(newXHelper + widthHelper))
+				{
+					stickingDelta = closestStickX2.X - (newXHelper + widthHelper);
+					closestStickX2.IsActive = true;
+				}
+				if (rangeX3.Contains(newXHelper + widthHelper/2))
+				{
+					stickingDelta = closestStickX3.X - (newXHelper + widthHelper/2);
+					closestStickX3.IsActive = true;
+				}
+				dX += stickingDelta;
+
+				stickingDelta = 0;
+				if (rangeY1.Contains(newYHelper))
+				{
+					stickingDelta = closestStickY1.Y - newYHelper;
+					closestStickY1.IsActive = true;
+				}
+				if (rangeY2.Contains(newYHelper + heightHelper))
+				{
+					stickingDelta = closestStickY2.Y - (newYHelper + heightHelper);
+					closestStickY2.IsActive = true;
+				}
+				if (rangeY3.Contains(newYHelper + heightHelper/2))
+				{
+					stickingDelta = closestStickY3.Y - (newYHelper + heightHelper/2);
+					closestStickY3.IsActive = true;
+				}
+				dY += stickingDelta; 
 			}
-			if (rangeY2.Contains(newYHelper + heightHelper))
-			{
-				stickingDelta = closestStickY2 - (newYHelper + heightHelper);
-			}
-			dY += stickingDelta;
 		}
 	}
 }

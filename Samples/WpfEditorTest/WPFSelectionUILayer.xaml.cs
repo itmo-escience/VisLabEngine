@@ -13,6 +13,7 @@ using WpfEditorTest.FrameSelection;
 using WpfEditorTest.ChildPanels;
 using Fusion.Engine.Frames;
 using ZWpfLib;
+using WpfEditorTest.Utility;
 
 namespace WpfEditorTest
 {
@@ -22,8 +23,10 @@ namespace WpfEditorTest
 	public partial class WPFSelectionUILayer : Grid
 	{
 		public Dictionary<Frame, FrameSelectionPanel> FrameSelectionPanelList = new Dictionary<Frame, FrameSelectionPanel>();
-		private List<int> StickingCoordsY = new List<int>();
-		private List<int> StickingCoordsX = new List<int>();
+		private List<StickCoordinateY> StickingCoordsY = new List<StickCoordinateY>();
+		private List<StickCoordinateX> StickingCoordsX = new List<StickCoordinateX>();
+
+		private List<Line> StickLines = new List<Line>();
 
 		private int _deltaX = 0;
 		private int _deltaY = 0;
@@ -157,6 +160,11 @@ namespace WpfEditorTest
 
 		private void DrawLine( double x1, double x2, double y1, double y2, double thickness, Brush brush )
 		{
+			VisualGrid.Children.Add(PrepareLine(x1, x2, y1, y2, thickness, brush));
+		}
+
+		private Line PrepareLine( double x1, double x2, double y1, double y2, double thickness, Brush brush )
+		{
 			// Add a Line Element
 			var myLine = new Line()
 			{
@@ -171,7 +179,7 @@ namespace WpfEditorTest
 				StrokeThickness = thickness,
 				SnapsToDevicePixels = true,
 			};
-			VisualGrid.Children.Add(myLine);
+			return myLine;
 		}
 
 		private void DrawSelectionRectangle( double width, double height, double top, double left, double thickness, Brush brush, Brush secondBrush )
@@ -414,6 +422,8 @@ namespace WpfEditorTest
 
 			_frameDragsPanel.DragMousePressed = false;
 
+			ForgetStickingCoords();
+
 			//if (PaletteWindow.SelectedFrameTemplate != null)
 			//{
 			//	//var createdFrame = Window.CreateFrameFromFile(System.IO.Path.Combine(ApplicationConfig.TemplatesPath, PaletteWindow.SelectedFrameTemplate) + ".xml");
@@ -459,19 +469,20 @@ namespace WpfEditorTest
 						this.MoveFrameToDragField(panel.SelectedFrame);
 						panel.IsInDragField = true;
 					}
-					StickingCoordsX.Clear();
-					StickingCoordsY.Clear();
+					ForgetStickingCoords();
 					RememberStickingCoords(SceneFrame);
 					_frameDragsPanel.SelectedGroupInitSize = new Size(_frameDragsPanel.Width, _frameDragsPanel.Height);
 					_frameDragsPanel.SelectedGroupInitPosition = new Point(_frameDragsPanel.RenderTransform.Value.OffsetX, _frameDragsPanel.RenderTransform.Value.OffsetY);
+				}
+				else
+				{
+					RecalculateSelectionPosition(e.MouseDevice.GetPosition(this));
 				}
 				if (movedPanel.IsInDragField || PaletteWindow.SelectedFrameTemplate != null)
 				{
 					var hovered = GetHoveredFrameOnScene(e.GetPosition(this), true);
 					ParentHighlightPanel.SelectedFrame = hovered;
 				}
-
-				RecalculateSelectionPosition(e.MouseDevice.GetPosition(this));
 			}
 		}
 
@@ -479,15 +490,109 @@ namespace WpfEditorTest
 		{
 			if (!FrameSelectionPanelList.ContainsKey(frame))
 			{
-				StickingCoordsX.Add(frame.GlobalRectangle.X);
-				StickingCoordsX.Add(frame.GlobalRectangle.X + frame.GlobalRectangle.Width);
-				//StickingCoordsX.Add(frame.GlobalRectangle.X + frame.GlobalRectangle.Width/2);
-				StickingCoordsY.Add(frame.GlobalRectangle.Y);
-				StickingCoordsY.Add(frame.GlobalRectangle.Y + frame.GlobalRectangle.Height);
-				//StickingCoordsY.Add(frame.GlobalRectangle.Y + frame.GlobalRectangle.Height/2);
+				StickingCoordsX.Add(new StickCoordinateX(frame.GlobalRectangle.X, frame.GlobalRectangle.Y, frame.GlobalRectangle.Y + frame.GlobalRectangle.Height)
+				{
+					ActiveChanged = DrawStickLine,
+				});
+				StickingCoordsX.Add(new StickCoordinateX(frame.GlobalRectangle.X + frame.GlobalRectangle.Width, frame.GlobalRectangle.Y, frame.GlobalRectangle.Y + frame.GlobalRectangle.Height)
+				{
+					ActiveChanged = DrawStickLine,
+				});
+				StickingCoordsX.Add(new StickCoordinateX(frame.GlobalRectangle.X + frame.GlobalRectangle.Width/2, frame.GlobalRectangle.Y, frame.GlobalRectangle.Y + frame.GlobalRectangle.Height)
+				{
+					ActiveChanged = DrawStickLine,
+				});
+				StickingCoordsY.Add(new StickCoordinateY(frame.GlobalRectangle.Y, frame.GlobalRectangle.X, frame.GlobalRectangle.X + frame.GlobalRectangle.Width)
+				{
+					ActiveChanged = DrawStickLine,
+				});
+				StickingCoordsY.Add(new StickCoordinateY(frame.GlobalRectangle.Y + frame.GlobalRectangle.Height, frame.GlobalRectangle.X, frame.GlobalRectangle.X + frame.GlobalRectangle.Width)
+				{
+					ActiveChanged = DrawStickLine,
+				});
+				StickingCoordsY.Add(new StickCoordinateY(frame.GlobalRectangle.Y + frame.GlobalRectangle.Height/2, frame.GlobalRectangle.X, frame.GlobalRectangle.X + frame.GlobalRectangle.Width)
+				{
+					ActiveChanged = DrawStickLine,
+				});
 
 				frame.ForEachChildren(c => RememberStickingCoords(c));
 			}
+		}
+
+		private void DrawStickLine( object sender, EventArgs e )
+		{
+			if (sender is StickCoordinateX)
+			{
+				var coordX = sender as StickCoordinateX;
+				if (coordX.IsActive)
+				{
+					var line =	PrepareLine(
+						coordX.X, coordX.X,
+						Math.Min(coordX.TopY, _frameDragsPanel.RenderTransform.Value.OffsetY),
+						Math.Max(coordX.BottomY, _frameDragsPanel.RenderTransform.Value.OffsetY + _frameDragsPanel.ActualHeight),
+						2, Brushes.MediumBlue
+						);
+					StickLinesGrid.Children.Add(line);
+					line.Tag = coordX;
+					StickLines.Add(line);
+				}
+				else
+				{
+					var line = StickLines.Where(l => l.Tag == coordX).FirstOrDefault();
+					if (line!=null)
+					{
+						StickLinesGrid.Children.Remove(line);
+						StickLines.Remove(line);
+					}
+				}
+			}
+			else
+			{
+				var coordY = sender as StickCoordinateY;
+				if (coordY.IsActive)
+				{
+					var line = PrepareLine(
+						Math.Min(coordY.LeftX, _frameDragsPanel.RenderTransform.Value.OffsetX),
+						Math.Max(coordY.RightX, _frameDragsPanel.RenderTransform.Value.OffsetX + _frameDragsPanel.ActualWidth),
+						coordY.Y, coordY.Y,
+						2, Brushes.MediumBlue
+						);
+					StickLinesGrid.Children.Add(line);
+					line.Tag = coordY;
+					StickLines.Add(line);
+				}
+				else
+				{
+					var line = StickLines.Where(l => l.Tag == coordY).FirstOrDefault();
+					if (line != null)
+					{
+						StickLinesGrid.Children.Remove(line);
+						StickLines.Remove(line);
+					}
+				}
+			}
+		}
+
+		private void ForgetStickingCoords()
+		{
+			foreach (var coord in StickingCoordsX)
+			{
+				coord.IsActive = false;
+				coord.ActiveChanged = null;
+			}
+			foreach (var coord in StickingCoordsY)
+			{
+				coord.IsActive = false;
+				coord.ActiveChanged = null;
+			}
+			StickingCoordsX.Clear();
+			StickingCoordsY.Clear();
+
+			foreach (var line in StickLines)
+			{
+				VisualGrid.Children.Remove(line);
+			}
+			StickLines.Clear();
 		}
 
 		public void RecalculateSelectionSize( Point currentLocation )
