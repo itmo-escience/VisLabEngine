@@ -22,12 +22,6 @@ namespace Fusion.Engine.Frames2.Components
             layer.Draw(new DrawBitmap(0, 0, Width, Height, _file, _opacity));
         }
 
-        public override void OnClick(MousePressEventArgs e)
-        {
-            base.OnClick(e);
-            Width += 25;
-        }
-
         public event MouseEvent MouseIn;
         public event MouseEvent MouseOver;
         public event MouseEvent MouseMove;

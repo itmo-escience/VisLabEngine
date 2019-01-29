@@ -59,16 +59,5 @@ namespace Fusion.Engine.Frames2
         }
 
         public override void Draw(SpriteLayerD2D layer) { }
-
-        public override void OnClick(Input.MousePressEventArgs e)
-        {
-            foreach (var child in Children)
-            {
-                if (child.IsInside(e.Position))
-                {
-                    child.OnClick(e);
-                }
-            }
-        }
     }
 }
