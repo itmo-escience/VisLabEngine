@@ -4,7 +4,7 @@ using Fusion.Engine.Graphics.SpritesD2D;
 
 namespace Fusion.Engine.Frames2.Components
 {
-    public sealed class Label : UIComponent, IUIMouseAware
+    public sealed class Label : UIComponent
     {
         private bool _isDirtyText;
         private string _text = "";
@@ -52,14 +52,5 @@ namespace Fusion.Engine.Frames2.Components
         {
             layer.Draw(_label);
         }
-
-        public event MouseEvent MouseIn;
-        public event MouseEvent MouseOver;
-        public event MouseEvent MouseMove;
-        public event MouseEvent MouseOut;
-        public event MouseEvent MouseDrag;
-        public event MouseEvent MouseDown;
-        public event MouseEvent MouseUp;
-        public event MouseEvent MouseClick;
     }
 }

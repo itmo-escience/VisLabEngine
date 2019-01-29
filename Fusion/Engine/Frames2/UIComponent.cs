@@ -4,11 +4,12 @@ using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using Fusion.Core.Mathematics;
 using Fusion.Engine.Common;
+using Fusion.Engine.Frames2.Managing;
 using Fusion.Engine.Graphics.SpritesD2D;
 
 namespace Fusion.Engine.Frames2
 {
-    public abstract class UIComponent : INotifyPropertyChanged
+    public abstract class UIComponent : INotifyPropertyChanged, IUIInputAware
     {
         #region Position
         private float _x;
@@ -267,5 +268,35 @@ namespace Fusion.Engine.Frames2
         }
 
         #endregion PropertyChanges
+
+        public event KeyDownEvent       KeyDown;
+        public event KeyUpEvent         KeyUp;
+        public event KeyPressEvent      KeyPress;
+        public event MouseMoveEvent     MouseMove;
+        public event MouseDragEvent     MouseDrag;
+        public event MouseDownEvent     MouseDown;
+        public event MouseUpEvent       MouseUp;
+        public event ClickEvent         Click;
+        public event DoubleClickEvent   DoubleClick;
+        public event ScrollEvent        Scroll;
+        public event EnterEvent         Enter;
+        public event LeaveEvent         Leave;
+        public event FocusEvent         Focus;
+        public event BlurEvent          Blur;
+
+        internal virtual void InvokeKeyDown     (UIEventProcessor eventProcessor, KeyEventArgs e)       => KeyDown(eventProcessor, e);
+        internal virtual void InvokeKeyUp       (UIEventProcessor eventProcessor, KeyEventArgs e)       => KeyUp(eventProcessor, e);
+        internal virtual void InvokeKeyPress    (UIEventProcessor eventProcessor, KeyEventArgs e)       => KeyPress(eventProcessor, e);
+        internal virtual void InvokeMouseMove   (UIEventProcessor eventProcessor, MoveEventArgs e)      => MouseMove(eventProcessor, e);
+        internal virtual void InvokeMouseDrag   (UIEventProcessor eventProcessor, DragEventArgs e)      => MouseDrag(eventProcessor, e);
+        internal virtual void InvokeMouseDown   (UIEventProcessor eventProcessor, ClickEventArgs e)     => MouseDown(eventProcessor, e);
+        internal virtual void InvokeMouseUp     (UIEventProcessor eventProcessor, ClickEventArgs e)     => MouseUp(eventProcessor, e);
+        internal virtual void InvokeClick       (UIEventProcessor eventProcessor, ClickEventArgs e)     => Click(eventProcessor, e);
+        internal virtual void InvokeDoubleClick (UIEventProcessor eventProcessor, ClickEventArgs e)     => DoubleClick(eventProcessor, e);
+        internal virtual void InvokeScroll      (UIEventProcessor eventProcessor, ScrollEventArgs e)    => Scroll(eventProcessor, e);
+        internal virtual void InvokeEnter       (UIEventProcessor eventProcessor)                       => Enter(eventProcessor);
+        internal virtual void InvokeLeave       (UIEventProcessor eventProcessor)                       => Leave(eventProcessor);
+        internal virtual void InvokeFocus       (UIEventProcessor eventProcessor)                       => Focus(eventProcessor);
+        internal virtual void InvokeBlur        (UIEventProcessor eventProcessor)                       => Blur(eventProcessor);
     }
 }

@@ -29,6 +29,7 @@ using Fusion.Engine.Frames2.Containers;
 using Fusion.Engine.Frames2.Managing;
 using Fusion.Engine.Graphics.SpritesD2D;
 using Label = Fusion.Engine.Graphics.SpritesD2D.Label;
+using KeyEventArgs = Fusion.Engine.Input.KeyEventArgs;
 
 namespace GISTest
 {

@@ -18,6 +18,16 @@ namespace Fusion.Engine.Frames2.Managing
 
         private void SubscribeToInputEvents()
         {
+            _game.Keyboard.KeyUp += (sender, args) => {
+                if (args.Key == Input.Keys.LeftButton)
+                {
+                    _root.InvokeClick(this, new ClickEventArgs(args.Key, _game.Mouse.Position));
+                }
+            };
+
+            _root.Click += (sender, args) => {
+                _root.Angle += 1;
+            };
         }
 
         public void Update(GameTime time)
