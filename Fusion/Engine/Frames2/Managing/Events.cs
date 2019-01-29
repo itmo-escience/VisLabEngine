@@ -115,5 +115,11 @@ namespace Fusion.Engine.Frames2.Managing
     {
         public Vector2 position;
         public int wheelDelta;
+
+        public ScrollEventArgs(Vector2 position, MouseScrollEventArgs args)
+        {
+            this.position = position;
+            wheelDelta = args.WheelDelta;
+        }
     }
 }
