@@ -1,6 +1,8 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using Fusion.Core.Mathematics;
 using Fusion.Engine.Common;
+using Fusion.Engine.Input;
 
 namespace Fusion.Engine.Frames2.Managing
 {
@@ -19,14 +21,14 @@ namespace Fusion.Engine.Frames2.Managing
         private void SubscribeToInputEvents()
         {
             _game.Keyboard.KeyUp += (sender, args) => {
-                if (args.Key == Input.Keys.LeftButton)
+                if (args.Key.IsMouseKey())
                 {
-                    _root.InvokeClick(this, new ClickEventArgs(args.Key, _game.Mouse.Position));
+                    Vector2 mousePosition = _game.Mouse.Position;
+                    foreach (var c in UIManager.BFSTraverseForPoint(_root, mousePosition))
+                    {
+                        c.InvokeClick(this, new ClickEventArgs(args.Key, _game.Mouse.Position));
+                    }
                 }
-            };
-
-            _root.Click += (sender, args) => {
-                _root.Angle += 1;
             };
         }
 

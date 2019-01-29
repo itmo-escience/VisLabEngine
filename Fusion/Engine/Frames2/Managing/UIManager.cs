@@ -91,6 +91,26 @@ namespace Fusion.Engine.Frames2.Managing
             }
         }
 
+        public static IEnumerable<UIComponent> BFSTraverseForPoint(UIComponent root, Vector2 point)
+        {
+            var queue = new Queue<UIComponent>();
+            if (root.IsInside(point)) queue.Enqueue(root);
+
+            while (queue.Any())
+            {
+                var c = queue.Dequeue();
+                yield return c;
+
+                if (c is UIContainer container)
+                {
+                    foreach (var child in container.Children)
+                    {
+                        if (child.IsInside(point)) queue.Enqueue(child);
+                    }
+                }
+            }
+        }
+
         public static IEnumerable<UIComponent> DFSTraverse(UIComponent root)
         {
             var stack = new Stack<UIComponent>();

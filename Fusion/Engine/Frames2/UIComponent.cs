@@ -284,19 +284,19 @@ namespace Fusion.Engine.Frames2
         public event FocusEvent         Focus;
         public event BlurEvent          Blur;
 
-        internal virtual void InvokeKeyDown     (UIEventProcessor eventProcessor, KeyEventArgs e)       => KeyDown(eventProcessor, e);
-        internal virtual void InvokeKeyUp       (UIEventProcessor eventProcessor, KeyEventArgs e)       => KeyUp(eventProcessor, e);
-        internal virtual void InvokeKeyPress    (UIEventProcessor eventProcessor, KeyEventArgs e)       => KeyPress(eventProcessor, e);
-        internal virtual void InvokeMouseMove   (UIEventProcessor eventProcessor, MoveEventArgs e)      => MouseMove(eventProcessor, e);
-        internal virtual void InvokeMouseDrag   (UIEventProcessor eventProcessor, DragEventArgs e)      => MouseDrag(eventProcessor, e);
-        internal virtual void InvokeMouseDown   (UIEventProcessor eventProcessor, ClickEventArgs e)     => MouseDown(eventProcessor, e);
-        internal virtual void InvokeMouseUp     (UIEventProcessor eventProcessor, ClickEventArgs e)     => MouseUp(eventProcessor, e);
-        internal virtual void InvokeClick       (UIEventProcessor eventProcessor, ClickEventArgs e)     => Click(eventProcessor, e);
-        internal virtual void InvokeDoubleClick (UIEventProcessor eventProcessor, ClickEventArgs e)     => DoubleClick(eventProcessor, e);
-        internal virtual void InvokeScroll      (UIEventProcessor eventProcessor, ScrollEventArgs e)    => Scroll(eventProcessor, e);
-        internal virtual void InvokeEnter       (UIEventProcessor eventProcessor)                       => Enter(eventProcessor);
-        internal virtual void InvokeLeave       (UIEventProcessor eventProcessor)                       => Leave(eventProcessor);
-        internal virtual void InvokeFocus       (UIEventProcessor eventProcessor)                       => Focus(eventProcessor);
-        internal virtual void InvokeBlur        (UIEventProcessor eventProcessor)                       => Blur(eventProcessor);
+        internal virtual void InvokeKeyDown     (UIEventProcessor eventProcessor, KeyEventArgs e)       => KeyDown?.Invoke(eventProcessor, e);
+        internal virtual void InvokeKeyUp       (UIEventProcessor eventProcessor, KeyEventArgs e)       => KeyUp?.Invoke(eventProcessor, e);
+        internal virtual void InvokeKeyPress    (UIEventProcessor eventProcessor, KeyEventArgs e)       => KeyPress?.Invoke(eventProcessor, e);
+        internal virtual void InvokeMouseMove   (UIEventProcessor eventProcessor, MoveEventArgs e)      => MouseMove?.Invoke(eventProcessor, e);
+        internal virtual void InvokeMouseDrag   (UIEventProcessor eventProcessor, DragEventArgs e)      => MouseDrag?.Invoke(eventProcessor, e);
+        internal virtual void InvokeMouseDown   (UIEventProcessor eventProcessor, ClickEventArgs e)     => MouseDown?.Invoke(eventProcessor, e);
+        internal virtual void InvokeMouseUp     (UIEventProcessor eventProcessor, ClickEventArgs e)     => MouseUp?.Invoke(eventProcessor, e);
+        internal virtual void InvokeClick       (UIEventProcessor eventProcessor, ClickEventArgs e)     => Click?.Invoke(eventProcessor, e);
+        internal virtual void InvokeDoubleClick (UIEventProcessor eventProcessor, ClickEventArgs e)     => DoubleClick?.Invoke(eventProcessor, e);
+        internal virtual void InvokeScroll      (UIEventProcessor eventProcessor, ScrollEventArgs e)    => Scroll?.Invoke(eventProcessor, e);
+        internal virtual void InvokeEnter       (UIEventProcessor eventProcessor)                       => Enter?.Invoke(eventProcessor);
+        internal virtual void InvokeLeave       (UIEventProcessor eventProcessor)                       => Leave?.Invoke(eventProcessor);
+        internal virtual void InvokeFocus       (UIEventProcessor eventProcessor)                       => Focus?.Invoke(eventProcessor);
+        internal virtual void InvokeBlur        (UIEventProcessor eventProcessor)                       => Blur?.Invoke(eventProcessor);
     }
 }
