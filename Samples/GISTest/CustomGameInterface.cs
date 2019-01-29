@@ -289,6 +289,7 @@ namespace GISTest
 		    txt.Angle = MathUtil.TwoPi - angle;
             img1.Angle = angle;
             img3.Angle = angle;
+            verticalBox1.Angle = -angle;
 
             _userInterface2.Update(gameTime);
 		    _userInterface2.Draw(_spriteLayer);

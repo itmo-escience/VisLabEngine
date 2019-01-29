@@ -66,9 +66,7 @@ namespace Fusion.Engine.Frames2
             {
                 if (child.IsInside(e.Position))
                 {
-                    Input.MousePressEventArgs eChild = e;
-                    eChild.Position = new Vector2(e.Position.X - child.X, e.Position.Y - child.Y);
-                    child.OnClick(eChild);
+                    child.OnClick(e);
                 }
             }
         }

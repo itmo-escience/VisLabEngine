@@ -57,13 +57,13 @@ namespace Fusion.Engine.Frames2.Managing
                         queue.Enqueue(child);
                     }
                 }
-                else {
-                    layer.Draw(new TransformCommand(c.GlobalTransform));
-                    c.Draw(layer);
-                }
+
+                layer.Draw(new TransformCommand(c.GlobalTransform));
+                c.Draw(layer);
 
                 if (DebugEnabled)
                 {
+                    layer.Draw(new TransformCommand(c.GlobalTransform));
                     c.DebugDraw(layer);
                 }
             }

@@ -21,9 +21,9 @@ namespace Fusion.Engine.Frames2.Containers
             foreach (var child in Children)
             {
                 child.Y += bottomBorder - child.LocalBoundingBox.Y;
-                bottomBorder += child.BoundingBox.Height;
+                bottomBorder += child.LocalBoundingBox.Height;
 
-                if (maxChildWidth < child.BoundingBox.Width) maxChildWidth = child.BoundingBox.Width;
+                if (maxChildWidth < child.LocalBoundingBox.Width) maxChildWidth = child.LocalBoundingBox.Width;
             }
 
             Width = maxChildWidth;
@@ -45,7 +45,7 @@ namespace Fusion.Engine.Frames2.Containers
 
             foreach (var child in Children)
             {
-                child.X += deltaXMultiplier * (maxChildWidth - child.BoundingBox.Width) - child.LocalBoundingBox.X;
+                child.X += deltaXMultiplier * (maxChildWidth - child.LocalBoundingBox.Width) - child.LocalBoundingBox.X;
             }
         }
 
@@ -54,6 +54,19 @@ namespace Fusion.Engine.Frames2.Containers
             debugBrush = new SolidBrushD2D(new Color4(0, 1, 1, 1));
             debugTextFormat = new TextFormatD2D("Consolas", 14);
             this.alignment = alignment;
+        }
+
+        public override void Draw(SpriteLayerD2D layer)
+        {
+            base.Draw(layer);
+            layer.Draw(new Rect(0, 0, Width, Height, debugBrush));
+
+            float bottomBorder = 0;
+            foreach (var child in Children)
+            {
+                bottomBorder += child.LocalBoundingBox.Height;
+                layer.Draw(new Line(new Vector2(0, bottomBorder), new Vector2(Width, bottomBorder), debugBrush));
+            }
         }
     }
 }
