@@ -9,8 +9,7 @@ namespace Fusion.Engine.Input {
 
 	public delegate void MouseMoveHandlerDelegate	( object sender, MouseMoveEventArgs e );
 	public delegate void MouseScrollEventHandler	( object sender, MouseScrollEventArgs e );
-    public delegate void MousePressEventHandler     (object sender, MousePressEventArgs e);
-    public delegate void KeyDownEventHandler	( object sender, KeyEventArgs e );
+	public delegate void KeyDownEventHandler	( object sender, KeyEventArgs e );
 	public delegate void KeyUpEventHandler		( object sender, KeyEventArgs e );
 	public delegate void KeyPressEventHandler	( object sender, KeyPressArgs e );
 
@@ -41,13 +40,8 @@ namespace Fusion.Engine.Input {
 		public Vector2 Offset;
 	}
 
-    public class MousePressEventArgs : EventArgs
-    {
-        public Vector2 Position;
-        public Keys Key;
-    }
 
-    public class TouchEventArgs
+	public class TouchEventArgs
 	{
 		public Point Position;
 		public float ScaleDelta;

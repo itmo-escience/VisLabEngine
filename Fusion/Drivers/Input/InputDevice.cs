@@ -67,7 +67,6 @@ namespace Fusion.Drivers.Input {
 
 		public event MouseMoveHandlerDelegate	MouseMove;
 		public event MouseScrollEventHandler	MouseScroll;
-        public event MousePressEventHandler     MousePress;
 		public event KeyDownEventHandler		KeyDown;
 		public event KeyUpEventHandler			KeyUp;
 		public event KeyDownEventHandler		FormKeyDown;
@@ -259,11 +258,7 @@ namespace Fusion.Drivers.Input {
 				}
 				TotalMouseScroll	+=	e.WheelDelta;
 			}
-
-            if (MousePress != null && e.ButtonFlags.HasFlag(MouseButtonFlags.LeftButtonDown))
-                MousePress(this, new KeyEventArgs() { Key = Keys.LeftButton}, 
-                    new MouseMoveEventArgs() { Position = GlobalMouseOffset, Offset = offset });
-        }
+		}
 
 
 		
