@@ -34,5 +34,17 @@ namespace Fusion.Engine.Frames2.Components
             base.InvokeMouseDrag(eventProcessor, e);
             System.Console.WriteLine($"{Name}.InvokeMouseDrag() at ({e.position.X}, {e.position.Y}) with key {e.key}");
         }
+
+        internal override void InvokeMouseDown(UIEventProcessor eventProcessor, ClickEventArgs e)
+        {
+            base.InvokeMouseDown(eventProcessor, e);
+            System.Console.WriteLine($"{Name}.InvokeMouseDown() at ({e.position.X}, {e.position.Y}) with key {e.key}");
+        }
+
+        internal override void InvokeMouseUp(UIEventProcessor eventProcessor, ClickEventArgs e)
+        {
+            base.InvokeMouseUp(eventProcessor, e);
+            System.Console.WriteLine($"{Name}.InvokeMouseUp() at ({e.position.X}, {e.position.Y}) with key {e.key}");
+        }
     }
 }

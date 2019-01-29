@@ -59,13 +59,14 @@ namespace Fusion.Engine.Frames2.Managing
     {
         public Keys key;
 
+        public KeyEventArgs(Keys key)
+        {
+            this.key = key;
+        }
+
         public static explicit operator KeyEventArgs(Input.KeyEventArgs args)
         {
-            KeyEventArgs temp = new KeyEventArgs
-            {
-                key = args.Key
-            };
-            return temp;
+            return new KeyEventArgs(args.Key);
         }
     }
 

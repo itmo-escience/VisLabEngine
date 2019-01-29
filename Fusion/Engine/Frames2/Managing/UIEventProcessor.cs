@@ -12,6 +12,8 @@ namespace Fusion.Engine.Frames2.Managing
         private readonly UIContainer _root;
         private UIComponent _focusComponent;
         private Keys _lastMouseKey;
+        private Keys _lastKey;
+        private UIComponent _lastMouseDownComponent;
 
         internal UIEventProcessor(UIContainer root)
         {
@@ -38,16 +40,14 @@ namespace Fusion.Engine.Frames2.Managing
 
             //KeyDown
             _game.Keyboard.KeyDown += (sender, args) => {
-                _focusComponent.InvokeKeyDown(this, (KeyEventArgs)args);
+                _focusComponent.InvokeKeyDown(this, (KeyEventArgs)args);    //TODO invoke for parents?
+                _lastKey = args.Key;
             };
 
             //KeyUp
             _game.Keyboard.KeyUp += (sender, args) => {
-                _focusComponent.InvokeKeyUp(this, (KeyEventArgs)args);
+                _focusComponent.InvokeKeyUp(this, (KeyEventArgs)args);      //also
             };
-
-            //KeyPress
-            //TODO
 
             //MouseMove
             _game.Mouse.Move += (sender, args) =>
@@ -83,19 +83,30 @@ namespace Fusion.Engine.Frames2.Managing
             _game.Keyboard.KeyDown += (sender, args) => {
                 if (args.Key.IsMouseKey())
                 {
-                    _focusComponent.InvokeMouseDown(this, new ClickEventArgs(args.Key, _game.Mouse.Position));
+                    Vector2 mousePosition = _game.Mouse.Position;
+                    UIComponent lastComponent = null;
+                    foreach (var c in UIManager.BFSTraverseForPoint(_root, mousePosition))
+                    {
+                        c.InvokeMouseDown(this, new ClickEventArgs(args.Key, mousePosition));
+                        lastComponent = c;
+                    }
                     _lastMouseKey = args.Key;
+                    _lastMouseDownComponent = lastComponent;
                 }
             };
             _game.Touch.Hold += (args) => {
-                _focusComponent.InvokeMouseDown(this, new ClickEventArgs(Keys.RightButton, args.Position));
+                _focusComponent.InvokeMouseDown(this, new ClickEventArgs(Keys.RightButton, args.Position)); //TODO hold == press?
             };
 
             //MouseUp
             _game.Keyboard.KeyUp += (sender, args) => {
                 if (args.Key.IsMouseKey())
                 {
-                    _focusComponent.InvokeMouseUp(this, new ClickEventArgs(args.Key, _game.Mouse.Position));
+                    Vector2 mousePosition = _game.Mouse.Position;
+                    foreach (var c in UIManager.BFSTraverseForPoint(_root, mousePosition))
+                    {
+                        c.InvokeMouseUp(this, new ClickEventArgs(args.Key, mousePosition));
+                    }
                 }
             };
 
@@ -138,21 +149,11 @@ namespace Fusion.Engine.Frames2.Managing
 
         public void Update(GameTime time)
         {
-            /*
-            var stack = new Stack<UIComponent>();
-
-            stack.Push(_root);
-
-            while (stack.Any())
+            //KeyPress
+            if (_game.Keyboard.IsKeyDown(_lastKey))
             {
-                var top = stack.Pop();
-
-                if (top is UIContainer)
-                {
-
-                }
+                _focusComponent.InvokeKeyPress(this, new KeyEventArgs(_lastKey));
             }
-            */
         }
     }
 }
