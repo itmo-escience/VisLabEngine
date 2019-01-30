@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using Fusion.Core.Mathematics;
 using Fusion.Engine.Common;
@@ -14,30 +15,22 @@ namespace Fusion.Engine.Frames2.Managing
         private Keys _lastMouseKey;
         private Keys _lastKey;
         private UIComponent _lastMouseDownComponent;
+        private UIComponent _lastClickComponent;
+        private Stopwatch _clickStopwatch;
+        private const long _clickDelay = 500;
 
         internal UIEventProcessor(UIContainer root)
         {
             _root = root;
             _game = Game.Instance;
             _focusComponent = root;
+            _clickStopwatch = new Stopwatch();
 
             SubscribeToInputEvents();
         }
 
         private void SubscribeToInputEvents()
         {
-            //wrong Click
-            _game.Keyboard.KeyUp += (sender, args) => {
-                if (args.Key.IsMouseKey())
-                {
-                    Vector2 mousePosition = _game.Mouse.Position;
-                    foreach (var c in UIManager.BFSTraverseForPoint(_root, mousePosition))
-                    {
-                        c.InvokeClick(this, new ClickEventArgs(args.Key, _game.Mouse.Position));
-                    }
-                }
-            };
-
             //KeyDown
             _game.Keyboard.KeyDown += (sender, args) => {
                 _focusComponent.InvokeKeyDown(this, (KeyEventArgs)args);    //TODO invoke for parents?
@@ -49,16 +42,18 @@ namespace Fusion.Engine.Frames2.Managing
                 _focusComponent.InvokeKeyUp(this, (KeyEventArgs)args);      //also
             };
 
-            //MouseMove
+            //MouseMove (mouse)
             _game.Mouse.Move += (sender, args) =>
             {
                 Vector2 mousePosition = _game.Mouse.Position;
-                foreach (var c in UIManager.BFSTraverseForPoint(_root, mousePosition))
+                foreach (var c in UIHelper.BFSTraverseForPoint(_root, mousePosition))
                 {
                     c.InvokeMouseMove(this, (MoveEventArgs)args);
                 }
             };
-            /*_game.Touch.Manipulate += (args) => {
+
+            /*//MouseMove (touch)
+            _game.Touch.Manipulate += (args) => {
                 Vector2 touchPosition = args.Position;
                 foreach (var c in UIManager.BFSTraverseForPoint(_root, touchPosition))
                 {
@@ -66,34 +61,43 @@ namespace Fusion.Engine.Frames2.Managing
                 }
             };*/
 
-            //MouseDrag
+            //MouseDrag (mouse)
             _game.Mouse.Move += (sender, args) =>
             {
                 if (_game.Keyboard.IsKeyDown(_lastMouseKey))
                 {
                     Vector2 mousePosition = _game.Mouse.Position;
-                    foreach (var c in UIManager.BFSTraverseForPoint(_root, mousePosition))
+                    foreach (var c in UIHelper.BFSTraverseForPoint(_root, mousePosition))
                     {
                         c.InvokeMouseDrag(this, new DragEventArgs(_lastMouseKey, args));
                     }
                 }
             };
 
-            //MouseDown
+            /*//MouseDrag (touch)
+            _game.Touch.Hold += (args) => {
+                foreach (var c in UIHelper.BFSTraverseForPoint(_root, args.Position))
+                {
+                    c.InvokeMouseDrag(this, new DragEventArgs(Keys.LeftButton, ));
+                }
+            };*/
+
+            //MouseDown (mouse)
             _game.Keyboard.KeyDown += (sender, args) => {
                 if (args.Key.IsMouseKey())
                 {
                     Vector2 mousePosition = _game.Mouse.Position;
-                    UIComponent lastComponent = null;
-                    foreach (var c in UIManager.BFSTraverseForPoint(_root, mousePosition))
+                    foreach (var c in UIHelper.BFSTraverseForPoint(_root, mousePosition))
                     {
                         c.InvokeMouseDown(this, new ClickEventArgs(args.Key, mousePosition));
-                        lastComponent = c;
                     }
+
                     _lastMouseKey = args.Key;
-                    _lastMouseDownComponent = lastComponent;
+                    _lastMouseDownComponent = UIHelper.GetLowestComponentInHierarchy(_root, mousePosition);
                 }
             };
+
+            //MouseDown (touch)
             _game.Touch.Hold += (args) => {
                 _focusComponent.InvokeMouseDown(this, new ClickEventArgs(Keys.RightButton, args.Position)); //TODO hold == press?
             };
@@ -103,26 +107,50 @@ namespace Fusion.Engine.Frames2.Managing
                 if (args.Key.IsMouseKey())
                 {
                     Vector2 mousePosition = _game.Mouse.Position;
-                    foreach (var c in UIManager.BFSTraverseForPoint(_root, mousePosition))
+                    foreach (var c in UIHelper.BFSTraverseForPoint(_root, mousePosition))
                     {
                         c.InvokeMouseUp(this, new ClickEventArgs(args.Key, mousePosition));
                     }
                 }
             };
 
-            //Click
-            //TODO
+            //Click + DoubleClick (mouse)
+            _game.Keyboard.KeyUp += (sender, args) => {
+                if (args.Key == _lastMouseKey)
+                {
+                    Vector2 mousePosition = _game.Mouse.Position;
+                    UIComponent currentComponent = UIHelper.GetLowestComponentInHierarchy(_root, mousePosition);
+                    if (currentComponent == _lastMouseDownComponent)
+                    {
+                        currentComponent?.InvokeClick(this, new ClickEventArgs(args.Key, mousePosition));
+
+                        if (currentComponent == _lastClickComponent)
+                        {
+                            _clickStopwatch.Stop();
+                            if (_clickStopwatch.ElapsedMilliseconds < _clickDelay)
+                            {
+                                currentComponent?.InvokeDoubleClick(this, new ClickEventArgs(args.Key, mousePosition));
+                                _lastClickComponent = null;     //TODO is normal?
+                            }
+                        } else {
+                            _lastClickComponent = currentComponent;
+                        }
+                        _clickStopwatch.Restart();
+                    }
+                }
+            };
+
+            //Click (touch)
             _game.Touch.Tap += (args) => {
-                foreach (var c in UIManager.BFSTraverseForPoint(_root, args.Position))
+                foreach (var c in UIHelper.BFSTraverseForPoint(_root, args.Position))
                 {
                     c.InvokeClick(this, new ClickEventArgs(Keys.LeftButton, args.Position));
                 }
             };
 
-            //DoubleClick
-            //TODO
+            //DoubleClick (touch)
             _game.Touch.DoubleTap += (args) => {
-                foreach (var c in UIManager.BFSTraverseForPoint(_root, args.Position))
+                foreach (var c in UIHelper.BFSTraverseForPoint(_root, args.Position))
                 {
                     c.InvokeDoubleClick(this, new ClickEventArgs(Keys.LeftButton, args.Position));
                 }

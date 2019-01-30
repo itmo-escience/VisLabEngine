@@ -11,7 +11,7 @@ namespace Fusion.Engine.Frames2.Managing
     public class UIManager
     {
         public UIEventProcessor UIEventProcessor { get; }
-        public UIContainer Root;
+        public UIContainer Root { get; }
 
         public bool DebugEnabled { get; set; }
 
@@ -26,7 +26,7 @@ namespace Fusion.Engine.Frames2.Managing
         {
             UIEventProcessor.Update(gameTime);
 
-            foreach (var c in DFSTraverse(Root).Where(c => typeof(UIContainer) != c.GetType()))
+            foreach (var c in UIHelper.DFSTraverse(Root).Where(c => typeof(UIContainer) != c.GetType()))
             {
                 c.Update(gameTime);
             }
@@ -71,94 +71,5 @@ namespace Fusion.Engine.Frames2.Managing
             layer.Draw(TransformCommand.Identity);
         }
 
-        public static IEnumerable<UIComponent> BFSTraverse(UIComponent root)
-        {
-            var queue = new Queue<UIComponent>();
-            queue.Enqueue(root);
-
-            while (queue.Any())
-            {
-                var c = queue.Dequeue();
-                yield return c;
-
-                if (c is UIContainer container)
-                {
-                    foreach (var child in container.Children)
-                    {
-                        queue.Enqueue(child);
-                    }
-                }
-            }
-        }
-
-        public static IEnumerable<UIComponent> BFSTraverseForPoint(UIComponent root, Vector2 point)
-        {
-            var queue = new Queue<UIComponent>();
-            if (root.IsInside(point)) queue.Enqueue(root);
-
-            while (queue.Any())
-            {
-                var c = queue.Dequeue();
-                yield return c;
-
-                if (c is UIContainer container)
-                {
-                    foreach (var child in container.Children)
-                    {
-                        if (child.IsInside(point)) queue.Enqueue(child);
-                    }
-                }
-            }
-        }
-
-        public static IEnumerable<UIComponent> DFSTraverse(UIComponent root)
-        {
-            var stack = new Stack<UIComponent>();
-            var stack2 = new Stack<UIComponent>();
-            stack.Push(root);
-
-            while (stack.Any())
-            {
-                var c = stack.Pop();
-                stack2.Push(c);
-
-                if (c is UIContainer container)
-                {
-                    foreach (var child in container.Children)
-                    {
-                        stack.Push(child);
-                    }
-                }
-            }
-
-            while (stack2.Any())
-            {
-                var c = stack2.Pop();
-                yield return c;
-            }
-        }
-
-        public IEnumerable<UIComponent> ComponentsAt(Vector2 point, bool includeContainers = true)
-        {
-            if (!Root.BoundingBox.Contains(point))
-                yield break;
-
-            var stack = new Stack<UIComponent>();
-            stack.Push(Root);
-            while (true)
-            {
-                var current = stack.Pop();
-                yield return current;
-
-                if (current is UIContainer container)
-                {
-                    foreach (var child in container.Children.Where(c => c.BoundingBox.Contains(point)))
-                    {
-                        stack.Push(child);
-                    }
-                }
-                else break;
-            }
-        }
     }
 }

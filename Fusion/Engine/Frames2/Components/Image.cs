@@ -26,25 +26,37 @@ namespace Fusion.Engine.Frames2.Components
         internal override void InvokeMouseMove(UIEventProcessor eventProcessor, MoveEventArgs e)
         {
             base.InvokeMouseMove(eventProcessor, e);
-            System.Console.WriteLine($"{Name}.InvokeMouseMove() at ({e.position.X}, {e.position.Y})");
+            //System.Console.WriteLine($"{Name}.InvokeMouseMove() at ({e.position.X}, {e.position.Y})");
         }
 
         internal override void InvokeMouseDrag(UIEventProcessor eventProcessor, DragEventArgs e)
         {
             base.InvokeMouseDrag(eventProcessor, e);
-            System.Console.WriteLine($"{Name}.InvokeMouseDrag() at ({e.position.X}, {e.position.Y}) with key {e.key}");
+            //System.Console.WriteLine($"{Name}.InvokeMouseDrag() at ({e.position.X}, {e.position.Y}) with key {e.key}");
         }
 
         internal override void InvokeMouseDown(UIEventProcessor eventProcessor, ClickEventArgs e)
         {
             base.InvokeMouseDown(eventProcessor, e);
-            System.Console.WriteLine($"{Name}.InvokeMouseDown() at ({e.position.X}, {e.position.Y}) with key {e.key}");
+            //System.Console.WriteLine($"{Name}.InvokeMouseDown() at ({e.position.X}, {e.position.Y}) with key {e.key}");
         }
 
         internal override void InvokeMouseUp(UIEventProcessor eventProcessor, ClickEventArgs e)
         {
             base.InvokeMouseUp(eventProcessor, e);
-            System.Console.WriteLine($"{Name}.InvokeMouseUp() at ({e.position.X}, {e.position.Y}) with key {e.key}");
+            //System.Console.WriteLine($"{Name}.InvokeMouseUp() at ({e.position.X}, {e.position.Y}) with key {e.key}");
+        }
+
+        internal override void InvokeClick(UIEventProcessor eventProcessor, ClickEventArgs e)
+        {
+            base.InvokeClick(eventProcessor, e);
+            System.Console.WriteLine($"{Name}.InvokeClick() at ({e.position.X}, {e.position.Y}) with key {e.key}");
+        }
+
+        internal override void InvokeDoubleClick(UIEventProcessor eventProcessor, ClickEventArgs e)
+        {
+            base.InvokeDoubleClick(eventProcessor, e);
+            System.Console.WriteLine($"{Name}.InvokeDoubleClick() at ({e.position.X}, {e.position.Y}) with key {e.key}");
         }
     }
 }
