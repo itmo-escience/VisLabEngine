@@ -18,6 +18,7 @@ namespace Fusion.Engine.Frames2.Managing
         private UIComponent _lastClickComponent;
         private Stopwatch _clickStopwatch;
         private const long _clickDelay = 500;
+        private List<UIComponent> _componentsWithMouse;
 
         internal UIEventProcessor(UIContainer root)
         {
@@ -25,6 +26,7 @@ namespace Fusion.Engine.Frames2.Managing
             _game = Game.Instance;
             _focusComponent = root;
             _clickStopwatch = new Stopwatch();
+            _componentsWithMouse = new List<UIComponent>();
 
             SubscribeToInputEvents();
         }
@@ -162,12 +164,6 @@ namespace Fusion.Engine.Frames2.Managing
                 _focusComponent.InvokeScroll(this, new ScrollEventArgs(_game.Mouse.Position, args));
             };
 
-            //Enter
-            //TODO
-
-            //Leave
-            //TODO
-
             //Focus
             //TODO
 
@@ -182,6 +178,23 @@ namespace Fusion.Engine.Frames2.Managing
             {
                 _focusComponent.InvokeKeyPress(this, new KeyEventArgs(_lastKey));
             }
+
+            //Enter + Leave (mouse)
+            InvokeEnterAndLeaveComponentsEvents();
+        }
+
+        private void InvokeEnterAndLeaveComponentsEvents()
+        {
+            List<UIComponent> newComponentsWithMouse = UIHelper.GetAllComponentsByPoint(_root, _game.Mouse.Position);
+            foreach (UIComponent c in newComponentsWithMouse.Except(_componentsWithMouse))
+            {
+                c.InvokeEnter(this);
+            }
+            foreach (UIComponent c in _componentsWithMouse.Except(newComponentsWithMouse))
+            {
+                c.InvokeLeave(this);
+            }
+            _componentsWithMouse = newComponentsWithMouse;
         }
     }
 }

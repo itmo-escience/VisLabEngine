@@ -29,10 +29,10 @@ namespace Fusion.Engine.Frames2.Managing
             }
         }
 
-        public static IEnumerable<UIComponent> BFSTraverseForPoint(UIComponent root, Vector2 point)
+        public static IEnumerable<UIComponent> BFSTraverseForPoint(UIComponent root, Vector2 innerPoint)
         {
             var queue = new Queue<UIComponent>();
-            if (root.IsInside(point)) queue.Enqueue(root);
+            if (root.IsInside(innerPoint)) queue.Enqueue(root);
 
             while (queue.Any())
             {
@@ -43,7 +43,7 @@ namespace Fusion.Engine.Frames2.Managing
                 {
                     foreach (var child in container.Children)
                     {
-                        if (child.IsInside(point)) queue.Enqueue(child);
+                        if (child.IsInside(innerPoint)) queue.Enqueue(child);
                     }
                 }
             }
@@ -76,14 +76,14 @@ namespace Fusion.Engine.Frames2.Managing
             }
         }
 
-        public static UIComponent GetLowestComponentInHierarchy(UIContainer root, Vector2 point)
+        public static UIComponent GetLowestComponentInHierarchy(UIContainer root, Vector2 innerPoint)
         {
-            if (!root.IsInside(point)) return null;
+            if (!root.IsInside(innerPoint)) return null;
 
             UIContainer lowestContainer = root;
             while (true)
             {
-                UIComponent newLowest = lowestContainer.Children.LastOrDefault(c => c.IsInside(point));
+                UIComponent newLowest = lowestContainer.Children.LastOrDefault(c => c.IsInside(innerPoint));
                 if (newLowest == null) return lowestContainer;
                 if (newLowest is UIContainer newContainer)
                 {
@@ -94,6 +94,13 @@ namespace Fusion.Engine.Frames2.Managing
                     return newLowest;
                 }
             }
+        }
+
+        public static List<UIComponent> GetAllComponentsByPoint(UIContainer root, Vector2 innerPoint)
+        {
+            List<UIComponent> components = new List<UIComponent>();
+            foreach (var c in UIHelper.BFSTraverseForPoint(root, innerPoint)) components.Add(c);
+            return components;
         }
     }
 }

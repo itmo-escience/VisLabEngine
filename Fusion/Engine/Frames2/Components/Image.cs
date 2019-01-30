@@ -82,5 +82,17 @@ namespace Fusion.Engine.Frames2.Components
             base.InvokeScroll(eventProcessor, e);
             //System.Console.WriteLine($"{Name}.InvokeScroll() at ({e.position.X}, {e.position.Y}) with delta {e.wheelDelta}");
         }
+
+        internal override void InvokeEnter(UIEventProcessor eventProcessor)
+        {
+            base.InvokeEnter(eventProcessor);
+            //System.Console.WriteLine($"{Name}.InvokeEnter()");
+        }
+
+        internal override void InvokeLeave(UIEventProcessor eventProcessor)
+        {
+            base.InvokeLeave(eventProcessor);
+            //System.Console.WriteLine($"{Name}.InvokeLeave()");
+        }
     }
 }
