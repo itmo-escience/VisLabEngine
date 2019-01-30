@@ -106,5 +106,39 @@ namespace Fusion.Engine.Graphics.SpritesD2D
             _isDirty = true;
             Draw(new Ellipse(x, y, r, r, new SolidBrushD2D(color)));
         }
+
+        public void StartClipping(Geometry geometry)
+        {
+            LayerParameters layerParameters = new LayerParameters
+            {
+                GeometricMask = geometry,
+                ContentBounds = RectangleF.Infinite.ToRawRectangleF(),
+                MaskAntialiasMode = AntialiasMode.PerPrimitive,
+                MaskTransform = SharpDX.Matrix3x2.Identity,
+                Opacity = 1.0f,
+                LayerOptions = LayerOptions.None,
+                OpacityBrush = null
+            };
+            _target.PushLayer(ref layerParameters, new Layer(_target));
+        }
+
+        public void StopClipping()
+        {
+            _target.PopLayer();
+        }
+
+        public Geometry CreateTestGeometry()
+        {
+            PathGeometry geometry = new PathGeometry(new SharpDX.Direct2D1.Factory());
+            GeometrySink sink = geometry.Open();
+            sink.SetFillMode(SharpDX.Direct2D1.FillMode.Winding);
+            sink.BeginFigure(new SharpDX.Mathematics.Interop.RawVector2(100, 100), FigureBegin.Filled);
+            sink.AddLine(new SharpDX.Mathematics.Interop.RawVector2(100, 200));
+            sink.AddLine(new SharpDX.Mathematics.Interop.RawVector2(200, 200));
+            sink.AddLine(new SharpDX.Mathematics.Interop.RawVector2(200, 100));
+            sink.EndFigure(FigureEnd.Closed);
+            sink.Close();
+            return geometry;
+        }
     }
 }

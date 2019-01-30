@@ -58,6 +58,8 @@ namespace Fusion.Engine.Frames2.Managing
                     }
                 }
 
+                //layer.StartClipping(layer.CreateTestGeometry());
+
                 layer.Draw(new TransformCommand(c.GlobalTransform));
                 c.Draw(layer);
 
@@ -66,6 +68,8 @@ namespace Fusion.Engine.Frames2.Managing
                     layer.Draw(new TransformCommand(c.GlobalTransform));
                     c.DebugDraw(layer);
                 }
+
+                //layer.StopClipping();
             }
 
             layer.Draw(TransformCommand.Identity);
