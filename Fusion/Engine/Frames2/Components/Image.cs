@@ -50,13 +50,37 @@ namespace Fusion.Engine.Frames2.Components
         internal override void InvokeClick(UIEventProcessor eventProcessor, ClickEventArgs e)
         {
             base.InvokeClick(eventProcessor, e);
-            System.Console.WriteLine($"{Name}.InvokeClick() at ({e.position.X}, {e.position.Y}) with key {e.key}");
+            //System.Console.WriteLine($"{Name}.InvokeClick() at ({e.position.X}, {e.position.Y}) with key {e.key}");
         }
 
         internal override void InvokeDoubleClick(UIEventProcessor eventProcessor, ClickEventArgs e)
         {
             base.InvokeDoubleClick(eventProcessor, e);
-            System.Console.WriteLine($"{Name}.InvokeDoubleClick() at ({e.position.X}, {e.position.Y}) with key {e.key}");
+            //System.Console.WriteLine($"{Name}.InvokeDoubleClick() at ({e.position.X}, {e.position.Y}) with key {e.key}");
+        }
+
+        internal override void InvokeKeyDown(UIEventProcessor eventProcessor, Managing.KeyEventArgs e)
+        {
+            base.InvokeKeyDown(eventProcessor, e);
+            //System.Console.WriteLine($"{Name}.InvokeKeyDown() with key {e.key}");
+        }
+
+        internal override void InvokeKeyUp(UIEventProcessor eventProcessor, Managing.KeyEventArgs e)
+        {
+            base.InvokeKeyUp(eventProcessor, e);
+            //System.Console.WriteLine($"{Name}.InvokeKeyUp() with key {e.key}");
+        }
+
+        internal override void InvokeKeyPress(UIEventProcessor eventProcessor, Managing.KeyEventArgs e)
+        {
+            base.InvokeKeyPress(eventProcessor, e);
+            //System.Console.WriteLine($"{Name}.InvokeKeyPress() with key {e.key}");
+        }
+
+        internal override void InvokeScroll(UIEventProcessor eventProcessor, ScrollEventArgs e)
+        {
+            base.InvokeScroll(eventProcessor, e);
+            //System.Console.WriteLine($"{Name}.InvokeScroll() at ({e.position.X}, {e.position.Y}) with delta {e.wheelDelta}");
         }
     }
 }
