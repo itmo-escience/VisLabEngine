@@ -7,9 +7,9 @@ namespace Fusion.Engine.Frames2
         protected bool IsAttached { get; private set; }
         public UIComponent Host { get; private set; }
 
-        public void AttachTo(UIComponent component)
+        public void AttachTo(UIComponent host)
         {
-            Host = component;
+            Host = host;
             AttachAction();
             IsAttached = true;
         }

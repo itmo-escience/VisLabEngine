@@ -26,6 +26,7 @@ using FusionUI.UI.Elements;
 using Fusion.Core.Utils;
 using Fusion.Engine.Frames2.Components;
 using Fusion.Engine.Frames2.Containers;
+using Fusion.Engine.Frames2.Controllers;
 using Fusion.Engine.Frames2.Managing;
 using Fusion.Engine.Graphics.SpritesD2D;
 using Label = Fusion.Engine.Graphics.SpritesD2D.Label;
@@ -186,10 +187,10 @@ namespace GISTest
 
             txt = new Fusion.Engine.Frames2.Components.Label("z", new TextFormatD2D("Calibri", 20), 150, 450, 100, 100);
             string fileName = @"E:\GitHub\image.png";
-            img1 = new Image(50, 50, fileName, 1);
-            img2 = new Image(50, 50, fileName, 0.66f);
-            img3 = new Image(50, 50, fileName, 0.33f);
-            img4 = new Image(50, 50, fileName, 0);
+            img1 = new Image(50, 50, 100, 100, fileName, 1);
+            img2 = new Image(50, 50, 100, 50, fileName, 0.66f);
+            img3 = new Image(50, 50, 30, 80, fileName, 0.77f);
+            img4 = new Image(50, 50, 90, 45, fileName, 0.55f);
 
             verticalAlignment alignment = verticalAlignment.CENTER;
 
@@ -201,6 +202,11 @@ namespace GISTest
             verticalBox2 = new VerticalBox(0, 0, 0, 0, alignment);
             verticalBox2.Add(img3);
             verticalBox2.Add(img4);
+
+		    var b = new ButtonController();
+            var t = new ToggleController();
+		    verticalBox2.AttachController("btn", b);
+		    verticalBox2.AttachController("tgl", t);
 
             verticalBox3 = new VerticalBox(200, 200, 0, 0, alignment);
             verticalBox3.Add(verticalBox1);
@@ -285,13 +291,14 @@ namespace GISTest
             img1.Angle = angle;
             img3.Angle = angle;
             verticalBox1.Angle = -angle;
+            verticalBox2.Angle = angle / 2;
 
             _userInterface2.Update(gameTime);
 		    _userInterface2.Draw(_spriteLayer);
 
 		    angle += 0.01f;
-		    if (angle > MathUtil.TwoPi)
-		        angle -= MathUtil.TwoPi;
+		    if (angle > 2 * MathUtil.TwoPi)
+		        angle -= 2 * MathUtil.TwoPi;
 		}
 
 		SpriteFont textFont;

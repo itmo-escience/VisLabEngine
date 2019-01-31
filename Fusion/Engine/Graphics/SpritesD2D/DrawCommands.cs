@@ -215,8 +215,7 @@ namespace Fusion.Engine.Graphics.SpritesD2D
 
     public sealed class DrawBitmap : IDrawCommand
     {
-        private readonly float _x, _y;
-        private readonly int _w, _h;
+        private readonly float _x, _y, _w, _h;
         private readonly float _opacity;
         private readonly RectangleF _targetRect;
         private readonly RectangleF _sourceRect;
@@ -229,8 +228,20 @@ namespace Fusion.Engine.Graphics.SpritesD2D
             _y = y;
             _w = image.Width;
             _h = image.Height;
-            _targetRect = new RectangleF(_x, _y, image.Width, image.Height);
-            _sourceRect = new RectangleF(0, 0, _w, _h);
+            _targetRect = new RectangleF(_x, _y, _w, _h);
+            _sourceRect = new RectangleF(0, 0, image.Width, image.Height);
+            _opacity = opacity;
+            _sourceImage = image;
+        }
+
+        public DrawBitmap(float x, float y, float width, float height, System.Drawing.Image image, float opacity = 1)
+        {
+            _x = x;
+            _y = y;
+            _w = width;
+            _h = height;
+            _targetRect = new RectangleF(_x, _y, _w, _h);
+            _sourceRect = new RectangleF(0, 0, image.Width, image.Height);
             _opacity = opacity;
             _sourceImage = image;
         }

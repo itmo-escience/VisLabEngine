@@ -1,11 +1,6 @@
-﻿using System.Drawing.Imaging;
-using System.Runtime.InteropServices;
-using Fusion.Core.Mathematics;
-using Fusion.Engine.Common;
+﻿using Fusion.Engine.Common;
 using Fusion.Engine.Frames2.Managing;
 using Fusion.Engine.Graphics.SpritesD2D;
-using Fusion.Engine.Input;
-using SharpDX.Direct2D1;
 
 namespace Fusion.Engine.Frames2.Components
 {
@@ -23,7 +18,14 @@ namespace Fusion.Engine.Frames2.Components
             Height = source.Height;
 
             _image = new DrawBitmap(0, 0, source, _opacity);
+        }
 
+        public Image(float x, float y, float width, float height, string file, float opacity = 1) : base(x, y, width, height)
+        {
+            _opacity = opacity;
+
+            var source = System.Drawing.Image.FromFile(file);
+            _image = new DrawBitmap(0, 0, width, height, source, _opacity);
         }
 
         public override void Update(GameTime gameTime) { }

@@ -1,28 +1,46 @@
-﻿using System;
-using Fusion.Engine.Common;
+﻿using Fusion.Engine.Common;
 
 namespace Fusion.Engine.Frames2.Controllers
 {
     public class ButtonController : UIController
     {
-        public ButtonController(UIComponent background)
+        public ButtonController()
         {
 
         }
 
         protected override void AttachAction()
         {
-            throw new NotImplementedException();
+            Host.Click += (processor, args) =>
+            {
+                Log.Message("Clicked");
+            };
         }
 
-        protected override void DetachAction()
+        protected override void DetachAction() { }
+
+        public override void Update(GameTime gameTime) { }
+    }
+
+    public class ToggleController : UIController
+    {
+        public bool Toggled { get; private set; }
+        public ToggleController()
         {
-            throw new NotImplementedException();
+
         }
 
-        public override void Update(GameTime gameTime)
+        protected override void AttachAction()
         {
-            throw new NotImplementedException();
+            Host.Click += (processor, args) =>
+            {
+                Toggled = !Toggled;
+                Log.Message("Toggle state: {0}", Toggled);
+            };
         }
+
+        protected override void DetachAction() { }
+
+        public override void Update(GameTime gameTime) { }
     }
 }

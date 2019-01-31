@@ -266,6 +266,7 @@
     <Compile Include="Engine\Frames2\UIContainer.cs" />
     <Compile Include="Engine\Frames2\Managing\UIEventProcessor.cs" />
     <Compile Include="Engine\Frames2\Managing\UIManager.cs" />
+	<Compile Include="Engine\Frames2\Controllers\ButtonController.cs" />
     <Compile Include="Engine\Frames\Abstract\DrawFrameItem.cs" />
     <Compile Include="Engine\Frames\Abstract\Events.cs" />
     <Compile Include="Engine\Frames\Abstract\IFrame.cs" />
