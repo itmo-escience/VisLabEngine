@@ -409,6 +409,8 @@ namespace WpfEditorTest
 				if (panel != null)
 					panel.MousePressed = true;
 			}
+
+			//this.CaptureMouse();
 		}
 
 		private void LocalGrid_MouseLeftButtonUp( object sender, MouseButtonEventArgs e )
@@ -424,32 +426,14 @@ namespace WpfEditorTest
 
 			ForgetStickingCoords();
 
-			//if (PaletteWindow.SelectedFrameTemplate != null)
-			//{
-			//	//var createdFrame = Window.CreateFrameFromFile(System.IO.Path.Combine(ApplicationConfig.TemplatesPath, PaletteWindow.SelectedFrameTemplate) + ".xml");
-			//	//if (createdFrame != null)
-			//	//{
-			//	//	commands = Window.AddFrameToScene(createdFrame, e.GetPosition(this), commands);
-			//	//	var command = new CommandGroup(commands.ToArray());
-			//	//	CommandManager.Instance.Execute(command);
-			//	//}
-			//	//PaletteWindow.SelectedFrameTemplate = null;
-			//	//ParentHighlightPanel.SelectedFrame = null;
-			//}
-			//else
-			//{
-			//	//if (commands.Count > 0)
-			//	//{
-			//	//	var command = new CommandGroup(commands.ToArray());
-			//	//	CommandManager.Instance.Execute(command);
-			//	//}
-			//}
 			if (commands.Count > 0)
 			{
 				var command = new CommandGroup(commands.ToArray());
 				CommandManager.Instance.Execute(command);
 			}
 			AreaSelectionEnd(SelectionManager.Instance.SelectedFrames);
+
+			//this.ReleaseMouseCapture();
 		}
 
 		private void LocalGrid_MouseMove( object sender, MouseEventArgs e )
