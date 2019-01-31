@@ -1,26 +1,36 @@
-﻿using Fusion.Core.Mathematics;
+﻿using System.Drawing.Imaging;
+using System.Runtime.InteropServices;
+using Fusion.Core.Mathematics;
 using Fusion.Engine.Common;
 using Fusion.Engine.Frames2.Managing;
 using Fusion.Engine.Graphics.SpritesD2D;
 using Fusion.Engine.Input;
+using SharpDX.Direct2D1;
 
 namespace Fusion.Engine.Frames2.Components
 {
     public sealed class Image : UIComponent
     {
-        private string _file;
-        private float _opacity;
-        public Image(float x, float y, float width, float height, string file, float opacity = 1) : base(x, y, width, height)
+        private readonly float _opacity;
+        private readonly DrawBitmap _image;
+
+        public Image(float x, float y, string file, float opacity = 1) : base(x, y)
         {
-            _file = file;
             _opacity = opacity;
+
+            var source = System.Drawing.Image.FromFile(file);
+            Width = source.Width;
+            Height = source.Height;
+
+            _image = new DrawBitmap(0, 0, source, _opacity);
+
         }
 
         public override void Update(GameTime gameTime) { }
 
         public override void Draw(SpriteLayerD2D layer)
         {
-            layer.Draw(new DrawBitmap(0, 0, Width, Height, _file, _opacity));
+            layer.Draw(_image);
         }
 
         internal override void InvokeMouseMove(UIEventProcessor eventProcessor, MoveEventArgs e)

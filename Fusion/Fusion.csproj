@@ -259,7 +259,7 @@
     <Compile Include="Engine\Frames2\Managing\Events.cs" />
     <Compile Include="Engine\Frames2\Managing\UIHelper.cs" />
     <Compile Include="Engine\Frames2\UIComponent.cs" />
-    <Compile Include="Engine\Frames2\IUIController.cs" />
+    <Compile Include="Engine\Frames2\UIController.cs" />
     <Compile Include="Engine\Frames2\IUIMouseAware.cs" />
     <Compile Include="Engine\Frames2\Components\Label.cs" />
     <Compile Include="Engine\Frames2\Managing\UIAnimator.cs" />

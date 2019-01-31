@@ -172,6 +172,11 @@ namespace Fusion.Engine.Frames2
             set => SetAndNotify(ref _name, value);
         }
 
+        protected UIComponent() : this(0, 0, 0, 0)
+        { }
+
+        protected UIComponent(float x, float y) : this(x, y, 0, 0)
+        { }
 
         protected UIComponent(float x, float y, float width, float height)
         {
