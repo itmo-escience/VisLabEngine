@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Linq;
 using System.Runtime.CompilerServices;
 using Fusion.Core.Mathematics;
 using Fusion.Engine.Common;
@@ -168,6 +169,7 @@ namespace Fusion.Engine.Frames2
             set => SetAndNotify(ref _name, value);
         }
 
+
         protected UIComponent(float x, float y, float width, float height)
         {
             Name = GenerateName(GetType());
@@ -189,11 +191,55 @@ namespace Fusion.Engine.Frames2
 
         // TODO: Anchors
 
-        public IList<IUIController> Controllers { get; } = new List<IUIController>();
+        #region Controllers
+
+        private readonly Dictionary<string, UIController> _controllers = new Dictionary<string, UIController>();
+
+        public bool AttachController(string key, UIController controller)
+        {
+            if (_controllers.ContainsKey(key))
+                return false;
+
+            controller.AttachTo(this);
+            _controllers[key] = controller;
+            return true;
+        }
+
+        public bool DetachController(string key)
+        {
+            if (!_controllers.TryGetValue(key, out var controller))
+                return false;
+
+            controller.Detach();
+            _controllers.Remove(key);
+            return true;
+        }
+
+        public UIController GetController(string key)
+        {
+            if (!_controllers.TryGetValue(key, out var result))
+            {
+                return null;
+            }
+
+            return result;
+        }
+
+        private void UpdateControllers(GameTime gameTime)
+        {
+            foreach (var controller in _controllers.Values)
+            {
+                controller.Update(gameTime);
+            }
+        }
+
+        #endregion
 
         internal void InternalUpdate(GameTime gameTime)
         {
             UpdateTransforms();
+
+            UpdateControllers(gameTime);
 
             Update(gameTime);
 
