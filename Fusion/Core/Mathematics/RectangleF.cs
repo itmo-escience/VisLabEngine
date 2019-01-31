@@ -527,5 +527,15 @@ namespace Fusion.Core.Mathematics
         {
             return new Rectangle((int)value.X, (int)value.Y, (int)value.Width, (int)value.Height);
         }
+
+        public RectangleF GetBound(Matrix3x2 transformMatrix)
+        {
+            var p0 = Matrix3x2.TransformPoint(transformMatrix, new Vector2(X, Y));
+            var p1 = Matrix3x2.TransformPoint(transformMatrix, new Vector2(X, Y + Height));
+            var p2 = Matrix3x2.TransformPoint(transformMatrix, new Vector2(X + Width, Y + Height));
+            var p3 = Matrix3x2.TransformPoint(transformMatrix, new Vector2(X + Width, Y));
+
+            return RectangleF.Bounding(p0, p1, p2, p3);
+        }
     }
 }

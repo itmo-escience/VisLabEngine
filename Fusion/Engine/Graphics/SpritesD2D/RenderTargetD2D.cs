@@ -1,6 +1,8 @@
 ﻿using Fusion.Core.Mathematics;
 using SharpDX.Direct2D1;
 using SharpDX.Mathematics.Interop;
+using System.Drawing.Imaging;
+using System.Runtime.InteropServices;
 
 namespace Fusion.Engine.Graphics.SpritesD2D
 {
@@ -12,6 +14,7 @@ namespace Fusion.Engine.Graphics.SpritesD2D
         private readonly RenderTarget _target;
         private readonly BrushFactory _brushFactory;
         private readonly TextFormatFactory _dwFactory;
+        private readonly TextLayoutFactory _layoutFactory;
 
         /// <remarks>This constructor must be internal in order to encapsulate Direct2D dependency.</remarks>
         internal RenderTargetD2D(RenderTarget renderTarget)
@@ -19,6 +22,7 @@ namespace Fusion.Engine.Graphics.SpritesD2D
             _target = renderTarget;
             _brushFactory = new BrushFactory(_target);
             _dwFactory = new TextFormatFactory();
+            _layoutFactory = new TextLayoutFactory();
         }
 
         /// <inheritdoc cref="RenderTarget.BeginDraw()"/>
@@ -49,35 +53,48 @@ namespace Fusion.Engine.Graphics.SpritesD2D
         /// <inheritdoc cref="RenderTarget.PopAxisAlignedClip()"/>
         public void PopAxisAlignedClip() => _target.PopAxisAlignedClip();
 
+        private RawVector2 createAlignedVector(RawVector2 vector)
+        {
+            return new RawVector2(vector.X + 0.5f, vector.Y + 0.5f);
+        }
+
+        private RawRectangleF createAlignedRectangle(RawRectangleF rectangle)
+        {
+            return new RawRectangleF(rectangle.Left + 0.5f, rectangle.Top + 0.5f, rectangle.Right + 0.5f, rectangle.Bottom + 0.5f);
+        }
+
         public void DrawEllipse(Vector2 center, float rX, float rY, IBrushD2D brush) =>
-            _target.DrawEllipse(new SharpDX.Direct2D1.Ellipse(center.ToRawVector2(), rX, rY), _brushFactory.GetOrCreateBrush(brush));
+            _target.DrawEllipse(new SharpDX.Direct2D1.Ellipse(createAlignedVector(center.ToRawVector2()), rX, rY), _brushFactory.GetOrCreateBrush(brush));
 
         public void DrawEllipse(Vector2 center, float rX, float rY, IBrushD2D brush, float strokeWidth) =>
-            _target.DrawEllipse(new SharpDX.Direct2D1.Ellipse(center.ToRawVector2(), rX, rY), _brushFactory.GetOrCreateBrush(brush), strokeWidth);
+            _target.DrawEllipse(new SharpDX.Direct2D1.Ellipse(createAlignedVector(center.ToRawVector2()), rX, rY), _brushFactory.GetOrCreateBrush(brush), strokeWidth);
 
         public void DrawLine(Vector2 p0, Vector2 p1, IBrushD2D brush) =>
-            _target.DrawLine(p0.ToRawVector2(), p1.ToRawVector2(), _brushFactory.GetOrCreateBrush(brush));
+            _target.DrawLine(createAlignedVector(p0.ToRawVector2()), createAlignedVector(p1.ToRawVector2()), _brushFactory.GetOrCreateBrush(brush));
 
         public void DrawLine(Vector2 p0, Vector2 p1, IBrushD2D brush, float strokeWidth) =>
-            _target.DrawLine(p0.ToRawVector2(), p1.ToRawVector2(), _brushFactory.GetOrCreateBrush(brush), strokeWidth);
+            _target.DrawLine(createAlignedVector(p0.ToRawVector2()), createAlignedVector(p1.ToRawVector2()), _brushFactory.GetOrCreateBrush(brush), strokeWidth);
 
         public void DrawRect(RectangleF rectangle, IBrushD2D brush) =>
-            _target.DrawRectangle(rectangle.ToRawRectangleF(), _brushFactory.GetOrCreateBrush(brush));
+            _target.DrawRectangle(createAlignedRectangle(rectangle.ToRawRectangleF()), _brushFactory.GetOrCreateBrush(brush));
 
         public void DrawRect(RectangleF rectangle, IBrushD2D brush, float strokeWidth) =>
-            _target.DrawRectangle(rectangle.ToRawRectangleF(), _brushFactory.GetOrCreateBrush(brush), strokeWidth);
+            _target.DrawRectangle(createAlignedRectangle(rectangle.ToRawRectangleF()), _brushFactory.GetOrCreateBrush(brush), strokeWidth);
 
         public void FillEllipse(Vector2 center, float rX, float rY, IBrushD2D brush) =>
-            _target.FillEllipse(new SharpDX.Direct2D1.Ellipse(center.ToRawVector2(), rX, rY), _brushFactory.GetOrCreateBrush(brush));
+            _target.FillEllipse(new SharpDX.Direct2D1.Ellipse(createAlignedVector(center.ToRawVector2()), rX, rY), _brushFactory.GetOrCreateBrush(brush));
 
         public void FillRect(RectangleF rectangle, IBrushD2D brush) =>
-            _target.FillRectangle(rectangle.ToRawRectangleF(), _brushFactory.GetOrCreateBrush(brush));
+            _target.FillRectangle(createAlignedRectangle(rectangle.ToRawRectangleF()), _brushFactory.GetOrCreateBrush(brush));
 
         public void DrawText(string text, TextFormatD2D textFormat, RectangleF rectangleF, IBrushD2D brush) =>
-            _target.DrawText(text, _dwFactory.CreateTextFormat(textFormat), rectangleF.ToRawRectangleF(), _brushFactory.GetOrCreateBrush(brush));
+            _target.DrawText(text, _dwFactory.CreateTextFormat(textFormat), createAlignedRectangle(rectangleF.ToRawRectangleF()), _brushFactory.GetOrCreateBrush(brush));
 
         public void DrawTextLayout(Vector2 origin, TextLayoutD2D layout, IBrushD2D brush) =>
-            _target.DrawTextLayout(origin.ToRawVector2(), layout.Layout, _brushFactory.GetOrCreateBrush(brush));
+            _target.DrawTextLayout(createAlignedVector(origin.ToRawVector2()), _layoutFactory.CreateTextLayout(layout), _brushFactory.GetOrCreateBrush(brush));
+
+        public void DrawBitmap(Bitmap bitmap, RectangleF destinationRectangle, float opacity, BitmapInterpolationMode interpolationMode, RectangleF sourceRectangle) =>
+            _target.DrawBitmap(bitmap, createAlignedRectangle(destinationRectangle.ToRawRectangleF()), opacity, interpolationMode, createAlignedRectangle(sourceRectangle.ToRawRectangleF()));
 
 
         public DrawingStateBlockD2D SaveDrawingState()
@@ -93,6 +110,52 @@ namespace Fusion.Engine.Graphics.SpritesD2D
         {
             get => _target.Transform.ToMatrix3x2();
             set => _target.Transform = value.ToRawMatrix3X2();
+        }
+
+        /// <summary>
+        /// Loads a Direct2D Bitmap from a file using System.Drawing.Image.FromFile(...)
+        /// </summary>
+        /// <param name="renderTarget">The render target.</param>
+        /// <param name="file">The file.</param>
+        /// <returns>A D2D1 Bitmap</returns>
+        public static Bitmap LoadFromFile(RenderTargetD2D renderTarget, string file)
+        {
+            // Loads from file using System.Drawing.Image
+            using (var bitmap = (System.Drawing.Bitmap)System.Drawing.Image.FromFile(file))
+            {
+                var sourceArea = new System.Drawing.Rectangle(0, 0, bitmap.Width, bitmap.Height);
+                var bitmapProperties = new BitmapProperties(new SharpDX.Direct2D1.PixelFormat(SharpDX.DXGI.Format.R8G8B8A8_UNorm, AlphaMode.Premultiplied));
+                var size = new System.Drawing.Size(bitmap.Width, bitmap.Height);
+
+                // Transform pixels from BGRA to RGBA
+                int stride = bitmap.Width * sizeof(int);
+                using (var tempStream = new SharpDX.DataStream(bitmap.Height * stride, true, true))
+                {
+                    // Lock System.Drawing.Bitmap
+                    var bitmapData = bitmap.LockBits(sourceArea, ImageLockMode.ReadOnly, System.Drawing.Imaging.PixelFormat.Format32bppPArgb);
+
+                    // Convert all pixels 
+                    for (int y = 0; y < bitmap.Height; y++)
+                    {
+                        int offset = bitmapData.Stride * y;
+                        for (int x = 0; x < bitmap.Width; x++)
+                        {
+                            // Not optimized 
+                            byte B = Marshal.ReadByte(bitmapData.Scan0, offset++);
+                            byte G = Marshal.ReadByte(bitmapData.Scan0, offset++);
+                            byte R = Marshal.ReadByte(bitmapData.Scan0, offset++);
+                            byte A = Marshal.ReadByte(bitmapData.Scan0, offset++);
+                            int rgba = R | (G << 8) | (B << 16) | (A << 24);
+                            tempStream.Write(rgba);
+                        }
+
+                    }
+                    bitmap.UnlockBits(bitmapData);
+                    tempStream.Position = 0;
+
+                    return new Bitmap(renderTarget._target, new SharpDX.Size2(bitmap.Width, bitmap.Height), tempStream, stride, bitmapProperties);
+                }
+            }
         }
 
         private void ZZZ()

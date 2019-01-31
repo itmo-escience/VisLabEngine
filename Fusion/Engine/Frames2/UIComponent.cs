@@ -5,11 +5,12 @@ using System.Linq;
 using System.Runtime.CompilerServices;
 using Fusion.Core.Mathematics;
 using Fusion.Engine.Common;
+using Fusion.Engine.Frames2.Managing;
 using Fusion.Engine.Graphics.SpritesD2D;
 
 namespace Fusion.Engine.Frames2
 {
-    public abstract class UIComponent : INotifyPropertyChanged
+    public abstract class UIComponent : INotifyPropertyChanged, IUIInputAware
     {
         #region Position
         private float _x;
@@ -123,18 +124,20 @@ namespace Fusion.Engine.Frames2
         {
             get
             {
-                if (!Visible)
-                {
-                    return new RectangleF(X, Y, 0, 0);
-                }
-
-                var p0 = Matrix3x2.TransformPoint(GlobalTransform, Vector2.Zero);
-                var p1 = Matrix3x2.TransformPoint(GlobalTransform, new Vector2(0, Height));
-                var p2 = Matrix3x2.TransformPoint(GlobalTransform, new Vector2(Width, Height));
-                var p3 = Matrix3x2.TransformPoint(GlobalTransform, new Vector2(Width, 0));
-
-                return RectangleF.Bounding(p0, p1, p2, p3);
+                return (Visible ? new RectangleF(0, 0, Width, Height) : new RectangleF(0, 0, 0, 0)).GetBound(GlobalTransform);
             }
+        }
+
+        public virtual RectangleF LocalBoundingBox
+        {
+            get {
+                return (Visible ? new RectangleF(0, 0, Width, Height) : new RectangleF(0, 0, 0, 0)).GetBound(_transform * _localTransform);
+            }
+        }
+
+        public virtual bool IsInside(Vector2 point)
+        {
+            return BoundingBox.Contains(point);
         }
 
         private UIContainer _parent;
@@ -173,10 +176,11 @@ namespace Fusion.Engine.Frames2
         protected UIComponent(float x, float y, float width, float height)
         {
             Name = GenerateName(GetType());
-            X = x;
-            Y = y;
-            Width = width;
-            Height = height;
+            _x = x;
+            _y = y;
+            _width = width;
+            _height = height;
+            _isTransformDirty = true;
         }
 
         public IEnumerable<UIContainer> Ancestors()
@@ -249,6 +253,19 @@ namespace Fusion.Engine.Frames2
         public abstract void Update(GameTime gameTime);
         public abstract void Draw(SpriteLayerD2D layer);
 
+        protected SolidBrushD2D debugBrush = new SolidBrushD2D(new Color4(0, 1, 0, 1));
+        protected TextFormatD2D debugTextFormat = new TextFormatD2D("Consolas", 12);
+        public virtual void DebugDraw(SpriteLayerD2D layer)
+        {
+            var b = BoundingBox;
+            layer.Draw(TransformCommand.Identity);
+            layer.Draw(new Rect(b.X, b.Y, b.Width, b.Height, debugBrush));
+
+            string debugText = $"{Name} X:{b.X:0.00} Y:{b.Y:0.00} W:{b.Width:0.00} H:{b.Height:0.00}";
+            TextLayoutD2D dtl = new TextLayoutD2D(debugText, debugTextFormat, float.MaxValue, float.MaxValue);
+            layer.Draw(new Label(debugText, new RectangleF(b.X, b.Y - dtl.Height, dtl.Width + 1, dtl.Height), debugTextFormat, debugBrush));
+        }
+
         #region Naming
 
         private static readonly Dictionary<Type, int> GeneratedCountOfType = new Dictionary<Type, int>();
@@ -297,5 +314,35 @@ namespace Fusion.Engine.Frames2
         }
 
         #endregion PropertyChanges
+
+        public event KeyDownEvent       KeyDown;
+        public event KeyUpEvent         KeyUp;
+        public event KeyPressEvent      KeyPress;
+        public event MouseMoveEvent     MouseMove;
+        public event MouseDragEvent     MouseDrag;
+        public event MouseDownEvent     MouseDown;
+        public event MouseUpEvent       MouseUp;
+        public event ClickEvent         Click;
+        public event DoubleClickEvent   DoubleClick;
+        public event ScrollEvent        Scroll;
+        public event EnterEvent         Enter;
+        public event LeaveEvent         Leave;
+        public event FocusEvent         Focus;
+        public event BlurEvent          Blur;
+
+        internal virtual void InvokeKeyDown     (UIEventProcessor eventProcessor, KeyEventArgs e)       => KeyDown?.Invoke(eventProcessor, e);
+        internal virtual void InvokeKeyUp       (UIEventProcessor eventProcessor, KeyEventArgs e)       => KeyUp?.Invoke(eventProcessor, e);
+        internal virtual void InvokeKeyPress    (UIEventProcessor eventProcessor, KeyEventArgs e)       => KeyPress?.Invoke(eventProcessor, e);
+        internal virtual void InvokeMouseMove   (UIEventProcessor eventProcessor, MoveEventArgs e)      => MouseMove?.Invoke(eventProcessor, e);
+        internal virtual void InvokeMouseDrag   (UIEventProcessor eventProcessor, DragEventArgs e)      => MouseDrag?.Invoke(eventProcessor, e);
+        internal virtual void InvokeMouseDown   (UIEventProcessor eventProcessor, ClickEventArgs e)     => MouseDown?.Invoke(eventProcessor, e);
+        internal virtual void InvokeMouseUp     (UIEventProcessor eventProcessor, ClickEventArgs e)     => MouseUp?.Invoke(eventProcessor, e);
+        internal virtual void InvokeClick       (UIEventProcessor eventProcessor, ClickEventArgs e)     => Click?.Invoke(eventProcessor, e);
+        internal virtual void InvokeDoubleClick (UIEventProcessor eventProcessor, ClickEventArgs e)     => DoubleClick?.Invoke(eventProcessor, e);
+        internal virtual void InvokeScroll      (UIEventProcessor eventProcessor, ScrollEventArgs e)    => Scroll?.Invoke(eventProcessor, e);
+        internal virtual void InvokeEnter       (UIEventProcessor eventProcessor)                       => Enter?.Invoke(eventProcessor);
+        internal virtual void InvokeLeave       (UIEventProcessor eventProcessor)                       => Leave?.Invoke(eventProcessor);
+        internal virtual void InvokeFocus       (UIEventProcessor eventProcessor)                       => Focus?.Invoke(eventProcessor);
+        internal virtual void InvokeBlur        (UIEventProcessor eventProcessor)                       => Blur?.Invoke(eventProcessor);
     }
 }

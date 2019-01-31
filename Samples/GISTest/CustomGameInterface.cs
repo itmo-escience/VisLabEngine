@@ -29,6 +29,7 @@ using Fusion.Engine.Frames2.Containers;
 using Fusion.Engine.Frames2.Managing;
 using Fusion.Engine.Graphics.SpritesD2D;
 using Label = Fusion.Engine.Graphics.SpritesD2D.Label;
+using KeyEventArgs = Fusion.Engine.Input.KeyEventArgs;
 
 namespace GISTest
 {
@@ -183,15 +184,29 @@ namespace GISTest
 		    _userInterface2 = new UIManager(Game.RenderSystem);
 		    _userInterface2.DebugEnabled = true;
 
-		    txt = new Fusion.Engine.Frames2.Components.Label("z", 150, 450, 100, 100);
-		    _userInterface2.Root.Add(txt);
+            txt = new Fusion.Engine.Frames2.Components.Label("z", new TextFormatD2D("Calibri", 20), 150, 450, 100, 100);
+            string fileName = @"E:\GitHub\image.png";
+            img1 = new Image(50, 50, 100, 100, fileName, 1);
+            img2 = new Image(50, 50, 100, 100, fileName, 0.66f);
+            img3 = new Image(50, 50, 100, 100, fileName, 0.33f);
+            img4 = new Image(50, 50, 100, 100, fileName, 0);
 
+            verticalAlignment alignment = verticalAlignment.CENTER;
 
-            img = new Image(250, 250, 100, 100);
-		    _userInterface2.Root.Add(img);
+            verticalBox1 = new VerticalBox(0, 0, 0, 0, alignment);
+            verticalBox1.Add(txt);
+            verticalBox1.Add(img1);
+            verticalBox1.Add(img2);
 
-            var img1 = new Image(50, 50, 100, 100);
-            _userInterface2.Root.Add(img1);
+            verticalBox2 = new VerticalBox(0, 0, 0, 0, alignment);
+            verticalBox2.Add(img3);
+            verticalBox2.Add(img4);
+
+            verticalBox3 = new VerticalBox(200, 200, 0, 0, alignment);
+            verticalBox3.Add(verticalBox1);
+            verticalBox3.Add(verticalBox2);
+
+            _userInterface2.Root.Add(verticalBox3);
 
             userInterface.RootFrame = this.rootFrame = new MainFrame(FrameProcessor);
 			viewLayer.SpriteLayers.Add(userInterface.FramesSpriteLayer);
@@ -265,9 +280,11 @@ namespace GISTest
 			}
 			messages.Clear();
 
-		    txt.Text = Game.Mouse.Position.ToString();
-		    img.Angle = angle;
+            txt.Text = Game.Mouse.Position.ToString();
 		    txt.Angle = MathUtil.TwoPi - angle;
+            img1.Angle = angle;
+            img3.Angle = angle;
+            verticalBox1.Angle = -angle;
 
             _userInterface2.Update(gameTime);
 		    _userInterface2.Draw(_spriteLayer);
@@ -287,9 +304,15 @@ namespace GISTest
 
 	    private Fusion.Engine.Frames2.Components.Label txt;
 	    private float angle = 0;
-	    private Image img;
+	    private Image img1;
+        private Image img2;
+        private Image img3;
+        private Image img4;
+        private VerticalBox verticalBox1;
+        private VerticalBox verticalBox2;
+        private VerticalBox verticalBox3;
 
-	    public void PrintMessage(string message)
+        public void PrintMessage(string message)
 		{
 			messages.Add(message);
 		}
