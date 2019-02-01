@@ -10,6 +10,7 @@ using System.Windows.Media;
 using Fusion.Drivers.Graphics;
 using Fusion.Drivers.Graphics.Display;
 using Fusion.Engine.Common;
+using SharpDX.Direct3D11;
 using Texture2D = SharpDX.Direct3D11.Texture2D;
 
 namespace ZWpfLib
@@ -173,9 +174,9 @@ namespace ZWpfLib
 			Console.WriteLine(DesiredSize);
 		}
 
-        private void SetBackBuffer(RenderTarget2D target, DXImageSource sur)
+        private void SetBackBuffer(RenderTarget2D target, DXImageSource sur, DeviceContext ctx)
         {
-            sur.SetD3D11BackBuffer(target.Surface.Resource.QueryInterface<Texture2D>());
+            sur.SetD3D11BackBuffer(target.Surface.Resource.QueryInterface<Texture2D>(), ctx);
         }
 
         private int frameCounter = 1;
@@ -200,7 +201,8 @@ namespace ZWpfLib
 		    if (_buf == null)
 		    {
 		        _buf = display.ExtractBuffer();
-                SetBackBuffer(_buf, Surface);
+                SetBackBuffer(_buf, Surface, display.DeferredContext);
+                display.RequestRender();
             }
 
 		    frameCounter++;
