@@ -252,7 +252,7 @@
     <Compile Include="Engine\Common\Commands\CrashServer.cs" />
     <Compile Include="Engine\Common\AtomAttribute.cs" />
     <Compile Include="Engine\Common\UserInterface.Internal.cs" />
-    <Compile Include="Engine\Frames2\Components\EndClippingFlag.cs" />
+    <Compile Include="Engine\Frames2\Components\ClippingFlags.cs" />
     <Compile Include="Engine\Frames2\Components\Image.cs" />
     <Compile Include="Engine\Frames2\Components\Border.cs" />
     <Compile Include="Engine\Frames2\Containers\FreePlacement.cs" />

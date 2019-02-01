@@ -52,6 +52,11 @@ namespace Fusion.Engine.Frames2.Managing
 
                 if (c is UIContainer container)
                 {
+                    if (container.NeedClipping)
+                    {
+                        queue.Enqueue(new Components.StartClippingFlag(container.GetClippingGeometry(layer)));
+                    }
+
                     foreach (var child in container.Children)
                     {
                         queue.Enqueue(child);
@@ -59,7 +64,6 @@ namespace Fusion.Engine.Frames2.Managing
 
                     if (container.NeedClipping)
                     {
-                        layer.Draw(new StartClippingAlongGeometry(container.GetClippingGeometry(layer), AntialiasModeD2D.Aliased));
                         queue.Enqueue(new Components.EndClippingFlag());
                     }
                 }
