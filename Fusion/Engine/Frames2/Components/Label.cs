@@ -7,7 +7,16 @@ namespace Fusion.Engine.Frames2.Components
     public sealed class Label : UIComponent
     {
         private bool _isDirtyText;
-        private readonly TextFormatD2D _textFormat;
+
+        private TextFormatD2D _textFormat;
+        public TextFormatD2D TextFormat {
+            get => _textFormat;
+            set {
+                _textFormat = value;
+                NotifyPropertyChanged();
+            }
+        }
+
 
         private float _maxWidth;
         public float MaxWidth {
@@ -40,18 +49,13 @@ namespace Fusion.Engine.Frames2.Components
 
                 Width = layout.Width < _maxWidth ? layout.Width : _maxWidth;
                 Height = layout.Height < _maxHeight ? layout.Height : _maxHeight;
+                NotifyPropertyChanged();
             }
         }
 
         private Graphics.SpritesD2D.Label _label;
 
-        public Label() : base() {
-            MaxWidth = 0;
-            MaxHeight = 0;
-            _isDirtyText = false;
-            _textFormat = new TextFormatD2D("Calibri", 20); //TODO make serializable
-            Text = "";
-        }
+        public Label() : base() {}
 
         public Label(string text, TextFormatD2D textFormat, float x, float y, float width, float height) : base(x, y, width, height)
         {
