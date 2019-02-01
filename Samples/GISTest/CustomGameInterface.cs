@@ -31,6 +31,7 @@ using Fusion.Engine.Frames2.Managing;
 using Fusion.Engine.Graphics.SpritesD2D;
 using Label = Fusion.Engine.Graphics.SpritesD2D.Label;
 using KeyEventArgs = Fusion.Engine.Input.KeyEventArgs;
+using Fusion.Engine.Frames2;
 
 namespace GISTest
 {
@@ -192,7 +193,7 @@ namespace GISTest
             img3 = new Image(50, 50, 30, 80, fileName, 0.77f);
             img4 = new Image(50, 50, 90, 45, fileName, 0.55f);
 
-            verticalAlignment alignment = verticalAlignment.CENTER;
+            VerticalAlignment alignment = VerticalAlignment.CENTER;
 
             verticalBox1 = new VerticalBox(0, 0, 0, 0, alignment, true);
             verticalBox1.Add(txt);
@@ -213,6 +214,12 @@ namespace GISTest
             verticalBox3.Add(verticalBox2);
 
             _userInterface2.Root.Add(verticalBox3);
+
+            //UIComponent deser;
+            //UIComponentSerializer.Read(@"E:\GitHub\testSer.xml", out deser);
+            //deser.X += 200;
+            //_userInterface2.Root.Add(deser);
+            //UIComponentSerializer.Write(_userInterface2.Root, @"E:\GitHub\testSer.xml");
 
             userInterface.RootFrame = this.rootFrame = new MainFrame(FrameProcessor);
 			viewLayer.SpriteLayers.Add(userInterface.FramesSpriteLayer);

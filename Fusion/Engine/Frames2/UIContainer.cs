@@ -55,14 +55,14 @@ namespace Fusion.Engine.Frames2
         protected UIContainer() : base()
         {
             _children = new ObservableCollection<UIComponent>();
-            Children = new ReadOnlyObservableCollection<UIComponent>(_children);
+            Children = new ObservableCollection<UIComponent>(_children);
             _needClipping = false;
         }
 
         protected UIContainer(float x, float y, float width, float height, bool needClipping = false) : base(x, y, width, height)
         {
             _children = new ObservableCollection<UIComponent>();
-            Children = new ReadOnlyObservableCollection<UIComponent>(_children);
+            Children = new ObservableCollection<UIComponent>(_children);
             _needClipping = needClipping;
         }
 
@@ -105,6 +105,18 @@ namespace Fusion.Engine.Frames2
             sink.EndFigure(FigureEnd.Closed);
             sink.Close();
             return new PathGeometryD2D(geometry);
+        }
+
+        internal void RestoreParents()
+        {
+            foreach (var child in Children)
+            {
+                child.Parent = this;
+                child.NotifyPropertyChanged("Parent");
+                if (child is UIContainer container) {
+                    container.RestoreParents();
+                }
+            }
         }
     }
 }

@@ -48,9 +48,9 @@ namespace Fusion.Engine.Frames2.Components
         public Label() : base() {
             MaxWidth = 0;
             MaxHeight = 0;
-            Text = "";
             _isDirtyText = false;
             _textFormat = new TextFormatD2D("Calibri", 20); //TODO make serializable
+            Text = "";
         }
 
         public Label(string text, TextFormatD2D textFormat, float x, float y, float width, float height) : base(x, y, width, height)

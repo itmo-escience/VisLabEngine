@@ -316,7 +316,7 @@ namespace Fusion.Engine.Frames2
             return true;
         }
 
-        protected void NotifyPropertyChanged([CallerMemberName] string propertyName = null)
+        internal void NotifyPropertyChanged([CallerMemberName] string propertyName = null)
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
