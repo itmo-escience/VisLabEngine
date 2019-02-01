@@ -1,6 +1,9 @@
 ﻿using System.Collections.Generic;
-using Fusion.Core.Mathematics;
+using SharpDX;
 using SharpDX.Direct2D1;
+using Matrix3x2 = Fusion.Core.Mathematics.Matrix3x2;
+using RectangleF = Fusion.Core.Mathematics.RectangleF;
+using Vector2 = Fusion.Core.Mathematics.Vector2;
 
 namespace Fusion.Engine.Graphics.SpritesD2D
 {
@@ -212,31 +215,53 @@ namespace Fusion.Engine.Graphics.SpritesD2D
 
     public sealed class DrawBitmap : IDrawCommand
     {
-        private readonly float X, Y, W, H;
-        private RectangleF _rect;
-        private string _file;
-        private float _opacity;
+        private readonly float _x, _y, _w, _h;
+        private readonly float _opacity;
+        private readonly RectangleF _targetRect;
+        private readonly RectangleF _sourceRect;
+        private SharpDX.Direct2D1.Bitmap _dxBitmap;
+        private readonly System.Drawing.Image _sourceImage;
 
-        public DrawBitmap(float x, float y, float w, float h, string file, float opacity = 1)
+        public DrawBitmap(float x, float y, System.Drawing.Image image, float opacity = 1)
         {
-            X = x;
-            Y = y;
-            W = w;
-            H = h;
-            _rect = new RectangleF(x, y, w, h);
-            _file = file;
+            _x = x;
+            _y = y;
+            _w = image.Width;
+            _h = image.Height;
+            _targetRect = new RectangleF(_x, _y, _w, _h);
+            _sourceRect = new RectangleF(0, 0, image.Width, image.Height);
             _opacity = opacity;
+            _sourceImage = image;
+        }
+
+        public DrawBitmap(float x, float y, float width, float height, System.Drawing.Image image, float opacity = 1)
+        {
+            _x = x;
+            _y = y;
+            _w = width;
+            _h = height;
+            _targetRect = new RectangleF(_x, _y, _w, _h);
+            _sourceRect = new RectangleF(0, 0, image.Width, image.Height);
+            _opacity = opacity;
+            _sourceImage = image;
         }
 
         public void Apply(RenderTargetD2D target)
         {
-            Bitmap bitmap = RenderTargetD2D.LoadFromFile(target, _file);
-            target.DrawBitmap(bitmap, new RectangleF(0, 0, W, H), _opacity, BitmapInterpolationMode.NearestNeighbor, new RectangleF(0, 0, bitmap.Size.Width, bitmap.Size.Height));
+            if(_dxBitmap == null)
+                _dxBitmap = target.ToBitmap(_sourceImage);
+
+            target.DrawBitmap(_dxBitmap,
+                _targetRect,
+                _opacity,
+                BitmapInterpolationMode.NearestNeighbor,
+                _sourceRect
+            );
         }
 
         public override string ToString()
         {
-            return $"DrawBitmap ({X}, {Y}, {W}, {H}, {_file})";
+            return $"DrawBitmap ({_x}, {_y}, {_w}, {_h})";
         }
     }
 

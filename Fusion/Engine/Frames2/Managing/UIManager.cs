@@ -28,7 +28,7 @@ namespace Fusion.Engine.Frames2.Managing
 
             foreach (var c in UIHelper.DFSTraverse(Root).Where(c => typeof(UIContainer) != c.GetType()))
             {
-                c.Update(gameTime);
+                c.InternalUpdate(gameTime);
             }
         }
 
