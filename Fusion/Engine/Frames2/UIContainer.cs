@@ -9,7 +9,17 @@ namespace Fusion.Engine.Frames2
     public abstract class UIContainer : UIComponent
     {
         private readonly ObservableCollection<UIComponent> _children;
-        public ReadOnlyObservableCollection<UIComponent> Children { get; }
+        public ObservableCollection<UIComponent> Children {
+            get { return _children; }
+            set {
+                foreach (UIComponent child in value)
+                {
+                    Add(child);
+                }
+                NotifyPropertyChanged();
+            }
+        }
+
         private bool _needClipping;
         public bool NeedClipping {
             get => _needClipping;
@@ -40,6 +50,13 @@ namespace Fusion.Engine.Frames2
 
                 return b;
             }
+        }
+
+        protected UIContainer() : base()
+        {
+            _children = new ObservableCollection<UIComponent>();
+            Children = new ReadOnlyObservableCollection<UIComponent>(_children);
+            _needClipping = false;
         }
 
         protected UIContainer(float x, float y, float width, float height, bool needClipping = false) : base(x, y, width, height)

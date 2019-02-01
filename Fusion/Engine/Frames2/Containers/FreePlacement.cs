@@ -11,6 +11,8 @@ namespace Fusion.Engine.Frames2.Containers
 
         }
 
+        public FreePlacement() : base() { }
+
         public FreePlacement(float x, float y, float width, float height, bool needClipping = false) : base(x, y, width, height, needClipping)
         {
             debugBrush = new SolidBrushD2D(new Color4(0, 1, 1, 1));

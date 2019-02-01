@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
 using System.Runtime.CompilerServices;
+using System.Xml.Serialization;
 using Fusion.Core.Mathematics;
 using Fusion.Engine.Common;
 using Fusion.Engine.Frames2.Managing;
@@ -142,6 +143,7 @@ namespace Fusion.Engine.Frames2
         }
 
         private UIContainer _parent;
+        [XmlIgnore]
         public UIContainer Parent
         {
             get => _parent;
