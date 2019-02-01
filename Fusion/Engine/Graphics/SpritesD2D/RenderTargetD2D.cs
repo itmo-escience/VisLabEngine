@@ -47,8 +47,8 @@ namespace Fusion.Engine.Graphics.SpritesD2D
         public void Flush(out long tag1, out long tag2) => _target.Flush(out tag1, out tag2);
 
         /// <inheritdoc cref="RenderTarget.PushAxisAlignedClip(RawRectangleF, AntialiasMode)"/>
-        public void PushAxisAlignedClip(RectangleF clip, AntialiasModeD2D antialiasMode) =>
-            _target.PushAxisAlignedClip(clip.ToRawRectangleF(), antialiasMode.ToAntialiasMode());
+        public void PushAxisAlignedClip(RectangleF clippingRecrangle, AntialiasModeD2D antialiasMode) =>
+            _target.PushAxisAlignedClip(createAlignedRectangle(clippingRecrangle.ToRawRectangleF()), antialiasMode.ToAntialiasMode());
 
         /// <inheritdoc cref="RenderTarget.PopAxisAlignedClip()"/>
         public void PopAxisAlignedClip() => _target.PopAxisAlignedClip();
@@ -96,6 +96,23 @@ namespace Fusion.Engine.Graphics.SpritesD2D
         public void DrawBitmap(Bitmap bitmap, RectangleF destinationRectangle, float opacity, BitmapInterpolationMode interpolationMode, RectangleF sourceRectangle) =>
             _target.DrawBitmap(bitmap, createAlignedRectangle(destinationRectangle.ToRawRectangleF()), opacity, interpolationMode, createAlignedRectangle(sourceRectangle.ToRawRectangleF()));
 
+        public void PushLayer(Geometry clippingGeometry, AntialiasModeD2D antialiasMode)
+        {
+            LayerParameters layerParameters = new LayerParameters
+            {
+                GeometricMask = clippingGeometry,
+                ContentBounds = RectangleF.Infinite.ToRawRectangleF(),
+                MaskAntialiasMode = antialiasMode.ToAntialiasMode(),
+                MaskTransform = SharpDX.Matrix3x2.Identity,
+                Opacity = 1.0f,
+                LayerOptions = LayerOptions.None,
+                OpacityBrush = null
+            };
+            _target.PushLayer(ref layerParameters, new Layer(_target));
+        }
+
+        public void PopLayer() =>
+            _target.PopLayer();
 
         public DrawingStateBlockD2D SaveDrawingState()
         {

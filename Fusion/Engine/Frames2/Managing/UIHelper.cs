@@ -1,4 +1,8 @@
 ﻿using Fusion.Core.Mathematics;
+using Fusion.Engine.Common;
+using Fusion.Engine.Graphics.SpritesD2D;
+using SharpDX.Direct2D1;
+using SharpDX.Mathematics.Interop;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -102,5 +106,39 @@ namespace Fusion.Engine.Frames2.Managing
             foreach (var c in UIHelper.BFSTraverseForPoint(root, innerPoint)) components.Add(c);
             return components;
         }
+
+        public static Geometry GetClippingGeometry(UIContainer container, Factory factory)
+        {
+            PathGeometry geometry = new PathGeometry(factory);
+            GeometrySink sink = geometry.Open();
+            sink.SetFillMode(FillMode.Winding);
+
+            RawVector2 p0 = Matrix3x2.TransformPoint(container.GlobalTransform, new Vector2(0, 0)).ToRawVector2();
+            RawVector2 p1 = Matrix3x2.TransformPoint(container.GlobalTransform, new Vector2(0, container.Height)).ToRawVector2();
+            RawVector2 p2 = Matrix3x2.TransformPoint(container.GlobalTransform, new Vector2(container.Width, container.Height)).ToRawVector2();
+            RawVector2 p3 = Matrix3x2.TransformPoint(container.GlobalTransform, new Vector2(container.Width, 0)).ToRawVector2();
+
+            sink.BeginFigure(p0, FigureBegin.Filled);
+            sink.AddLine(p1);
+            sink.AddLine(p2);
+            sink.AddLine(p3);
+            sink.EndFigure(FigureEnd.Closed);
+            sink.Close();
+            return geometry;
+        }
+    }
+
+    public sealed class EndClippingFlag : UIComponent
+    {
+        public EndClippingFlag() : base(0, 0, 0, 0)
+        {
+        }
+
+        public override void Draw(SpriteLayerD2D layer)
+        {
+            layer.Draw(new EndClippingAlongGeometry());
+        }
+
+        public override void Update(GameTime gameTime) {}
     }
 }

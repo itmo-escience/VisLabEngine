@@ -8,6 +8,7 @@ namespace Fusion.Engine.Frames2
     {
         private readonly ObservableCollection<UIComponent> _children;
         public ReadOnlyObservableCollection<UIComponent> Children { get; }
+        public readonly bool needClipping;
 
         public override void InvalidateTransform()
         {
@@ -33,10 +34,11 @@ namespace Fusion.Engine.Frames2
             }
         }
 
-        protected UIContainer(float x, float y, float width, float height) : base(x, y, width, height)
+        protected UIContainer(float x, float y, float width, float height, bool needClipping = false) : base(x, y, width, height)
         {
             _children = new ObservableCollection<UIComponent>();
             Children = new ReadOnlyObservableCollection<UIComponent>(_children);
+            this.needClipping = needClipping;
         }
 
         public virtual void Add(UIComponent child)

@@ -49,7 +49,7 @@ namespace Fusion.Engine.Frames2.Containers
             }
         }
 
-        public VerticalBox(float x, float y, float width, float height, verticalAlignment alignment = verticalAlignment.LEFT) : base(x, y, width, height)
+        public VerticalBox(float x, float y, float width, float height, verticalAlignment alignment = verticalAlignment.LEFT, bool needClipping = false) : base(x, y, width, height, needClipping)
         {
             debugBrush = new SolidBrushD2D(new Color4(0, 1, 1, 1));
             debugTextFormat = new TextFormatD2D("Consolas", 14);

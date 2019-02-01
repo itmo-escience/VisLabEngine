@@ -56,20 +56,21 @@ namespace Fusion.Engine.Frames2.Managing
                     {
                         queue.Enqueue(child);
                     }
-                }
 
-                //layer.StartClipping(layer.CreateTestGeometry());
+                    if (container.needClipping)
+                    {
+                        layer.Draw(new StartClippingAlongGeometry(UIHelper.GetClippingGeometry(container, layer.Factory), AntialiasModeD2D.Aliased));
+                        queue.Enqueue(new EndClippingFlag());
+                    }
+                }
 
                 layer.Draw(new TransformCommand(c.GlobalTransform));
                 c.Draw(layer);
 
                 if (DebugEnabled)
                 {
-                    layer.Draw(new TransformCommand(c.GlobalTransform));
                     c.DebugDraw(layer);
                 }
-
-                //layer.StopClipping();
             }
 
             layer.Draw(TransformCommand.Identity);

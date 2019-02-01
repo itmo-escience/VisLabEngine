@@ -239,4 +239,75 @@ namespace Fusion.Engine.Graphics.SpritesD2D
             return $"DrawBitmap ({X}, {Y}, {W}, {H}, {_file})";
         }
     }
+
+    public sealed class StartClippingAlongRectangle : IDrawCommand
+    {
+        RectangleF clippingRecrangle;
+        AntialiasModeD2D antialiasMode;
+
+        public StartClippingAlongRectangle(RectangleF clippingRecrangle, AntialiasModeD2D antialiasMode)
+        {
+            this.clippingRecrangle = clippingRecrangle;
+            this.antialiasMode = antialiasMode;
+        }
+
+        public void Apply(RenderTargetD2D target)
+        {
+            target.PushAxisAlignedClip(clippingRecrangle, antialiasMode);
+        }
+
+        public override string ToString()
+        {
+            return $"StartClippingAlongRectangle ({clippingRecrangle.X}, {clippingRecrangle.Y}, {clippingRecrangle.Width}, {clippingRecrangle.Height}, {antialiasMode})";
+        }
+    }
+
+    public sealed class EndClippingAlongRectangle : IDrawCommand
+    {
+        public void Apply(RenderTargetD2D target)
+        {
+            target.PopAxisAlignedClip();
+        }
+
+        public override string ToString()
+        {
+            return $"EndClippingAlongRectangle";
+        }
+    }
+
+    public sealed class StartClippingAlongGeometry : IDrawCommand
+    {
+        Geometry clippingGeometry;
+        AntialiasModeD2D antialiasMode;
+
+        public StartClippingAlongGeometry(Geometry clippingGeometry, AntialiasModeD2D antialiasMode)
+        {
+            this.clippingGeometry = clippingGeometry;
+            this.antialiasMode = antialiasMode;
+        }
+
+        public void Apply(RenderTargetD2D target)
+        {
+            target.PushLayer(clippingGeometry, antialiasMode);
+        }
+
+        public override string ToString()
+        {
+            SharpDX.Mathematics.Interop.RawRectangleF bounds = clippingGeometry.GetBounds();
+            return $"StartClippingAlongGeometry ({bounds.Left}, {bounds.Top}, {bounds.Right - bounds.Left}, {bounds.Bottom - bounds.Top}, {antialiasMode})";
+        }
+    }
+
+    public sealed class EndClippingAlongGeometry : IDrawCommand
+    {
+        public void Apply(RenderTargetD2D target)
+        {
+            target.PopLayer();
+        }
+
+        public override string ToString()
+        {
+            return $"EndClippingAlongGeometry";
+        }
+    }
 }
