@@ -2,6 +2,7 @@
 using System.Windows;
 using System.Windows.Interop;
 using Fusion.Drivers.Graphics;
+using SharpDX.Direct3D11;
 using SharpDX.Direct3D9;
 
 namespace ZWpfLib
@@ -50,10 +51,30 @@ namespace ZWpfLib
             }
         }
 
-
-		public void SetD3D11BackBuffer(SharpDX.Direct3D11.Texture2D texture)
+	    private SharpDX.Direct3D11.Texture2D buffer = null;
+		public void SetD3D11BackBuffer(SharpDX.Direct3D11.Texture2D texture, DeviceContext ctx)
 		{
-            SetBackBuffer(d3d9.Device.GetSharedD3D9(texture));
+		    bool Same(SharpDX.Direct3D11.Texture2D x, SharpDX.Direct3D11.Texture2D y)
+		    {
+		        var xd = x.Description;
+		        var yd = y.Description;
+		        return xd.Width == yd.Width && xd.Height == yd.Height && xd.Format == yd.Format;
+		    };
+
+		    var shared = d3d9.Device.GetSharedD3D9(texture);
+
+		    if (buffer == null || buffer.IsDisposed || !Same(texture, buffer))
+		    {
+		        buffer = texture;
+		        SetBackBuffer(shared);
+            }
+		    else
+		    {
+                Lock();
+                ctx.CopyResource(texture, buffer);
+		        AddDirtyRect(new Int32Rect(0, 0, base.PixelWidth, base.PixelHeight));
+                Unlock();
+            }
         }
 
 

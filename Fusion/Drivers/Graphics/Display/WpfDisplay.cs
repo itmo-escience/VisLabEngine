@@ -57,14 +57,15 @@ namespace Fusion.Drivers.Graphics.Display
 		{
 			base.CreateDisplayResources();
 
-            //_extractedBuffer?.Dispose();
+            DeferredContext?.Dispose();
+
             _currentBuffer?.Dispose();
-            while(_frontBuffers.TryDequeue(out var buffer))
+		    while (_frontBuffers.TryDequeue(out var buffer))
                 buffer.Dispose();
 
 			_backbufferDepth?.Dispose();
 
-
+            DeferredContext = new DeviceContext(device.Device);
 
 		    _frontBuffers.Enqueue(CreateBuffer());
 		    _frontBuffers.Enqueue(CreateBuffer());
@@ -80,6 +81,8 @@ namespace Fusion.Drivers.Graphics.Display
         }
 
 		public override void Prepare() { }
+
+	    public DeviceContext DeferredContext { get; private set; }
 
 		public override void SwapBuffers(int syncInterval)
 		{
@@ -135,7 +138,7 @@ namespace Fusion.Drivers.Graphics.Display
 	        {
 	            _frontBuffers.Enqueue(CreateBuffer());
 
-                buffer.Dispose();
+                //buffer.Dispose();
             }
 	        else
 	        {
@@ -143,6 +146,11 @@ namespace Fusion.Drivers.Graphics.Display
             }
 	    }
 
+	    private bool _renderRequested = false;
+	    public void RequestRender()
+	    {
+	        _renderRequested = true;
+	    }
 
 		public override void Update()
 		{
@@ -158,6 +166,13 @@ namespace Fusion.Drivers.Graphics.Display
 			}
 
             UpdateReady?.Invoke(this, null);
+
+		    if (_renderRequested)
+		    {
+		        var lst = DeferredContext.FinishCommandList(false);
+                device.Device.ImmediateContext.ExecuteCommandList(lst, false);
+		        _renderRequested = false;
+		    }
 		}
 
 
