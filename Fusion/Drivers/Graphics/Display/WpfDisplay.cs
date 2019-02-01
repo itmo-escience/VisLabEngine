@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Concurrent;
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using SharpDX.Direct3D;
 using SharpDX.Direct3D11;
@@ -18,9 +20,11 @@ namespace Fusion.Drivers.Graphics.Display
 
 	    public override StereoEye[] StereoEyeList => new[] { StereoEye.Mono };
 
-        private ConcurrentQueue<RenderTarget2D> _frontBuffers = new ConcurrentQueue<RenderTarget2D>();
+        private ConcurrentQueue<RenderTarget2D> _oldBuffers = new ConcurrentQueue<RenderTarget2D>();
 	    private RenderTarget2D _currentBuffer;
-	    private readonly object _extractedBufferLockHolder = new object();
+	    private volatile RenderTarget2D _readyBuffer;
+	    private readonly object lockObject = new object();
+
         public override RenderTarget2D BackbufferColor => _currentBuffer;
 
         private DepthStencil2D _backbufferDepth;
@@ -51,25 +55,29 @@ namespace Fusion.Drivers.Graphics.Display
 #endif
 
             d3dDevice = new D3DDevice(adapter, creationFlags, FeatureLevel.Level_11_1, FeatureLevel.Level_11_0);
-		}
+        }
 
 	    internal override void CreateDisplayResources()
 		{
 			base.CreateDisplayResources();
 
-            DeferredContext?.Dispose();
+		    DeferredContext?.Dispose();
 
-            _currentBuffer?.Dispose();
-		    while (_frontBuffers.TryDequeue(out var buffer))
-                buffer.Dispose();
+            //_readyBuffer?.Dispose();
+		    _currentBuffer?.Dispose();
+		    while (_oldBuffers.TryDequeue(out var buffer))
+		    {
+		        buffer.Dispose();
+		    }
+		    _backbufferDepth?.Dispose();
 
-			_backbufferDepth?.Dispose();
 
-            DeferredContext = new DeviceContext(device.Device);
 
-		    _frontBuffers.Enqueue(CreateBuffer());
-		    _frontBuffers.Enqueue(CreateBuffer());
-		    _frontBuffers.Enqueue(CreateBuffer());
+		    DeferredContext = new DeviceContext(device.Device);
+
+            _oldBuffers.Enqueue(CreateBuffer());
+		    _oldBuffers.Enqueue(CreateBuffer());
+		    _oldBuffers.Enqueue(CreateBuffer());
 		    _currentBuffer = CreateBuffer();
 
             _backbufferDepth = new DepthStencil2D(device, DepthFormat.D24S8, _currentBuffer.Width, _currentBuffer.Height, _currentBuffer.SampleCount);
@@ -82,9 +90,9 @@ namespace Fusion.Drivers.Graphics.Display
 
 		public override void Prepare() { }
 
-	    public DeviceContext DeferredContext { get; private set; }
+	    public DeviceContext DeferredContext { get; set; }
 
-		public override void SwapBuffers(int syncInterval)
+	    public override void SwapBuffers(int syncInterval)
 		{
 		    var q = new Query(d3dDevice, new QueryDescription { Type = QueryType.Event });
 
@@ -101,29 +109,47 @@ namespace Fusion.Drivers.Graphics.Display
 
             q.Dispose();
 
-            _frontBuffers.Enqueue(_currentBuffer);
-            if (!_frontBuffers.TryDequeue(out _currentBuffer))
+		    RenderTarget2D old;
+		    lock (lockObject)
+		    {
+		        old = _readyBuffer;
+		        _readyBuffer = _currentBuffer;
+		    }
+
+		    if (old != null)
+		        _oldBuffers.Enqueue(old);
+
+            if (!_oldBuffers.TryDequeue(out _currentBuffer))
             {
                 throw new InvalidOperationException("There is no backBuffer in the queue. What happened?");
             }
 		}
 
-
+	    private bool _extracted = false;
         /// <summary>
         /// Gets one buffer out of front buffer collection
         /// </summary>
         /// <returns></returns>
 	    public RenderTarget2D ExtractBuffer()
-	    {
-	            //if (_extractedBuffer != null)
-	            //    throw new InvalidOperationException("Return extracted buffer before extracting again.");
+        {
+            if(_extracted)
+                throw new InvalidOperationException("Can't extract twice");
 
-	        if (!_frontBuffers.TryDequeue(out var extractedBuffer))
-	        {
-                throw new InvalidOperationException("There is no backBuffer in the queue. What happened?");
-	        }
+            RenderTarget2D extracted = null;
+            while (extracted == null)
+            {
+                lock (lockObject)
+                {
+                    extracted = _readyBuffer;
+                    _readyBuffer = null;
+                }
 
-	        return extractedBuffer;
+                Thread.Sleep(1);
+            }
+
+            _extracted = true;
+
+            return extracted;
 	    }
 
 	    /// <summary>
@@ -132,21 +158,30 @@ namespace Fusion.Drivers.Graphics.Display
 	    /// <returns></returns>
         public void ReturnBuffer(RenderTarget2D buffer)
 	    {
-	        if (buffer == null) throw new InvalidOperationException("There is nothing to return");
+	        if (!_extracted)
+	            throw new InvalidOperationException("What are you returning?");
+
+            if (buffer == null)
+	        {
+                Log.Warning("Null buffer was returned.");
+	            return;
+	        }
 
 	        if (buffer.IsDisposed || !(buffer.Width == _clientWidth && buffer.Height == _clientHeight))
 	        {
-	            _frontBuffers.Enqueue(CreateBuffer());
+	            _oldBuffers.Enqueue(CreateBuffer());
 
-                //buffer.Dispose();
+                buffer.Dispose();
             }
 	        else
 	        {
-                _frontBuffers.Enqueue(buffer);
+                _oldBuffers.Enqueue(buffer);
             }
+
+	        _extracted = false;
 	    }
 
-	    private bool _renderRequested = false;
+	    private volatile bool _renderRequested = false;
 	    public void RequestRender()
 	    {
 	        _renderRequested = true;

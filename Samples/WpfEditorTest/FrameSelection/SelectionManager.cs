@@ -37,7 +37,7 @@ namespace WpfEditorTest.FrameSelection
 
 		private void OnFrameUpdated( object frame, PropertyChangedEventArgs args)
 		{
-		    Application.Current.Dispatcher.Invoke(() => FrameUpdated?.Invoke(this, (Frame)frame));
+		    Application.Current.Dispatcher.InvokeAsync(() => FrameUpdated?.Invoke(this, (Frame)frame));
 		}
 	}
 }

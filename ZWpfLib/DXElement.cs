@@ -40,8 +40,8 @@ namespace ZWpfLib
 
             Surface.IsFrontBufferAvailableChanged += delegate {
 				UpdateReallyLoopRendering();
-				if (!IsReallyLoopRendering && Surface.IsFrontBufferAvailable)
-					Render();
+				//if (!IsReallyLoopRendering && Surface.IsFrontBufferAvailable)
+					//Render();
 			};
 
             IsVisibleChanged += delegate { UpdateReallyLoopRendering(); };
@@ -206,17 +206,6 @@ namespace ZWpfLib
             }
 
 		    frameCounter++;
-
-		    /*
-            if (_buf != null)
-                display.ReturnBuffer(_buf);
-
-            var b = display.ExtractBuffer();
-
-            SetBackBuffer(b, Surface);
-
-            _buf = b;
-            */
 		}
 
 
