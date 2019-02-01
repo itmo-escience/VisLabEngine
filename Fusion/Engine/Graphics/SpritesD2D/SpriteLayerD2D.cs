@@ -18,6 +18,7 @@ namespace Fusion.Engine.Graphics.SpritesD2D
 
         private RenderTargetD2D _wrapperTarget;
         public ShaderResource ShaderResource { get; private set; }
+        internal SharpDX.Direct2D1.Factory Factory { get => _target.Factory; }
 
         public SpriteLayerD2D(RenderSystem rs)
         {

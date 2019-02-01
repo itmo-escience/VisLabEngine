@@ -194,7 +194,7 @@ namespace GISTest
 
             verticalAlignment alignment = verticalAlignment.CENTER;
 
-            verticalBox1 = new VerticalBox(0, 0, 0, 0, alignment);
+            verticalBox1 = new VerticalBox(0, 0, 0, 0, alignment, true);
             verticalBox1.Add(txt);
             verticalBox1.Add(img1);
             verticalBox1.Add(img2);

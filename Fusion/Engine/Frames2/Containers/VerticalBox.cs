@@ -12,7 +12,7 @@ namespace Fusion.Engine.Frames2.Containers
 
     public class VerticalBox : UIContainer
     {
-        private verticalAlignment alignment;
+        private readonly verticalAlignment _alignment;
 
         public override void Update(GameTime gameTime)
         {
@@ -30,7 +30,7 @@ namespace Fusion.Engine.Frames2.Containers
             Height = bottomBorder;
 
             float deltaXMultiplier = 0;
-            switch (alignment)
+            switch (_alignment)
             {
                 case verticalAlignment.LEFT:
                     deltaXMultiplier = 0;
@@ -49,11 +49,11 @@ namespace Fusion.Engine.Frames2.Containers
             }
         }
 
-        public VerticalBox(float x, float y, float width, float height, verticalAlignment alignment = verticalAlignment.LEFT) : base(x, y, width, height)
+        public VerticalBox(float x, float y, float width, float height, verticalAlignment alignment = verticalAlignment.LEFT, bool needClipping = false) : base(x, y, width, height, needClipping)
         {
             debugBrush = new SolidBrushD2D(new Color4(0, 1, 1, 1));
             debugTextFormat = new TextFormatD2D("Consolas", 14);
-            this.alignment = alignment;
+            _alignment = alignment;
         }
 
         public override void Draw(SpriteLayerD2D layer)

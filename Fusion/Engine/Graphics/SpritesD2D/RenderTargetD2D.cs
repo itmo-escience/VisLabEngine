@@ -53,8 +53,8 @@ namespace Fusion.Engine.Graphics.SpritesD2D
         public void Flush(out long tag1, out long tag2) => _target.Flush(out tag1, out tag2);
 
         /// <inheritdoc cref="RenderTarget.PushAxisAlignedClip(RawRectangleF, AntialiasMode)"/>
-        public void PushAxisAlignedClip(RectangleF clip, AntialiasModeD2D antialiasMode) =>
-            _target.PushAxisAlignedClip(clip.ToRawRectangleF(), antialiasMode.ToAntialiasMode());
+        public void PushAxisAlignedClip(RectangleF clippingRecrangle, AntialiasModeD2D antialiasMode) =>
+            _target.PushAxisAlignedClip(createAlignedRectangle(clippingRecrangle.ToRawRectangleF()), antialiasMode.ToAntialiasMode());
 
         /// <inheritdoc cref="RenderTarget.PopAxisAlignedClip()"/>
         public void PopAxisAlignedClip() => _target.PopAxisAlignedClip();
@@ -99,9 +99,26 @@ namespace Fusion.Engine.Graphics.SpritesD2D
         public void DrawTextLayout(Vector2 origin, TextLayoutD2D layout, IBrushD2D brush) =>
             _target.DrawTextLayout(createAlignedVector(origin.ToRawVector2()), _layoutFactory.CreateTextLayout(layout), _brushFactory.GetOrCreateBrush(brush));
 
-        public void DrawBitmap(Bitmap bitmap, RectangleF destinationRectangle, float opacity, BitmapInterpolationMode interpolationMode, RectangleF sourceRectangle) =>
-            _target.DrawBitmap(bitmap, createAlignedRectangle(destinationRectangle.ToRawRectangleF()), opacity, interpolationMode, createAlignedRectangle(sourceRectangle.ToRawRectangleF()));
+        public void DrawBitmap(BitmapD2D bitmap, RectangleF destinationRectangle, float opacity, RectangleF sourceRectangle) =>
+            _target.DrawBitmap(bitmap.Bitmap, createAlignedRectangle(destinationRectangle.ToRawRectangleF()), opacity, BitmapInterpolationMode.NearestNeighbor, createAlignedRectangle(sourceRectangle.ToRawRectangleF()));
 
+        public void PushLayer(PathGeometryD2D clippingGeometry, AntialiasModeD2D antialiasMode)
+        {
+            LayerParameters layerParameters = new LayerParameters
+            {
+                GeometricMask = clippingGeometry.PathGeometry,
+                ContentBounds = RectangleF.Infinite.ToRawRectangleF(),
+                MaskAntialiasMode = antialiasMode.ToAntialiasMode(),
+                MaskTransform = SharpDX.Matrix3x2.Identity,
+                Opacity = 1.0f,
+                LayerOptions = LayerOptions.None,
+                OpacityBrush = null
+            };
+            _target.PushLayer(ref layerParameters, new Layer(_target));
+        }
+
+        public void PopLayer() =>
+            _target.PopLayer();
 
         public DrawingStateBlockD2D SaveDrawingState()
         {
@@ -123,7 +140,7 @@ namespace Fusion.Engine.Graphics.SpritesD2D
         /// </summary>
         /// <param name="image">Image to convert</param>
         /// <returns>A D2D1 Bitmap</returns>
-        public Bitmap ToBitmap(System.Drawing.Image image)
+        internal Bitmap ToBitmap(System.Drawing.Image image)
         {
             var bitmap = (System.Drawing.Bitmap) image;
             var sourceArea = new System.Drawing.Rectangle(0, 0, bitmap.Width, bitmap.Height);

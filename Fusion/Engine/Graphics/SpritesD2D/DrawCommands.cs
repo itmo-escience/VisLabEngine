@@ -219,7 +219,7 @@ namespace Fusion.Engine.Graphics.SpritesD2D
         private readonly float _opacity;
         private readonly RectangleF _targetRect;
         private readonly RectangleF _sourceRect;
-        private SharpDX.Direct2D1.Bitmap _dxBitmap;
+        private Bitmap _dxBitmap;
         private readonly System.Drawing.Image _sourceImage;
 
         public DrawBitmap(float x, float y, System.Drawing.Image image, float opacity = 1)
@@ -251,10 +251,9 @@ namespace Fusion.Engine.Graphics.SpritesD2D
             if(_dxBitmap == null)
                 _dxBitmap = target.ToBitmap(_sourceImage);
 
-            target.DrawBitmap(_dxBitmap,
+            target.DrawBitmap(new BitmapD2D(_dxBitmap),
                 _targetRect,
                 _opacity,
-                BitmapInterpolationMode.NearestNeighbor,
                 _sourceRect
             );
         }
@@ -262,6 +261,76 @@ namespace Fusion.Engine.Graphics.SpritesD2D
         public override string ToString()
         {
             return $"DrawBitmap ({_x}, {_y}, {_w}, {_h})";
+        }
+    }
+
+    public sealed class StartClippingAlongRectangle : IDrawCommand
+    {
+        private RectangleF _clippingRecrangle;
+        private AntialiasModeD2D _antialiasMode;
+
+        public StartClippingAlongRectangle(RectangleF clippingRecrangle, AntialiasModeD2D antialiasMode)
+        {
+            _clippingRecrangle = clippingRecrangle;
+            _antialiasMode = antialiasMode;
+        }
+
+        public void Apply(RenderTargetD2D target)
+        {
+            target.PushAxisAlignedClip(_clippingRecrangle, _antialiasMode);
+        }
+
+        public override string ToString()
+        {
+            return $"StartClippingAlongRectangle ({_clippingRecrangle.X}, {_clippingRecrangle.Y}, {_clippingRecrangle.Width}, {_clippingRecrangle.Height}, {_antialiasMode})";
+        }
+    }
+
+    public sealed class EndClippingAlongRectangle : IDrawCommand
+    {
+        public void Apply(RenderTargetD2D target)
+        {
+            target.PopAxisAlignedClip();
+        }
+
+        public override string ToString()
+        {
+            return $"EndClippingAlongRectangle";
+        }
+    }
+
+    public sealed class StartClippingAlongGeometry : IDrawCommand
+    {
+        private PathGeometryD2D _clippingGeometry;
+        private AntialiasModeD2D _antialiasMode;
+
+        public StartClippingAlongGeometry(PathGeometryD2D clippingGeometry, AntialiasModeD2D antialiasMode)
+        {
+            _clippingGeometry = clippingGeometry;
+            _antialiasMode = antialiasMode;
+        }
+
+        public void Apply(RenderTargetD2D target)
+        {
+            target.PushLayer(_clippingGeometry, _antialiasMode);
+        }
+
+        public override string ToString()
+        {
+            return $"StartClippingAlongGeometry ({_antialiasMode})";
+        }
+    }
+
+    public sealed class EndClippingAlongGeometry : IDrawCommand
+    {
+        public void Apply(RenderTargetD2D target)
+        {
+            target.PopLayer();
+        }
+
+        public override string ToString()
+        {
+            return $"EndClippingAlongGeometry";
         }
     }
 }

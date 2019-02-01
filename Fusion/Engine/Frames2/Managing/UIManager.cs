@@ -52,9 +52,19 @@ namespace Fusion.Engine.Frames2.Managing
 
                 if (c is UIContainer container)
                 {
+                    if (container.NeedClipping)
+                    {
+                        queue.Enqueue(new Components.StartClippingFlag(container.GetClippingGeometry(layer)));
+                    }
+
                     foreach (var child in container.Children)
                     {
                         queue.Enqueue(child);
+                    }
+
+                    if (container.NeedClipping)
+                    {
+                        queue.Enqueue(new Components.EndClippingFlag());
                     }
                 }
 
@@ -63,13 +73,11 @@ namespace Fusion.Engine.Frames2.Managing
 
                 if (DebugEnabled)
                 {
-                    layer.Draw(new TransformCommand(c.GlobalTransform));
                     c.DebugDraw(layer);
                 }
             }
 
             layer.Draw(TransformCommand.Identity);
         }
-
     }
 }

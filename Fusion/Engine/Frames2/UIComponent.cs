@@ -130,7 +130,8 @@ namespace Fusion.Engine.Frames2
 
         public virtual RectangleF LocalBoundingBox
         {
-            get {
+            get
+            {
                 return (Visible ? new RectangleF(0, 0, Width, Height) : new RectangleF(0, 0, 0, 0)).GetBound(_transform * _localTransform);
             }
         }

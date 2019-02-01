@@ -1,4 +1,8 @@
 ﻿using Fusion.Core.Mathematics;
+using Fusion.Engine.Common;
+using Fusion.Engine.Graphics.SpritesD2D;
+using SharpDX.Direct2D1;
+using SharpDX.Mathematics.Interop;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -7,7 +11,7 @@ using System.Threading.Tasks;
 
 namespace Fusion.Engine.Frames2.Managing
 {
-    public class UIHelper
+    internal class UIHelper
     {
         public static IEnumerable<UIComponent> BFSTraverse(UIComponent root)
         {
