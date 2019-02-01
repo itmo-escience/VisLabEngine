@@ -99,14 +99,14 @@ namespace Fusion.Engine.Graphics.SpritesD2D
         public void DrawTextLayout(Vector2 origin, TextLayoutD2D layout, IBrushD2D brush) =>
             _target.DrawTextLayout(createAlignedVector(origin.ToRawVector2()), _layoutFactory.CreateTextLayout(layout), _brushFactory.GetOrCreateBrush(brush));
 
-        public void DrawBitmap(Bitmap bitmap, RectangleF destinationRectangle, float opacity, BitmapInterpolationMode interpolationMode, RectangleF sourceRectangle) =>
-            _target.DrawBitmap(bitmap, createAlignedRectangle(destinationRectangle.ToRawRectangleF()), opacity, interpolationMode, createAlignedRectangle(sourceRectangle.ToRawRectangleF()));
+        public void DrawBitmap(BitmapD2D bitmap, RectangleF destinationRectangle, float opacity, RectangleF sourceRectangle) =>
+            _target.DrawBitmap(bitmap.Bitmap, createAlignedRectangle(destinationRectangle.ToRawRectangleF()), opacity, BitmapInterpolationMode.NearestNeighbor, createAlignedRectangle(sourceRectangle.ToRawRectangleF()));
 
-        public void PushLayer(Geometry clippingGeometry, AntialiasModeD2D antialiasMode)
+        public void PushLayer(PathGeometryD2D clippingGeometry, AntialiasModeD2D antialiasMode)
         {
             LayerParameters layerParameters = new LayerParameters
             {
-                GeometricMask = clippingGeometry,
+                GeometricMask = clippingGeometry.PathGeometry,
                 ContentBounds = RectangleF.Infinite.ToRawRectangleF(),
                 MaskAntialiasMode = antialiasMode.ToAntialiasMode(),
                 MaskTransform = SharpDX.Matrix3x2.Identity,
@@ -140,7 +140,7 @@ namespace Fusion.Engine.Graphics.SpritesD2D
         /// </summary>
         /// <param name="image">Image to convert</param>
         /// <returns>A D2D1 Bitmap</returns>
-        public Bitmap ToBitmap(System.Drawing.Image image)
+        internal Bitmap ToBitmap(System.Drawing.Image image)
         {
             var bitmap = (System.Drawing.Bitmap) image;
             var sourceArea = new System.Drawing.Rectangle(0, 0, bitmap.Width, bitmap.Height);

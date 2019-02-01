@@ -219,7 +219,7 @@ namespace Fusion.Engine.Graphics.SpritesD2D
         private readonly float _opacity;
         private readonly RectangleF _targetRect;
         private readonly RectangleF _sourceRect;
-        private SharpDX.Direct2D1.Bitmap _dxBitmap;
+        private Bitmap _dxBitmap;
         private readonly System.Drawing.Image _sourceImage;
 
         public DrawBitmap(float x, float y, System.Drawing.Image image, float opacity = 1)
@@ -251,10 +251,9 @@ namespace Fusion.Engine.Graphics.SpritesD2D
             if(_dxBitmap == null)
                 _dxBitmap = target.ToBitmap(_sourceImage);
 
-            target.DrawBitmap(_dxBitmap,
+            target.DrawBitmap(new BitmapD2D(_dxBitmap),
                 _targetRect,
                 _opacity,
-                BitmapInterpolationMode.NearestNeighbor,
                 _sourceRect
             );
         }
@@ -267,23 +266,23 @@ namespace Fusion.Engine.Graphics.SpritesD2D
 
     public sealed class StartClippingAlongRectangle : IDrawCommand
     {
-        RectangleF clippingRecrangle;
-        AntialiasModeD2D antialiasMode;
+        private RectangleF _clippingRecrangle;
+        private AntialiasModeD2D _antialiasMode;
 
         public StartClippingAlongRectangle(RectangleF clippingRecrangle, AntialiasModeD2D antialiasMode)
         {
-            this.clippingRecrangle = clippingRecrangle;
-            this.antialiasMode = antialiasMode;
+            _clippingRecrangle = clippingRecrangle;
+            _antialiasMode = antialiasMode;
         }
 
         public void Apply(RenderTargetD2D target)
         {
-            target.PushAxisAlignedClip(clippingRecrangle, antialiasMode);
+            target.PushAxisAlignedClip(_clippingRecrangle, _antialiasMode);
         }
 
         public override string ToString()
         {
-            return $"StartClippingAlongRectangle ({clippingRecrangle.X}, {clippingRecrangle.Y}, {clippingRecrangle.Width}, {clippingRecrangle.Height}, {antialiasMode})";
+            return $"StartClippingAlongRectangle ({_clippingRecrangle.X}, {_clippingRecrangle.Y}, {_clippingRecrangle.Width}, {_clippingRecrangle.Height}, {_antialiasMode})";
         }
     }
 
@@ -302,24 +301,23 @@ namespace Fusion.Engine.Graphics.SpritesD2D
 
     public sealed class StartClippingAlongGeometry : IDrawCommand
     {
-        Geometry clippingGeometry;
-        AntialiasModeD2D antialiasMode;
+        private PathGeometryD2D _clippingGeometry;
+        private AntialiasModeD2D _antialiasMode;
 
-        public StartClippingAlongGeometry(Geometry clippingGeometry, AntialiasModeD2D antialiasMode)
+        public StartClippingAlongGeometry(PathGeometryD2D clippingGeometry, AntialiasModeD2D antialiasMode)
         {
-            this.clippingGeometry = clippingGeometry;
-            this.antialiasMode = antialiasMode;
+            _clippingGeometry = clippingGeometry;
+            _antialiasMode = antialiasMode;
         }
 
         public void Apply(RenderTargetD2D target)
         {
-            target.PushLayer(clippingGeometry, antialiasMode);
+            target.PushLayer(_clippingGeometry, _antialiasMode);
         }
 
         public override string ToString()
         {
-            SharpDX.Mathematics.Interop.RawRectangleF bounds = clippingGeometry.GetBounds();
-            return $"StartClippingAlongGeometry ({bounds.Left}, {bounds.Top}, {bounds.Right - bounds.Left}, {bounds.Bottom - bounds.Top}, {antialiasMode})";
+            return $"StartClippingAlongGeometry ({_antialiasMode})";
         }
     }
 

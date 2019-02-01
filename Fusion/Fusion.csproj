@@ -252,6 +252,7 @@
     <Compile Include="Engine\Common\Commands\CrashServer.cs" />
     <Compile Include="Engine\Common\AtomAttribute.cs" />
     <Compile Include="Engine\Common\UserInterface.Internal.cs" />
+    <Compile Include="Engine\Frames2\Components\EndClippingFlag.cs" />
     <Compile Include="Engine\Frames2\Components\Image.cs" />
     <Compile Include="Engine\Frames2\Components\Border.cs" />
     <Compile Include="Engine\Frames2\Containers\FreePlacement.cs" />
@@ -266,7 +267,7 @@
     <Compile Include="Engine\Frames2\UIContainer.cs" />
     <Compile Include="Engine\Frames2\Managing\UIEventProcessor.cs" />
     <Compile Include="Engine\Frames2\Managing\UIManager.cs" />
-	<Compile Include="Engine\Frames2\Controllers\ButtonController.cs" />
+    <Compile Include="Engine\Frames2\Controllers\ButtonController.cs" />
     <Compile Include="Engine\Frames\Abstract\DrawFrameItem.cs" />
     <Compile Include="Engine\Frames\Abstract\Events.cs" />
     <Compile Include="Engine\Frames\Abstract\IFrame.cs" />
@@ -355,6 +356,7 @@
     <Compile Include="Engine\Graphics\RenderCounters.cs" />
     <Compile Include="Engine\Graphics\SpritesD2D\BrushD2D.cs" />
     <Compile Include="Engine\Graphics\SpritesD2D\DrawCommands.cs" />
+    <Compile Include="Engine\Graphics\SpritesD2D\PathGeometryD2D.cs" />
     <Compile Include="Engine\Graphics\SpritesD2D\RenderTargetD2D.cs" />
     <Compile Include="Engine\Graphics\SpritesD2D\SpriteEngineD2D.cs" />
     <Compile Include="Engine\Graphics\SpritesD2D\SpriteLayerD2D.cs" />

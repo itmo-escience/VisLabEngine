@@ -9,14 +9,14 @@ namespace Fusion.Engine.Graphics.SpritesD2D
         public float Height { get => _layout.Metrics.Height; }
         public float MaxWidth { get => _layout.MaxWidth; }
         public float MaxHeight { get => _layout.MaxHeight; }
-        public readonly string text;
-        public readonly TextFormat textFormat;
+        public readonly string Text;
+        public readonly TextFormat TextFormat;
 
         public TextLayoutD2D(string text, TextFormatD2D textFormat, float maxWidth, float maxHeight)
         {
-            this.text = text;
-            this.textFormat = new TextFormatFactory().CreateTextFormat(textFormat);
-            _layout = new TextLayout(new Factory(), text, this.textFormat, maxWidth, maxHeight);
+            Text = text;
+            TextFormat = new TextFormatFactory().CreateTextFormat(textFormat);
+            _layout = new TextLayout(new Factory(), text, TextFormat, maxWidth, maxHeight);
         }
     }
 
@@ -31,7 +31,7 @@ namespace Fusion.Engine.Graphics.SpritesD2D
 
         public TextLayout CreateTextLayout(TextLayoutD2D layout)
         {
-            return new TextLayout(_factory, layout.text, layout.textFormat, layout.MaxWidth, layout.MaxHeight);
+            return new TextLayout(_factory, layout.Text, layout.TextFormat, layout.MaxWidth, layout.MaxHeight);
         }
     }
 }

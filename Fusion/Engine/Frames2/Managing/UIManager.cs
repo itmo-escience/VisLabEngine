@@ -57,10 +57,10 @@ namespace Fusion.Engine.Frames2.Managing
                         queue.Enqueue(child);
                     }
 
-                    if (container.needClipping)
+                    if (container.NeedClipping)
                     {
-                        layer.Draw(new StartClippingAlongGeometry(UIHelper.GetClippingGeometry(container, layer.Factory), AntialiasModeD2D.Aliased));
-                        queue.Enqueue(new EndClippingFlag());
+                        layer.Draw(new StartClippingAlongGeometry(container.GetClippingGeometry(layer), AntialiasModeD2D.Aliased));
+                        queue.Enqueue(new Components.EndClippingFlag());
                     }
                 }
 
@@ -75,6 +75,5 @@ namespace Fusion.Engine.Frames2.Managing
 
             layer.Draw(TransformCommand.Identity);
         }
-
     }
 }

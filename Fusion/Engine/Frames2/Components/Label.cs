@@ -8,9 +8,9 @@ namespace Fusion.Engine.Frames2.Components
     {
         private bool _isDirtyText;
         private string _text = "";
-        private TextFormatD2D _textFormat;
-        private float _maxWidth;
-        private float _maxHeight;
+        private readonly TextFormatD2D _textFormat;
+        private readonly float _maxWidth;
+        private readonly float _maxHeight;
         public string Text
         {
             get => _text;
