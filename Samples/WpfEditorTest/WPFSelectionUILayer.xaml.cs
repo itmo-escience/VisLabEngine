@@ -391,6 +391,10 @@ namespace WpfEditorTest
 					AreaSelectionEnabled = true;
 				}
 			}
+			else
+			{
+				PrepareStickingCoords();
+			}
 
 			foreach (var frameAndPanel in FrameSelectionPanelList)
 			{
@@ -441,6 +445,7 @@ namespace WpfEditorTest
 			RecalcMouseDelta(e);
 			if (_frameDragsPanel.DragMousePressed)
 			{
+				//PrepareStickingCoords();
 				RecalculateSelectionSize(e.MouseDevice.GetPosition(this));
 			}
 			else if (FrameSelectionPanelList.Any(fsp => fsp.Value.MousePressed))
@@ -453,8 +458,7 @@ namespace WpfEditorTest
 						this.MoveFrameToDragField(panel.SelectedFrame);
 						panel.IsInDragField = true;
 					}
-					ForgetStickingCoords();
-					RememberStickingCoords(SceneFrame);
+					PrepareStickingCoords();
 					_frameDragsPanel.SelectedGroupInitSize = new Size(_frameDragsPanel.Width, _frameDragsPanel.Height);
 					_frameDragsPanel.SelectedGroupInitPosition = new Point(_frameDragsPanel.RenderTransform.Value.OffsetX, _frameDragsPanel.RenderTransform.Value.OffsetY);
 				}
@@ -468,6 +472,12 @@ namespace WpfEditorTest
 					ParentHighlightPanel.SelectedFrame = hovered;
 				}
 			}
+		}
+
+		public void PrepareStickingCoords()
+		{
+			ForgetStickingCoords();
+			RememberStickingCoords(SceneFrame);
 		}
 
 		private void RememberStickingCoords( Frame frame )
@@ -584,7 +594,8 @@ namespace WpfEditorTest
 			var isShiftPressed = Keyboard.IsKeyDown(Key.LeftShift) || Keyboard.IsKeyDown(Key.RightShift);
 			var isControlPressed = Keyboard.IsKeyDown(Key.LeftCtrl) || Keyboard.IsKeyDown(Key.RightCtrl);
 
-			_frameDragsPanel.Resize(_deltaX, _deltaY, isShiftPressed, isControlPressed, out double heightMult, out double widthMult);
+			_frameDragsPanel.Resize(_deltaX, _deltaY, isShiftPressed, isControlPressed, GridSizeMultiplier, NeedSnapping(), VisualGrid.Visibility,
+				StickingCoordsX, StickingCoordsY, out double heightMult, out double widthMult);
 
 			var dragsPanelX = _frameDragsPanel.RenderTransform.Value.OffsetX;
 			var dragsPanelY = _frameDragsPanel.RenderTransform.Value.OffsetY;
@@ -607,7 +618,7 @@ namespace WpfEditorTest
 			var isShiftPressed = Keyboard.IsKeyDown(Key.LeftShift) || Keyboard.IsKeyDown(Key.RightShift);
 			var isControlPressed = Keyboard.IsKeyDown(Key.LeftCtrl) || Keyboard.IsKeyDown(Key.RightCtrl);
 
-			_frameDragsPanel.Reposition(_deltaX, _deltaY, isShiftPressed, isControlPressed, GridSizeMultiplier, NeedSnapping(),
+			_frameDragsPanel.Reposition(_deltaX, _deltaY, isShiftPressed, isControlPressed, GridSizeMultiplier, NeedSnapping(), VisualGrid.Visibility,
 				StickingCoordsX, StickingCoordsY, out double dX, out double dY);
 
 			foreach (var panel in FrameSelectionPanelList.Values)

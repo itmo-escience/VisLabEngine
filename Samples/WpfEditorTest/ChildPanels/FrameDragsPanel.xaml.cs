@@ -218,7 +218,8 @@ namespace WpfEditorTest.ChildPanels
 			}
 		}
 
-		internal void Resize(double deltaX, double deltaY, bool isShiftPressed, bool isControlPressed, out double heightMultiplier, out double widthMultiplier)
+		internal void Resize(double deltaX, double deltaY, bool isShiftPressed, bool isControlPressed, int gridSizeMultiplier, bool needSnapping,
+			Visibility gridVisibility, List<StickCoordinateX> stickingCoordsX, List<StickCoordinateY> stickingCoordsY, out double heightMultiplier, out double widthMultiplier)
 		{
 			var pivot = isControlPressed ? CenteredPivot : CurrentPivot;
 
@@ -231,8 +232,107 @@ namespace WpfEditorTest.ChildPanels
 				);
 			var mouseInitPosition = RelativeToPivot(pivot, CurrentDragInitPosition);
 
-			var scaleX = Math.Abs(mouseInitPosition.X) > double.Epsilon ? ((mouseInitPosition.X + deltaX) / mouseInitPosition.X) : 1.0d;
-			var scaleY = Math.Abs(mouseInitPosition.Y) > double.Epsilon ? ((mouseInitPosition.Y + deltaY) / mouseInitPosition.Y) : 1.0d;
+			/*---*/
+			bool gridEnabled = gridVisibility == Visibility.Visible;
+			var step = (int)(FusionUI.UI.ScalableFrame.ScaleMultiplier * gridSizeMultiplier);
+			double newX;
+			double newY;
+			var dX = deltaX;
+			var dY = deltaY;
+			if (needSnapping)
+			{
+				newX = mouseInitPosition.X + deltaX;
+				newY = mouseInitPosition.Y + deltaY;
+				dX -= -step / 2 + (newX + step / 2) % step;
+				dY -= -step / 2 + (newY + step / 2) % step;
+			}
+			else if (!gridEnabled)
+			{
+				newX = CurrentDragInitPosition.X + deltaX;
+				newY = CurrentDragInitPosition.Y + deltaY;
+
+				var stickingDelta = 0;
+
+				var newXHelper = (int)(newX + 0.5 * Math.Sign(newX));
+				//var widthHelper = (int)(SelectedGroupInitSize.Width + 0.5);
+				var newYHelper = (int)(newY + 0.5 * Math.Sign(newY));
+				//var heightHelper = (int)(SelectedGroupInitSize.Height + 0.5);
+
+				foreach (var x in stickingCoordsX)
+				{
+					x.IsActive = false;
+				}
+				foreach (var y in stickingCoordsY)
+				{
+					y.IsActive = false;
+				}
+
+				var closestStickX1 =
+					stickingCoordsX.Where(scX => Math.Abs(newXHelper - scX.X) == stickingCoordsX.Select(x => Math.Abs(newXHelper - x.X)).Min()).FirstOrDefault();
+				//var closestStickX2 =
+				//	stickingCoordsX.Where(scX => Math.Abs(newXHelper + widthHelper - scX.X) == stickingCoordsX.Select(x => Math.Abs(newXHelper + widthHelper - x.X)).Min()).FirstOrDefault();
+				//var closestStickX3 =
+				//	stickingCoordsX.Where(scX => Math.Abs(newXHelper + widthHelper / 2 - scX.X) == stickingCoordsX.Select(x => Math.Abs(newXHelper + widthHelper / 2 - x.X)).Min()).FirstOrDefault();
+				var closestStickY1 =
+					stickingCoordsY.Where(scY => Math.Abs(newYHelper - scY.Y) == stickingCoordsY.Select(y => Math.Abs(newYHelper - y.Y)).Min()).FirstOrDefault();
+				//var closestStickY2 =
+				//	stickingCoordsY.Where(scY => Math.Abs(newYHelper + heightHelper - scY.Y) == stickingCoordsY.Select(y => Math.Abs(newYHelper + heightHelper - y.Y)).Min()).FirstOrDefault();
+				//var closestStickY3 =
+				//	stickingCoordsY.Where(scY => Math.Abs(newYHelper + heightHelper / 2 - scY.Y) == stickingCoordsY.Select(y => Math.Abs(newYHelper + heightHelper / 2 - y.Y)).Min()).FirstOrDefault();
+
+				if (closestStickX1 != null && //closestStickX2 != null &&
+					closestStickY1 != null //&& closestStickY2 != null &&
+										   //closestStickX3 != null && closestStickY3 != null)
+					)
+				{
+
+					var rangeX1 = Enumerable.Range(closestStickX1.X - StickingCoordsSensitivity, StickingCoordsSensitivity * 2);
+					//var rangeX2 = Enumerable.Range(closestStickX2.X - StickingCoordsSensitivity, StickingCoordsSensitivity * 2);
+					//var rangeX3 = Enumerable.Range(closestStickX3.X - StickingCoordsSensitivity, StickingCoordsSensitivity * 2);
+					var rangeY1 = Enumerable.Range(closestStickY1.Y - StickingCoordsSensitivity, StickingCoordsSensitivity * 2);
+					//var rangeY2 = Enumerable.Range(closestStickY2.Y - StickingCoordsSensitivity, StickingCoordsSensitivity * 2);
+					//var rangeY3 = Enumerable.Range(closestStickY3.Y - StickingCoordsSensitivity, StickingCoordsSensitivity * 2);
+
+					if (rangeX1.Contains(newXHelper) && mouseInitPosition.X > double.Epsilon)
+					{
+						stickingDelta = closestStickX1.X - newXHelper;
+						closestStickX1.IsActive = true;
+					}
+					//if (rangeX2.Contains(newXHelper + widthHelper))
+					//{
+					//	stickingDelta = closestStickX2.X - (newXHelper + widthHelper);
+					//	closestStickX2.IsActive = true;
+					//}
+					//if (rangeX3.Contains(newXHelper + widthHelper / 2))
+					//{
+					//	stickingDelta = closestStickX3.X - (newXHelper + widthHelper / 2);
+					//	closestStickX3.IsActive = true;
+					//}
+					dX += stickingDelta;
+
+					stickingDelta = 0;
+					if (rangeY1.Contains(newYHelper) && mouseInitPosition.Y > double.Epsilon)
+					{
+						stickingDelta = closestStickY1.Y - newYHelper;
+						closestStickY1.IsActive = true;
+					}
+					//if (rangeY2.Contains(newYHelper + heightHelper))
+					//{
+					//	stickingDelta = closestStickY2.Y - (newYHelper + heightHelper);
+					//	closestStickY2.IsActive = true;
+					//}
+					//if (rangeY3.Contains(newYHelper + heightHelper / 2))
+					//{
+					//	stickingDelta = closestStickY3.Y - (newYHelper + heightHelper / 2);
+					//	closestStickY3.IsActive = true;
+					//}
+					dY += stickingDelta;
+				}
+			}
+			/*---*/
+
+			var scaleX = Math.Abs(mouseInitPosition.X) > double.Epsilon ? ((mouseInitPosition.X + dX) / mouseInitPosition.X) : 1.0d;
+			var scaleY = Math.Abs(mouseInitPosition.Y) > double.Epsilon ? ((mouseInitPosition.Y + dY) / mouseInitPosition.Y) : 1.0d;
 
 			if (isShiftPressed)
 			{
@@ -242,7 +342,7 @@ namespace WpfEditorTest.ChildPanels
 				} else if (Math.Abs(mouseInitPosition.Y) < double.Epsilon)
 				{
 					scaleY = scaleX;
-				} else if ((deltaX * mouseInitPosition.Y > mouseInitPosition.X * deltaY) ^(mouseInitPosition.X < 0) ^ (mouseInitPosition.Y < 0))
+				} else if ((dX * mouseInitPosition.Y > mouseInitPosition.X * dY) ^(mouseInitPosition.X < 0) ^ (mouseInitPosition.Y < 0))
 				{
 					scaleY = scaleX;
 				} else
@@ -266,19 +366,20 @@ namespace WpfEditorTest.ChildPanels
 		}
 
 		internal void Reposition( int deltaX, int deltaY, bool isShiftPressed, bool isControlPressed, int gridSizeMultiplier, bool needSnapping,
-			List<StickCoordinateX> stickingCoordsX, List<StickCoordinateY> stickingCoordsY, out double dX, out double dY )
+			Visibility gridVisibility, List<StickCoordinateX> stickingCoordsX, List<StickCoordinateY> stickingCoordsY, out double dX, out double dY )
 		{
+			bool gridEnabled = gridVisibility == Visibility.Visible;
 			var step = (int)(FusionUI.UI.ScalableFrame.ScaleMultiplier * gridSizeMultiplier);
-			var newX = SelectedGroupInitPosition.X + deltaX;
-			var newY = SelectedGroupInitPosition.Y + deltaY;
-			dX = newX - SelectedGroupInitPosition.X;
-			dY = newY - SelectedGroupInitPosition.Y;
+			var newX =  SelectedGroupInitPosition.X + deltaX;
+			var newY =  SelectedGroupInitPosition.Y + deltaY;
+			dX = deltaX;
+			dY = deltaY;
 			if (needSnapping)
 			{
 				dX -= -step / 2 + (newX + step / 2) % step;
 				dY -= -step / 2 + (newY + step / 2) % step;
 			}
-			else
+			else if(!gridEnabled)
 			{
 				var stickingDelta = 0;
 
