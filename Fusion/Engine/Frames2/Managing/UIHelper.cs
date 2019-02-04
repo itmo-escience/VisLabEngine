@@ -106,5 +106,15 @@ namespace Fusion.Engine.Frames2.Managing
             foreach (var c in UIHelper.BFSTraverseForPoint(root, innerPoint)) components.Add(c);
             return components;
         }
+
+        public static IEnumerable<UIContainer> Ancestors(UIComponent component)
+        {
+            var current = component.Parent;
+            while (current != null)
+            {
+                yield return current;
+                current = current.Parent;
+            }
+        }
     }
 }

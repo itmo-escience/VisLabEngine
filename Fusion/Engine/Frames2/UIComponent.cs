@@ -191,16 +191,6 @@ namespace Fusion.Engine.Frames2
             _isTransformDirty = true;
         }
 
-        public IEnumerable<UIContainer> Ancestors()
-        {
-            var current = Parent;
-            while (current != null)
-            {
-                yield return current;
-                current = current.Parent;
-            }
-        }
-
         // TODO: Anchors
 
         #region Controllers
