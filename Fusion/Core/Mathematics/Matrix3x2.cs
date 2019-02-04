@@ -21,7 +21,7 @@
 using System;
 using System.Globalization;
 using System.Runtime.InteropServices;
-
+using System.Xml.Serialization;
 
 namespace Fusion.Core.Mathematics
 {
@@ -120,6 +120,7 @@ namespace Fusion.Core.Mathematics
         /// <summary>
         /// Gets or sets the first row in the matrix; that is M11 and M12.
         /// </summary>
+        [XmlIgnore]
         public Vector2 Row1
         {
             get { return new Vector2(M11, M12); }
@@ -129,6 +130,7 @@ namespace Fusion.Core.Mathematics
         /// <summary>
         /// Gets or sets the second row in the matrix; that is M21 and M22.
         /// </summary>
+        [XmlIgnore]
         public Vector2 Row2
         {
             get { return new Vector2(M21, M22); }
@@ -138,6 +140,7 @@ namespace Fusion.Core.Mathematics
         /// <summary>
         /// Gets or sets the third row in the matrix; that is M31 and M32.
         /// </summary>
+        [XmlIgnore]
         public Vector2 Row3
         {
             get { return new Vector2(M31, M32); }
@@ -147,6 +150,7 @@ namespace Fusion.Core.Mathematics
         /// <summary>
         /// Gets or sets the first column in the matrix; that is M11, M21, and M31.
         /// </summary>
+        [XmlIgnore]
         public Vector3 Column1
         {
             get { return new Vector3(M11, M21, M31); }
@@ -156,6 +160,7 @@ namespace Fusion.Core.Mathematics
         /// <summary>
         /// Gets or sets the second column in the matrix; that is M12, M22, and M32.
         /// </summary>
+        [XmlIgnore]
         public Vector3 Column2
         {
             get { return new Vector3(M12, M22, M32); }
@@ -165,6 +170,7 @@ namespace Fusion.Core.Mathematics
         /// <summary>
         /// Gets or sets the translation of the matrix; that is M31 and M32.
         /// </summary>
+        [XmlIgnore]
         public Vector2 TranslationVector
         {
             get { return new Vector2(M31, M32); }
@@ -174,6 +180,7 @@ namespace Fusion.Core.Mathematics
         /// <summary>
         /// Gets or sets the scale of the matrix; that is M11 and M22.
         /// </summary>
+        [XmlIgnore]
         public Vector2 ScaleVector
         {
             get { return new Vector2(M11, M22); }

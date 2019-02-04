@@ -4,8 +4,11 @@ namespace Fusion.Engine.Graphics.SpritesD2D
 {
     public class TextFormatD2D
     {
-        public string FontFamily { get; }
-        public float Size { get; }
+        public string FontFamily { get; set; }
+        public float Size { get; set; }
+
+        public TextFormatD2D() { }
+
         public TextFormatD2D(string fontFamilyName, float fontSize)
         {
             FontFamily = fontFamilyName;

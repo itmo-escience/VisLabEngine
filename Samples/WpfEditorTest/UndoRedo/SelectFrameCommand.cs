@@ -1,4 +1,4 @@
-﻿using Fusion.Engine.Frames;
+﻿using Fusion.Engine.Frames2;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,10 +10,10 @@ namespace WpfEditorTest.UndoRedo
 {
 	public class SelectFrameCommand : IEditorCommand
 	{
-		private List<Frame> _frames;
-		private List<Frame> _oldFrames;
+		private List<UIComponent> _frames;
+		private List<UIComponent> _oldFrames;
 
-		public SelectFrameCommand( List<Frame> frame )
+		public SelectFrameCommand( List<UIComponent> frame )
 		{
 			this._frames = frame;
 			this._oldFrames = SelectionManager.Instance.SelectedFrames;

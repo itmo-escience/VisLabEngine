@@ -7,7 +7,7 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
-using Frame = Fusion.Engine.Frames.Frame;
+using Fusion.Engine.Frames2;
 
 namespace WpfEditorTest.ChildPanels
 {
@@ -16,8 +16,8 @@ namespace WpfEditorTest.ChildPanels
     /// </summary>
     public partial class FrameTreeView : Window
     {
-        private Frame _selectedFrame;
-        public Frame SelectedFrame
+        private UIComponent _selectedFrame;
+        public UIComponent SelectedFrame
         {
             get => _selectedFrame;
             set
@@ -27,7 +27,7 @@ namespace WpfEditorTest.ChildPanels
             }
         }
 
-        public EventHandler<Frame> SelectedFrameChangedInUI;
+        public EventHandler<UIComponent> SelectedFrameChangedInUI;
 		public EventHandler RequestFrameDeletionInUI;
 
 		public FrameTreeView()
@@ -48,7 +48,7 @@ namespace WpfEditorTest.ChildPanels
 
 		private void TextBlock_MouseDown( object sender, MouseButtonEventArgs e )
 		{
-		    SelectedFrameChangedInUI?.Invoke(this, (Frame)(sender as TextBlock).Tag);
+		    SelectedFrameChangedInUI?.Invoke(this, (UIComponent)(sender as TextBlock).Tag);
         }
 
 		private void Window_KeyDown( object sender, KeyEventArgs e )
@@ -59,12 +59,12 @@ namespace WpfEditorTest.ChildPanels
 			}
 		}
 
-		public void SetSelected( ItemsControl parent, Frame child )
+		public void SetSelected( ItemsControl parent, UIComponent child )
 		{
 			var currentFrame = child;
-			List<Frame> frames = new List<Frame>();
+			List<UIComponent> frames = new List<UIComponent>();
 
-			while (currentFrame.Parent != null && currentFrame.Parent.Text != "Scene")
+			while (currentFrame.Parent != null /*&& currentFrame.Parent.Text != "Scene"*/)
 			{
 				currentFrame = currentFrame.Parent;
 				frames.Add(currentFrame);

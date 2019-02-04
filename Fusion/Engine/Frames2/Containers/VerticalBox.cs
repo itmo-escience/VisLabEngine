@@ -5,14 +5,20 @@ using Fusion.Engine.Graphics.SpritesD2D;
 namespace Fusion.Engine.Frames2.Containers
 {
 
-    public enum verticalAlignment
+    public enum VerticalAlignment
     {
         LEFT, CENTER, RIGHT
     }
 
     public class VerticalBox : UIContainer
     {
-        private readonly verticalAlignment _alignment;
+        private VerticalAlignment _alignment;
+        public VerticalAlignment Alignment {
+            get => _alignment;
+            set {
+                SetAndNotify(ref _alignment, value);
+            }
+        }
 
         public override void Update(GameTime gameTime)
         {
@@ -30,15 +36,15 @@ namespace Fusion.Engine.Frames2.Containers
             Height = bottomBorder;
 
             float deltaXMultiplier = 0;
-            switch (_alignment)
+            switch (Alignment)
             {
-                case verticalAlignment.LEFT:
+                case VerticalAlignment.LEFT:
                     deltaXMultiplier = 0;
                     break;
-                case verticalAlignment.CENTER:
+                case VerticalAlignment.CENTER:
                     deltaXMultiplier = 0.5f;
                     break;
-                case verticalAlignment.RIGHT:
+                case VerticalAlignment.RIGHT:
                     deltaXMultiplier = 1;
                     break;
             }
@@ -49,16 +55,24 @@ namespace Fusion.Engine.Frames2.Containers
             }
         }
 
-        public VerticalBox(float x, float y, float width, float height, verticalAlignment alignment = verticalAlignment.LEFT, bool needClipping = false) : base(x, y, width, height, needClipping)
+        public VerticalBox() : base() {
+            debugBrush = new SolidBrushD2D(new Color4(0, 1, 1, 1));
+            debugTextFormat = new TextFormatD2D("Consolas", 14);
+            Alignment = VerticalAlignment.LEFT;
+        }
+
+        public VerticalBox(float x, float y, float width, float height, VerticalAlignment alignment = VerticalAlignment.LEFT, bool needClipping = false) : base(x, y, width, height, needClipping)
         {
             debugBrush = new SolidBrushD2D(new Color4(0, 1, 1, 1));
             debugTextFormat = new TextFormatD2D("Consolas", 14);
-            _alignment = alignment;
+            Alignment = alignment;
         }
 
-        public override void Draw(SpriteLayerD2D layer)
+        public override void DebugDraw(SpriteLayerD2D layer)
         {
-            base.Draw(layer);
+            base.DebugDraw(layer);
+            layer.Draw(new TransformCommand(GlobalTransform));
+
             layer.Draw(new Rect(0, 0, Width, Height, debugBrush));
 
             float bottomBorder = 0;

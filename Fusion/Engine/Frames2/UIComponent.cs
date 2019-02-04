@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
 using System.Runtime.CompilerServices;
+using System.Xml.Serialization;
 using Fusion.Core.Mathematics;
 using Fusion.Engine.Common;
 using Fusion.Engine.Frames2.Managing;
@@ -142,6 +143,7 @@ namespace Fusion.Engine.Frames2
         }
 
         private UIContainer _parent;
+        [XmlIgnore]
         public UIContainer Parent
         {
             get => _parent;
@@ -187,16 +189,6 @@ namespace Fusion.Engine.Frames2
             _width = width;
             _height = height;
             _isTransformDirty = true;
-        }
-
-        public IEnumerable<UIContainer> Ancestors()
-        {
-            var current = Parent;
-            while (current != null)
-            {
-                yield return current;
-                current = current.Parent;
-            }
         }
 
         // TODO: Anchors
@@ -314,7 +306,7 @@ namespace Fusion.Engine.Frames2
             return true;
         }
 
-        protected void NotifyPropertyChanged([CallerMemberName] string propertyName = null)
+        internal void NotifyPropertyChanged([CallerMemberName] string propertyName = null)
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }

@@ -6,10 +6,10 @@ namespace Fusion.Engine.Frames2.Components
 {
     public class Border : UIComponent
     {
-        private Rect _rect;
+        public Border() : base() { }
+
         public Border(float x, float y, float width, float height) : base(x, y, width, height)
         {
-            _rect = new Rect(0, 0, width, height, new SolidBrushD2D(Color4.White));
         }
 
         public override void Update(GameTime gameTime)
@@ -19,7 +19,7 @@ namespace Fusion.Engine.Frames2.Components
 
         public override void Draw(SpriteLayerD2D layer)
         {
-            layer.Draw(_rect);
+            layer.Draw(new Rect(0, 0, Width, Height, new SolidBrushD2D(Color4.White)));
         }
     }
 }

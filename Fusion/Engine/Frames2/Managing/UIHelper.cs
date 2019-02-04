@@ -11,7 +11,7 @@ using System.Threading.Tasks;
 
 namespace Fusion.Engine.Frames2.Managing
 {
-    internal class UIHelper
+    public class UIHelper
     {
         public static IEnumerable<UIComponent> BFSTraverse(UIComponent root)
         {
@@ -105,6 +105,16 @@ namespace Fusion.Engine.Frames2.Managing
             List<UIComponent> components = new List<UIComponent>();
             foreach (var c in UIHelper.BFSTraverseForPoint(root, innerPoint)) components.Add(c);
             return components;
+        }
+
+        public static IEnumerable<UIContainer> Ancestors(UIComponent component)
+        {
+            var current = component.Parent;
+            while (current != null)
+            {
+                yield return current;
+                current = current.Parent;
+            }
         }
     }
 }

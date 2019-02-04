@@ -31,6 +31,7 @@ using Fusion.Engine.Frames2.Managing;
 using Fusion.Engine.Graphics.SpritesD2D;
 using Label = Fusion.Engine.Graphics.SpritesD2D.Label;
 using KeyEventArgs = Fusion.Engine.Input.KeyEventArgs;
+using Fusion.Engine.Frames2;
 
 namespace GISTest
 {
@@ -186,18 +187,18 @@ namespace GISTest
 		    _userInterface2.DebugEnabled = true;
 
             txt = new Fusion.Engine.Frames2.Components.Label("z", new TextFormatD2D("Calibri", 20), 150, 450, 100, 100);
-            string fileName = @"E:\GitHub\image.png";
+            string fileName = @"C:\image.png";
             img1 = new Image(50, 50, 100, 100, fileName, 1);
             img2 = new Image(50, 50, 100, 50, fileName, 0.66f);
             img3 = new Image(50, 50, 30, 80, fileName, 0.77f);
             img4 = new Image(50, 50, 90, 45, fileName, 0.55f);
 
-            verticalAlignment alignment = verticalAlignment.CENTER;
+            VerticalAlignment alignment = VerticalAlignment.CENTER;
 
             verticalBox1 = new VerticalBox(0, 0, 0, 0, alignment, true);
             verticalBox1.Add(txt);
-            verticalBox1.Add(img1);
-            verticalBox1.Add(img2);
+            //verticalBox1.Add(img1);
+            //verticalBox1.Add(img2);
 
             verticalBox2 = new VerticalBox(0, 0, 0, 0, alignment);
             verticalBox2.Add(img3);
@@ -212,7 +213,18 @@ namespace GISTest
             verticalBox3.Add(verticalBox1);
             verticalBox3.Add(verticalBox2);
 
+            flexbox1 = new Flexbox(400, 400, 220, 0);
+            flexbox1.Add(img1);
+            flexbox1.Add(img2);
+
             _userInterface2.Root.Add(verticalBox3);
+            _userInterface2.Root.Add(flexbox1);
+
+            //UIComponent deser;
+            //UIComponentSerializer.Read(@"E:\GitHub\testSer.xml", out deser);
+            //deser.X += 200;
+            //_userInterface2.Root.Add(deser);
+            //UIComponentSerializer.Write(_userInterface2.Root, @"E:\GitHub\testSer.xml");
 
             userInterface.RootFrame = this.rootFrame = new MainFrame(FrameProcessor);
 			viewLayer.SpriteLayers.Add(userInterface.FramesSpriteLayer);
@@ -318,6 +330,7 @@ namespace GISTest
         private VerticalBox verticalBox1;
         private VerticalBox verticalBox2;
         private VerticalBox verticalBox3;
+        private Flexbox flexbox1;
 
         public void PrintMessage(string message)
 		{
@@ -329,6 +342,10 @@ namespace GISTest
 	        messages.Add(string.Format(messageFormat, args));
 	    }
 
+        public UIContainer GetUIRoot()
+        {
+            return _userInterface2.Root;
+        }
 
         /// <summary>
         ///

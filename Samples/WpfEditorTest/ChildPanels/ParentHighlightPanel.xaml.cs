@@ -12,6 +12,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using Fusion.Engine.Frames2;
 
 namespace WpfEditorTest.ChildPanels
 {
@@ -21,8 +22,8 @@ namespace WpfEditorTest.ChildPanels
 	public partial class ParentHighlightPanel : Border
 	{
 
-		private Fusion.Engine.Frames.Frame _selectedFrame;
-		public Fusion.Engine.Frames.Frame SelectedFrame
+		private UIComponent _selectedFrame;
+		public UIComponent SelectedFrame
 		{
 			get => _selectedFrame;
 			set
@@ -40,8 +41,8 @@ namespace WpfEditorTest.ChildPanels
 
 				var delta = new TranslateTransform();
 				RenderTransform = delta;
-				delta.X = _selectedFrame.GlobalRectangle.X;
-				delta.Y = _selectedFrame.GlobalRectangle.Y;
+				delta.X = _selectedFrame.BoundingBox.X;
+				delta.Y = _selectedFrame.BoundingBox.Y;
 
 				this.Visibility = Visibility.Visible;
 			}

@@ -6,6 +6,7 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
+using Fusion.Engine.Frames2;
 using WpfEditorTest.UndoRedo;
 using CommandManager = WpfEditorTest.UndoRedo.CommandManager;
 
@@ -16,7 +17,7 @@ namespace WpfEditorTest.ChildPanels
 	/// </summary>
 	public partial class FrameSelectionPanel : UserControl
 	{
-		private Fusion.Engine.Frames.Frame _selectedFrame;
+		private UIComponent _selectedFrame;
 		private double _widthBuffer;
 		private double _heightBuffer;
 
@@ -25,7 +26,7 @@ namespace WpfEditorTest.ChildPanels
 		private bool _locked = false;
 		private bool _isInDragField;
 
-		public Fusion.Engine.Frames.Frame SelectedFrame
+		public UIComponent SelectedFrame
 		{
 			get => _selectedFrame;
 			set
@@ -41,13 +42,13 @@ namespace WpfEditorTest.ChildPanels
 
 				var delta = new TranslateTransform();
 				RenderTransform = delta;
-				delta.X = _selectedFrame.GlobalRectangle.X;
-				delta.Y = _selectedFrame.GlobalRectangle.Y;
+				delta.X = _selectedFrame.BoundingBox.X;
+				delta.Y = _selectedFrame.BoundingBox.Y;
 
 				_oldX = RenderTransform.Value.OffsetX;
 				_oldY = RenderTransform.Value.OffsetY;
 
-				UpdateVisualAnchors(_selectedFrame.Anchor);
+				//UpdateVisualAnchors(_selectedFrame.Anchor);
 
 				_selectedFrame.PropertyChanged += FrameDimensionsChange;
 			}
@@ -78,8 +79,8 @@ namespace WpfEditorTest.ChildPanels
 		            {
 		                var frameDelta = new TranslateTransform();
 		                RenderTransform = frameDelta;
-		                frameDelta.X = selected.GlobalRectangle.X;
-		                frameDelta.Y = selected.GlobalRectangle.Y;
+		                frameDelta.X = selected.BoundingBox.X;
+		                frameDelta.Y = selected.BoundingBox.Y;
 
 		                _oldX = RenderTransform.Value.OffsetX;
 		                _oldY = RenderTransform.Value.OffsetY;
@@ -87,7 +88,7 @@ namespace WpfEditorTest.ChildPanels
 		            }
 		            case "Anchor":
 		            {
-		                UpdateVisualAnchors(selected.Anchor);
+		                //UpdateVisualAnchors(selected.Anchor);
 		                break;
 		            }
 		        }
@@ -121,7 +122,7 @@ namespace WpfEditorTest.ChildPanels
 				}
 				else
 				{
-					UpdateVisualAnchors(_selectedFrame.Anchor);
+					//UpdateVisualAnchors(_selectedFrame.Anchor);
 				}
 			}
 		}
@@ -147,8 +148,8 @@ namespace WpfEditorTest.ChildPanels
 			}
 		}
 
-		public Fusion.Core.Mathematics.Rectangle InitialGlobalRectangle { get; internal set; }
-		public Fusion.Engine.Frames.Frame InitFrameParent { get; internal set; }
+		public Fusion.Core.Mathematics.RectangleF InitialGlobalRectangle { get; internal set; }
+		public UIContainer InitFrameParent { get; internal set; }
 		public Point InitPanelPosition { get; internal set; }
 
 		public FrameSelectionPanel()
@@ -192,7 +193,7 @@ namespace WpfEditorTest.ChildPanels
 			_locked = true;
 			var sumX = 0;
 			var sumY = 0;
-			_selectedFrame.ForEachAncestor(a => { sumX += a.X; sumY += a.Y; });
+			//_selectedFrame.ForEachAncestor(a => { sumX += a.X; sumY += a.Y; });
 			_selectedFrame.X = (int)RenderTransform.Value.OffsetX - (sumX - _selectedFrame.X);
 			_selectedFrame.Y = (int)RenderTransform.Value.OffsetY - (sumY - _selectedFrame.Y);
 
