@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
-using Fusion.Engine.Frames;
+using Fusion.Engine.Frames2;
 
 namespace WpfEditorTest.FrameSelection
 {
@@ -15,20 +15,20 @@ namespace WpfEditorTest.FrameSelection
 
 		private SelectionManager() { }
 
-		public List<Frame> SelectedFrames { get; private set; } = new List<Frame>();
+		public List<UIComponent> SelectedFrames { get; private set; } = new List<UIComponent>();
 
-		public event EventHandler<List<Frame>> FrameSelected;
+		public event EventHandler<List<UIComponent>> FrameSelected;
 
-		public event EventHandler<Frame> FrameUpdated;
+		public event EventHandler<UIComponent> FrameUpdated;
 
-		public void SelectFrame( List<Frame> frame )
+		public void SelectFrame( List<UIComponent> frame )
 		{
-			foreach (Frame selectedFrame in SelectedFrames)
+			foreach (UIComponent selectedFrame in SelectedFrames)
 			{
 				selectedFrame.PropertyChanged -= OnFrameUpdated;
 			}
 			SelectedFrames = frame;
-			foreach (Frame selectedFrame in SelectedFrames)
+			foreach (UIComponent selectedFrame in SelectedFrames)
 			{
 				selectedFrame.PropertyChanged += OnFrameUpdated;
 			}
@@ -37,7 +37,7 @@ namespace WpfEditorTest.FrameSelection
 
 		private void OnFrameUpdated( object frame, PropertyChangedEventArgs args)
 		{
-		    Application.Current.Dispatcher.Invoke(() => FrameUpdated?.Invoke(this, (Frame)frame));
+		    Application.Current.Dispatcher.InvokeAsync(() => FrameUpdated?.Invoke(this, (UIComponent)frame));
 		}
 	}
 }

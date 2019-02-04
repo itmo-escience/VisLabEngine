@@ -187,7 +187,7 @@ namespace GISTest
 		    _userInterface2.DebugEnabled = true;
 
             txt = new Fusion.Engine.Frames2.Components.Label("z", new TextFormatD2D("Calibri", 20), 150, 450, 100, 100);
-            string fileName = @"E:\GitHub\image.png";
+            string fileName = @"C:\image.png";
             img1 = new Image(50, 50, 100, 100, fileName, 1);
             img2 = new Image(50, 50, 100, 50, fileName, 0.66f);
             img3 = new Image(50, 50, 30, 80, fileName, 0.77f);
@@ -277,7 +277,6 @@ namespace GISTest
 			Game.Exit();
 		}
 
-
 		/// <summary>
 		/// Updates internal state of interface.
 		/// </summary>
@@ -286,8 +285,9 @@ namespace GISTest
 		{
 #if DEBUG
 		    PrintMessage("Tiles to render count: " + tiles.GetTilesToRenderCount());
+		    PrintMessage("FPS: {0:0.00}", gameTime.Fps);
 #endif
-			console.Update( gameTime );
+            console.Update( gameTime );
 			tiles.Update(gameTime);
 			userInterface.Update(gameTime);
 
@@ -338,11 +338,15 @@ namespace GISTest
 			messages.Add(message);
 		}
 
+	    public void PrintMessage(string messageFormat, params object[] args)
+	    {
+	        messages.Add(string.Format(messageFormat, args));
+	    }
+
         public UIContainer GetUIRoot()
         {
             return _userInterface2.Root;
         }
-
 
         /// <summary>
         ///

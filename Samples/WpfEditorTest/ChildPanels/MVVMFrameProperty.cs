@@ -1,4 +1,4 @@
-﻿using Fusion.Engine.Frames;
+﻿using Fusion.Engine.Frames2;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -12,7 +12,7 @@ namespace WpfEditorTest.ChildPanels
 {
 	public class MVVMFrameProperty : INotifyPropertyChanged
 	{
-		public MVVMFrameProperty( PropertyInfo prop, Frame obj )
+		public MVVMFrameProperty( PropertyInfo prop, UIComponent obj )
 		{
 			Obj = obj;
 			PropName = prop.Name;
@@ -68,7 +68,7 @@ namespace WpfEditorTest.ChildPanels
 			}
 		}
 
-		public Frame Obj { get; set; }
+		public UIComponent Obj { get; set; }
 
 		public PropertyInfo PropInfo { get; set; }
 		public Type PropType { get; set; }

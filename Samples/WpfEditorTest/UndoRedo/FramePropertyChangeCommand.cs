@@ -1,4 +1,4 @@
-﻿using Fusion.Engine.Frames;
+﻿using Fusion.Engine.Frames2;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,12 +10,12 @@ namespace WpfEditorTest.UndoRedo
 {
 	internal class FramePropertyChangeCommand : IEditorCommand
 	{
-		Frame _frame;
+		UIComponent _frame;
 		PropertyInfo _propertyToChange;
 		object _valueToSet;
 		object _previousValue;
 
-		public FramePropertyChangeCommand(Frame frame, string propertyName, object valueToSet)
+		public FramePropertyChangeCommand( UIComponent frame, string propertyName, object valueToSet)
 		{
 			_frame = frame;
 			_propertyToChange = _frame.GetType().GetProperty(propertyName);
@@ -23,7 +23,7 @@ namespace WpfEditorTest.UndoRedo
 			_previousValue = _propertyToChange.GetValue(_frame);
 		}
 
-		public FramePropertyChangeCommand( Frame frame, string propertyName, object valueToSet, object forcedPreviousValue ) : this(frame, propertyName, valueToSet)
+		public FramePropertyChangeCommand( UIComponent frame, string propertyName, object valueToSet, object forcedPreviousValue ) : this(frame, propertyName, valueToSet)
 		{
 			_previousValue = forcedPreviousValue;
 		}

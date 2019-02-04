@@ -7,36 +7,32 @@ using SharpDX.DXGI;
 using System.Windows.Forms;
 using Fusion.Core.Mathematics;
 using Fusion.Engine.Common;
-using Buffer = SharpDX.Direct3D11.Buffer;
 using D3DDevice = SharpDX.Direct3D11.Device;
 
 namespace Fusion.Drivers.Graphics.Display
 {
 	public class WpfDisplay : BaseDisplay
 	{
-	    public event EventHandler UpdateReady;
-
-	    public override StereoEye[] StereoEyeList => new[] { StereoEye.Mono };
-
-        private ConcurrentQueue<RenderTarget2D> _frontBuffers = new ConcurrentQueue<RenderTarget2D>();
+        private ConcurrentQueue<RenderTarget2D> _oldBuffers = new ConcurrentQueue<RenderTarget2D>();
 	    private RenderTarget2D _currentBuffer;
-	    private readonly object _extractedBufferLockHolder = new object();
+	    private volatile RenderTarget2D _readyBuffer;
+	    private DepthStencil2D _backbufferDepth;
+
+        private readonly object _lockHolder = new object();
+
+	    private int _clientWidth;
+	    private int _clientHeight;
+	    private const int SyncTime = (int)(1000.0 / 60.0);
+
+        public DeviceContext DeferredContext { get; set; }
         public override RenderTarget2D BackbufferColor => _currentBuffer;
-
-        private DepthStencil2D _backbufferDepth;
 	    public override DepthStencil2D BackbufferDepth => _backbufferDepth;
-
-	    public override StereoEye TargetEye { get; internal set; }
+	    public override StereoEye[] StereoEyeList => new[] { StereoEye.Mono };
+        public override StereoEye TargetEye { get; internal set; }
 	    public override bool Fullscreen { get => false; internal set { } }
 	    public override Rectangle Bounds => new Rectangle(0, 0, _clientWidth, _clientHeight);
 	    public override Form Window => null;
 	    public override bool Focused { get => true; }
-
-
-        private int _clientWidth;
-	    private int _clientHeight;
-
-	    private const int SyncTime = (int)(1000.0 / 60.0);
 
 		public WpfDisplay(Game game, GraphicsDevice device, GraphicsParameters parameters) : base(game, device, parameters)
 		{
@@ -51,25 +47,32 @@ namespace Fusion.Drivers.Graphics.Display
 #endif
 
             d3dDevice = new D3DDevice(adapter, creationFlags, FeatureLevel.Level_11_1, FeatureLevel.Level_11_0);
-		}
+        }
 
 	    internal override void CreateDisplayResources()
-		{
-			base.CreateDisplayResources();
+	    {
+	        base.CreateDisplayResources();
+            RecreateBuffers();
+	    }
 
-            DeferredContext?.Dispose();
+	    private void RecreateBuffers() {
+		    DeferredContext?.Dispose();
 
-            _currentBuffer?.Dispose();
-		    while (_frontBuffers.TryDequeue(out var buffer))
-                buffer.Dispose();
+            //_readyBuffer?.Dispose();
+		    //_currentBuffer?.Dispose();
+		    while (_oldBuffers.TryDequeue(out var buffer))
+		    {
+		        //buffer.Dispose();
+		    }
+		    //_backbufferDepth?.Dispose();
 
-			_backbufferDepth?.Dispose();
+		    _renderRequested = false;
 
-            DeferredContext = new DeviceContext(device.Device);
+		    DeferredContext = new DeviceContext(device.Device);
 
-		    _frontBuffers.Enqueue(CreateBuffer());
-		    _frontBuffers.Enqueue(CreateBuffer());
-		    _frontBuffers.Enqueue(CreateBuffer());
+            _oldBuffers.Enqueue(CreateBuffer());
+		    _oldBuffers.Enqueue(CreateBuffer());
+		    _oldBuffers.Enqueue(CreateBuffer());
 		    _currentBuffer = CreateBuffer();
 
             _backbufferDepth = new DepthStencil2D(device, DepthFormat.D24S8, _currentBuffer.Width, _currentBuffer.Height, _currentBuffer.SampleCount);
@@ -82,9 +85,7 @@ namespace Fusion.Drivers.Graphics.Display
 
 		public override void Prepare() { }
 
-	    public DeviceContext DeferredContext { get; private set; }
-
-		public override void SwapBuffers(int syncInterval)
+	    public override void SwapBuffers(int syncInterval)
 		{
 		    var q = new Query(d3dDevice, new QueryDescription { Type = QueryType.Event });
 
@@ -101,29 +102,54 @@ namespace Fusion.Drivers.Graphics.Display
 
             q.Dispose();
 
-            _frontBuffers.Enqueue(_currentBuffer);
-            if (!_frontBuffers.TryDequeue(out _currentBuffer))
+		    RenderTarget2D old;
+		    lock (_lockHolder)
+		    {
+		        old = _readyBuffer;
+		        _readyBuffer = _currentBuffer;
+		    }
+
+		    if (old != null)
+		        _oldBuffers.Enqueue(old);
+
+            if (!_oldBuffers.TryDequeue(out _currentBuffer))
             {
                 throw new InvalidOperationException("There is no backBuffer in the queue. What happened?");
             }
+
+		    if (_currentBuffer.IsDisposed || _currentBuffer.Width != _clientWidth ||
+		        _currentBuffer.Height != _clientHeight)
+		    {
+                _currentBuffer.Dispose();
+		        _currentBuffer = CreateBuffer();
+		    }
 		}
 
-
+	    private bool _extracted = false;
         /// <summary>
         /// Gets one buffer out of front buffer collection
         /// </summary>
         /// <returns></returns>
 	    public RenderTarget2D ExtractBuffer()
-	    {
-	            //if (_extractedBuffer != null)
-	            //    throw new InvalidOperationException("Return extracted buffer before extracting again.");
+        {
+            if(_extracted)
+                throw new InvalidOperationException("Can't extract twice");
 
-	        if (!_frontBuffers.TryDequeue(out var extractedBuffer))
-	        {
-                throw new InvalidOperationException("There is no backBuffer in the queue. What happened?");
-	        }
+            RenderTarget2D extracted = null;
+            while (extracted == null || extracted.IsDisposed)
+            {
+                lock (_lockHolder)
+                {
+                    extracted = _readyBuffer;
+                    _readyBuffer = null;
+                }
 
-	        return extractedBuffer;
+                Thread.Sleep(1);
+            }
+
+            _extracted = true;
+
+            return extracted;
 	    }
 
 	    /// <summary>
@@ -132,21 +158,30 @@ namespace Fusion.Drivers.Graphics.Display
 	    /// <returns></returns>
         public void ReturnBuffer(RenderTarget2D buffer)
 	    {
-	        if (buffer == null) throw new InvalidOperationException("There is nothing to return");
+	        if (!_extracted)
+	            throw new InvalidOperationException("What are you returning?");
+
+            if (buffer == null)
+	        {
+                Log.Warning("Null buffer was returned.");
+	            return;
+	        }
 
 	        if (buffer.IsDisposed || !(buffer.Width == _clientWidth && buffer.Height == _clientHeight))
 	        {
-	            _frontBuffers.Enqueue(CreateBuffer());
+	            _oldBuffers.Enqueue(CreateBuffer());
 
                 //buffer.Dispose();
             }
 	        else
 	        {
-                _frontBuffers.Enqueue(buffer);
+                _oldBuffers.Enqueue(buffer);
             }
+
+	        _extracted = false;
 	    }
 
-	    private bool _renderRequested = false;
+	    private volatile bool _renderRequested = false;
 	    public void RequestRender()
 	    {
 	        _renderRequested = true;
@@ -158,19 +193,21 @@ namespace Fusion.Drivers.Graphics.Display
 				_clientWidth = _reqWidth;
 				_clientHeight = _reqHeight;
 
-				CreateDisplayResources();
+				RecreateBuffers();
 
 				device.NotifyViewportChanges();
 
 				_isResizeRequested = false;
 			}
 
-            UpdateReady?.Invoke(this, null);
-
 		    if (_renderRequested)
 		    {
 		        var lst = DeferredContext.FinishCommandList(false);
-                device.Device.ImmediateContext.ExecuteCommandList(lst, false);
+                if(lst != null)
+                    device.Device.ImmediateContext.ExecuteCommandList(lst, false);
+                else
+                    Log.Warning("Empty command list");
+
 		        _renderRequested = false;
 		    }
 		}
@@ -187,7 +224,7 @@ namespace Fusion.Drivers.Graphics.Display
 		}
 
 
-	    private bool _isResizeRequested = false;
+	    private volatile bool _isResizeRequested = false;
 	    private int _reqWidth = 1;
 		private int _reqHeight = 1;
 	}

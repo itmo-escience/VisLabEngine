@@ -1,21 +1,21 @@
-﻿using Fusion.Engine.Frames;
+﻿using Fusion.Engine.Frames2;
 
 namespace WpfEditorTest.UndoRedo
 {
 	internal class FrameParentChangeCommand: IEditorCommand
 	{
-		private Frame _frame;
-		private Frame _newParent;
-		private Frame _oldParent;
+		private UIComponent _frame;
+		private UIContainer _newParent;
+		private UIContainer _oldParent;
 
-		public FrameParentChangeCommand( Frame frame, Frame newParent )
+		public FrameParentChangeCommand( UIComponent frame, UIContainer newParent )
 		{
 			this._frame = frame;
 			this._newParent = newParent;
 			this._oldParent = _frame.Parent;
 		}
 
-		public FrameParentChangeCommand( Frame frame, Frame newParent, Frame oldParent ) : this(frame, newParent)
+		public FrameParentChangeCommand( UIComponent frame, UIContainer newParent, UIContainer oldParent ) : this(frame, newParent)
 		{
 			this._oldParent = oldParent;
 		}

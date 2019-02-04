@@ -35,10 +35,6 @@
     <Prefer32Bit>true</Prefer32Bit>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="FusionUI, Version=1.0.0.0, Culture=neutral, processorArchitecture=AMD64">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\FusionUI\bin\Debug\FusionUI.dll</HintPath>
-    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Configuration" />
     <Reference Include="System.Data" />
@@ -88,6 +84,7 @@
       <DependentUpon>SceneConfigWindow.xaml</DependentUpon>
     </Compile>
     <Compile Include="UndoRedo\SelectFrameCommand.cs" />
+    <Compile Include="Utility\StickingCoordinates.cs" />
     <Compile Include="WPFConverters\BoolToIndexConverter.cs" />
     <Compile Include="ChildPanels\FrameDetails.xaml.cs">
       <DependentUpon>FrameDetails.xaml</DependentUpon>
@@ -191,6 +188,10 @@
     </None>
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\FusionUI\FusionUI.csproj">
+      <Project>{c8a88228-e78d-4782-9504-39118e29b8ad}</Project>
+      <Name>FusionUI</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\Fusion\Fusion.csproj">
       <Project>{085c9e62-cddf-4b95-994d-085c74fa90fc}</Project>
       <Name>Fusion</Name>
