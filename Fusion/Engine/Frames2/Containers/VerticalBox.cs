@@ -68,9 +68,11 @@ namespace Fusion.Engine.Frames2.Containers
             Alignment = alignment;
         }
 
-        public override void Draw(SpriteLayerD2D layer)
+        public override void DebugDraw(SpriteLayerD2D layer)
         {
-            base.Draw(layer);
+            base.DebugDraw(layer);
+            layer.Draw(new TransformCommand(GlobalTransform));
+
             layer.Draw(new Rect(0, 0, Width, Height, debugBrush));
 
             float bottomBorder = 0;
