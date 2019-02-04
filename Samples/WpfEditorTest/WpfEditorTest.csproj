@@ -35,10 +35,6 @@
     <Prefer32Bit>true</Prefer32Bit>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="FusionUI, Version=1.0.0.0, Culture=neutral, processorArchitecture=AMD64">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\FusionUI\bin\Debug\FusionUI.dll</HintPath>
-    </Reference>
     <Reference Include="SharpDX.Mathematics, Version=4.0.1.0, Culture=neutral, PublicKeyToken=b4dcf0f35e5521f1" />
     <Reference Include="System" />
     <Reference Include="System.Configuration" />
@@ -193,6 +189,10 @@
     </None>
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\FusionUI\FusionUI.csproj">
+      <Project>{c8a88228-e78d-4782-9504-39118e29b8ad}</Project>
+      <Name>FusionUI</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\Fusion\Fusion.csproj">
       <Project>{085c9e62-cddf-4b95-994d-085c74fa90fc}</Project>
       <Name>Fusion</Name>

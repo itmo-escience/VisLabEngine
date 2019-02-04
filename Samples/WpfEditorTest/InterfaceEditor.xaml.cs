@@ -15,7 +15,7 @@ using System.Windows.Media;
 using Fusion.Engine.Frames;
 using Fusion.Engine.Input;
 using WpfEditorTest.ChildPanels;
-using Frame = Fusion.Engine.Frames.Frame;
+using Fusion.Engine.Frames2;
 using KeyEventArgs = System.Windows.Input.KeyEventArgs;
 using CommandManager = WpfEditorTest.UndoRedo.CommandManager;
 using WpfEditorTest.UndoRedo;
@@ -59,9 +59,9 @@ namespace WpfEditorTest
 		private Binding _childrenBinding;
 		private readonly Game _engine;
 
-		public FusionUI.UI.ScalableFrame DragFieldFrame;
-		public FusionUI.UI.ScalableFrame SceneFrame;
-		public FusionUI.UI.MainFrame RootFrame;
+		public UIContainer DragFieldFrame;
+		public UIContainer SceneFrame;
+		public UIContainer RootFrame;
 		private string _currentSceneFile;
 		private string _sceneChangedIndicator;
 		private string _titleWithFileName = ApplicationConfig.BaseTitle + " - " + ApplicationConfig.BaseSceneName;
@@ -138,7 +138,7 @@ namespace WpfEditorTest
 
 			_treeView.SelectedFrameChangedInUI += ( _, frame ) =>
 			{
-				var command = new SelectFrameCommand(new List<Frame> { frame });
+				var command = new SelectFrameCommand(new List<UIComponent> { frame });
 				CommandManager.Instance.Execute(command);
 			};
 			_treeView.RequestFrameDeletionInUI += ( _, __ ) => TryDeleteSelectedFrame();
@@ -319,7 +319,7 @@ namespace WpfEditorTest
 			{
 				if (saveDialog.ShowDialog() == System.Windows.Forms.DialogResult.OK)
 				{
-					Fusion.Core.Utils.FrameSerializer.Write(SceneFrame, saveDialog.FileName);
+					Fusion.Core.Utils.UIComponentSerializer.Write(SceneFrame, saveDialog.FileName);
 					this.CurrentSceneFile = saveDialog.FileName;
 					CommandManager.Instance.SetNotDirty();
 					return true;
@@ -349,7 +349,7 @@ namespace WpfEditorTest
 		{
 			if (!String.IsNullOrEmpty(this.CurrentSceneFile))
 			{
-				Fusion.Core.Utils.FrameSerializer.Write(SceneFrame, this.CurrentSceneFile);
+				Fusion.Core.Utils.UIComponentSerializer.Write(SceneFrame, this.CurrentSceneFile);
 				CommandManager.Instance.SetNotDirty();
 				return true;
 			}
@@ -369,7 +369,7 @@ namespace WpfEditorTest
 				}
 				var selectedFrame = SelectionLayer.FrameSelectionPanelList.FirstOrDefault().Value.SelectedFrame;
 
-				Fusion.Core.Utils.FrameSerializer.Write(selectedFrame, ApplicationConfig.TemplatesPath + "\\" + (selectedFrame.Text ?? selectedFrame.GetType().ToString()) + ".xml");
+				Fusion.Core.Utils.UIComponentSerializer.Write(selectedFrame, ApplicationConfig.TemplatesPath + "\\" + (selectedFrame.Text ?? selectedFrame.GetType().ToString()) + ".xml");
 				this.LoadPalettes();
 			}
 		}
@@ -388,7 +388,7 @@ namespace WpfEditorTest
 			Frame createdFrame;
 			try
 			{
-				Fusion.Core.Utils.FrameSerializer.Read(filePath, out createdFrame);
+				Fusion.Core.Utils.UIComponentSerializer.Read(filePath, out createdFrame);
 			}
 			catch (Exception)
 			{
@@ -550,7 +550,7 @@ namespace WpfEditorTest
 				var selectedFrame = SelectionLayer.FrameSelectionPanelList.FirstOrDefault().Value.SelectedFrame;
 				if (selectedFrame != null)
 				{
-					_xmlFrameBuffer = Fusion.Core.Utils.FrameSerializer.WriteToString(selectedFrame);
+					_xmlFrameBuffer = Fusion.Core.Utils.UIComponentSerializer.WriteToString(selectedFrame);
 					//Clipboard.SetData(DataFormats.Text, (Object)xmlFrame);
 					var upperLeft = this.PointToScreen(new Point(selectedFrame.X, selectedFrame.Y));
 					var lowerRight = this.PointToScreen(new Point(selectedFrame.X + selectedFrame.Width, selectedFrame.Y + selectedFrame.Height));
@@ -578,7 +578,7 @@ namespace WpfEditorTest
 			{
 				List<IEditorCommand> commands = new List<IEditorCommand>();
 				this.AddFrameToScene(
-					Fusion.Core.Utils.FrameSerializer.ReadFromString(_xmlFrameBuffer),
+					Fusion.Core.Utils.UIComponentSerializer.ReadFromString(_xmlFrameBuffer),
 					System.Windows.Input.Mouse.GetPosition(this), commands
 					);
 				var command = new CommandGroup(commands.ToArray());

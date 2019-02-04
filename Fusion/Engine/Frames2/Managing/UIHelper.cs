@@ -11,7 +11,7 @@ using System.Threading.Tasks;
 
 namespace Fusion.Engine.Frames2.Managing
 {
-    internal class UIHelper
+    public class UIHelper
     {
         public static IEnumerable<UIComponent> BFSTraverse(UIComponent root)
         {

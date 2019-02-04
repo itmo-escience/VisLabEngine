@@ -7,7 +7,8 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Shapes;
 using WpfEditorTest.UndoRedo;
-using Frame = Fusion.Engine.Frames.Frame;
+using Fusion.Engine.Frames2;
+using Fusion.Engine.Frames2.Managing;
 using CommandManager = WpfEditorTest.UndoRedo.CommandManager;
 using WpfEditorTest.FrameSelection;
 using WpfEditorTest.ChildPanels;
@@ -22,7 +23,7 @@ namespace WpfEditorTest
 	/// </summary>
 	public partial class WPFSelectionUILayer : Grid
 	{
-		public Dictionary<Frame, FrameSelectionPanel> FrameSelectionPanelList = new Dictionary<Frame, FrameSelectionPanel>();
+		public Dictionary<UIComponent, FrameSelectionPanel> FrameSelectionPanelList = new Dictionary<UIComponent, FrameSelectionPanel>();
 		private List<StickCoordinateY> StickingCoordsY = new List<StickCoordinateY>();
 		private List<StickCoordinateX> StickingCoordsX = new List<StickCoordinateX>();
 
@@ -46,9 +47,9 @@ namespace WpfEditorTest
 			{ "10x", 10 }
 		};
 
-		public FusionUI.UI.ScalableFrame DragFieldFrame => Window.DragFieldFrame;
-		public FusionUI.UI.ScalableFrame SceneFrame => Window.SceneFrame;
-		public FusionUI.UI.MainFrame RootFrame => Window.RootFrame;
+		public UIContainer DragFieldFrame => Window.DragFieldFrame;
+		public UIContainer SceneFrame => Window.SceneFrame;
+		public UIContainer RootFrame => Window.RootFrame;
 		public FramePalette PaletteWindow;
 
 		public InterfaceEditor Window { get; set; }
@@ -57,7 +58,7 @@ namespace WpfEditorTest
 
 		public struct FrameSelectionPair
 		{
-			public Frame Frame;
+			public UIComponent Frame;
 			public FrameSelectionPanel Panel;
 		}
 		public event EventHandler<FrameSelectionPair> FrameSelected;
@@ -80,7 +81,7 @@ namespace WpfEditorTest
 					var frame = frameAndPanel.Key;
 					var selectionPanel = frameAndPanel.Value;
 
-					var commands = this.ResetSelectedFrame(new Point(frame.GlobalRectangle.X, frame.GlobalRectangle.Y), selectionPanel);
+					var commands = this.ResetSelectedFrame(new Point(frame.BoundingBox.X, frame.BoundingBox.Y), selectionPanel);
 					var command = new CommandGroup(commands.ToArray());
 					CommandManager.Instance.ExecuteWithoutMemorising(command);
 
@@ -224,7 +225,7 @@ namespace WpfEditorTest
 			VisualGrid.Visibility = enable ? Visibility.Visible : Visibility.Collapsed;
 		}
 
-		private void SelectFrame( Frame frame )
+		private void SelectFrame( UIComponent frame )
 		{
 			if (FrameSelectionPanelList.TryGetValue(frame, out var panel))
 			{
@@ -254,24 +255,24 @@ namespace WpfEditorTest
 			return commands;
 		}
 
-		public Frame GetHoveredFrameOnScene( Point mousePos, bool ignoreScene )
+		public UIComponent GetHoveredFrameOnScene( Point mousePos, bool ignoreScene )
 		{
-			var hoveredFrames = FrameProcessor.GetFramesAt(SceneFrame, (int)mousePos.X, (int)mousePos.Y);
+			var hoveredFrame = UIHelper.GetLowestComponentInHierarchy(SceneFrame, new Fusion.Core.Mathematics.Vector2((int)mousePos.X, (int)mousePos.Y));
 
 			if (ignoreScene)
 			{
-				if (hoveredFrames.Count > 1) // if something is there and it's not SceneFrame
+				if (hoveredFrame != SceneFrame) // if something is there and it's not SceneFrame
 				{
-					return hoveredFrames.Pop();
+					return hoveredFrame;
 				}
 
 				return null;
 			}
 			else
 			{
-				if (hoveredFrames.Any()) // if something is there
+				if (hoveredFrame != null) // if something is there
 				{
-					return hoveredFrames.Pop();
+					return hoveredFrame;
 				}
 				return null;
 			}
@@ -279,10 +280,10 @@ namespace WpfEditorTest
 
 		private bool HasFrameChangedSize( FrameSelectionPanel panel )
 		{
-			return panel.SelectedFrame.GlobalRectangle != panel.InitialGlobalRectangle;
+			return panel.SelectedFrame.BoundingBox != panel.InitialGlobalRectangle;
 		}
 
-		public void MoveFrameToDragField( Frame frame )
+		public void MoveFrameToDragField( UIComponent frame )
 		{
 			frame.Parent?.Remove(frame);
 
@@ -293,14 +294,20 @@ namespace WpfEditorTest
 			panel.UpdateSelectedFramePosition();
 		}
 
-		public void LandFrameOnScene( Frame frame, Point mousePosition )
+		public void LandFrameOnScene( UIContainer frame, Point mousePosition )
 		{
 			frame.Parent?.Remove(frame);
 
 			// If we can't find where to land it (that's weird) just try attach to the scene
 			var hoveredFrame = GetHoveredFrameOnScene(mousePosition, false) ?? SceneFrame;
-
-			hoveredFrame.Add(frame);
+			if (hoveredFrame is UIContainer)
+			{
+				(hoveredFrame as UIContainer).Add(frame);
+			}
+			else
+			{
+				hoveredFrame.Parent.Add(frame);
+			}
 		}
 
 		private List<IEditorCommand> ReleaseFrame( Point point, FrameSelectionPanel panel )
@@ -315,15 +322,23 @@ namespace WpfEditorTest
 					ParentHighlightPanel.SelectedFrame = null;
 
 					var hoveredFrame = GetHoveredFrameOnScene(point, false) ?? SceneFrame;
+
+					if (!(hoveredFrame is UIContainer))
+					{
+						hoveredFrame = hoveredFrame.Parent;
+					}
+
+					UIContainer container = hoveredFrame as UIContainer;
+
 					panel.SelectedFrame.Parent?.Remove(panel.SelectedFrame);
 
 					commands.Add(new CommandGroup(
-						new FrameParentChangeCommand(panel.SelectedFrame, hoveredFrame, panel.InitFrameParent),
+						new FrameParentChangeCommand(panel.SelectedFrame, container, panel.InitFrameParent),
 						new FramePropertyChangeCommand(panel.SelectedFrame, "X",
-						(int)point.X - hoveredFrame.GlobalRectangle.X - ((int)point.X - panel.SelectedFrame.GlobalRectangle.X),
+						(int)point.X - hoveredFrame.BoundingBox.X - ((int)point.X - panel.SelectedFrame.BoundingBox.X),
 						panel.InitialGlobalRectangle.X),
 						new FramePropertyChangeCommand(panel.SelectedFrame, "Y",
-						(int)point.Y - hoveredFrame.GlobalRectangle.Y - ((int)point.Y - panel.SelectedFrame.GlobalRectangle.Y),
+						(int)point.Y - hoveredFrame.BoundingBox.Y - ((int)point.Y - panel.SelectedFrame.BoundingBox.Y),
 						panel.InitialGlobalRectangle.Y)
 					));
 				}
@@ -357,7 +372,7 @@ namespace WpfEditorTest
 					IEditorCommand command = null;
 					if (Keyboard.IsKeyDown(Key.LeftShift) || Keyboard.IsKeyDown(Key.RightShift))
 					{
-						var framesToSelect = new List<Frame>(SelectionManager.Instance.SelectedFrames);
+						var framesToSelect = new List<UIComponent>(SelectionManager.Instance.SelectedFrames);
 						if (framesToSelect.Contains(hovered))
 						{
 							framesToSelect.Remove(hovered);
@@ -372,7 +387,7 @@ namespace WpfEditorTest
 					{
 						if (!SelectionManager.Instance.SelectedFrames.Contains(hovered))
 						{
-							command = new SelectFrameCommand(new List<Frame> { hovered });
+							command = new SelectFrameCommand(new List<UIComponent> { hovered });
 						}
 					}
 					if (command != null)
@@ -384,7 +399,7 @@ namespace WpfEditorTest
 				{
 					if (!Keyboard.IsKeyDown(Key.LeftShift) && !Keyboard.IsKeyDown(Key.RightShift))
 					{
-						var command = new SelectFrameCommand(new List<Frame> { });
+						var command = new SelectFrameCommand(new List<UIComponent> { });
 						CommandManager.Instance.Execute(command);
 					}
 

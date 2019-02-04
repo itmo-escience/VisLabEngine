@@ -1,4 +1,4 @@
-﻿using Fusion.Engine.Frames;
+﻿using Fusion.Engine.Frames2;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -12,7 +12,7 @@ using WpfEditorTest.UndoRedo;
 using WpfEditorTest.Utility;
 using CommandManager = WpfEditorTest.UndoRedo.CommandManager;
 using Frame = Fusion.Engine.Frames.Frame;
-using Rectangle = Fusion.Core.Mathematics.Rectangle;
+using RectangleF = Fusion.Core.Mathematics.RectangleF;
 
 namespace WpfEditorTest.ChildPanels
 {
@@ -39,7 +39,7 @@ namespace WpfEditorTest.ChildPanels
 		public Transform PreviousDragTransform { get; set; }
 		public List<Border> Drags { get; set; }
 
-		public Dictionary<Frame, Rectangle> InitialFramesRectangles { get; private set; }
+		public Dictionary<UIComponent, RectangleF> InitialFramesRectangles { get; private set; }
 
 		private bool _dragMousePressed;
 
@@ -87,10 +87,10 @@ namespace WpfEditorTest.ChildPanels
 			if (frames.Count > 0)
 			{
 				this.Visibility = Visibility.Visible;
-				int minX = frames.Select(f => f.GlobalRectangle.X).Min();
-				int minY = frames.Select(f => f.GlobalRectangle.Y).Min();
-				int maxX = frames.Select(f => f.GlobalRectangle.X + f.Width).Max();
-				int maxY = frames.Select(f => f.GlobalRectangle.Y + f.Height).Max();
+				int minX = (int)(frames.Select(f => f.BoundingBox.X).Min()+0.5f);
+				int minY = (int)(frames.Select(f => f.BoundingBox.Y).Min() + 0.5f);
+				int maxX = (int)(frames.Select(f => f.BoundingBox.X + f.Width).Max() + 0.5f);
+				int maxY = (int)(frames.Select(f => f.BoundingBox.Y + f.Height).Max() + 0.5f);
 				Width = Math.Max(maxX - minX, double.Epsilon);
 				Height = Math.Max(maxY - minY, double.Epsilon);
 				var delta = new TranslateTransform();
@@ -104,64 +104,16 @@ namespace WpfEditorTest.ChildPanels
 			}
 		}
 
-		public void StickToX( int x ) //TODO: Delete this
+		private void RememberSizeAndPosition( List<UIComponent> selectedFrames )
 		{
-			var frames = SelectionManager.Instance.SelectedFrames;
-			if (frames.Count > 0)
-			{
-				Frame minXFrame = frames.Where(fr => fr.GlobalRectangle.X == frames
-					.Select(f => f.GlobalRectangle.X).Min()).FirstOrDefault();
-				Frame maxXFrame = frames.Where(fr => fr.GlobalRectangle.X + fr.Width == frames
-					.Select(f => f.GlobalRectangle.X + f.Width).Max()).FirstOrDefault();
-
-				var rangeX = Enumerable.Range(x - StickingCoordsSensitivity, StickingCoordsSensitivity * 2);
-				if (rangeX.Contains(minXFrame.GlobalRectangle.X))
-				{
-					var stickingDelta = x - minXFrame.GlobalRectangle.X;
-					frames.ForEach(f => f.X += stickingDelta);
-				}
-				if (rangeX.Contains(maxXFrame.GlobalRectangle.X + maxXFrame.GlobalRectangle.Width))
-				{
-					var stickingDelta = x - (maxXFrame.GlobalRectangle.X + maxXFrame.GlobalRectangle.Width);
-					frames.ForEach(f => f.X += stickingDelta);
-				}
-			}
-		}
-
-		public void StickToY( int y ) //TODO: Delete this
-		{
-			var frames = SelectionManager.Instance.SelectedFrames;
-			if (frames.Count > 0)
-			{
-				Frame minYFrame = frames.Where(fr => fr.GlobalRectangle.Y == frames
-					.Select(f => f.GlobalRectangle.Y).Min()).FirstOrDefault();
-				Frame maxYFrame = frames.Where(fr => fr.GlobalRectangle.Y + fr.Height == frames
-					.Select(f => f.GlobalRectangle.Y + f.Height).Max()).FirstOrDefault();
-
-				var rangeY = Enumerable.Range(y - StickingCoordsSensitivity, StickingCoordsSensitivity * 2);
-				if (rangeY.Contains(minYFrame.GlobalRectangle.Y))
-				{
-					var stickingDelta = y - minYFrame.GlobalRectangle.Y;
-					frames.ForEach(f => f.Y += stickingDelta);
-				}
-				if (rangeY.Contains(maxYFrame.GlobalRectangle.Y + maxYFrame.GlobalRectangle.Height))
-				{
-					var stickingDelta = y - (maxYFrame.GlobalRectangle.Y + maxYFrame.GlobalRectangle.Height);
-					frames.ForEach(f => f.Y += stickingDelta);
-				}
-			}
-		}
-
-		private void RememberSizeAndPosition( List<Frame> selectedFrames )
-		{
-			InitialFramesRectangles = new Dictionary<Frame, Rectangle>();
-			foreach (Frame frame in selectedFrames)
+			InitialFramesRectangles = new Dictionary<UIComponent, RectangleF>();
+			foreach (UIComponent frame in selectedFrames)
 			{
 				InitialFramesRectangles.Add(
 					frame,
-					new Rectangle(
-						frame.GlobalRectangle.X - (int)RenderTransform.Value.OffsetX,
-						frame.GlobalRectangle.Y - (int)RenderTransform.Value.OffsetY,
+					new RectangleF(
+						frame.BoundingBox.X - (int)RenderTransform.Value.OffsetX,
+						frame.BoundingBox.Y - (int)RenderTransform.Value.OffsetY,
 						frame.Width,
 						frame.Height
 					)
@@ -207,15 +159,15 @@ namespace WpfEditorTest.ChildPanels
 
 		private void Drag_MouseRightButtonDown( object sender, MouseButtonEventArgs e )
 		{
-			var frames = SelectionManager.Instance.SelectedFrames;
+			//var frames = SelectionManager.Instance.SelectedFrames;
 
-			if (frames.Count == 1)
-			{
-				FrameAnchor changedAnchor = (FrameAnchor)Enum.Parse(typeof(FrameAnchor), (sender as Border).Tag as string);
-				var initialAnchor = frames.First().Anchor;
-				var command = new FramePropertyChangeCommand(frames.First(), "Anchor", initialAnchor ^= changedAnchor);
-				CommandManager.Instance.Execute(command);
-			}
+			//if (frames.Count == 1)
+			//{
+			//	FrameAnchor changedAnchor = (FrameAnchor)Enum.Parse(typeof(FrameAnchor), (sender as Border).Tag as string);
+			//	var initialAnchor = frames.First().Anchor;
+			//	var command = new FramePropertyChangeCommand(frames.First(), "Anchor", initialAnchor ^= changedAnchor);
+			//	CommandManager.Instance.Execute(command);
+			//}
 		}
 
 		internal void Resize(double deltaX, double deltaY, bool isShiftPressed, bool isControlPressed, int gridSizeMultiplier, bool needSnapping,
