@@ -197,8 +197,8 @@ namespace GISTest
 
             verticalBox1 = new VerticalBox(0, 0, 0, 0, alignment, true);
             verticalBox1.Add(txt);
-            verticalBox1.Add(img1);
-            verticalBox1.Add(img2);
+            //verticalBox1.Add(img1);
+            //verticalBox1.Add(img2);
 
             verticalBox2 = new VerticalBox(0, 0, 0, 0, alignment);
             verticalBox2.Add(img3);
@@ -213,7 +213,12 @@ namespace GISTest
             verticalBox3.Add(verticalBox1);
             verticalBox3.Add(verticalBox2);
 
+            flexbox1 = new Flexbox(400, 400, 200, 0);
+            flexbox1.Add(img1);
+            flexbox1.Add(img2);
+
             _userInterface2.Root.Add(verticalBox3);
+            _userInterface2.Root.Add(flexbox1);
 
             //UIComponent deser;
             //UIComponentSerializer.Read(@"E:\GitHub\testSer.xml", out deser);
@@ -325,6 +330,7 @@ namespace GISTest
         private VerticalBox verticalBox1;
         private VerticalBox verticalBox2;
         private VerticalBox verticalBox3;
+        private Flexbox flexbox1;
 
         public void PrintMessage(string message)
 		{
