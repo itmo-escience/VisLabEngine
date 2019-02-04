@@ -213,9 +213,10 @@ namespace GISTest
             verticalBox3.Add(verticalBox1);
             verticalBox3.Add(verticalBox2);
 
-            flexbox1 = new Flexbox(400, 400, 220, 0);
+            flexbox1 = new Flexbox(500, 300, 220, 0);
             flexbox1.Add(img1);
             flexbox1.Add(img2);
+            flexbox1.Angle = 1;
 
             _userInterface2.Root.Add(verticalBox3);
             _userInterface2.Root.Add(flexbox1);
