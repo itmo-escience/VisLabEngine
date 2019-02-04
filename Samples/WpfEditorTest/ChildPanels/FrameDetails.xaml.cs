@@ -4,7 +4,7 @@ using System.Linq;
 using System.Reflection;
 using System.Windows;
 using System.Windows.Media;
-using Fusion.Engine.Frames;
+using Fusion.Engine.Frames2;
 
 namespace WpfEditorTest.ChildPanels
 {
@@ -28,7 +28,7 @@ namespace WpfEditorTest.ChildPanels
             Closing += (s, e) => {this.Hide(); e.Cancel = true; };
 		}
 
-	    public void SetSelectFrame(Frame frame)
+	    public void SetSelectFrame(UIComponent frame)
 	    {
 	        var publicProperties = frame.GetType().GetProperties(BindingFlags.Public | BindingFlags.Instance);
 

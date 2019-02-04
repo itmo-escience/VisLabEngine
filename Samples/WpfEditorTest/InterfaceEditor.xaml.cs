@@ -29,6 +29,7 @@ using WpfEditorTest.FrameSelection;
 using ZWpfLib;
 using Keyboard = System.Windows.Input.Keyboard;
 using WpfEditorTest.DialogWindows;
+using Fusion.Engine.Frames2.Containers;
 
 namespace WpfEditorTest
 {
@@ -154,14 +155,14 @@ namespace WpfEditorTest
 		    {
 		        Application.Current.Dispatcher.Invoke(() =>
 		        {
-		            RootFrame = ApplicationInterface.Instance.rootFrame;
-		            SceneFrame = (FusionUI.UI.ScalableFrame) RootFrame.Children.FirstOrDefault();
-		            DragFieldFrame = new FusionUI.UI.ScalableFrame(0, 0, RootFrame.UnitWidth, RootFrame.UnitHeight,
-		                "DragFieldFrame", Fusion.Core.Mathematics.Color.Zero)
-		            {
-		                Anchor = FrameAnchor.All,
-		                ZOrder = 1000000,
-		            };
+		            RootFrame = (_engine.GameInterface as CustomGameInterface).GetUIRoot();
+		            SceneFrame = RootFrame.Children.FirstOrDefault() as UIContainer;
+					DragFieldFrame = new FreePlacement(0, 0, RootFrame.Width, RootFrame.Height);
+		            //    ,"DragFieldFrame", Fusion.Core.Mathematics.Color.Zero)
+		            //{
+		            //    Anchor = FrameAnchor.All,
+		            //    ZOrder = 1000000,
+		            //};
 		            RootFrame.Add(DragFieldFrame);
 
 		            SelectionLayer.DxElem.Renderer = _engine;
@@ -229,7 +230,7 @@ namespace WpfEditorTest
 			if (SelectionLayer.FrameSelectionPanelList.Count >= 0)
 			{
 				List<IEditorCommand> commands = new List<IEditorCommand>();
-				commands.Add(new SelectFrameCommand(new List<Frame> { }));
+				commands.Add(new SelectFrameCommand(new List<UIComponent> { }));
 				foreach (var frame in SelectionLayer.FrameSelectionPanelList.Keys)
 				{
 					commands.Add(new FrameParentChangeCommand(frame, null));
@@ -255,7 +256,7 @@ namespace WpfEditorTest
 				var createdFrame = CreateFrameFromFile(openDialog.FileName);
 				if (createdFrame != null && createdFrame.GetType() == typeof(FusionUI.UI.ScalableFrame))
 				{
-					SelectionManager.Instance.SelectFrame(new List<Frame> { });
+					SelectionManager.Instance.SelectFrame(new List<UIComponent> { });
 					RootFrame.Remove(SceneFrame);
 					foreach (var panel in SelectionLayer.FrameSelectionPanelList.Values)
 					{
@@ -264,9 +265,9 @@ namespace WpfEditorTest
 						CommandManager.Instance.ExecuteWithoutMemorising(command);
 					}
 
-					SceneFrame = (FusionUI.UI.ScalableFrame)createdFrame;
+					SceneFrame = createdFrame as UIContainer;
 					RootFrame.Add(SceneFrame);
-					DragFieldFrame.ZOrder = 1000000;
+					//DragFieldFrame.ZOrder = 1000000;
 
 					_childrenBinding = new Binding("Children")
 					{
@@ -288,7 +289,7 @@ namespace WpfEditorTest
 		{
 			if (!this.CheckForChanges())
 				return;
-			SelectionManager.Instance.SelectFrame(new List<Frame> { });
+			SelectionManager.Instance.SelectFrame(new List<UIComponent> { });
 			RootFrame.Remove(SceneFrame);
 			foreach (var panel in SelectionLayer.FrameSelectionPanelList.Values)
 			{
@@ -297,9 +298,11 @@ namespace WpfEditorTest
 				CommandManager.Instance.ExecuteWithoutMemorising(command);
 			}
 
-			SceneFrame = new FusionUI.UI.ScalableFrame(0, 0, this.RootFrame.UnitWidth, this.RootFrame.UnitHeight, "Scene", Fusion.Core.Mathematics.Color.Zero) { Anchor = FrameAnchor.All };
+			SceneFrame = new FreePlacement(0, 0, RootFrame.Width, RootFrame.Height);
+
+			//new FusionUI.UI.ScalableFrame(0, 0, this.RootFrame.UnitWidth, this.RootFrame.UnitHeight, "Scene", Fusion.Core.Mathematics.Color.Zero) { Anchor = FrameAnchor.All };
 			RootFrame.Add(SceneFrame);
-			DragFieldFrame.ZOrder = 1000000;
+			//DragFieldFrame.ZOrder = 1000000;
 
 			_childrenBinding = new Binding("Children")
 			{
@@ -331,15 +334,22 @@ namespace WpfEditorTest
 			}
 		}
 
-		internal List<IEditorCommand> AddFrameToScene( Frame createdFrame, Point point, List<IEditorCommand> commands )
+		internal List<IEditorCommand> AddFrameToScene( UIComponent createdFrame, Point point, List<IEditorCommand> commands )
 		{
 			var hoveredFrame = SelectionLayer.GetHoveredFrameOnScene(point, false) ?? SceneFrame;
 
+			if (!(hoveredFrame is UIContainer))
+			{
+				hoveredFrame = hoveredFrame.Parent;
+			}
+
+			UIContainer container = hoveredFrame as UIContainer;
+
 			commands.Add(new CommandGroup(
-				new FrameParentChangeCommand(createdFrame, hoveredFrame),
-				new FramePropertyChangeCommand(createdFrame, "X", (int)point.X - hoveredFrame.GlobalRectangle.X - createdFrame.Width / 2),
-				new FramePropertyChangeCommand(createdFrame, "Y", (int)point.Y - hoveredFrame.GlobalRectangle.Y - createdFrame.Height / 2),
-				new SelectFrameCommand(new List<Frame> { createdFrame })
+				new FrameParentChangeCommand(createdFrame, container),
+				new FramePropertyChangeCommand(createdFrame, "X", (int)point.X - hoveredFrame.BoundingBox.X - createdFrame.Width / 2),
+				new FramePropertyChangeCommand(createdFrame, "Y", (int)point.Y - hoveredFrame.BoundingBox.Y - createdFrame.Height / 2),
+				new SelectFrameCommand(new List<UIComponent> { createdFrame })
 			));
 
 			return commands;
@@ -369,7 +379,7 @@ namespace WpfEditorTest
 				}
 				var selectedFrame = SelectionLayer.FrameSelectionPanelList.FirstOrDefault().Value.SelectedFrame;
 
-				Fusion.Core.Utils.UIComponentSerializer.Write(selectedFrame, ApplicationConfig.TemplatesPath + "\\" + (selectedFrame.Text ?? selectedFrame.GetType().ToString()) + ".xml");
+				Fusion.Core.Utils.UIComponentSerializer.Write(selectedFrame, ApplicationConfig.TemplatesPath + "\\" + (selectedFrame.Name ?? selectedFrame.GetType().ToString()) + ".xml");
 				this.LoadPalettes();
 			}
 		}
@@ -383,9 +393,9 @@ namespace WpfEditorTest
 			}
 		}
 
-		public Frame CreateFrameFromFile( string filePath )
+		public UIComponent CreateFrameFromFile( string filePath )
 		{
-			Frame createdFrame;
+			UIComponent createdFrame;
 			try
 			{
 				Fusion.Core.Utils.UIComponentSerializer.Read(filePath, out createdFrame);
@@ -444,7 +454,7 @@ namespace WpfEditorTest
 				(int)(FusionUI.UI.ScalableFrame.ScaleMultiplier * SelectionLayer.GridSizeMultiplier) : 1;
 			List<IEditorCommand> commands = new List<IEditorCommand>();
 			var delta = KeyboardArrowsSteps[e.Parameter.ToString()];
-			foreach (Frame frame in SelectionLayer.FrameSelectionPanelList.Keys)
+			foreach (UIComponent frame in SelectionLayer.FrameSelectionPanelList.Keys)
 			{
 				commands.Add(new CommandGroup(
 					new FramePropertyChangeCommand(frame, "X", frame.X + (int)delta.X* step),
@@ -470,38 +480,38 @@ namespace WpfEditorTest
 				{
 					case "up":
 						{
-							minY = frames.Select(f => f.Y).Min();
+							minY = (int)(frames.Select(f => f.Y).Min()+0.5f);
 							break;
 						}
 					case "down":
 						{
-							maxY = frames.Select(f => f.Y + f.Height).Max();
+							maxY = (int)(frames.Select(f => f.Y + f.Height).Max() + 0.5f);
 							break;
 						}
 					case "left":
 						{
-							minX = frames.Select(f => f.X).Min();
+							minX = (int)(frames.Select(f => f.X).Min() + 0.5f);
 							break;
 						}
 					case "right":
 						{
-							maxX = frames.Select(f => f.X + f.Width).Max();
+							maxX = (int)(frames.Select(f => f.X + f.Width).Max() + 0.5f);
 							break;
 						}
 					case "horizontal":
 						{
-							minX = frames.Select(f => f.X).Min();
-							maxX = frames.Select(f => f.X + f.Width).Max();
+							minX = (int)(frames.Select(f => f.X).Min() + 0.5f);
+							maxX = (int)(frames.Select(f => f.X + f.Width).Max() + 0.5f);
 							break;
 						}
 					case "vertical":
 						{
-							minY = frames.Select(f => f.Y).Min();
-							maxY = frames.Select(f => f.Y + f.Height).Max();
+							minY = (int)(frames.Select(f => f.Y).Min() + 0.5f);
+							maxY = (int)(frames.Select(f => f.Y + f.Height).Max() + 0.5f);
 							break;
 						}
 				}
-				foreach (Frame frame in SelectionLayer.FrameSelectionPanelList.Keys)
+				foreach (UIComponent frame in SelectionLayer.FrameSelectionPanelList.Keys)
 				{
 					switch (e.Parameter.ToString())
 					{

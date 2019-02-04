@@ -148,7 +148,7 @@ namespace WpfEditorTest.ChildPanels
 			}
 		}
 
-		public Fusion.Core.Mathematics.Rectangle InitialGlobalRectangle { get; internal set; }
+		public Fusion.Core.Mathematics.RectangleF InitialGlobalRectangle { get; internal set; }
 		public UIContainer InitFrameParent { get; internal set; }
 		public Point InitPanelPosition { get; internal set; }
 

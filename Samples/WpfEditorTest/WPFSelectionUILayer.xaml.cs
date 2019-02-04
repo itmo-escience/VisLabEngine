@@ -416,7 +416,7 @@ namespace WpfEditorTest
 				var frame = frameAndPanel.Key;
 				var selectionPanel = frameAndPanel.Value;
 
-				selectionPanel.InitialGlobalRectangle = new Fusion.Core.Mathematics.Rectangle(frame.X, frame.Y, frame.Width, frame.Height);
+				selectionPanel.InitialGlobalRectangle = new Fusion.Core.Mathematics.RectangleF(frame.X, frame.Y, frame.Width, frame.Height);
 				selectionPanel.InitPanelPosition = new Point(selectionPanel.RenderTransform.Value.OffsetX, selectionPanel.RenderTransform.Value.OffsetY);
 				selectionPanel.InitFrameParent = frame.Parent;
 			}
@@ -492,39 +492,46 @@ namespace WpfEditorTest
 		public void PrepareStickingCoords()
 		{
 			ForgetStickingCoords();
-			RememberStickingCoords(SceneFrame);
+			foreach (var item in UIHelper.DFSTraverse(SceneFrame))
+			{
+				RememberStickingCoords(item);
+			}
+
+			
 		}
 
-		private void RememberStickingCoords( Frame frame )
+		private void RememberStickingCoords( UIComponent frame )
 		{
 			if (!FrameSelectionPanelList.ContainsKey(frame))
 			{
-				StickingCoordsX.Add(new StickCoordinateX(frame.GlobalRectangle.X, frame.GlobalRectangle.Y, frame.GlobalRectangle.Y + frame.GlobalRectangle.Height)
+				StickingCoordsX.Add(new StickCoordinateX((int)frame.BoundingBox.X, (int)frame.BoundingBox.Y, (int)(frame.BoundingBox.Y + frame.BoundingBox.Height))
 				{
 					ActiveChanged = DrawStickLine,
 				});
-				StickingCoordsX.Add(new StickCoordinateX(frame.GlobalRectangle.X + frame.GlobalRectangle.Width, frame.GlobalRectangle.Y, frame.GlobalRectangle.Y + frame.GlobalRectangle.Height)
+				StickingCoordsX.Add(new StickCoordinateX((int)(frame.BoundingBox.X + frame.BoundingBox.Width), (int)frame.BoundingBox.Y, (int)(frame.BoundingBox.Y + frame.BoundingBox.Height))
 				{
 					ActiveChanged = DrawStickLine,
 				});
-				StickingCoordsX.Add(new StickCoordinateX(frame.GlobalRectangle.X + frame.GlobalRectangle.Width/2, frame.GlobalRectangle.Y, frame.GlobalRectangle.Y + frame.GlobalRectangle.Height)
+				StickingCoordsX.Add(new StickCoordinateX((int)(frame.BoundingBox.X + frame.BoundingBox.Width/2), (int)frame.BoundingBox.Y, (int)(frame.BoundingBox.Y + frame.BoundingBox.Height))
 				{
 					ActiveChanged = DrawStickLine,
 				});
-				StickingCoordsY.Add(new StickCoordinateY(frame.GlobalRectangle.Y, frame.GlobalRectangle.X, frame.GlobalRectangle.X + frame.GlobalRectangle.Width)
+				StickingCoordsY.Add(new StickCoordinateY((int)frame.BoundingBox.Y, (int)frame.BoundingBox.X, (int)(frame.BoundingBox.X + frame.BoundingBox.Width))
 				{
 					ActiveChanged = DrawStickLine,
 				});
-				StickingCoordsY.Add(new StickCoordinateY(frame.GlobalRectangle.Y + frame.GlobalRectangle.Height, frame.GlobalRectangle.X, frame.GlobalRectangle.X + frame.GlobalRectangle.Width)
+				StickingCoordsY.Add(new StickCoordinateY((int)(frame.BoundingBox.Y + frame.BoundingBox.Height), (int)frame.BoundingBox.X, (int)(frame.BoundingBox.X + frame.BoundingBox.Width))
 				{
 					ActiveChanged = DrawStickLine,
 				});
-				StickingCoordsY.Add(new StickCoordinateY(frame.GlobalRectangle.Y + frame.GlobalRectangle.Height/2, frame.GlobalRectangle.X, frame.GlobalRectangle.X + frame.GlobalRectangle.Width)
+				StickingCoordsY.Add(new StickCoordinateY((int)(frame.BoundingBox.Y + frame.BoundingBox.Height/2), (int)frame.BoundingBox.X, (int)(frame.BoundingBox.X + frame.BoundingBox.Width))
 				{
 					ActiveChanged = DrawStickLine,
 				});
 
-				frame.ForEachChildren(c => RememberStickingCoords(c));
+				//UIHelper.DFSTraverse(frame);
+
+				//frame.ForEachChildren(c => RememberStickingCoords(c));
 			}
 		}
 
@@ -648,21 +655,24 @@ namespace WpfEditorTest
 			return VisualGrid.Visibility == Visibility.Visible && !(Keyboard.IsKeyDown(Key.LeftAlt) || Keyboard.IsKeyDown(Key.RightAlt));
 		}
 
-		private void AreaSelectionEnd( List<Frame> selectedFrames )
+		private void AreaSelectionEnd( List<UIComponent> selectedFrames )
 		{
 			AreaSelectionEnabled = false;
 			if (_selectionRectangle != null)
 			{
-				var selectedframes = new List<Frame>(selectedFrames);
-				Fusion.Core.Mathematics.Rectangle selectedArea = new Fusion.Core.Mathematics.Rectangle(
+				var selectedframes = new List<UIComponent>(selectedFrames);
+				Fusion.Core.Mathematics.RectangleF selectedArea = new Fusion.Core.Mathematics.RectangleF(
 						(int)Canvas.GetLeft(_selectionRectangle),
 						(int)Canvas.GetTop(_selectionRectangle),
 						(int)_selectionRectangle.Width,
 						(int)_selectionRectangle.Height
 					);
-				foreach (Frame frame in SceneFrame.Children)
+				foreach (UIComponent frame in SceneFrame.Children)
 				{
-					if (selectedArea.Contains(frame.GlobalRectangle) && !selectedframes.Contains(frame))
+					bool contains;
+					var bb = frame.BoundingBox;
+					selectedArea.Contains(ref bb, out contains);
+					if (contains && !selectedframes.Contains(frame))
 					{
 						selectedframes.Add(frame);
 					}
