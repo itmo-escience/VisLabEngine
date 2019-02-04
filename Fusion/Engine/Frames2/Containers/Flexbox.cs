@@ -24,24 +24,24 @@ namespace Fusion.Engine.Frames2.Containers
 
             foreach (var child in Children)
             {
-                if ((lineWidth == 0) || (lineWidth + child.Width <= _mainSize))
+                if ((lineWidth == 0) || (lineWidth + child.LocalBoundingBox.Width <= _mainSize))
                 {
-                    child.X = lineWidth - child.LocalBoundingBox.X;
-                    child.Y = bottomBorder - child.LocalBoundingBox.Y;
+                    child.X += lineWidth - child.LocalBoundingBox.X;
+                    child.Y += bottomBorder - child.LocalBoundingBox.Y;
 
-                    lineWidth += child.Width;
-                    lineHeight = Math.Max(lineHeight, child.Height);
+                    lineWidth += child.LocalBoundingBox.Width;
+                    lineHeight = Math.Max(lineHeight, child.LocalBoundingBox.Height);
                 }
                 else
                 {
                     bottomBorder += lineHeight;
                     maxLineWidth = Math.Min(maxLineWidth, lineWidth);
 
-                    child.X = - child.LocalBoundingBox.X;
-                    child.Y = bottomBorder - child.LocalBoundingBox.Y;
+                    child.X += - child.LocalBoundingBox.X;
+                    child.Y += bottomBorder - child.LocalBoundingBox.Y;
 
-                    lineWidth = child.Width;
-                    lineHeight = child.Height;
+                    lineWidth = child.LocalBoundingBox.Width;
+                    lineHeight = child.LocalBoundingBox.Height;
                 }
             }
 
