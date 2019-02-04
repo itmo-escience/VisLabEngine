@@ -337,13 +337,18 @@ namespace GISTest
 			messages.Add(message);
 		}
 
+        public UIContainer GetUIRoot()
+        {
+            return _userInterface2.Root;
+        }
 
-		/// <summary>
-		///
-		/// </summary>
-		/// <param name="endPoint"></param>
-		/// <param name="serverInfo"></param>
-		public override void DiscoveryResponse ( System.Net.IPEndPoint endPoint, string serverInfo )
+
+        /// <summary>
+        ///
+        /// </summary>
+        /// <param name="endPoint"></param>
+        /// <param name="serverInfo"></param>
+        public override void DiscoveryResponse ( System.Net.IPEndPoint endPoint, string serverInfo )
 		{
 			Log.Message("DISCOVERY : {0} - {1}", endPoint.ToString(), serverInfo );
 		}
