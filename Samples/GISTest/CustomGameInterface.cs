@@ -264,7 +264,6 @@ namespace GISTest
 			Game.Exit();
 		}
 
-
 		/// <summary>
 		/// Updates internal state of interface.
 		/// </summary>
@@ -273,8 +272,9 @@ namespace GISTest
 		{
 #if DEBUG
 		    PrintMessage("Tiles to render count: " + tiles.GetTilesToRenderCount());
+		    PrintMessage("FPS: {0:0.00}", gameTime.Fps);
 #endif
-			console.Update( gameTime );
+            console.Update( gameTime );
 			tiles.Update(gameTime);
 			userInterface.Update(gameTime);
 
@@ -324,13 +324,18 @@ namespace GISTest
 			messages.Add(message);
 		}
 
+	    public void PrintMessage(string messageFormat, params object[] args)
+	    {
+	        messages.Add(string.Format(messageFormat, args));
+	    }
 
-		/// <summary>
-		///
-		/// </summary>
-		/// <param name="endPoint"></param>
-		/// <param name="serverInfo"></param>
-		public override void DiscoveryResponse ( System.Net.IPEndPoint endPoint, string serverInfo )
+
+        /// <summary>
+        ///
+        /// </summary>
+        /// <param name="endPoint"></param>
+        /// <param name="serverInfo"></param>
+        public override void DiscoveryResponse ( System.Net.IPEndPoint endPoint, string serverInfo )
 		{
 			Log.Message("DISCOVERY : {0} - {1}", endPoint.ToString(), serverInfo );
 		}

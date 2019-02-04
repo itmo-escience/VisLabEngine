@@ -124,9 +124,9 @@ namespace ZWpfLib
             dc.DrawImage(Surface, new Rect(RenderSize));
 		}
 
-		bool IsReallyLoopRendering { get; set; }
+        private bool IsReallyLoopRendering { get; set; }
 
-		void UpdateReallyLoopRendering()
+        private void UpdateReallyLoopRendering()
 		{
 			var newValue =
 				!IsInDesignMode
@@ -149,23 +149,23 @@ namespace ZWpfLib
 		}
 
 
-        private TimeSpan _lastRenderingTime;
-        void OnLoopRendering(object sender, EventArgs e)
+        private TimeSpan _lastRenderTime;
+        private void OnLoopRendering(object sender, EventArgs e)
 		{
 		    var renderingTime = ((RenderingEventArgs) e).RenderingTime;
 
             if (!IsReallyLoopRendering)
 				return;
 
-            if (renderingTime == _lastRenderingTime)
+            if (renderingTime == _lastRenderTime)
                 return;
 
-		    _lastRenderingTime = renderingTime;
+		    _lastRenderTime = renderingTime;
             Render();
 		}
 
 
-		void UpdateSize()
+        private void UpdateSize()
 		{
 			if (Renderer == null || !Renderer.IsInitialized)
 				return;
