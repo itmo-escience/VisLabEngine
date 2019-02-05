@@ -160,8 +160,8 @@ namespace WpfEditorTest
 		            SceneFrame = new FreePlacement(0, 0, RootFrame.Width, RootFrame.Height);//RootFrame.Children.FirstOrDefault() as UIContainer;
 					foreach (var child in rootChildren)
 					{
-						SceneFrame.Add(child);
 						RootFrame.Remove(child);
+						SceneFrame.Add(child);
 					}
 					DragFieldFrame = new FreePlacement(0, 0, RootFrame.Width, RootFrame.Height);
 					//    ,"DragFieldFrame", Fusion.Core.Mathematics.Color.Zero)

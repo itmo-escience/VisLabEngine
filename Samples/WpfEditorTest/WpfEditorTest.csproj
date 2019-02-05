@@ -111,6 +111,7 @@
     <Compile Include="UndoRedo\CommandManager.cs" />
     <Compile Include="UndoRedo\IEditorCommand.cs" />
     <Compile Include="UndoRedo\FramePropertyChangeCommand.cs" />
+    <Compile Include="WPFConverters\TransformValueConverter.cs" />
     <Compile Include="WPFSelectionUILayer.xaml.cs">
       <DependentUpon>WPFSelectionUILayer.xaml</DependentUpon>
     </Compile>

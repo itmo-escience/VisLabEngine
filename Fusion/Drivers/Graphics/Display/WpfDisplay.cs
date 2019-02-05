@@ -144,9 +144,8 @@ namespace Fusion.Drivers.Graphics.Display
                     _readyBuffer = null;
                 }
 
-                Thread.Sleep(1);
-            }
-
+                Thread.Sleep(10);
+            }			
             _extracted = true;
 
             return extracted;

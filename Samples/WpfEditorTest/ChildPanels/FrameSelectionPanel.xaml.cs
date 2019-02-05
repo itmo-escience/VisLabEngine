@@ -38,8 +38,8 @@ namespace WpfEditorTest.ChildPanels
 				_selectedFrame = value;
 				if (_selectedFrame == null) return;
 
-				Width = WidthBuffer = _selectedFrame.Width;
-				Height = HeightBuffer = _selectedFrame.Height;
+				Width = WidthBuffer = _selectedFrame/*.BoundingBox*/.Width;
+				Height = HeightBuffer = _selectedFrame/*.BoundingBox*/.Height;
 
 				var delta = new TranslateTransform();
 				RenderTransform = delta;
@@ -67,13 +67,13 @@ namespace WpfEditorTest.ChildPanels
 		            case "Width":
 		            case "UnitWidth":
 		            {
-		                WidthBuffer = selected.BoundingBox.Width;
+		                WidthBuffer = selected/*.BoundingBox*/.Width;
 		                break;
 		            }
 		            case "Height":
 		            case "UnitHeight":
 		            {
-		                HeightBuffer = selected.BoundingBox.Height;
+		                HeightBuffer = selected/*.BoundingBox*/.Height;
 		                break;
 		            }
 		            case "GlobalRectangle":
@@ -196,13 +196,13 @@ namespace WpfEditorTest.ChildPanels
 			var sumY = 0;
 			//_selectedFrame.ForEachAncestor(a => { sumX += a.X; sumY += a.Y; });
 
-			foreach (var item in UIHelper.DFSTraverse(_selectedFrame))
+			foreach (var item in UIHelper.Ancestors(_selectedFrame))
 			{
 				sumX += (int)(item.X+0.5f); sumY += (int)(item.Y+0.5f);
 			}
 
-			_selectedFrame.X = (int)RenderTransform.Value.OffsetX - (sumX - _selectedFrame.X);
-			_selectedFrame.Y = (int)RenderTransform.Value.OffsetY - (sumY - _selectedFrame.Y);
+			_selectedFrame.X = (int)RenderTransform.Value.OffsetX - (sumX/* - _selectedFrame.X*/);
+			_selectedFrame.Y = (int)RenderTransform.Value.OffsetY - (sumY/* - _selectedFrame.Y*/);
 
 			_oldX = RenderTransform.Value.OffsetX;
 			_oldY = RenderTransform.Value.OffsetY;
