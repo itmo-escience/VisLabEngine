@@ -20,6 +20,12 @@ namespace Fusion.Engine.Frames2.Managing
             Root = new FreePlacement(0, 0, rs.Width, rs.Height);
 
             UIEventProcessor = new UIEventProcessor(Root);
+
+            rs.DisplayBoundsChanged += (s, e) =>
+            {
+                Root.Width = rs.DisplayBounds.Width;
+                Root.Height = rs.DisplayBounds.Height;
+            };
         }
 
         public void Update(GameTime gameTime)

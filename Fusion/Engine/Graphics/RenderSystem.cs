@@ -152,6 +152,17 @@ namespace Fusion.Engine.Graphics {
 
 			Device.DisplayBoundsChanged += (s,e) => {
 				DisplayBoundsChanged?.Invoke(s, e);
+
+                Width = DisplayBounds.Width;
+                Height = DisplayBounds.Height;
+
+                foreach (var viewLayer in viewLayers)
+                {
+                    foreach (var spriteLayer in viewLayer.SpriteLayersD2D)
+                    {
+                        spriteLayer.UpdateSize();
+                    }
+                }
 			};
 		}
 
