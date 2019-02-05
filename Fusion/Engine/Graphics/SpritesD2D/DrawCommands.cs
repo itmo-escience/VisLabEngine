@@ -98,20 +98,29 @@ namespace Fusion.Engine.Graphics.SpritesD2D
         protected readonly float X, Y, W, H;
         private readonly IBrushD2D _brush;
         private RectangleF _rect;
+        private bool _isStroked;
 
-        public Rect(float x, float y, float w, float h, IBrushD2D brush)
+        public Rect(float x, float y, float w, float h, IBrushD2D brush, bool isStroked = false)
         {
             X = x;
             Y = y;
             W = w;
             H = h;
             _brush = brush;
+            _isStroked = isStroked;
             _rect = new RectangleF(x, y, w, h);
         }
 
         public void Apply(RenderTargetD2D target)
         {
-            target.DrawRect(_rect, _brush);
+            if (_isStroked)
+            {
+                target.DrawStrokeRect(_rect, _brush);
+            }
+            else
+            {
+                target.DrawRect(_rect, _brush);
+            }
         }
 
         public override string ToString()

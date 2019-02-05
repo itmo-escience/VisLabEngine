@@ -35,7 +35,6 @@ namespace Fusion.Engine.Frames2.Containers
                 else
                 {
                     bottomBorder += lineHeight;
-                    maxLineWidth = Math.Min(maxLineWidth, lineWidth);
 
                     child.X += - child.LocalBoundingBox.X;
                     child.Y += bottomBorder - child.LocalBoundingBox.Y;
@@ -43,6 +42,7 @@ namespace Fusion.Engine.Frames2.Containers
                     lineWidth = child.LocalBoundingBox.Width;
                     lineHeight = child.LocalBoundingBox.Height;
                 }
+                maxLineWidth = Math.Max(maxLineWidth, lineWidth);
             }
 
             Width = Math.Min(maxLineWidth, _mainSize);
@@ -68,9 +68,9 @@ namespace Fusion.Engine.Frames2.Containers
             base.DebugDraw(layer);
             layer.Draw(new TransformCommand(GlobalTransform));
 
-            //layer.Draw(new Rect(0, 0, Width, Height, debugBrush));
-
-            //
+            layer.Draw(new Rect(0, 0, Width, Height, debugBrush));
+            
+            layer.Draw(new Rect(0, 0, _mainSize, Height, debugBrush, true));
         }
     }
 }

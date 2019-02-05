@@ -81,11 +81,29 @@ namespace Fusion.Engine.Graphics.SpritesD2D
         public void DrawLine(Vector2 p0, Vector2 p1, IBrushD2D brush, float strokeWidth) =>
             _target.DrawLine(createAlignedVector(p0.ToRawVector2()), createAlignedVector(p1.ToRawVector2()), _brushFactory.GetOrCreateBrush(brush), strokeWidth);
 
+        public void DrawStrokeLine(Vector2 p0, Vector2 p1, IBrushD2D brush, float strokeWidth = 1)
+        {
+            StrokeStyleProperties prop = new StrokeStyleProperties
+            {
+                DashStyle = DashStyle.Dash,
+            };
+            _target.DrawLine(createAlignedVector(p0.ToRawVector2()), createAlignedVector(p1.ToRawVector2()), _brushFactory.GetOrCreateBrush(brush), strokeWidth, new StrokeStyle(_target.Factory, prop));
+        }
+
         public void DrawRect(RectangleF rectangle, IBrushD2D brush) =>
             _target.DrawRectangle(createAlignedRectangle(rectangle.ToRawRectangleF()), _brushFactory.GetOrCreateBrush(brush));
 
         public void DrawRect(RectangleF rectangle, IBrushD2D brush, float strokeWidth) =>
             _target.DrawRectangle(createAlignedRectangle(rectangle.ToRawRectangleF()), _brushFactory.GetOrCreateBrush(brush), strokeWidth);
+
+        public void DrawStrokeRect(RectangleF rectangle, IBrushD2D brush, float strokeWidth = 1)
+        {
+            StrokeStyleProperties prop = new StrokeStyleProperties
+            {
+                DashStyle = DashStyle.Dash,
+            };
+            _target.DrawRectangle(createAlignedRectangle(rectangle.ToRawRectangleF()), _brushFactory.GetOrCreateBrush(brush), strokeWidth, new StrokeStyle(_target.Factory, prop));
+        }
 
         public void FillEllipse(Vector2 center, float rX, float rY, IBrushD2D brush) =>
             _target.FillEllipse(new SharpDX.Direct2D1.Ellipse(createAlignedVector(center.ToRawVector2()), rX, rY), _brushFactory.GetOrCreateBrush(brush));

@@ -60,7 +60,7 @@ namespace WpfEditorTest.ChildPanels
 		    var selected = _selectedFrame;
             if (_locked || selected == null) return;
 
-		    Application.Current.Dispatcher.Invoke(() =>
+		    Application.Current.Dispatcher.InvokeAsync(() =>
 		    {
 		        switch (args.PropertyName)
 		        {

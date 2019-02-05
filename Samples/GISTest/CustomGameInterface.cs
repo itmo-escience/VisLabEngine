@@ -216,9 +216,10 @@ namespace GISTest
             verticalBox3.Add(verticalBox1);
             verticalBox3.Add(verticalBox2);
 
-            flexbox1 = new Flexbox(400, 400, 220, 0);
+            flexbox1 = new Flexbox(500, 300, 220, 0);
             flexbox1.Add(img1);
             flexbox1.Add(img2);
+            flexbox1.Angle = 1;
 
             _userInterface2.Root.Add(verticalBox3);
             _userInterface2.Root.Add(flexbox1);
@@ -279,7 +280,6 @@ namespace GISTest
 			Game.Exit();
 		}
 
-
 		/// <summary>
 		/// Updates internal state of interface.
 		/// </summary>
@@ -288,8 +288,9 @@ namespace GISTest
 		{
 #if DEBUG
 		    PrintMessage("Tiles to render count: " + tiles.GetTilesToRenderCount());
+		    PrintMessage("FPS: {0:0.00}", gameTime.Fps);
 #endif
-			console.Update( gameTime );
+            console.Update( gameTime );
 			tiles.Update(gameTime);
 			userInterface.Update(gameTime);
 
@@ -340,11 +341,15 @@ namespace GISTest
 			messages.Add(message);
 		}
 
+	    public void PrintMessage(string messageFormat, params object[] args)
+	    {
+	        messages.Add(string.Format(messageFormat, args));
+	    }
+
         public UIContainer GetUIRoot()
         {
             return _userInterface2.Root;
         }
-
 
         /// <summary>
         ///
