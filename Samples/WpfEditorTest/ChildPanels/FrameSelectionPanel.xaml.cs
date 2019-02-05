@@ -67,13 +67,13 @@ namespace WpfEditorTest.ChildPanels
 		            case "Width":
 		            case "UnitWidth":
 		            {
-		                WidthBuffer = selected.Width;
+		                WidthBuffer = selected.BoundingBox.Width;
 		                break;
 		            }
 		            case "Height":
 		            case "UnitHeight":
 		            {
-		                HeightBuffer = selected.Height;
+		                HeightBuffer = selected.BoundingBox.Height;
 		                break;
 		            }
 		            case "GlobalRectangle":
