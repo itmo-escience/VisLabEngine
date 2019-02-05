@@ -66,9 +66,12 @@ namespace GISTest
 	}
 
 
+	public interface ICustomizableUI
+	{
+		UIContainer GetUIRoot();
+	}
 
-
-	public class CustomGameInterface : ApplicationInterface
+	public class CustomGameInterface : ApplicationInterface, ICustomizableUI
 	{
 
 		[GameModule("Console", "con", InitOrder.Before)]
@@ -298,19 +301,19 @@ namespace GISTest
 			}
 			messages.Clear();
 
-            txt.Text = Game.Mouse.Position.ToString();
-		    txt.Angle = MathUtil.TwoPi - angle;
-            img1.Angle = angle;
-            img3.Angle = angle;
-            verticalBox1.Angle = -angle;
-            verticalBox2.Angle = angle / 2;
+           // txt.Text = Game.Mouse.Position.ToString();
+		   // txt.Angle = MathUtil.TwoPi - angle;
+           // img1.Angle = angle;
+           // img3.Angle = angle;
+           // verticalBox1.Angle = -angle;
+           // verticalBox2.Angle = angle / 2;
 
             _userInterface2.Update(gameTime);
 		    _userInterface2.Draw(_spriteLayer);
 
-		    angle += 0.01f;
-		    if (angle > 2 * MathUtil.TwoPi)
-		        angle -= 2 * MathUtil.TwoPi;
+		   // angle += 0.01f;
+		   // if (angle > 2 * MathUtil.TwoPi)
+		   //     angle -= 2 * MathUtil.TwoPi;
 		}
 
 		SpriteFont textFont;

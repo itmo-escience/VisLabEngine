@@ -72,7 +72,7 @@ namespace Fusion.Engine.Frames2
                 return;
 
             child.Parent = this;
-            _children.Add(child);
+            Children.Add(child);
         }
 
         public virtual bool Remove(UIComponent child)

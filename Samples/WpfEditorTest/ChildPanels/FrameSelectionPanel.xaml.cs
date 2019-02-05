@@ -9,6 +9,7 @@ using System.Windows.Media;
 using Fusion.Engine.Frames2;
 using WpfEditorTest.UndoRedo;
 using CommandManager = WpfEditorTest.UndoRedo.CommandManager;
+using Fusion.Engine.Frames2.Managing;
 
 namespace WpfEditorTest.ChildPanels
 {
@@ -194,6 +195,12 @@ namespace WpfEditorTest.ChildPanels
 			var sumX = 0;
 			var sumY = 0;
 			//_selectedFrame.ForEachAncestor(a => { sumX += a.X; sumY += a.Y; });
+
+			foreach (var item in UIHelper.DFSTraverse(_selectedFrame))
+			{
+				sumX += (int)(item.X+0.5f); sumY += (int)(item.Y+0.5f);
+			}
+
 			_selectedFrame.X = (int)RenderTransform.Value.OffsetX - (sumX - _selectedFrame.X);
 			_selectedFrame.Y = (int)RenderTransform.Value.OffsetY - (sumY - _selectedFrame.Y);
 

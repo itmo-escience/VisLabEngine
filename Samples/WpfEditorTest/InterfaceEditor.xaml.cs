@@ -156,13 +156,20 @@ namespace WpfEditorTest
 		        Application.Current.Dispatcher.Invoke(() =>
 		        {
 		            RootFrame = (_engine.GameInterface as CustomGameInterface).GetUIRoot();
-		            SceneFrame = RootFrame.Children.FirstOrDefault() as UIContainer;
+					var rootChildren = new List<UIComponent>(RootFrame.Children);
+		            SceneFrame = new FreePlacement(0, 0, RootFrame.Width, RootFrame.Height);//RootFrame.Children.FirstOrDefault() as UIContainer;
+					foreach (var child in rootChildren)
+					{
+						SceneFrame.Add(child);
+						RootFrame.Remove(child);
+					}
 					DragFieldFrame = new FreePlacement(0, 0, RootFrame.Width, RootFrame.Height);
-		            //    ,"DragFieldFrame", Fusion.Core.Mathematics.Color.Zero)
-		            //{
-		            //    Anchor = FrameAnchor.All,
-		            //    ZOrder = 1000000,
-		            //};
+					//    ,"DragFieldFrame", Fusion.Core.Mathematics.Color.Zero)
+					//{
+					//    Anchor = FrameAnchor.All,
+					//    ZOrder = 1000000,
+					//};
+					RootFrame.Add(SceneFrame);
 		            RootFrame.Add(DragFieldFrame);
 
 		            SelectionLayer.DxElem.Renderer = _engine;
@@ -174,6 +181,7 @@ namespace WpfEditorTest
 		                Mode = BindingMode.OneWay
 		            };
 		            _treeView.ElementHierarchyView.SetBinding(TreeView.ItemsSourceProperty, binding);
+					_treeView.AttachScene(SceneFrame);
 		        });
 		    };
 
@@ -254,7 +262,7 @@ namespace WpfEditorTest
 				if (openDialog.ShowDialog() != System.Windows.Forms.DialogResult.OK) return;
 
 				var createdFrame = CreateFrameFromFile(openDialog.FileName);
-				if (createdFrame != null && createdFrame.GetType() == typeof(FusionUI.UI.ScalableFrame))
+				if (createdFrame != null && createdFrame.GetType() == typeof(UIContainer))
 				{
 					SelectionManager.Instance.SelectFrame(new List<UIComponent> { });
 					RootFrame.Remove(SceneFrame);

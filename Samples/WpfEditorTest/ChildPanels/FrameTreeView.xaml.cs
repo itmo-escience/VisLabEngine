@@ -16,6 +16,8 @@ namespace WpfEditorTest.ChildPanels
     /// </summary>
     public partial class FrameTreeView : Window
     {
+		private UIContainer _scene { get; set; }
+
         private UIComponent _selectedFrame;
         public UIComponent SelectedFrame
         {
@@ -46,6 +48,11 @@ namespace WpfEditorTest.ChildPanels
             Closing += (s, e) => { this.Hide(); e.Cancel = true; };
 		}
 
+		public void AttachScene(UIContainer scene )
+		{
+			_scene = scene;
+		}
+
 		private void TextBlock_MouseDown( object sender, MouseButtonEventArgs e )
 		{
 		    SelectedFrameChangedInUI?.Invoke(this, (UIComponent)(sender as TextBlock).Tag);
@@ -64,7 +71,7 @@ namespace WpfEditorTest.ChildPanels
 			var currentFrame = child;
 			List<UIComponent> frames = new List<UIComponent>();
 
-			while (currentFrame.Parent != null /*&& currentFrame.Parent.Text != "Scene"*/)
+			while (currentFrame.Parent != null && currentFrame.Parent != _scene)
 			{
 				currentFrame = currentFrame.Parent;
 				frames.Add(currentFrame);
