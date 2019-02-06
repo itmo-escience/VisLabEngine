@@ -27,6 +27,8 @@ namespace WpfEditorTest
 		public static SolidColorBrush DefaultGridLinesBrush = new SolidColorBrush(Colors.LightSteelBlue) { Opacity=0.5d };
 		public static SolidColorBrush DefaultSelectionRectanglePrimaryBrush = new SolidColorBrush(Colors.White) { Opacity = 1d };
 		public static SolidColorBrush DefaultSelectionRectangleSecondaryBrush = new SolidColorBrush(Colors.Black) { Opacity = 1d };
+		public static SolidColorBrush TreeViewItemHolderAllowedHoveredColor = new SolidColorBrush(Color.FromArgb(255, 131, 255, 131));
+		public static SolidColorBrush TreeViewItemHolderRestrictedHoveredColor = new SolidColorBrush(Color.FromArgb(255, 255, 131, 131));
 
 		public static double SceneLayerWidth = SystemParameters.MaximizedPrimaryScreenWidth - 20;
 		public static double SceneLayerHeight = SystemParameters.MaximizedPrimaryScreenHeight - 80;
