@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Fusion.Core.Mathematics;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -22,6 +23,9 @@ namespace WpfEditorTest.WPFConverters
 				if (Prop.PropType == typeof(Fusion.Core.Mathematics.Color))
 					return
 						element.FindResource("ColorProp") as DataTemplate;
+				if (Prop.PropType == typeof(Matrix3x2))
+					return
+						element.FindResource("TransformProp") as DataTemplate;
 				if (Prop.PropType == typeof(Boolean))
 					return
 						element.FindResource("BoolProp") as DataTemplate;
