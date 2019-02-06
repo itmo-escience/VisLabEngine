@@ -89,8 +89,8 @@ namespace WpfEditorTest.ChildPanels
 				this.Visibility = Visibility.Visible;
 				int minX = (int)(frames.Select(f => f.BoundingBox.X).Min()+0.5f);
 				int minY = (int)(frames.Select(f => f.BoundingBox.Y).Min() + 0.5f);
-				int maxX = (int)(frames.Select(f => f.BoundingBox.X + f.Width).Max() + 0.5f);
-				int maxY = (int)(frames.Select(f => f.BoundingBox.Y + f.Height).Max() + 0.5f);
+				int maxX = (int)(frames.Select(f => f.BoundingBox.X + f.BoundingBox.Width).Max() + 0.5f);
+				int maxY = (int)(frames.Select(f => f.BoundingBox.Y + f.BoundingBox.Height).Max() + 0.5f);
 				Width = Math.Max(maxX - minX, double.Epsilon);
 				Height = Math.Max(maxY - minY, double.Epsilon);
 				var delta = new TranslateTransform();

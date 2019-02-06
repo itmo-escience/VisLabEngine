@@ -14,10 +14,12 @@
         MinWidth="350" MinHeight="150"
         MaxWidth="350" MaxHeight="950" KeyDown="Window_KeyDown">
     <ScrollViewer Height="auto" Width="auto" Background="LightGray">
-        <TreeView Name="ElementHierarchyView" Background="LightGray" Height="auto" Width="auto">
+        <TreeView Name="ElementHierarchyView" Background="LightGray" Height="auto" Width="auto" AllowDrop="True" Drop="ElementHierarchyView_Drop">
             <TreeView.ItemTemplate>
                 <HierarchicalDataTemplate ItemsSource="{Binding Path=Children}">
-                    <TextBlock Text="{Binding Name}" Tag="{Binding}" MouseDown="TextBlock_MouseDown"/>
+                    <TextBlock Text="{Binding Name}" Tag="{Binding}" 
+                               MouseDown="TextBlock_MouseDown" PreviewDragOver="TextBlock_PreviewDragOver" PreviewDrop="TextBlock_PreviewDrop" 
+                               PreviewDragLeave="TextBlock_PreviewDragLeave" PreviewDragEnter="TextBlock_PreviewDragEnter"/>
                 </HierarchicalDataTemplate>
             </TreeView.ItemTemplate>
         </TreeView>

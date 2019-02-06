@@ -145,7 +145,6 @@ namespace Fusion.Drivers.Graphics.Display
                      Interlocked.CompareExchange(ref _readyBuffer, null, extracted) != extracted
             );
 
-
             _extracted = true;
 
             return extracted;

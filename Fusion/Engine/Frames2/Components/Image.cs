@@ -29,6 +29,14 @@ namespace Fusion.Engine.Frames2.Components
         public Image() : base() {
             Opacity = 1;
             _sourseFile = "";
+
+            PropertyChanged += (s, e) =>
+            {
+                if ((e.PropertyName == nameof(Width)) || (e.PropertyName == nameof(Height)) || (e.PropertyName == nameof(Opacity)))
+                {
+                    UpdateImage();
+                }
+            };
         }
 
         public Image(float x, float y, string file, float opacity = 1) : base(x, y)
@@ -40,12 +48,34 @@ namespace Fusion.Engine.Frames2.Components
             Height = source.Height;
 
             _image = new DrawBitmap(0, 0, source, Opacity);
+
+            PropertyChanged += (s, e) =>
+            {
+                if ((e.PropertyName == nameof(Width)) || (e.PropertyName == nameof(Height)) || (e.PropertyName == nameof(Opacity)))
+                {
+                    UpdateImage();
+                }
+            };
         }
 
         public Image(float x, float y, float width, float height, string file, float opacity = 1) : base(x, y, width, height)
         {
             Opacity = opacity;
             SourceFile = file;
+
+            PropertyChanged += (s, e) =>
+            {
+                if ((e.PropertyName == nameof(Width)) || (e.PropertyName == nameof(Height)) || (e.PropertyName == nameof(Opacity)))
+                {
+                    UpdateImage();
+                }
+            };
+        }
+
+        private void UpdateImage()
+        {
+            var sourceFile = System.Drawing.Image.FromFile(_sourseFile);
+            _image = new DrawBitmap(0, 0, Width, Height, sourceFile, Opacity);
         }
 
         public override void Update(GameTime gameTime) { }

@@ -11,7 +11,7 @@
         Width="320"
         MinHeight="10"
         MinWidth="320"
-        ResizeMode="CanResizeWithGrip"
+        ResizeMode="NoResize"
         ShowInTaskbar="False"
         WindowStartupLocation="CenterOwner" >
     <Grid>
