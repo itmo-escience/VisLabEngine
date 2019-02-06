@@ -54,10 +54,9 @@ namespace GISTest
 
 				//	apply command-line options here:
 				//	...
-				LaunchBox.Show(engine, "Config.ini");
-				//if (!LaunchBox.Show(engine, "Config.ini")) {
-				//	return 0;
-				//}
+				if (!LaunchBox.Show(engine, "Config.ini")) {
+					return 0;
+				}
 
 				//	run:
 				engine.Run();
