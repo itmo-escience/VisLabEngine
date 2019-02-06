@@ -24,10 +24,12 @@ namespace Fusion.Engine.Graphics.SpritesD2D
         {
             _rs = rs;
 
-            Initialize();
+            var factory = new SharpDX.Direct2D1.Factory();
+
+            CreateTargets(factory);
         }
 
-        private void Initialize()
+        private void CreateTargets(SharpDX.Direct2D1.Factory factory)
         {
             var w = _rs.DisplayBounds.Width;
             var h = _rs.DisplayBounds.Height;
@@ -36,9 +38,6 @@ namespace Fusion.Engine.Graphics.SpritesD2D
 
             var shaderResourceView = new ShaderResourceView(_rs.Device.Device, _renderTargetFusion.Surface.Resource);
             ShaderResource = new ShaderResource(_rs.Device, shaderResourceView, w, h, 1);
-
-            var factory = new SharpDX.Direct2D1.Factory();
-
 
             using (var res = _renderTargetFusion.Surface.RTV.Resource)
             using (var surface = res.QueryInterface<Surface>())
@@ -56,26 +55,12 @@ namespace Fusion.Engine.Graphics.SpritesD2D
 
         public void UpdateSize()
         {
-            var w = _rs.DisplayBounds.Width;
-            var h = _rs.DisplayBounds.Height;
+            _renderTargetFusion.Dispose();
+            ShaderResource.Dispose();
 
-            _renderTargetFusion = new RenderTarget2D(_rs.Device, ColorFormat.Bgra8, w, h, false, false, true);
-
-            var shaderResourceView = new ShaderResourceView(_rs.Device.Device, _renderTargetFusion.Surface.Resource);
-            ShaderResource = new ShaderResource(_rs.Device, shaderResourceView, w, h, 1);
-
-            using (var res = _renderTargetFusion.Surface.RTV.Resource)
-            using (var surface = res.QueryInterface<Surface>())
-            {
-                _target = new RenderTarget(
-                    _target.Factory,
-                    surface,
-                    new RenderTargetProperties(new PixelFormat(Format.Unknown, SharpDX.Direct2D1.AlphaMode.Premultiplied))
-                );
-            }
-            _wrapperTarget = new RenderTargetD2D(_target);
-
-            _isDirty = true;
+            var oldTarget = _target;
+            CreateTargets(_target.Factory);
+            oldTarget.Dispose();
         }
 
         public void Render(GameTime gameTime)

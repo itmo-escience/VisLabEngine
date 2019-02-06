@@ -1,22 +1,21 @@
-﻿using Fusion.Core.Mathematics;
-using Fusion.Engine.Frames2;
-using SharpDX.Direct2D1;
-using SharpDX.Mathematics.Interop;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using SharpDX.Direct2D1;
+using Fusion.Core;
 
 namespace Fusion.Engine.Graphics.SpritesD2D
 {
-    public class PathGeometryD2D
+    public class PathGeometryD2D : DisposableBase
     {
         internal readonly PathGeometry PathGeometry;
 
         internal PathGeometryD2D(PathGeometry pathGeometry)
         {
             PathGeometry = pathGeometry;
+        }
+
+        protected override void Dispose(bool disposing)
+        {
+            base.Dispose(disposing);
+            PathGeometry.Dispose();
         }
     }
 }

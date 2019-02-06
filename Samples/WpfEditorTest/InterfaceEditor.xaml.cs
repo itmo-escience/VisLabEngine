@@ -153,7 +153,7 @@ namespace WpfEditorTest
 
             _engine.OnInitialized += () =>
 		    {
-		        Application.Current.Dispatcher.Invoke(() =>
+		        Application.Current.Dispatcher.InvokeAsync(() =>
 		        {
 		            RootFrame = (_engine.GameInterface as CustomGameInterface).GetUIRoot();
 					var rootChildren = new List<UIComponent>(RootFrame.Children);

@@ -104,6 +104,8 @@ namespace Fusion.Engine.Frames2
             sink.AddLine(p3);
             sink.EndFigure(FigureEnd.Closed);
             sink.Close();
+            sink.Dispose();
+
             return new PathGeometryD2D(geometry);
         }
 
