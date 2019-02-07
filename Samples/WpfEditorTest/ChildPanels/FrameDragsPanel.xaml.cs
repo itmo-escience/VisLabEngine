@@ -46,8 +46,9 @@ namespace WpfEditorTest.ChildPanels
 		private int StickingCoordsSensitivity = ApplicationConfig.FrameStickingSensitivity;
 
 		public Dictionary<Border, Border> DragPivots { get; private set; }
+        public Point NewDeziredPosition { get; private set; }
 
-		public FrameDragsPanel()
+        public FrameDragsPanel()
 		{
 			InitializeComponent();
 
@@ -322,7 +323,9 @@ namespace WpfEditorTest.ChildPanels
 
 			var topLeftAbsolutePosition = AbsolutePosition(pivot, topLeftNew);
 
-			RenderTransform = new TranslateTransform(topLeftAbsolutePosition.X, topLeftAbsolutePosition.Y);
+            this.NewDeziredPosition = topLeftAbsolutePosition;
+
+            //RenderTransform = new TranslateTransform(topLeftAbsolutePosition.X, topLeftAbsolutePosition.Y);
 
 			widthMultiplier = newWidth / SelectedGroupInitSize.Width;
 			heightMultiplier = newHeight / SelectedGroupInitSize.Height;

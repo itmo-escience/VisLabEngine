@@ -619,8 +619,8 @@ namespace WpfEditorTest
 			_frameDragsPanel.Resize(_deltaX, _deltaY, isShiftPressed, isControlPressed, GridSizeMultiplier, NeedSnapping(), VisualGrid.Visibility,
 				StickingCoordsX, StickingCoordsY, out double heightMult, out double widthMult);
 
-			var dragsPanelX = _frameDragsPanel.RenderTransform.Value.OffsetX;
-			var dragsPanelY = _frameDragsPanel.RenderTransform.Value.OffsetY;
+			var dragsPanelX = _frameDragsPanel.NewDeziredPosition.X;
+			var dragsPanelY = _frameDragsPanel.NewDeziredPosition.Y;
 			foreach (var panel in FrameSelectionPanelList.Values)
 			{
 				var initRect = _frameDragsPanel.InitialFramesRectangles[panel.SelectedFrame];
@@ -631,7 +631,12 @@ namespace WpfEditorTest
 					X = dragsPanelX + initRect.X * widthMult,
 					Y = dragsPanelY + initRect.Y * heightMult
 				};
-				panel.RenderTransform = multedTransform;
+
+                var transform = new TransformGroup();
+                transform.Children.Add(new RotateTransform() { Angle = panel.SelectedFrame.Angle * (180 / Math.PI), CenterX = 0, CenterY = 0 });
+                transform.Children.Add(multedTransform);
+
+                panel.RenderTransform = transform;
 			}
 		}
 
@@ -646,7 +651,10 @@ namespace WpfEditorTest
 			foreach (var panel in FrameSelectionPanelList.Values)
 			{
 				var transformDelta = new TranslateTransform(panel.InitPanelPosition.X + dX, panel.InitPanelPosition.Y + dY);
-				panel.RenderTransform = transformDelta;
+                var transform = new TransformGroup();
+                transform.Children.Add(new RotateTransform() { Angle= panel.SelectedFrame.Angle * (180/Math.PI), CenterX = 0, CenterY = 0 });
+                transform.Children.Add(transformDelta);
+                panel.RenderTransform = transform;
 			}
 		}
 
