@@ -74,8 +74,9 @@ namespace Fusion.Engine.Frames2.Components
 
         private void UpdateImage()
         {
-            var sourceFile = System.Drawing.Image.FromFile(_sourseFile);
-            _image = new DrawBitmap(0, 0, Width, Height, sourceFile, Opacity);
+            _image.Width = Width;
+            _image.Height = Height;
+            _image.Opacity = Opacity;
         }
 
         public override void Update(GameTime gameTime) { }

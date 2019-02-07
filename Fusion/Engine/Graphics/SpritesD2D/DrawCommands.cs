@@ -224,9 +224,9 @@ namespace Fusion.Engine.Graphics.SpritesD2D
 
     public sealed class DrawBitmap : IDrawCommand
     {
-        private readonly float _x, _y, _w, _h;
-        private readonly float _opacity;
-        private readonly RectangleF _targetRect;
+        private readonly float _x, _y;
+        public float Width, Height;
+        public float Opacity;
         private readonly RectangleF _sourceRect;
         private Bitmap _dxBitmap;
         private readonly System.Drawing.Image _sourceImage;
@@ -235,11 +235,10 @@ namespace Fusion.Engine.Graphics.SpritesD2D
         {
             _x = x;
             _y = y;
-            _w = image.Width;
-            _h = image.Height;
-            _targetRect = new RectangleF(_x, _y, _w, _h);
+            Width = image.Width;
+            Height = image.Height;
             _sourceRect = new RectangleF(0, 0, image.Width, image.Height);
-            _opacity = opacity;
+            Opacity = opacity;
             _sourceImage = image;
         }
 
@@ -247,11 +246,10 @@ namespace Fusion.Engine.Graphics.SpritesD2D
         {
             _x = x;
             _y = y;
-            _w = width;
-            _h = height;
-            _targetRect = new RectangleF(_x, _y, _w, _h);
+            Width = width;
+            Height = height;
             _sourceRect = new RectangleF(0, 0, image.Width, image.Height);
-            _opacity = opacity;
+            Opacity = opacity;
             _sourceImage = image;
         }
 
@@ -261,15 +259,15 @@ namespace Fusion.Engine.Graphics.SpritesD2D
                 _dxBitmap = target.ToBitmap(_sourceImage);
 
             target.DrawBitmap(new BitmapD2D(_dxBitmap),
-                _targetRect,
-                _opacity,
+                new RectangleF(_x, _y, Width, Height),
+                Opacity,
                 _sourceRect
             );
         }
 
         public override string ToString()
         {
-            return $"DrawBitmap ({_x}, {_y}, {_w}, {_h})";
+            return $"DrawBitmap ({_x}, {_y}, {Width}, {Height})";
         }
     }
 
