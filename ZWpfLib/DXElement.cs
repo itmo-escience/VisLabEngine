@@ -1,17 +1,12 @@
 ﻿using System;
 using System.ComponentModel;
 using System.Diagnostics;
-using System.Threading;
-using System.Threading.Tasks;
 using System.Windows;
-using System.Windows.Input;
 using System.Windows.Interop;
 using System.Windows.Media;
 using Fusion.Drivers.Graphics;
 using Fusion.Drivers.Graphics.Display;
 using Fusion.Engine.Common;
-using SharpDX.Direct3D11;
-using Texture2D = SharpDX.Direct3D11.Texture2D;
 
 namespace ZWpfLib
 {
@@ -210,9 +205,7 @@ namespace ZWpfLib
 
 		    if (_buf == null)
 		    {
-		        _buf = display.ExtractBuffer();
-                Surface.CopyBackBuffer(_buf.Surface.Resource.QueryInterface<Texture2D>());
-                display.RequestRender();
+		        _buf = Surface.CopyBackBuffer( display);
             }
 
 		    frameCounter++;

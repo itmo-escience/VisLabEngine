@@ -52,19 +52,20 @@ namespace Fusion.Drivers.Graphics.Display
 	    internal override void CreateDisplayResources()
 	    {
 	        base.CreateDisplayResources();
+
+	        DeferredContext = new DeviceContext(device.Device);
             RecreateBuffers();
 	    }
 
 	    private void RecreateBuffers() {
-		    //DeferredContext?.Dispose();
 
-            //_readyBuffer?.Dispose();
-		    //_currentBuffer?.Dispose();
+            _readyBuffer?.Dispose();
+		    _currentBuffer?.Dispose();
 		    while (_oldBuffers.TryDequeue(out var buffer))
 		    {
-		        //buffer.Dispose();
+		        buffer.Dispose();
 		    }
-		    //_backbufferDepth?.Dispose();
+		    _backbufferDepth?.Dispose();
 
 		    _renderRequested = false;
 
@@ -76,8 +77,6 @@ namespace Fusion.Drivers.Graphics.Display
 	        _readyBuffer = CreateBuffer();
 
             _backbufferDepth = new DepthStencil2D(device, DepthFormat.D24S8, _currentBuffer.Width, _currentBuffer.Height, _currentBuffer.SampleCount);
-
-	        DeferredContext = new DeviceContext(device.Device);
         }
 
 	    private RenderTarget2D CreateBuffer()
@@ -122,7 +121,7 @@ namespace Fusion.Drivers.Graphics.Display
 		    if (_currentBuffer.IsDisposed || _currentBuffer.Width != _clientWidth ||
 		        _currentBuffer.Height != _clientHeight)
 		    {
-                //_currentBuffer.Dispose();
+                _currentBuffer.Dispose();
 		        _currentBuffer = CreateBuffer();
 		    }
 		}
@@ -161,9 +160,11 @@ namespace Fusion.Drivers.Graphics.Display
 	    }
 
 	    private volatile bool _renderRequested = false;
+	    public volatile bool RenderRequestComplete = false;
 	    public void RequestRender()
 	    {
-	        _renderRequested = true;
+	        RenderRequestComplete = false;
+            _renderRequested = true;
 	    }
 
 		public override void Update()
@@ -191,6 +192,7 @@ namespace Fusion.Drivers.Graphics.Display
 		            Log.Warning("Empty command list");
 
 		        _renderRequested = false;
+		        RenderRequestComplete = true;
 		    }
         }
 

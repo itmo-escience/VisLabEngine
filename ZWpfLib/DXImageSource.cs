@@ -1,11 +1,10 @@
 ﻿using System;
+using System.Threading;
 using System.Windows;
 using System.Windows.Interop;
 using Fusion.Drivers.Graphics;
 using Fusion.Drivers.Graphics.Display;
 using SharpDX.Direct3D11;
-using SharpDX.Direct3D9;
-using Device = SharpDX.Direct3D11.Device;
 using Texture2D = SharpDX.Direct3D11.Texture2D;
 
 namespace ZWpfLib
@@ -69,13 +68,21 @@ namespace ZWpfLib
         }
 
 	    private Texture2D _texture;
-		public void CopyBackBuffer(Texture2D texture)
+		public RenderTarget2D CopyBackBuffer(WpfDisplay display)
 		{
 		    Lock();
-		    _deferredContext.CopyResource(texture, _texture);
+		    var newBuffer = display.ExtractBuffer();
+		    var newTexture = newBuffer.Surface.Resource.QueryInterface<Texture2D>();
+
+            _deferredContext.CopyResource(newTexture, _texture);
+            display.RequestRender();
+            while(!display.RenderRequestComplete) Thread.Sleep(5);
+
 		    AddDirtyRect(new Int32Rect(0, 0, base.PixelWidth, base.PixelHeight));
 		    Unlock();
-        }
+
+            return newBuffer;
+		}
 
 		private static void StartD3D9()
 		{
