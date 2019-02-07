@@ -10,6 +10,7 @@ using Fusion.Engine.Frames2;
 using WpfEditorTest.UndoRedo;
 using CommandManager = WpfEditorTest.UndoRedo.CommandManager;
 using Fusion.Engine.Frames2.Managing;
+using Matrix3x2 = Fusion.Core.Mathematics.Matrix3x2;
 
 namespace WpfEditorTest.ChildPanels
 {
@@ -158,7 +159,7 @@ namespace WpfEditorTest.ChildPanels
 			}
 		}
 
-		public Fusion.Core.Mathematics.RectangleF InitialGlobalRectangle { get; internal set; }
+		public Matrix3x2 InitialTransform { get; internal set; }
 		public UIContainer InitFrameParent { get; internal set; }
 		public Point InitPanelPosition { get; internal set; }
 

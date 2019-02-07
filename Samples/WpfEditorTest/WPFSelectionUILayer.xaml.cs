@@ -280,7 +280,7 @@ namespace WpfEditorTest
 
 		private bool HasFrameChangedSize( FrameSelectionPanel panel )
 		{
-			return panel.SelectedFrame.BoundingBox != panel.InitialGlobalRectangle;
+			return (panel.SelectedFrame.Width != panel.Width) || (panel.SelectedFrame.Height != panel.Height);
 		}
 
 		public void MoveFrameToDragField( UIComponent frame )
@@ -334,26 +334,29 @@ namespace WpfEditorTest
 
 					commands.Add(new CommandGroup(
 						new FrameParentChangeCommand(panel.SelectedFrame, container, panel.InitFrameParent),
-						new FramePropertyChangeCommand(panel.SelectedFrame, "X",
-						(int)point.X - hoveredFrame.BoundingBox.X - ((int)point.X - panel.SelectedFrame.BoundingBox.X),
-						panel.InitialGlobalRectangle.X),
-						new FramePropertyChangeCommand(panel.SelectedFrame, "Y",
-						(int)point.Y - hoveredFrame.BoundingBox.Y - ((int)point.Y - panel.SelectedFrame.BoundingBox.Y),
-						panel.InitialGlobalRectangle.Y)
+						new FramePropertyChangeCommand(panel.SelectedFrame, "Transform",
+                        panel.SelectedFrame.Transform,
+						panel.InitialTransform)
+						//new FramePropertyChangeCommand(panel.SelectedFrame, "Y",
+						//(int)point.Y - hoveredFrame.BoundingBox.Y - ((int)point.Y - panel.SelectedFrame.BoundingBox.Y),
+						//panel.InitialGlobalRectangle)
 					));
 				}
 				else if (this.HasFrameChangedSize(panel))
 				{
 					commands.Add(new CommandGroup(
-						new FramePropertyChangeCommand(panel.SelectedFrame, "Width",
-						panel.SelectedFrame.Width, panel.InitialGlobalRectangle.Width),
-						new FramePropertyChangeCommand(panel.SelectedFrame, "Height",
-						panel.SelectedFrame.Height, panel.InitialGlobalRectangle.Height),
-						new FramePropertyChangeCommand(panel.SelectedFrame, "X",
-						panel.SelectedFrame.X, panel.InitialGlobalRectangle.X),
-						new FramePropertyChangeCommand(panel.SelectedFrame, "Y",
-						panel.SelectedFrame.Y, panel.InitialGlobalRectangle.Y)
-					));
+                        //new FramePropertyChangeCommand(panel.SelectedFrame, "Width",
+                        //panel.SelectedFrame.Width, panel.InitialGlobalRectangle.Width),
+                        //new FramePropertyChangeCommand(panel.SelectedFrame, "Height",
+                        //panel.SelectedFrame.Height, panel.InitialGlobalRectangle.Height),
+                        //new FramePropertyChangeCommand(panel.SelectedFrame, "X",
+                        //panel.SelectedFrame.X, panel.InitialGlobalRectangle.X),
+                        //new FramePropertyChangeCommand(panel.SelectedFrame, "Y",
+                        //panel.SelectedFrame.Y, panel.InitialGlobalRectangle.Y)
+                        new FramePropertyChangeCommand(panel.SelectedFrame, "Transform",
+                        panel.SelectedFrame.Transform,
+                        panel.InitialTransform)
+                    ));
 				}
 			}
 			panel.MousePressed = false;
@@ -416,7 +419,7 @@ namespace WpfEditorTest
 				var frame = frameAndPanel.Key;
 				var selectionPanel = frameAndPanel.Value;
 
-				selectionPanel.InitialGlobalRectangle = new Fusion.Core.Mathematics.RectangleF(frame.X, frame.Y, frame.Width, frame.Height);
+                selectionPanel.InitialTransform = frame.Transform;// new Fusion.Core.Mathematics.RectangleF(frame.X, frame.Y, frame.Width, frame.Height);
 				selectionPanel.InitPanelPosition = new Point(selectionPanel.RenderTransform.Value.OffsetX, selectionPanel.RenderTransform.Value.OffsetY);
 				selectionPanel.InitFrameParent = frame.Parent;
 			}

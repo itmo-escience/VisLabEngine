@@ -124,8 +124,8 @@ namespace WpfEditorTest.ChildPanels
 				InitialFramesRectangles.Add(
 					frame,
 					new RectangleF(
-						frame.BoundingBox.X - (int)RenderTransform.Value.OffsetX,
-						frame.BoundingBox.Y - (int)RenderTransform.Value.OffsetY,
+						frame.X - (int)RenderTransform.Value.OffsetX,
+						frame.Y - (int)RenderTransform.Value.OffsetY,
 						frame.Width,
 						frame.Height
 					)
