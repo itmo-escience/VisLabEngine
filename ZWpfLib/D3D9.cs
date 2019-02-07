@@ -18,7 +18,7 @@ namespace ZWpfLib
 		{
 		}
 
-		public D3D9(DeviceEx device) 
+		public D3D9(DeviceEx device)
 		{
 			if (device != null) {
 				throw new NotSupportedException("dunno how to get the context");
@@ -83,8 +83,5 @@ namespace ZWpfLib
 				Reset(1, 1);
 			return property;
 		}
-
-
-		public void SetBackBuffer(DXImageSource dximage) { dximage.SetBackBuffer(RenderTarget); }
 	}
 }

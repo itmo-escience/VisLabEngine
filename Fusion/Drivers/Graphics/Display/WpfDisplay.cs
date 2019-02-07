@@ -56,7 +56,7 @@ namespace Fusion.Drivers.Graphics.Display
 	    }
 
 	    private void RecreateBuffers() {
-		    DeferredContext?.Dispose();
+		    //DeferredContext?.Dispose();
 
             //_readyBuffer?.Dispose();
 		    //_currentBuffer?.Dispose();
@@ -68,14 +68,15 @@ namespace Fusion.Drivers.Graphics.Display
 
 		    _renderRequested = false;
 
-		    DeferredContext = new DeviceContext(device.Device);
-
             _oldBuffers.Enqueue(CreateBuffer());
 		    _oldBuffers.Enqueue(CreateBuffer());
 		    _oldBuffers.Enqueue(CreateBuffer());
 		    _currentBuffer = CreateBuffer();
+	        _readyBuffer = CreateBuffer();
 
             _backbufferDepth = new DepthStencil2D(device, DepthFormat.D24S8, _currentBuffer.Width, _currentBuffer.Height, _currentBuffer.SampleCount);
+
+	        DeferredContext = new DeviceContext(device.Device);
         }
 
 	    private RenderTarget2D CreateBuffer()
@@ -102,12 +103,12 @@ namespace Fusion.Drivers.Graphics.Display
 
             q.Dispose();
 
+
 		    RenderTarget2D old;
-		    lock (_lockHolder)
+		    do
 		    {
 		        old = _readyBuffer;
-		        _readyBuffer = _currentBuffer;
-		    }
+		    } while (Interlocked.CompareExchange(ref _readyBuffer, _currentBuffer, old) != old);
 
 		    if (old != null)
 		        _oldBuffers.Enqueue(old);
@@ -120,7 +121,7 @@ namespace Fusion.Drivers.Graphics.Display
 		    if (_currentBuffer.IsDisposed || _currentBuffer.Width != _clientWidth ||
 		        _currentBuffer.Height != _clientHeight)
 		    {
-                _currentBuffer.Dispose();
+                //_currentBuffer.Dispose();
 		        _currentBuffer = CreateBuffer();
 		    }
 		}
@@ -135,17 +136,15 @@ namespace Fusion.Drivers.Graphics.Display
             if(_extracted)
                 throw new InvalidOperationException("Can't extract twice");
 
-            RenderTarget2D extracted = null;
-            while (extracted == null || extracted.IsDisposed)
-            {
-                lock (_lockHolder)
-                {
-                    extracted = _readyBuffer;
-                    _readyBuffer = null;
-                }
+            RenderTarget2D extracted;
 
-                Thread.Sleep(1);
-            }			
+            do
+            {
+                extracted = _readyBuffer;
+            } while (extracted == null || extracted.IsDisposed ||
+                     Interlocked.CompareExchange(ref _readyBuffer, null, extracted) != extracted
+            );
+
             _extracted = true;
 
             return extracted;
@@ -166,17 +165,7 @@ namespace Fusion.Drivers.Graphics.Display
 	            return;
 	        }
 
-	        if (buffer.IsDisposed || !(buffer.Width == _clientWidth && buffer.Height == _clientHeight))
-	        {
-	            _oldBuffers.Enqueue(CreateBuffer());
-
-                //buffer.Dispose();
-            }
-	        else
-	        {
-                _oldBuffers.Enqueue(buffer);
-            }
-
+	        _oldBuffers.Enqueue(buffer);
 	        _extracted = false;
 	    }
 
@@ -188,28 +177,32 @@ namespace Fusion.Drivers.Graphics.Display
 
 		public override void Update()
 		{
-            if (_isResizeRequested) {
-				_clientWidth = _reqWidth;
-				_clientHeight = _reqHeight;
-
-				RecreateBuffers();
-
-				device.NotifyViewportChanges();
-
-				_isResizeRequested = false;
-			}
-
-		    if (_renderRequested)
+		    if (_isResizeRequested)
 		    {
-		        var lst = DeferredContext.FinishCommandList(false);
-                if(lst != null)
-                    device.Device.ImmediateContext.ExecuteCommandList(lst, false);
-                else
-                    Log.Warning("Empty command list");
+		        _clientWidth = _reqWidth;
+		        _clientHeight = _reqHeight;
+
+		        RecreateBuffers();
+
+		        device.NotifyViewportChanges();
+
+		        _isResizeRequested = false;
+		    }
+
+            if (_renderRequested)
+		    {
+
+		        /*var lst = DeferredContext.FinishCommandList(false);
+		        if (lst != null)
+		            device.Device.ImmediateContext.ExecuteCommandList(lst, false);
+		        else
+		            Log.Warning("Empty command list");
+
+    */
 
 		        _renderRequested = false;
 		    }
-		}
+        }
 
 
 	    internal override void Resize(int width, int height)

@@ -174,11 +174,6 @@ namespace ZWpfLib
 			Console.WriteLine(DesiredSize);
 		}
 
-        private void SetBackBuffer(RenderTarget2D target, DXImageSource sur, DeviceContext ctx)
-        {
-            sur.SetD3D11BackBuffer(target.Surface.Resource.QueryInterface<Texture2D>(), ctx);
-        }
-
         private int frameCounter = 1;
         private RenderTarget2D _buf = null;
         /// <summary>
@@ -201,7 +196,7 @@ namespace ZWpfLib
 		    if (_buf == null)
 		    {
 		        _buf = display.ExtractBuffer();
-                SetBackBuffer(_buf, Surface, display.DeferredContext);
+                Surface.SetBackBuffer(_buf.Surface.Resource.QueryInterface<Texture2D>(), display.DeferredContext);
                 display.RequestRender();
             }
 

@@ -1,4 +1,5 @@
-﻿using SharpDX.Direct2D1;
+﻿using System.Collections.Generic;
+using SharpDX.Direct2D1;
 using SharpDX.Mathematics.Interop;
 using System.Drawing.Imaging;
 using System.Runtime.InteropServices;
@@ -28,7 +29,7 @@ namespace Fusion.Engine.Graphics.SpritesD2D
             _target = renderTarget;
             _brushFactory = new BrushFactory(_target);
             _dwFactory = new TextFormatFactory();
-            _layoutFactory = new TextLayoutFactory();
+            _layoutFactory = TextLayoutFactory.Instance;
         }
 
         /// <inheritdoc cref="RenderTarget.BeginDraw()"/>
@@ -120,9 +121,10 @@ namespace Fusion.Engine.Graphics.SpritesD2D
         public void DrawBitmap(BitmapD2D bitmap, RectangleF destinationRectangle, float opacity, RectangleF sourceRectangle) =>
             _target.DrawBitmap(bitmap.Bitmap, createAlignedRectangle(destinationRectangle.ToRawRectangleF()), opacity, BitmapInterpolationMode.NearestNeighbor, createAlignedRectangle(sourceRectangle.ToRawRectangleF()));
 
+        private readonly Stack<Layer> _layers = new Stack<Layer>();
         public void PushLayer(PathGeometryD2D clippingGeometry, AntialiasModeD2D antialiasMode)
         {
-            LayerParameters layerParameters = new LayerParameters
+            var layerParameters = new LayerParameters
             {
                 GeometricMask = clippingGeometry.PathGeometry,
                 ContentBounds = RectangleF.Infinite.ToRawRectangleF(),
@@ -132,11 +134,18 @@ namespace Fusion.Engine.Graphics.SpritesD2D
                 LayerOptions = LayerOptions.None,
                 OpacityBrush = null
             };
-            _target.PushLayer(ref layerParameters, new Layer(_target));
+
+            var layer = new Layer(_target);
+            _layers.Push(layer);
+            _target.PushLayer(ref layerParameters, layer);
         }
 
-        public void PopLayer() =>
+        public void PopLayer()
+        {
+            var l = _layers.Pop();
+            l.Dispose();
             _target.PopLayer();
+        }
 
         public DrawingStateBlockD2D SaveDrawingState()
         {

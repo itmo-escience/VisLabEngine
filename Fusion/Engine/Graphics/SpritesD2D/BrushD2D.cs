@@ -1,10 +1,11 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using Fusion.Core.Mathematics;
 using SharpDX.Direct2D1;
 
 namespace Fusion.Engine.Graphics.SpritesD2D
 {
-    public interface IBrushD2D
+    public interface IBrushD2D : IEquatable<IBrushD2D>
     {
         Color4 Color { get; }
     }
@@ -16,9 +17,32 @@ namespace Fusion.Engine.Graphics.SpritesD2D
         {
             Color = color;
         }
+
+        public bool Equals(IBrushD2D other)
+        {
+            if (ReferenceEquals(null, other)) return false;
+            if (ReferenceEquals(this, other)) return true;
+            if (GetType() != other.GetType()) return false;
+
+            return Color.Equals(other.Color);
+        }
+
+        public override bool Equals(object obj)
+        {
+            if (ReferenceEquals(null, obj)) return false;
+            if (ReferenceEquals(this, obj)) return true;
+            if (obj.GetType() != this.GetType()) return false;
+
+            return Equals((SolidBrushD2D) obj);
+        }
+
+        public override int GetHashCode()
+        {
+            return Color.GetHashCode();
+        }
     }
 
-    public class BrushFactory
+    internal class BrushFactory
     {
         internal RenderTarget Target { get; }
 
