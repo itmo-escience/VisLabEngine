@@ -84,21 +84,32 @@ namespace WpfEditorTest.ChildPanels
 		private void UpdateBoundingBox()
 		{
 			var frames = SelectionManager.Instance.SelectedFrames;
-			if (frames.Count > 0)
-			{
-				this.Visibility = Visibility.Visible;
-				int minX = (int)(frames.Select(f => f.BoundingBox.X).Min()+0.5f);
-				int minY = (int)(frames.Select(f => f.BoundingBox.Y).Min() + 0.5f);
-				int maxX = (int)(frames.Select(f => f.BoundingBox.X + f.BoundingBox.Width).Max() + 0.5f);
-				int maxY = (int)(frames.Select(f => f.BoundingBox.Y + f.BoundingBox.Height).Max() + 0.5f);
-				Width = Math.Max(maxX - minX, double.Epsilon);
-				Height = Math.Max(maxY - minY, double.Epsilon);
-				var delta = new TranslateTransform();
-				RenderTransform = delta;
-				delta.X = minX;
-				delta.Y = minY;
-			}
-			else
+            if (frames.Count > 1)
+            {
+                Visibility = Visibility.Visible;
+                int minX = (int)(frames.Select(f => f.BoundingBox.X).Min() + 0.5f);
+                int minY = (int)(frames.Select(f => f.BoundingBox.Y).Min() + 0.5f);
+                int maxX = (int)(frames.Select(f => f.BoundingBox.X + f.BoundingBox.Width).Max() + 0.5f);
+                int maxY = (int)(frames.Select(f => f.BoundingBox.Y + f.BoundingBox.Height).Max() + 0.5f);
+                Width = Math.Max(maxX - minX, double.Epsilon);
+                Height = Math.Max(maxY - minY, double.Epsilon);
+                var delta = new TranslateTransform();
+                RenderTransform = delta;
+                delta.X = minX;
+                delta.Y = minY;
+            }
+            else if (frames.Count == 1)
+            {
+                Visibility = Visibility.Visible;
+                UIComponent frame = frames.First();
+                Width = frame.Width;
+                Height = frame.Height;
+                var transform = new MatrixTransform(frame.GlobalTransform.M11, frame.GlobalTransform.M12,
+                                                    frame.GlobalTransform.M21, frame.GlobalTransform.M22,
+                                                    frame.GlobalTransform.M31, frame.GlobalTransform.M32);
+                RenderTransform = transform;
+            }
+            else
 			{
 				this.Visibility = Visibility.Collapsed;
 			}

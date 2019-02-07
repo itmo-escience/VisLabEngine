@@ -38,15 +38,15 @@ namespace WpfEditorTest.ChildPanels
 				_selectedFrame = value;
 				if (_selectedFrame == null) return;
 
-				Width = WidthBuffer = _selectedFrame/*.BoundingBox*/.Width;
-				Height = HeightBuffer = _selectedFrame/*.BoundingBox*/.Height;
+				Width = WidthBuffer = _selectedFrame.Width;
+				Height = HeightBuffer = _selectedFrame.Height;
 
-				var delta = new TranslateTransform();
-				RenderTransform = delta;
-				delta.X = _selectedFrame.BoundingBox.X;
-				delta.Y = _selectedFrame.BoundingBox.Y;
+                var transform = new MatrixTransform(_selectedFrame.GlobalTransform.M11, _selectedFrame.GlobalTransform.M12,
+                                                    _selectedFrame.GlobalTransform.M21, _selectedFrame.GlobalTransform.M22,
+                                                    _selectedFrame.GlobalTransform.M31, _selectedFrame.GlobalTransform.M32);
+                RenderTransform = transform;
 
-				_oldX = RenderTransform.Value.OffsetX;
+                _oldX = RenderTransform.Value.OffsetX;
 				_oldY = RenderTransform.Value.OffsetY;
 
 				//UpdateVisualAnchors(_selectedFrame.Anchor);

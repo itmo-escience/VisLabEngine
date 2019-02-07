@@ -477,7 +477,7 @@ namespace WpfEditorTest
 					_frameDragsPanel.SelectedGroupInitSize = new Size(_frameDragsPanel.Width, _frameDragsPanel.Height);
 					_frameDragsPanel.SelectedGroupInitPosition = new Point(_frameDragsPanel.RenderTransform.Value.OffsetX, _frameDragsPanel.RenderTransform.Value.OffsetY);
 				}
-				else
+				else if (_deltaX != 0 || _deltaY != 0)
 				{
 					RecalculateSelectionPosition(e.MouseDevice.GetPosition(this));
 				}
