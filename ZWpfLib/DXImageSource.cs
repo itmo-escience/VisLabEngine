@@ -1,8 +1,11 @@
 ﻿using System;
+using System.Threading;
 using System.Windows;
 using System.Windows.Interop;
+using Fusion.Drivers.Graphics;
+using Fusion.Drivers.Graphics.Display;
 using SharpDX.Direct3D11;
-using SharpDX.Direct3D9;
+using Texture2D = SharpDX.Direct3D11.Texture2D;
 
 namespace ZWpfLib
 {
@@ -44,41 +47,42 @@ namespace ZWpfLib
             Unlock();
         }
 
-	    private Texture2D _buffer;
-		public void SetBackBuffer(Texture2D texture, DeviceContext deferredContext)
-		{
-		    bool Same(Texture2D x, Texture2D y)
-		    {
-		        var xd = x.Description;
-		        var yd = y.Description;
-		        return xd.Width == yd.Width && xd.Height == yd.Height && xd.Format == yd.Format;
-		    };
+	    private DeviceContext _deferredContext;
+	    internal RenderTarget2D Buffer { get; private set; }
+	    internal void SetBufferWithContext(RenderTarget2D target, DeviceContext deferredContext)
+        {
+            Buffer = target;
+            _deferredContext = deferredContext;
+            _texture = Buffer.Surface.Resource.QueryInterface<Texture2D>();
+            var shared = _D3D9.Device.GetSharedD3D9(_texture);
+            using (var surface = shared.GetSurfaceLevel(0))
+            {
+                if (TryLock(new Duration(default(TimeSpan))))
+                {
+                    SetBackBuffer(D3DResourceType.IDirect3DSurface9, surface.NativePointer);
+                    AddDirtyRect(new Int32Rect(0, 0, base.PixelWidth, base.PixelHeight));
+                }
 
-		    if (_buffer == null || _buffer.IsDisposed || !Same(texture, _buffer))
-		    {
-                _buffer?.Dispose();
-		        _buffer = texture;
-
-		        var shared = _D3D9.Device.GetSharedD3D9(_buffer);
-		        using (var surface = shared.GetSurfaceLevel(0))
-		        {
-		            if (TryLock(new Duration(default(TimeSpan))))
-		            {
-		                SetBackBuffer(D3DResourceType.IDirect3DSurface9, surface.NativePointer);
-		                AddDirtyRect(new Int32Rect(0, 0, base.PixelWidth, base.PixelHeight));
-		            }
-
-		            Unlock();
-		        }
-            }
-		    else
-		    {
-                Lock();
-                deferredContext.CopyResource(texture, _buffer);
-		        AddDirtyRect(new Int32Rect(0, 0, base.PixelWidth, base.PixelHeight));
                 Unlock();
             }
         }
+
+	    private Texture2D _texture;
+		public RenderTarget2D CopyBackBuffer(WpfDisplay display)
+		{
+		    Lock();
+		    var newBuffer = display.ExtractBuffer();
+		    var newTexture = newBuffer.Surface.Resource.QueryInterface<Texture2D>();
+
+            _deferredContext.CopyResource(newTexture, _texture);
+            display.RequestRender();
+            while(!display.RenderRequestComplete) Thread.Sleep(5);
+
+		    AddDirtyRect(new Int32Rect(0, 0, base.PixelWidth, base.PixelHeight));
+		    Unlock();
+
+            return newBuffer;
+		}
 
 		private static void StartD3D9()
 		{
