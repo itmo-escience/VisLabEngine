@@ -84,6 +84,7 @@
       <DependentUpon>SceneConfigWindow.xaml</DependentUpon>
     </Compile>
     <Compile Include="UndoRedo\SelectFrameCommand.cs" />
+    <Compile Include="Utility\CustomTreeViewAdorner.cs" />
     <Compile Include="Utility\StickingCoordinates.cs" />
     <Compile Include="WPFConverters\BoolToIndexConverter.cs" />
     <Compile Include="ChildPanels\FrameDetails.xaml.cs">
