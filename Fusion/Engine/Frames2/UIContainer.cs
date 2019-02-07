@@ -68,14 +68,31 @@ namespace Fusion.Engine.Frames2
 
         public virtual void Add(UIComponent child)
         {
-            if(_children.Contains(child))
-                return;
+			//if(_children.Contains(child))
+			//    return;
 
-            child.Parent = this;
-            Children.Add(child);
-        }
+			//child.Parent = this;
+			//Children.Add(child);
+			AddAt(child, int.MaxValue);
 
-        public virtual bool Remove(UIComponent child)
+		}
+
+		public virtual void AddAt( UIComponent child, int index )
+		{
+			if (_children.Contains(child))
+				return;
+
+			child.Parent = this;
+			if (index >= Children.Count)
+			{
+				Children.Add(child);
+			} else
+			{
+				Children.Insert(index, child);
+			}
+		}
+
+		public virtual bool Remove(UIComponent child)
         {
             if(!Children.Contains(child))
                 return false;

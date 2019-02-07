@@ -5,10 +5,12 @@ using System.Linq;
 using System.Reflection;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
 using Fusion.Engine.Frames2;
 using WpfEditorTest.UndoRedo;
+using WpfEditorTest.Utility;
 using CommandManager = WpfEditorTest.UndoRedo.CommandManager;
 
 namespace WpfEditorTest.ChildPanels
@@ -37,6 +39,11 @@ namespace WpfEditorTest.ChildPanels
 		private TextBlock initTreeViewItemHolder;
 		private Brush treeViewItemHolderInitColor;
 
+		public Point LeftTextBlockPoint = new Point();
+		public Point RightTextBlockPoint = new Point();
+		AdornerLayer parentAdorner;
+		CustomTreeViewAdorner customAdorner;
+
 		public FrameTreeView()
 		{
 			InitializeComponent();
@@ -51,6 +58,9 @@ namespace WpfEditorTest.ChildPanels
 			VerticalAlignment = VerticalAlignment.Bottom;
 
 			Closing += (s, e) => { this.Hide(); e.Cancel = true; };
+
+			parentAdorner = AdornerLayer.GetAdornerLayer(ElementHierarchyView);
+			parentAdorner.Add(customAdorner = new CustomTreeViewAdorner(ElementHierarchyView, this));
 		}
 
 		public void AttachScene(UIContainer scene )
@@ -111,6 +121,27 @@ namespace WpfEditorTest.ChildPanels
 			childNode.IsSelected = true;
 		}
 
+		public static bool IsInFirstHalf( FrameworkElement container, Point mousePosition)
+		{
+			return mousePosition.Y < container.ActualHeight / 2;
+		}
+
+		public static int IsOnEdges( FrameworkElement container, Point mousePosition )
+		{
+			if (mousePosition.Y < container.ActualHeight / 5)
+			{
+				return -1; // mouse is on upper edge of the container
+			}
+			else if (mousePosition.Y > container.ActualHeight / 5 * 4)
+			{
+				return 1; // mouse is on lower edge of the container
+			}
+			else
+			{
+				return 0; // mouse is approximately in the center of the container
+			}
+		}
+
 		private void TextBlock_PreviewDragOver( object sender, DragEventArgs e )
 		{
 			var treeViewItemHolder = sender as TextBlock;
@@ -123,6 +154,9 @@ namespace WpfEditorTest.ChildPanels
 			// If the string can be converted into a Brush, allow copying.
 			if (dataComponent != null && treeViewItemHolder != this.initTreeViewItemHolder)
 			{
+				customAdorner.Visibility = Visibility.Visible;
+				var toAncestor = (treeViewItemHolder.TransformToAncestor(ElementHierarchyView) as Transform);
+
 				if (treeViewItemHolder.Tag is UIContainer)
 				{
 					e.Effects = DragDropEffects.Copy | DragDropEffects.Move;
@@ -133,23 +167,81 @@ namespace WpfEditorTest.ChildPanels
 					e.Effects = DragDropEffects.None;
 					treeViewItemHolder.Background = ApplicationConfig.TreeViewItemHolderRestrictedHoveredColor;
 				}
+
+				switch (IsOnEdges(treeViewItemHolder, e.GetPosition(treeViewItemHolder)))
+				{
+					case -1:
+						{
+							LeftTextBlockPoint = new Point(toAncestor.Value.OffsetX,
+								toAncestor.Value.OffsetY);
+							RightTextBlockPoint = new Point(treeViewItemHolder.RenderSize.Width,
+								toAncestor.Value.OffsetY);
+							break;
+						}
+					case 1:
+						{
+							LeftTextBlockPoint = new Point(toAncestor.Value.OffsetX,
+								toAncestor.Value.OffsetY + treeViewItemHolder.RenderSize.Height);
+							RightTextBlockPoint = new Point(treeViewItemHolder.RenderSize.Width,
+								toAncestor.Value.OffsetY + treeViewItemHolder.RenderSize.Height);
+							break;
+						}
+					case 0:
+						{
+							LeftTextBlockPoint = new Point(0,
+								-10);
+							RightTextBlockPoint = new Point(0,
+								-10);
+							break;
+						}
+				}
+
+				parentAdorner.RenderTransform = new TranslateTransform(LeftTextBlockPoint.X, LeftTextBlockPoint.Y);
+				parentAdorner.Update();
 			}
 		}
 
 		private void TextBlock_PreviewDrop( object sender, DragEventArgs e )
 		{
+			e.Handled = true;
 			var treeViewItemHolder = sender as TextBlock;
 			// If the DataObject contains string data, extract it.
 			if (e.Data.GetDataPresent(DataFormats.FileDrop))
 			{
 				UIComponent dataComponent = (UIComponent)e.Data.GetData(DataFormats.FileDrop);
-				if (dataComponent !=null && treeViewItemHolder != this.initTreeViewItemHolder && treeViewItemHolder.Tag is UIContainer)
+				if (dataComponent !=null && treeViewItemHolder != this.initTreeViewItemHolder)
 				{
-					var command = new FrameParentChangeCommand(dataComponent, treeViewItemHolder.Tag as UIContainer, dataComponent.Parent);
-					CommandManager.Instance.Execute(command);
+					IEditorCommand command = null;
+					int index = (treeViewItemHolder.Tag as UIComponent).Parent.Children.IndexOf(treeViewItemHolder.Tag as UIComponent);
+					switch (IsOnEdges(treeViewItemHolder, e.GetPosition(treeViewItemHolder)))
+					{
+						case -1:
+							{
+								command = new FrameParentChangeCommand(dataComponent, (treeViewItemHolder.Tag as UIComponent).Parent, dataComponent.Parent, index);
+								break;
+							}
+						case 1:
+							{
+								command = new FrameParentChangeCommand(dataComponent, (treeViewItemHolder.Tag as UIComponent).Parent, dataComponent.Parent, index+1);
+								break;
+							}
+						case 0:
+							{
+								if (treeViewItemHolder.Tag is UIContainer)
+									command = new FrameParentChangeCommand(dataComponent, treeViewItemHolder.Tag as UIContainer, dataComponent.Parent);
+								break;
+							}
+					}
+
+					//command = new FrameParentChangeCommand(dataComponent, treeViewItemHolder.Tag as UIContainer, dataComponent.Parent);
+					if (command!=null)
+					{
+						CommandManager.Instance.Execute(command); 
+					}
 				}
 			}
 			treeViewItemHolder.Background = treeViewItemHolderInitColor;
+			customAdorner.Visibility = Visibility.Hidden;
 		}
 
 		private void TextBlock_PreviewDragLeave( object sender, DragEventArgs e )
@@ -171,9 +263,16 @@ namespace WpfEditorTest.ChildPanels
 				UIComponent dataComponent = (UIComponent)e.Data.GetData(DataFormats.FileDrop);
 				if (dataComponent != null)
 				{
-					this.initTreeViewItemHolder = null;
+					var command = new FrameParentChangeCommand(dataComponent, _scene, dataComponent.Parent);
+					CommandManager.Instance.Execute(command);
 				}
 			}
+			customAdorner.Visibility = Visibility.Hidden;
+		}
+
+		private void TextBlock_MouseMove( object sender, MouseEventArgs e )
+		{
+			//IsInFirstHalf(sender as TreeViewItem, e.GetPosition(sender as TreeViewItem));
 		}
 	}
 }
