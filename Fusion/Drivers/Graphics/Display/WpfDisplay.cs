@@ -71,6 +71,7 @@ namespace Fusion.Drivers.Graphics.Display
             _oldBuffers.Enqueue(CreateBuffer());
 		    _oldBuffers.Enqueue(CreateBuffer());
 		    _oldBuffers.Enqueue(CreateBuffer());
+		    _oldBuffers.Enqueue(CreateBuffer());
 		    _currentBuffer = CreateBuffer();
 	        _readyBuffer = CreateBuffer();
 
@@ -126,16 +127,12 @@ namespace Fusion.Drivers.Graphics.Display
 		    }
 		}
 
-	    private bool _extracted = false;
         /// <summary>
-        /// Gets one buffer out of front buffer collection
+        /// Gets one rendered buffer
         /// </summary>
         /// <returns></returns>
 	    public RenderTarget2D ExtractBuffer()
         {
-            if(_extracted)
-                throw new InvalidOperationException("Can't extract twice");
-
             RenderTarget2D extracted;
 
             do
@@ -144,8 +141,6 @@ namespace Fusion.Drivers.Graphics.Display
             } while (extracted == null || extracted.IsDisposed ||
                      Interlocked.CompareExchange(ref _readyBuffer, null, extracted) != extracted
             );
-
-            _extracted = true;
 
             return extracted;
 	    }
@@ -156,9 +151,6 @@ namespace Fusion.Drivers.Graphics.Display
 	    /// <returns></returns>
         public void ReturnBuffer(RenderTarget2D buffer)
 	    {
-	        if (!_extracted)
-	            throw new InvalidOperationException("What are you returning?");
-
             if (buffer == null)
 	        {
                 Log.Warning("Null buffer was returned.");
@@ -166,7 +158,6 @@ namespace Fusion.Drivers.Graphics.Display
 	        }
 
 	        _oldBuffers.Enqueue(buffer);
-	        _extracted = false;
 	    }
 
 	    private volatile bool _renderRequested = false;
@@ -191,14 +182,13 @@ namespace Fusion.Drivers.Graphics.Display
 
             if (_renderRequested)
 		    {
-
-		        /*var lst = DeferredContext.FinishCommandList(false);
+		        var lst = DeferredContext.FinishCommandList(false);
 		        if (lst != null)
+		        {
 		            device.Device.ImmediateContext.ExecuteCommandList(lst, false);
-		        else
+                    lst.Dispose();
+		        } else
 		            Log.Warning("Empty command list");
-
-    */
 
 		        _renderRequested = false;
 		    }

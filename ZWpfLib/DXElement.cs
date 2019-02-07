@@ -174,6 +174,13 @@ namespace ZWpfLib
 			Console.WriteLine(DesiredSize);
 		}
 
+        private bool SameDimensions(RenderTarget2D t1, RenderTarget2D t2)
+        {
+            if (t1 == t2) return true;
+            if (t1 == null || t2 == null) return false;
+            return t1.Width == t2.Width && t1.Height == t2.Height && t1.Format == t2.Format;
+        }
+
         private int frameCounter = 1;
         private RenderTarget2D _buf = null;
         /// <summary>
@@ -181,10 +188,18 @@ namespace ZWpfLib
 		/// </summary>
 		public void Render()
 		{
-			if (Renderer == null || !Renderer.IsInitialized || IsInDesignMode)
-				return;
+			if (Renderer == null || !Renderer.IsInitialized || IsInDesignMode) return;
 
 		    var display = (WpfDisplay) Renderer.GraphicsDevice.Display;
+		    var sb = Surface.Buffer;
+
+            if (sb == null || (_buf != null && !SameDimensions(sb, _buf)))
+		    {
+                if(sb != null)
+                    display.ReturnBuffer(sb);
+
+		        Surface.SetBufferWithContext(display.ExtractBuffer(), display.DeferredContext);
+		    }
 
 		    if (_buf != null)
 		    {
@@ -196,7 +211,7 @@ namespace ZWpfLib
 		    if (_buf == null)
 		    {
 		        _buf = display.ExtractBuffer();
-                Surface.SetBackBuffer(_buf.Surface.Resource.QueryInterface<Texture2D>(), display.DeferredContext);
+                Surface.CopyBackBuffer(_buf.Surface.Resource.QueryInterface<Texture2D>());
                 display.RequestRender();
             }
 
