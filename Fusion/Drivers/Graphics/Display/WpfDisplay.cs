@@ -67,7 +67,7 @@ namespace Fusion.Drivers.Graphics.Display
 		    }
 		    _backbufferDepth?.Dispose();
 
-		    _renderRequested = false;
+		    //_renderRequested = false;
 
             _oldBuffers.Enqueue(CreateBuffer());
 		    _oldBuffers.Enqueue(CreateBuffer());
@@ -159,8 +159,8 @@ namespace Fusion.Drivers.Graphics.Display
 	        _oldBuffers.Enqueue(buffer);
 	    }
 
-	    private volatile bool _renderRequested = false;
-	    public volatile bool RenderRequestComplete = false;
+	    private volatile bool _renderRequested;
+	    public volatile bool RenderRequestComplete = true;
 	    public void RequestRender()
 	    {
 	        RenderRequestComplete = false;
