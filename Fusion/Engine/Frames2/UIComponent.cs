@@ -139,7 +139,10 @@ namespace Fusion.Engine.Frames2
 
         public virtual bool IsInside(Vector2 point)
         {
-            return BoundingBox.Contains(point);
+            Matrix3x2 invertTransform = GlobalTransform;
+            invertTransform.Invert();
+            Vector2 localPoint = Matrix3x2.TransformPoint(invertTransform, point);
+            return ((localPoint.X >= 0) && (localPoint.Y >= 0) && (localPoint.X < Width) && (localPoint.Y < Height));
         }
 
         private UIContainer _parent;
