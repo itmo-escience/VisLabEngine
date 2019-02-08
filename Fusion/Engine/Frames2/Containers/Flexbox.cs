@@ -15,8 +15,11 @@ namespace Fusion.Engine.Frames2.Containers
             }
         }
 
-        public override void Update(GameTime gameTime)
-        {
+        public override void Update(GameTime gameTime) {
+            UpdateChildrenLayout();
+        }
+
+        protected override void UpdateChildrenLayout() {
             float bottomBorder = 0;
             float lineWidth = 0;
             float lineHeight = 0;
@@ -36,7 +39,7 @@ namespace Fusion.Engine.Frames2.Containers
                 {
                     bottomBorder += lineHeight;
 
-                    child.X += - child.LocalBoundingBox.X;
+                    child.X += -child.LocalBoundingBox.X;
                     child.Y += bottomBorder - child.LocalBoundingBox.Y;
 
                     lineWidth = child.LocalBoundingBox.Width;
