@@ -1,13 +1,22 @@
-﻿using Fusion.Engine.Common;
+﻿using System.Collections.Generic;
+using Fusion.Engine.Common;
 
 namespace Fusion.Engine.Frames2
 {
     public abstract class UIController
     {
-        protected bool IsAttached { get; private set; }
-        public UIComponent Host { get; private set; }
+        public bool IsAttached { get; private set; }
+        public UIContainer Host { get; private set; }
 
-        public void AttachTo(UIComponent host)
+        protected UIContainer Holder { get; set; }
+
+        public abstract IReadOnlyList<StateName> States { get; }
+
+        private readonly Dictionary<StateName, IReadOnlyList<PropertyValue>> _modifications = new Dictionary<StateName, IReadOnlyList<PropertyValue>>();
+        public IReadOnlyDictionary<StateName, IReadOnlyList<PropertyValue>> StateModifications => _modifications;
+        public StateName CurrentState { get; protected set; }
+
+        public void AttachTo(UIContainer host)
         {
             Host = host;
             AttachAction();
@@ -21,9 +30,27 @@ namespace Fusion.Engine.Frames2
             IsAttached = false;
         }
 
-        protected abstract void AttachAction();
-        protected abstract void DetachAction();
+        protected virtual void AttachAction() { }
+        protected virtual void DetachAction() { }
 
-        public abstract void Update(GameTime gameTime);
+        public void Update(GameTime gameTime)
+        {
+
+        }
+
+        public struct PropertyValue
+        {
+            public string Property;
+            public object Value;
+        }
+
+        public class StateName
+        {
+            public string Name;
+            internal StateName(string name)
+            {
+                Name = name;
+            }
+        }
     }
 }
