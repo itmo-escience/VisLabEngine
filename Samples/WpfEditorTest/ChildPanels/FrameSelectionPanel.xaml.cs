@@ -77,35 +77,34 @@ namespace WpfEditorTest.ChildPanels
 		                HeightBuffer = selected/*.BoundingBox*/.Height;
 		                break;
 		            }
-		            case "GlobalRectangle":
+		            case "Parent":
 		            {
-		                var frameDelta = new TranslateTransform();
-		                RenderTransform = frameDelta;
-		                frameDelta.X = selected.BoundingBox.X;
-		                frameDelta.Y = selected.BoundingBox.Y;
+                        var transform = new MatrixTransform(_selectedFrame.GlobalTransform.M11, _selectedFrame.GlobalTransform.M12,
+                                                    _selectedFrame.GlobalTransform.M21, _selectedFrame.GlobalTransform.M22,
+                                                    _selectedFrame.GlobalTransform.M31, _selectedFrame.GlobalTransform.M32);
+                        RenderTransform = transform;
 
-		                _oldX = RenderTransform.Value.OffsetX;
+                        _oldX = RenderTransform.Value.OffsetX;
 		                _oldY = RenderTransform.Value.OffsetY;
 		                break;
 		            }
                     case "Angle":
                     {
-                        var transform = new TransformGroup();
-                        var transformDelta = new TranslateTransform(RenderTransform.Value.OffsetX, RenderTransform.Value.OffsetY);
-                        transform.Children.Add(new RotateTransform() { Angle = selected.GlobalAngle * (180 / Math.PI), CenterX = 0, CenterY = 0 });
-                        transform.Children.Add(transformDelta);
+                        var transform = new MatrixTransform(_selectedFrame.GlobalTransform.M11, _selectedFrame.GlobalTransform.M12,
+                                                    _selectedFrame.GlobalTransform.M21, _selectedFrame.GlobalTransform.M22,
+                                                    _selectedFrame.GlobalTransform.M31, _selectedFrame.GlobalTransform.M32);
                         RenderTransform = transform;
                         break;
                     }
                     case "X":
                     case "Y":
                     {
-                            var transform = new TransformGroup();
-                            var transformDelta = new TranslateTransform(selected.GlobalTransform.M31 - RenderTransform.Value.OffsetX, selected.GlobalTransform.M32 - RenderTransform.Value.OffsetY);
-                            transform.Children.Add(RenderTransform);
-                            transform.Children.Add(transformDelta);
-                            RenderTransform = transform;
-                            break;
+                        var transform = new TransformGroup();
+                        var transformDelta = new TranslateTransform(selected.GlobalTransform.M31 - RenderTransform.Value.OffsetX, selected.GlobalTransform.M32 - RenderTransform.Value.OffsetY);
+                        transform.Children.Add(RenderTransform);
+                        transform.Children.Add(transformDelta);
+                        RenderTransform = transform;
+                        break;
                     }
 		            case "Anchor":
 		            {
