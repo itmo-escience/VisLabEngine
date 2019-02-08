@@ -94,6 +94,8 @@ namespace WpfEditorTest.ChildPanels
                                                     _selectedFrame.GlobalTransform.M21, _selectedFrame.GlobalTransform.M22,
                                                     _selectedFrame.GlobalTransform.M31, _selectedFrame.GlobalTransform.M32);
                         RenderTransform = transform;
+                        _oldX = RenderTransform.Value.OffsetX;
+                        _oldY = RenderTransform.Value.OffsetY;
                         break;
                     }
                     case "X":
@@ -104,6 +106,8 @@ namespace WpfEditorTest.ChildPanels
                         transform.Children.Add(RenderTransform);
                         transform.Children.Add(transformDelta);
                         RenderTransform = transform;
+                        _oldX = RenderTransform.Value.OffsetX;
+                        _oldY = RenderTransform.Value.OffsetY;
                         break;
                     }
 		            case "Anchor":
