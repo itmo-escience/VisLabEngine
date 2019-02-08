@@ -655,7 +655,7 @@ namespace WpfEditorTest
 			{
 				var transformDelta = new TranslateTransform(panel.InitPanelPosition.X + dX, panel.InitPanelPosition.Y + dY);
                 var transform = new TransformGroup();
-                transform.Children.Add(new RotateTransform() { Angle= panel.SelectedFrame.Angle * (180/Math.PI), CenterX = 0, CenterY = 0 });
+                transform.Children.Add(new RotateTransform() { Angle= panel.SelectedFrame.GlobalAngle * (180/Math.PI), CenterX = 0, CenterY = 0 });
                 transform.Children.Add(transformDelta);
                 panel.RenderTransform = transform;
 			}

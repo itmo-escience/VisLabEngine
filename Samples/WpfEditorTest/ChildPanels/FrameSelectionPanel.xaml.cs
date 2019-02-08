@@ -90,9 +90,19 @@ namespace WpfEditorTest.ChildPanels
 		            }
                     case "Angle":
                     {
+                        var transform = new TransformGroup();
+                        var transformDelta = new TranslateTransform(RenderTransform.Value.OffsetX, RenderTransform.Value.OffsetY);
+                        transform.Children.Add(new RotateTransform() { Angle = selected.GlobalAngle * (180 / Math.PI), CenterX = 0, CenterY = 0 });
+                        transform.Children.Add(transformDelta);
+                        RenderTransform = transform;
+                        break;
+                    }
+                    case "X":
+                    case "Y":
+                    {
                             var transform = new TransformGroup();
-                            var transformDelta = new TranslateTransform(RenderTransform.Value.OffsetX, RenderTransform.Value.OffsetY);
-                            transform.Children.Add(new RotateTransform() { Angle = selected.Angle * (180 / Math.PI), CenterX = 0, CenterY = 0 });
+                            var transformDelta = new TranslateTransform(selected.GlobalTransform.M31 - RenderTransform.Value.OffsetX, selected.GlobalTransform.M32 - RenderTransform.Value.OffsetY);
+                            transform.Children.Add(RenderTransform);
                             transform.Children.Add(transformDelta);
                             RenderTransform = transform;
                             break;

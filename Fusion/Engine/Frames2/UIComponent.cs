@@ -137,6 +137,21 @@ namespace Fusion.Engine.Frames2
             }
         }
 
+        public float GlobalAngle
+        {
+            get
+            {
+                float angle = _angle;
+                UIComponent parent = _parent;
+                while (parent != null)
+                {
+                    angle += parent.Angle;
+                    parent = parent.Parent;
+                }
+                return angle;
+            }
+        }
+
         public virtual bool IsInside(Vector2 point)
         {
             Matrix3x2 invertTransform = GlobalTransform;
