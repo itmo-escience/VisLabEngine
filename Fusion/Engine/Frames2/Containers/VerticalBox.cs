@@ -20,7 +20,11 @@ namespace Fusion.Engine.Frames2.Containers
             }
         }
 
-        public override void Update(GameTime gameTime)
+        public override void Update(GameTime gameTime) {
+            UpdateChildrenLayout();
+        }
+
+        protected override void UpdateChildrenLayout()
         {
             float bottomBorder = 0;
             float maxChildWidth = 0;

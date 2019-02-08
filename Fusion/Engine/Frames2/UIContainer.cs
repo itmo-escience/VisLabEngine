@@ -90,9 +90,14 @@ namespace Fusion.Engine.Frames2
 			{
 				Children.Insert(index, child);
 			}
-		}
 
-		public virtual bool Remove(UIComponent child)
+            UpdateChildrenLayout();
+
+        }
+
+        protected virtual void UpdateChildrenLayout() { }
+
+        public virtual bool Remove(UIComponent child)
         {
             if(!Children.Contains(child))
                 return false;
