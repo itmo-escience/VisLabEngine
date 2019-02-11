@@ -111,7 +111,7 @@ namespace WpfEditorTest
             var fusionThread = new Thread(() => _engine.RunExternal(tokenSource.Token));
 		    fusionThread.Name = "Fusion";
 
-		    Closing += (sender, args) => tokenSource.Cancel();
+		    Closing += (sender, args) => { if (args.Cancel == false) tokenSource.Cancel(); };
 
             _details = new FrameDetails();
 			_treeView = new FrameTreeView();

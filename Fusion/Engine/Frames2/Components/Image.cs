@@ -74,9 +74,12 @@ namespace Fusion.Engine.Frames2.Components
 
         private void UpdateImage()
         {
-            _image.Width = Width;
-            _image.Height = Height;
-            _image.Opacity = Opacity;
+			if (_image!=null)
+			{
+				_image.Width = Width;
+				_image.Height = Height;
+				_image.Opacity = Opacity; 
+			}
         }
 
         public override void Update(GameTime gameTime) { }
