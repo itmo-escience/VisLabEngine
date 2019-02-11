@@ -207,10 +207,8 @@ namespace GISTest
             verticalBox2.Add(img3);
             verticalBox2.Add(img4);
 
-		    var b = new ButtonController();
-            var t = new ToggleController();
-		    verticalBox2.AttachController("btn", b);
-		    verticalBox2.AttachController("tgl", t);
+		    var b = new ButtonController("Button", 100, 100);
+            b.AttachTo(verticalBox2);
 
             verticalBox3 = new VerticalBox(200, 200, 0, 0, alignment);
             verticalBox3.Add(verticalBox1);
