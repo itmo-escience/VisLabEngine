@@ -107,6 +107,39 @@ namespace Fusion.Engine.Frames2
             return true;
         }
 
+        #region ZOrder
+
+        public void AddAtFront(UIComponent child)
+        {
+            Add(child);
+        }
+
+        public void AddAtBack(UIComponent child)
+        {
+            AddAt(child, 0);
+        }
+
+        public void AddInFrontOf(UIComponent child, UIComponent otherChild)
+        {
+            if (!Children.Contains(otherChild))
+                return;
+
+            AddAt(child, Children.IndexOf(otherChild) + 1);
+        }
+
+        public void MoveTo(UIComponent child, int index)
+        {
+            if (!Children.Contains(child))
+                return;
+
+            if (index < 0) index = 0;
+
+            Remove(child);
+            AddAt(child, index);
+        }
+
+        #endregion
+
         public override void Draw(SpriteLayerD2D layer) { }
 
         public PathGeometryD2D GetClippingGeometry(SpriteLayerD2D layer)
