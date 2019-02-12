@@ -262,7 +262,7 @@ namespace WpfEditorTest
 				if (openDialog.ShowDialog() != System.Windows.Forms.DialogResult.OK) return;
 
 				var createdFrame = CreateFrameFromFile(openDialog.FileName);
-				if (createdFrame != null && createdFrame.GetType() == typeof(UIContainer))
+				if (createdFrame != null && createdFrame.GetType().BaseType == typeof(UIContainer))
 				{
 					SelectionManager.Instance.SelectFrame(new List<UIComponent> { });
 					RootFrame.Remove(SceneFrame);
@@ -275,6 +275,7 @@ namespace WpfEditorTest
 
 					SceneFrame = createdFrame as UIContainer;
 					RootFrame.Add(SceneFrame);
+					_treeView.AttachScene(SceneFrame);
 					//DragFieldFrame.ZOrder = 1000000;
 
 					_childrenBinding = new Binding("Children")
@@ -310,6 +311,7 @@ namespace WpfEditorTest
 
 			//new FusionUI.UI.ScalableFrame(0, 0, this.RootFrame.UnitWidth, this.RootFrame.UnitHeight, "Scene", Fusion.Core.Mathematics.Color.Zero) { Anchor = FrameAnchor.All };
 			RootFrame.Add(SceneFrame);
+			_treeView.AttachScene(SceneFrame);
 			//DragFieldFrame.ZOrder = 1000000;
 
 			_childrenBinding = new Binding("Children")

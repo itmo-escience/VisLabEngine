@@ -60,6 +60,11 @@ namespace WpfEditorTest.WPFConverters
 
 		public object ConvertBack( object value, Type targetType, object parameter, CultureInfo culture )
 		{
+			if (value == null)
+			{
+				return value;
+			}
+
 			if (value.GetType() == typeof(System.Windows.Media.Color))
 			{
 				System.Windows.Media.Color col = (System.Windows.Media.Color)value;

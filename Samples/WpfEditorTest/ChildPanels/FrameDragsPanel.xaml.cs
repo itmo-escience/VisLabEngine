@@ -1,4 +1,6 @@
-﻿using Fusion.Engine.Frames2;
+﻿using Vector2 = Fusion.Core.Mathematics.Vector2;
+using Matrix3x2 = Fusion.Core.Mathematics.Matrix3x2;
+using Fusion.Engine.Frames2;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -47,8 +49,10 @@ namespace WpfEditorTest.ChildPanels
 
 		public Dictionary<Border, Border> DragPivots { get; private set; }
         public Point NewDeziredPosition { get; private set; }
+		public Point TransformedCurrentDragInitPosition { get; private set; }
+		public Matrix3x2 GlobalFrameMatrix;
 
-        public FrameDragsPanel()
+		public FrameDragsPanel()
 		{
 			InitializeComponent();
 
@@ -143,7 +147,28 @@ namespace WpfEditorTest.ChildPanels
 
 			SelectedGroupInitSize = new Size(Width, Height);
 			SelectedGroupInitPosition = new Point(RenderTransform.Value.OffsetX, RenderTransform.Value.OffsetY);
-			CenteredPivot = new Point(SelectedGroupInitPosition.X + SelectedGroupInitSize.Width / 2, SelectedGroupInitPosition.Y + SelectedGroupInitSize.Height / 2);
+			CenteredPivot = new Point((CurrentPivot.X + CurrentDragInitPosition.X) / 2, (CurrentPivot.Y + CurrentDragInitPosition.Y) / 2);
+			if (SelectionManager.Instance.SelectedFrames.Count==1)
+			{
+				GlobalFrameMatrix = new Matrix3x2(SelectionManager.Instance.SelectedFrames.First().GlobalTransform.ToArray());
+				GlobalFrameMatrix.Invert();
+
+				var vectorHelper = Matrix3x2.TransformPoint(GlobalFrameMatrix, new Vector2((float)CurrentPivot.X, (float)CurrentPivot.Y));
+				CurrentPivot = new Point(vectorHelper.X, vectorHelper.Y);
+				vectorHelper = Matrix3x2.TransformPoint(GlobalFrameMatrix, new Vector2((float)CurrentDragInitPosition.X, (float)CurrentDragInitPosition.Y));
+				TransformedCurrentDragInitPosition = new Point(vectorHelper.X, vectorHelper.Y);
+				vectorHelper = Matrix3x2.TransformPoint(GlobalFrameMatrix, new Vector2((float)SelectedGroupInitPosition.X, (float)SelectedGroupInitPosition.Y));
+				SelectedGroupInitPosition = new Point(vectorHelper.X, vectorHelper.Y);
+				vectorHelper = Matrix3x2.TransformPoint(GlobalFrameMatrix, new Vector2((float)CenteredPivot.X, (float)CenteredPivot.Y));
+				CenteredPivot = new Point(vectorHelper.X, vectorHelper.Y);
+
+				GlobalFrameMatrix.Invert();
+			}
+			else
+			{
+				TransformedCurrentDragInitPosition = CurrentDragInitPosition;
+			}
+
 
 			DragMousePressed = true;
 			PreviousDragTransform = CurrentDrag.RenderTransform;
@@ -153,15 +178,22 @@ namespace WpfEditorTest.ChildPanels
 		private Point GetPosition( Border border )
 		{
 			var offset = VisualTreeHelper.GetOffset(border);
+			double angle = 0;
+			if (SelectionManager.Instance.SelectedFrames.Count == 1)
+			{
+				angle = SelectionManager.Instance.SelectedFrames.First().Angle;
+			}
 			return new Point(
-				RenderTransform.Value.OffsetX + offset.X + border.Width * border.RenderTransformOrigin.X ,
-				RenderTransform.Value.OffsetY + offset.Y + border.Height * border.RenderTransformOrigin.Y
+				RenderTransform.Value.OffsetX + 
+				(offset.X + border.Width * border.RenderTransformOrigin.X) * Math.Cos(angle) - (offset.Y + border.Height * border.RenderTransformOrigin.Y) * Math.Sin(angle),
+				RenderTransform.Value.OffsetY + 
+				(offset.Y + border.Height * border.RenderTransformOrigin.Y) * Math.Cos(angle) + (offset.X + border.Width * border.RenderTransformOrigin.X) * Math.Sin(angle)
 			);
 		}
 
 		private Point RelativeToPivot(Point pivotPoint, Point point)
 		{
-			return new Point(point.X - pivotPoint.X, point.Y - pivotPoint.Y);
+			return new Point(Math.Round(point.X - pivotPoint.X,3), Math.Round(point.Y - pivotPoint.Y, 3));
 		}
 
 		private Point AbsolutePosition(Point pivotPoint, Point point)
@@ -194,13 +226,31 @@ namespace WpfEditorTest.ChildPanels
 					SelectedGroupInitPosition.X + SelectedGroupInitSize.Width,
 					SelectedGroupInitPosition.Y + SelectedGroupInitSize.Height)
 				);
-			var mouseInitPosition = RelativeToPivot(pivot, CurrentDragInitPosition);
+			var mouseInitPosition = RelativeToPivot(pivot, TransformedCurrentDragInitPosition);
 
 			/*---*/
 			bool gridEnabled = gridVisibility == Visibility.Visible;
 			var step = (int)(FusionUI.UI.ScalableFrame.ScaleMultiplier * gridSizeMultiplier);
 			double newX;
 			double newY;
+			if (SelectionManager.Instance.SelectedFrames.Count == 1)
+			{
+				//var frameAngle = SelectionManager.Instance.SelectedFrames.First().Angle;
+				//var delX = deltaX * Math.Cos(frameAngle) + deltaY * Math.Sin(frameAngle);
+				//var delY = deltaY * Math.Cos(frameAngle) - deltaX * Math.Sin(frameAngle);
+
+				//deltaX = delX;
+				//deltaY = delY;
+
+
+				var deltaVector = new Vector2((float)(deltaX+ CurrentDragInitPosition.X), (float)(deltaY + CurrentDragInitPosition.Y));
+				GlobalFrameMatrix.Invert();
+				deltaVector = Matrix3x2.TransformPoint(GlobalFrameMatrix, deltaVector);
+				GlobalFrameMatrix.Invert();
+				deltaX = deltaVector.X - TransformedCurrentDragInitPosition.X;
+				deltaY = deltaVector.Y - TransformedCurrentDragInitPosition.Y;
+			}
+
 			var dX = deltaX;
 			var dY = deltaY;
 			if (needSnapping)
@@ -212,15 +262,13 @@ namespace WpfEditorTest.ChildPanels
 			}
 			else if (!gridEnabled)
 			{
-				newX = CurrentDragInitPosition.X + deltaX;
-				newY = CurrentDragInitPosition.Y + deltaY;
+				newX = TransformedCurrentDragInitPosition.X + deltaX;
+				newY = TransformedCurrentDragInitPosition.Y + deltaY;
 
 				var stickingDelta = 0;
 
 				var newXHelper = (int)(newX + 0.5 * Math.Sign(newX));
-				//var widthHelper = (int)(SelectedGroupInitSize.Width + 0.5);
 				var newYHelper = (int)(newY + 0.5 * Math.Sign(newY));
-				//var heightHelper = (int)(SelectedGroupInitSize.Height + 0.5);
 
 				foreach (var x in stickingCoordsX)
 				{
@@ -233,45 +281,20 @@ namespace WpfEditorTest.ChildPanels
 
 				var closestStickX1 =
 					stickingCoordsX.Where(scX => Math.Abs(newXHelper - scX.X) == stickingCoordsX.Select(x => Math.Abs(newXHelper - x.X)).Min()).FirstOrDefault();
-				//var closestStickX2 =
-				//	stickingCoordsX.Where(scX => Math.Abs(newXHelper + widthHelper - scX.X) == stickingCoordsX.Select(x => Math.Abs(newXHelper + widthHelper - x.X)).Min()).FirstOrDefault();
-				//var closestStickX3 =
-				//	stickingCoordsX.Where(scX => Math.Abs(newXHelper + widthHelper / 2 - scX.X) == stickingCoordsX.Select(x => Math.Abs(newXHelper + widthHelper / 2 - x.X)).Min()).FirstOrDefault();
 				var closestStickY1 =
 					stickingCoordsY.Where(scY => Math.Abs(newYHelper - scY.Y) == stickingCoordsY.Select(y => Math.Abs(newYHelper - y.Y)).Min()).FirstOrDefault();
-				//var closestStickY2 =
-				//	stickingCoordsY.Where(scY => Math.Abs(newYHelper + heightHelper - scY.Y) == stickingCoordsY.Select(y => Math.Abs(newYHelper + heightHelper - y.Y)).Min()).FirstOrDefault();
-				//var closestStickY3 =
-				//	stickingCoordsY.Where(scY => Math.Abs(newYHelper + heightHelper / 2 - scY.Y) == stickingCoordsY.Select(y => Math.Abs(newYHelper + heightHelper / 2 - y.Y)).Min()).FirstOrDefault();
 
-				if (closestStickX1 != null && //closestStickX2 != null &&
-					closestStickY1 != null //&& closestStickY2 != null &&
-										   //closestStickX3 != null && closestStickY3 != null)
-					)
+				if (closestStickX1 != null && closestStickY1 != null)
 				{
 
 					var rangeX1 = Enumerable.Range(closestStickX1.X - StickingCoordsSensitivity, StickingCoordsSensitivity * 2);
-					//var rangeX2 = Enumerable.Range(closestStickX2.X - StickingCoordsSensitivity, StickingCoordsSensitivity * 2);
-					//var rangeX3 = Enumerable.Range(closestStickX3.X - StickingCoordsSensitivity, StickingCoordsSensitivity * 2);
 					var rangeY1 = Enumerable.Range(closestStickY1.Y - StickingCoordsSensitivity, StickingCoordsSensitivity * 2);
-					//var rangeY2 = Enumerable.Range(closestStickY2.Y - StickingCoordsSensitivity, StickingCoordsSensitivity * 2);
-					//var rangeY3 = Enumerable.Range(closestStickY3.Y - StickingCoordsSensitivity, StickingCoordsSensitivity * 2);
 
 					if (rangeX1.Contains(newXHelper) && mouseInitPosition.X > double.Epsilon)
 					{
 						stickingDelta = closestStickX1.X - newXHelper;
 						closestStickX1.IsActive = true;
 					}
-					//if (rangeX2.Contains(newXHelper + widthHelper))
-					//{
-					//	stickingDelta = closestStickX2.X - (newXHelper + widthHelper);
-					//	closestStickX2.IsActive = true;
-					//}
-					//if (rangeX3.Contains(newXHelper + widthHelper / 2))
-					//{
-					//	stickingDelta = closestStickX3.X - (newXHelper + widthHelper / 2);
-					//	closestStickX3.IsActive = true;
-					//}
 					dX += stickingDelta;
 
 					stickingDelta = 0;
@@ -280,16 +303,6 @@ namespace WpfEditorTest.ChildPanels
 						stickingDelta = closestStickY1.Y - newYHelper;
 						closestStickY1.IsActive = true;
 					}
-					//if (rangeY2.Contains(newYHelper + heightHelper))
-					//{
-					//	stickingDelta = closestStickY2.Y - (newYHelper + heightHelper);
-					//	closestStickY2.IsActive = true;
-					//}
-					//if (rangeY3.Contains(newYHelper + heightHelper / 2))
-					//{
-					//	stickingDelta = closestStickY3.Y - (newYHelper + heightHelper / 2);
-					//	closestStickY3.IsActive = true;
-					//}
 					dY += stickingDelta;
 				}
 			}
@@ -323,9 +336,13 @@ namespace WpfEditorTest.ChildPanels
 
 			var topLeftAbsolutePosition = AbsolutePosition(pivot, topLeftNew);
 
-            this.NewDeziredPosition = topLeftAbsolutePosition;
+			var vectorHelper = Matrix3x2.TransformPoint(GlobalFrameMatrix,
+				new Vector2((float)topLeftAbsolutePosition.X, (float)topLeftAbsolutePosition.Y));
+			topLeftAbsolutePosition = new Point(vectorHelper.X, vectorHelper.Y);
 
-            //RenderTransform = new TranslateTransform(topLeftAbsolutePosition.X, topLeftAbsolutePosition.Y);
+			this.NewDeziredPosition = topLeftAbsolutePosition;
+
+			//RenderTransform = new TranslateTransform(topLeftAbsolutePosition.X, topLeftAbsolutePosition.Y);
 
 			widthMultiplier = newWidth / SelectedGroupInitSize.Width;
 			heightMultiplier = newHeight / SelectedGroupInitSize.Height;
