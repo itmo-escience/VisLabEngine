@@ -186,17 +186,35 @@ namespace GISTest
 		        }
             };
 
-		    _userInterface2 = new UIManager(Game.RenderSystem);
+            #region UITesting
+
+            _userInterface2 = new UIManager(Game.RenderSystem);
 		    _userInterface2.DebugEnabled = true;
 
             txt = new Fusion.Engine.Frames2.Components.Label("z", new TextFormatD2D("Calibri", 20), 150, 450, 100, 100);
             string fileName = @"C:\image.png";
-            img1 = new Image(50, 50, 100, 100, fileName, 1);
-            img2 = new Image(50, 50, 100, 50, fileName, 0.66f);
-            img3 = new Image(50, 50, 30, 80, fileName, 0.77f);
-            img4 = new Image(50, 50, 90, 45, fileName, 0.55f);
+            img1 = new Image(0, 0, 200, 75, fileName, 1);
+            img2 = new Image(125, 0, 75, 200, fileName, 1);
+            img3 = new Image(0, 125, 200, 75, fileName, 1);
+            img4 = new Image(0, 0, 75, 200, fileName, 1);
 
-            VerticalAlignment alignment = VerticalAlignment.CENTER;
+            FreePlacement freePlacement = new FreePlacement(300, 300, 200, 200);
+            freePlacement.Add(img1);
+            freePlacement.Add(img2);
+            freePlacement.Add(img3);
+            freePlacement.Add(img4);
+
+            _userInterface2.Root.Add(freePlacement);
+
+            /*Game.Keyboard.KeyUp += (sender, args) =>
+            {
+                if (args.Key == Keys.Space)
+                {
+                    img2.BringForward();  
+                }
+            };*/
+
+            /*VerticalAlignment alignment = VerticalAlignment.CENTER;
 
             verticalBox1 = new VerticalBox(0, 0, 0, 0, alignment, true);
             verticalBox1.Add(txt);
@@ -220,13 +238,9 @@ namespace GISTest
             flexbox1.Angle = 1;
 
             _userInterface2.Root.Add(verticalBox3);
-            _userInterface2.Root.Add(flexbox1);
+            _userInterface2.Root.Add(flexbox1);*/
 
-            //UIComponent deser;
-            //UIComponentSerializer.Read(@"E:\GitHub\testSer.xml", out deser);
-            //deser.X += 200;
-            //_userInterface2.Root.Add(deser);
-            //UIComponentSerializer.Write(_userInterface2.Root, @"E:\GitHub\testSer.xml");
+            #endregion
 
             userInterface.RootFrame = this.rootFrame = new MainFrame(FrameProcessor);
 			viewLayer.SpriteLayers.Add(userInterface.FramesSpriteLayer);
