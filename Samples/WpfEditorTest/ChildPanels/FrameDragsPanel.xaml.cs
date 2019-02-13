@@ -336,9 +336,13 @@ namespace WpfEditorTest.ChildPanels
 
 			var topLeftAbsolutePosition = AbsolutePosition(pivot, topLeftNew);
 
-			var vectorHelper = Matrix3x2.TransformPoint(GlobalFrameMatrix,
-				new Vector2((float)topLeftAbsolutePosition.X, (float)topLeftAbsolutePosition.Y));
-			topLeftAbsolutePosition = new Point(vectorHelper.X, vectorHelper.Y);
+			if (SelectionManager.Instance.SelectedFrames.Count == 1)
+			{
+				var vectorHelper = Matrix3x2.TransformPoint(GlobalFrameMatrix,
+					new Vector2((float)topLeftAbsolutePosition.X, (float)topLeftAbsolutePosition.Y));
+
+				topLeftAbsolutePosition = new Point(vectorHelper.X, vectorHelper.Y);
+			}
 
 			this.NewDeziredPosition = topLeftAbsolutePosition;
 
