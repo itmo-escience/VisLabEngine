@@ -348,17 +348,17 @@ namespace WpfEditorTest
 				else if (this.HasFrameChangedSize(panel))
 				{
 					commands.Add(new CommandGroup(
-                        new FramePropertyChangeCommand(panel.SelectedFrame, "Width",
+						new FramePropertyChangeCommand(panel.SelectedFrame, "Transform",
+						panel.SelectedFrame.Transform,
+						panel.InitialTransform),
+						new FramePropertyChangeCommand(panel.SelectedFrame, "Width",
                         panel.SelectedFrame.Width, (float)panel.InitialFrameSize.Width),
                         new FramePropertyChangeCommand(panel.SelectedFrame, "Height",
                         panel.SelectedFrame.Height, (float)panel.InitialFrameSize.Height),
                         new FramePropertyChangeCommand(panel.SelectedFrame, "X",
                         panel.SelectedFrame.X, (float)panel.InitFramePosition.X),
                         new FramePropertyChangeCommand(panel.SelectedFrame, "Y",
-                        panel.SelectedFrame.Y, (float)panel.InitFramePosition.Y),
-                        new FramePropertyChangeCommand(panel.SelectedFrame, "Transform",
-                        panel.SelectedFrame.Transform,
-                        panel.InitialTransform)
+                        panel.SelectedFrame.Y, (float)panel.InitFramePosition.Y)
                     ));
 				}
 			}
