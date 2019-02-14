@@ -280,7 +280,7 @@ namespace WpfEditorTest
 
 		private bool HasFrameChangedSize( FrameSelectionPanel panel )
 		{
-			return (panel.SelectedFrame.Width != panel.Width) || (panel.SelectedFrame.Height != panel.Height);
+			return (panel.SelectedFrame.Width != panel.InitialFrameSize.Width) || (panel.SelectedFrame.Height != panel.InitialFrameSize.Height);
 		}
 
 		public void MoveFrameToDragField( UIComponent frame )
