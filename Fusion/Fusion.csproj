@@ -258,6 +258,7 @@
     <Compile Include="Engine\Frames2\Containers\Flexbox.cs" />
     <Compile Include="Engine\Frames2\Containers\FreePlacement.cs" />
     <Compile Include="Engine\Frames2\Containers\VerticalBox.cs" />
+    <Compile Include="Engine\Frames2\Managing\EditionSceneManager.cs" />
     <Compile Include="Engine\Frames2\Managing\Events.cs" />
     <Compile Include="Engine\Frames2\Managing\UIHelper.cs" />
     <Compile Include="Engine\Frames2\UIComponent.cs" />

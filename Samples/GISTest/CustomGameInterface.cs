@@ -66,11 +66,6 @@ namespace GISTest
 	}
 
 
-	public interface ICustomizableUI
-	{
-		UIContainer GetUIRoot();
-	}
-
 	public class CustomGameInterface : ApplicationInterface, ICustomizableUI
 	{
 

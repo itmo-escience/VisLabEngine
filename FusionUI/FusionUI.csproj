@@ -68,6 +68,7 @@
   <ItemGroup>
     <Compile Include="AbstractTimeManager.cs" />
     <Compile Include="AppInterface.cs" />
+    <Compile Include="ICustomizableUI.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="UI\ComplexNode.cs" />
     <Compile Include="UI\ControllableFrame.cs" />
