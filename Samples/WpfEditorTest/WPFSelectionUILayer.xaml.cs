@@ -336,10 +336,13 @@ namespace WpfEditorTest
 						new FrameParentChangeCommand(panel.SelectedFrame, container, panel.InitFrameParent),
 						new FramePropertyChangeCommand(panel.SelectedFrame, "Transform",
                         panel.SelectedFrame.Transform,
-						panel.InitialTransform)
-						//new FramePropertyChangeCommand(panel.SelectedFrame, "Y",
-						//(int)point.Y - hoveredFrame.BoundingBox.Y - ((int)point.Y - panel.SelectedFrame.BoundingBox.Y),
-						//panel.InitialGlobalRectangle)
+						panel.InitialTransform),
+					new FramePropertyChangeCommand(panel.SelectedFrame, "X",
+					(int)point.X - hoveredFrame.BoundingBox.X - ((int)point.X - panel.SelectedFrame.BoundingBox.X),
+					panel.InitPanelPosition.X),
+					new FramePropertyChangeCommand(panel.SelectedFrame, "Y",
+					(int)point.Y - hoveredFrame.BoundingBox.Y - ((int)point.Y - panel.SelectedFrame.BoundingBox.Y),
+					panel.InitPanelPosition.Y)
 					));
 				}
 				else if (this.HasFrameChangedSize(panel))
