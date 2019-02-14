@@ -28,32 +28,32 @@ namespace Fusion.Engine.Frames2.Managing
         event BlurEvent Blur;
     }
 
-    public delegate void KeyDownEvent(UIEventProcessor eventProcessor, KeyEventArgs e);
-    public delegate void KeyUpEvent(UIEventProcessor eventProcessor, KeyEventArgs e);
-    public delegate void KeyPressEvent(UIEventProcessor eventProcessor, KeyEventArgs e);
+    public delegate void KeyDownEvent(UIComponent sender, KeyEventArgs e);
+    public delegate void KeyUpEvent(UIComponent sender, KeyEventArgs e);
+    public delegate void KeyPressEvent(UIComponent sender, KeyEventArgs e);
 
-    public delegate void MouseMoveEvent(UIEventProcessor eventProcessor, MoveEventArgs e);
+    public delegate void MouseMoveEvent(UIComponent sender, MoveEventArgs e);
 
     //mouse + touch START
-    public delegate void MouseDragEvent(UIEventProcessor eventProcessor, DragEventArgs e);
+    public delegate void MouseDragEvent(UIComponent sender, DragEventArgs e);
 
-    public delegate void MouseDownEvent(UIEventProcessor eventProcessor, ClickEventArgs e);
-    public delegate void MouseUpEvent(UIEventProcessor eventProcessor, ClickEventArgs e);
+    public delegate void MouseDownEvent(UIComponent sender, ClickEventArgs e);
+    public delegate void MouseUpEvent(UIComponent sender, ClickEventArgs e);
 
-    public delegate void ClickEvent(UIEventProcessor eventProcessor, ClickEventArgs e);
-    public delegate void DoubleClickEvent(UIEventProcessor eventProcessor, ClickEventArgs e);
+    public delegate void ClickEvent(UIComponent sender, ClickEventArgs e);
+    public delegate void DoubleClickEvent(UIComponent sender, ClickEventArgs e);
 
-    public delegate void EnterEvent(UIEventProcessor eventProcessor);
-    public delegate void LeaveEvent(UIEventProcessor eventProcessor);
+    public delegate void EnterEvent(UIComponent sender);
+    public delegate void LeaveEvent(UIComponent sender);
     //mouse + touch END
 
-    public delegate void ScrollEvent(UIEventProcessor eventProcessor, ScrollEventArgs e);
+    public delegate void ScrollEvent(UIComponent sender, ScrollEventArgs e);
 
-    //public delegate void HoldEvent(UIEventProcessor eventProcessor, ClickEventArgs e);
-    //public delegate void CanselEvent(UIEventProcessor eventProcessor, MoveEventArgs e);
+    //public delegate void HoldEvent(UIComponent sender, ClickEventArgs e);
+    //public delegate void CanselEvent(UIComponent sender, MoveEventArgs e);
 
-    public delegate void FocusEvent(UIEventProcessor eventProcessor);
-    public delegate void BlurEvent(UIEventProcessor eventProcessor);
+    public delegate void FocusEvent(UIComponent sender);
+    public delegate void BlurEvent(UIComponent sender);
 
     public class KeyEventArgs : EventArgs
     {
