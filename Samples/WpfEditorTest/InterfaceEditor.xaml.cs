@@ -66,7 +66,7 @@ namespace WpfEditorTest
 		private string _currentSceneFile;
 		private string _sceneChangedIndicator;
 		private string _titleWithFileName = ApplicationConfig.BaseTitle + " - " + ApplicationConfig.BaseSceneName;
-		private string _xmlFrameBuffer;
+		private List<string> _xmlFramesBuffer = new List<string>();
 
 		public string CurrentSceneFile { get => _currentSceneFile; set { _currentSceneFile = value; this.UpdateTitle(); } }
 		public string SceneChangedIndicator { get => _sceneChangedIndicator; set { _sceneChangedIndicator = value; this.UpdateTitle(); } }
@@ -357,8 +357,8 @@ namespace WpfEditorTest
 
 			commands.Add(new CommandGroup(
 				new FrameParentChangeCommand(createdFrame, container),
-				new FramePropertyChangeCommand(createdFrame, "X", (int)point.X - hoveredFrame.BoundingBox.X - createdFrame.Width / 2),
-				new FramePropertyChangeCommand(createdFrame, "Y", (int)point.Y - hoveredFrame.BoundingBox.Y - createdFrame.Height / 2),
+				new FramePropertyChangeCommand(createdFrame, "X", (int)point.X - hoveredFrame.BoundingBox.X),
+				new FramePropertyChangeCommand(createdFrame, "Y", (int)point.Y - hoveredFrame.BoundingBox.Y),
 				new SelectFrameCommand(new List<UIComponent> { createdFrame })
 			));
 
@@ -565,25 +565,22 @@ namespace WpfEditorTest
 
 		private void ExecutedCopyFrameCommand( object sender, ExecutedRoutedEventArgs e )
 		{
-			if (SelectionLayer.FrameSelectionPanelList.Count == 1)
-			{
-				var selectedFrame = SelectionLayer.FrameSelectionPanelList.FirstOrDefault().Value.SelectedFrame;
-				if (selectedFrame != null)
-				{
-					_xmlFrameBuffer = Fusion.Core.Utils.UIComponentSerializer.WriteToString(selectedFrame);
-					//Clipboard.SetData(DataFormats.Text, (Object)xmlFrame);
-					var upperLeft = this.PointToScreen(new Point(selectedFrame.X, selectedFrame.Y));
-					var lowerRight = this.PointToScreen(new Point(selectedFrame.X + selectedFrame.Width, selectedFrame.Y + selectedFrame.Height));
+            _xmlFramesBuffer.Clear();
+            foreach (UIComponent component in SelectionLayer.FrameSelectionPanelList.Keys)
+            {
+                _xmlFramesBuffer.Add(Fusion.Core.Utils.UIComponentSerializer.WriteToString(component));
 
-					var img = this.CopyScreen(
-						(int)upperLeft.X,
-						(int)upperLeft.Y + (int)SystemParameters.WindowCaptionHeight + 9,
-						(int)lowerRight.X,
-						(int)lowerRight.Y + (int)SystemParameters.WindowCaptionHeight + 9
-						);
-					Clipboard.SetData(DataFormats.Bitmap, (Object)img);
-				}
-			}
+                /*var upperLeft = this.PointToScreen(new Point(component.X, component.Y));
+                var lowerRight = this.PointToScreen(new Point(component.X + component.Width, component.Y + component.Height));
+
+                var img = this.CopyScreen(
+                    (int)upperLeft.X,
+                    (int)upperLeft.Y + (int)SystemParameters.WindowCaptionHeight + 9,
+                    (int)lowerRight.X,
+                    (int)lowerRight.Y + (int)SystemParameters.WindowCaptionHeight + 9
+                    );
+                Clipboard.SetData(DataFormats.Bitmap, (Object)img);*/
+            }
 		}
 
 		private void ExecutedCutFrameCommand( object sender, ExecutedRoutedEventArgs e )
@@ -594,16 +591,19 @@ namespace WpfEditorTest
 
 		private void ExecutedPasteFrameCmdCommand( object sender, ExecutedRoutedEventArgs e )
 		{
-			if (!string.IsNullOrEmpty(_xmlFrameBuffer))
-			{
-				List<IEditorCommand> commands = new List<IEditorCommand>();
-				this.AddFrameToScene(
-					Fusion.Core.Utils.UIComponentSerializer.ReadFromString(_xmlFrameBuffer),
-					System.Windows.Input.Mouse.GetPosition(this), commands
-					);
-				var command = new CommandGroup(commands.ToArray());
-				CommandManager.Instance.Execute(command);
-			}
+            foreach (string frameXml in _xmlFramesBuffer)
+            {
+                if (!string.IsNullOrEmpty(frameXml))
+                {
+                    List<IEditorCommand> commands = new List<IEditorCommand>();
+                    AddFrameToScene(
+                        Fusion.Core.Utils.UIComponentSerializer.ReadFromString(frameXml),
+                        System.Windows.Input.Mouse.GetPosition(this), commands
+                        );
+                    var command = new CommandGroup(commands.ToArray());
+                    CommandManager.Instance.Execute(command);
+                }
+            }
 		}
 
 		private void ExecutedSceneConfigCommand( object sender, ExecutedRoutedEventArgs e )
