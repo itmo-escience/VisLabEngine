@@ -173,6 +173,8 @@ namespace WpfEditorTest.ChildPanels
 		public Matrix3x2 InitialTransform { get; internal set; }
 		public UIContainer InitFrameParent { get; internal set; }
 		public Point InitPanelPosition { get; internal set; }
+		public Point InitFramePosition { get; internal set; }
+		public Size InitialFrameSize { get; internal set; }
 
 		public FrameSelectionPanel()
 		{

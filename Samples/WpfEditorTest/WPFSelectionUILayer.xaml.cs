@@ -339,23 +339,23 @@ namespace WpfEditorTest
 						panel.InitialTransform),
 					new FramePropertyChangeCommand(panel.SelectedFrame, "X",
 					(int)point.X - hoveredFrame.BoundingBox.X - ((int)point.X - panel.SelectedFrame.BoundingBox.X),
-					panel.InitPanelPosition.X),
+					(float)panel.InitFramePosition.X),
 					new FramePropertyChangeCommand(panel.SelectedFrame, "Y",
 					(int)point.Y - hoveredFrame.BoundingBox.Y - ((int)point.Y - panel.SelectedFrame.BoundingBox.Y),
-					panel.InitPanelPosition.Y)
+					(float)panel.InitFramePosition.Y)
 					));
 				}
 				else if (this.HasFrameChangedSize(panel))
 				{
 					commands.Add(new CommandGroup(
-                        //new FramePropertyChangeCommand(panel.SelectedFrame, "Width",
-                        //panel.SelectedFrame.Width, panel.InitialGlobalRectangle.Width),
-                        //new FramePropertyChangeCommand(panel.SelectedFrame, "Height",
-                        //panel.SelectedFrame.Height, panel.InitialGlobalRectangle.Height),
-                        //new FramePropertyChangeCommand(panel.SelectedFrame, "X",
-                        //panel.SelectedFrame.X, panel.InitialGlobalRectangle.X),
-                        //new FramePropertyChangeCommand(panel.SelectedFrame, "Y",
-                        //panel.SelectedFrame.Y, panel.InitialGlobalRectangle.Y)
+                        new FramePropertyChangeCommand(panel.SelectedFrame, "Width",
+                        panel.SelectedFrame.Width, (float)panel.InitialFrameSize.Width),
+                        new FramePropertyChangeCommand(panel.SelectedFrame, "Height",
+                        panel.SelectedFrame.Height, (float)panel.InitialFrameSize.Height),
+                        new FramePropertyChangeCommand(panel.SelectedFrame, "X",
+                        panel.SelectedFrame.X, (float)panel.InitFramePosition.X),
+                        new FramePropertyChangeCommand(panel.SelectedFrame, "Y",
+                        panel.SelectedFrame.Y, (float)panel.InitFramePosition.Y),
                         new FramePropertyChangeCommand(panel.SelectedFrame, "Transform",
                         panel.SelectedFrame.Transform,
                         panel.InitialTransform)
@@ -424,6 +424,8 @@ namespace WpfEditorTest
 
                 selectionPanel.InitialTransform = frame.Transform;// new Fusion.Core.Mathematics.RectangleF(frame.X, frame.Y, frame.Width, frame.Height);
 				selectionPanel.InitPanelPosition = new Point(selectionPanel.RenderTransform.Value.OffsetX, selectionPanel.RenderTransform.Value.OffsetY);
+				selectionPanel.InitFramePosition = new Point(frame.X, frame.Y);
+				selectionPanel.InitialFrameSize = new Size(frame.Width, frame.Height);
 				selectionPanel.InitFrameParent = frame.Parent;
 			}
 
