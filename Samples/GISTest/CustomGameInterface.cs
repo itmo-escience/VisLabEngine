@@ -183,8 +183,8 @@ namespace GISTest
 
             #region UITesting
 
-            _userInterface2 = new UIManager(Game.RenderSystem);
-		    _userInterface2.DebugEnabled = true;
+            UIManager = new UIManager(Game.RenderSystem);
+		    UIManager.DebugEnabled = true;
 
             txt = new Fusion.Engine.Frames2.Components.Label("z", new TextFormatD2D("Calibri", 20), 150, 450, 100, 100);
             string fileName = @"C:\image.png";
@@ -199,7 +199,7 @@ namespace GISTest
             freePlacement.Add(img3);
             freePlacement.Add(img4);
 
-            _userInterface2.Root.Add(freePlacement);
+            UIManager.Root.Add(freePlacement);
 
             /*Game.Keyboard.KeyUp += (sender, args) =>
             {
@@ -316,8 +316,8 @@ namespace GISTest
            // verticalBox1.Angle = -angle;
            // verticalBox2.Angle = angle / 2;
 
-            _userInterface2.Update(gameTime);
-		    _userInterface2.Draw(_spriteLayer);
+            UIManager.Update(gameTime);
+		    UIManager.Draw(_spriteLayer);
 
 		   // angle += 0.01f;
 		   // if (angle > 2 * MathUtil.TwoPi)
@@ -330,9 +330,9 @@ namespace GISTest
 	    private Random _random;
 	    private TextFormatD2D _textFormat;
 	    private SolidBrushD2D _brush;
-	    private UIManager _userInterface2;
+        public UIManager UIManager { get; private set; }
 
-	    private Fusion.Engine.Frames2.Components.Label txt;
+        private Fusion.Engine.Frames2.Components.Label txt;
 	    private float angle = 0;
 	    private Image img1;
         private Image img2;
@@ -355,7 +355,12 @@ namespace GISTest
 
         public UIContainer GetUIRoot()
         {
-            return _userInterface2.Root;
+            return UIManager.Root;
+        }
+
+        public UIManager GetUIManager()
+        {
+            return UIManager;
         }
 
         /// <summary>

@@ -5,6 +5,7 @@ using Fusion.Engine.Common;
 using Fusion.Engine.Frames2.Containers;
 using Fusion.Engine.Graphics;
 using Fusion.Engine.Graphics.SpritesD2D;
+using System.Text.RegularExpressions;
 
 namespace Fusion.Engine.Frames2.Managing
 {
@@ -84,6 +85,48 @@ namespace Fusion.Engine.Frames2.Managing
             }
 
             layer.Draw(TransformCommand.Identity);
+        }
+
+        public static bool IsComponentNameValid(string name, UIComponent root, UIComponent ignoredComponent = null)
+        {
+            foreach (UIComponent component in UIHelper.BFSTraverse(root))
+            {
+                if (component == root) continue;
+                if ((component.Name == name) && (component != ignoredComponent)) return false;
+            }
+            return true;
+        }
+
+        public static void MakeComponentNameValid(UIComponent component, UIComponent root, UIComponent ignoredComponent = null)
+        {
+            string name = component.Name;
+
+            if (IsComponentNameValid(name, root, ignoredComponent)) return;
+
+            Regex nameEnd = new Regex(@"_\d+$");
+
+            string nameBase;
+            int index;
+            if (!nameEnd.IsMatch(name))
+            {
+                nameBase = name;
+                index = 1;
+            }
+            else
+            {
+                int underscoreIndex = name.LastIndexOf('_');
+                nameBase = name.Remove(underscoreIndex, name.Length - underscoreIndex);
+                index = int.Parse(name.Substring(underscoreIndex + 1));
+            }
+
+            name = nameBase + '_' + index.ToString();
+            while (!IsComponentNameValid(name, root, ignoredComponent))
+            {
+                index++;
+                name = nameBase + '_' + index.ToString();
+            }
+
+            component.Name = name;
         }
     }
 }
