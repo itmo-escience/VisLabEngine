@@ -11,6 +11,7 @@
   - [x] Отображение имени фрейма, а не его текста
   - [x] Раскрытие дерева до выбранного мышью элемента
   - [x] Drag'n'drop!!!!
+  - [ ] Мультивыделение элементов (Shift/Ctrl)
 - Палитра фреймов, доспутных для импортирования из *.xml файлов
   - [x] Формирование списка шаблонов из доступных файлов
   - [x] Drag'n'drop для создания
@@ -115,9 +116,9 @@
   - [ ] Zero warnings policy - в коде редактора не должно быть warning'ов
   - [ ] Очистить ненужные комментарии
 - Переделываем ZOrder
-  - [ ] Bring to front, Send to back, Bring forward, Send backward
-  - [ ] Add at front, Add at back
-  - [ ] Add in front of
+  - [x] Bring to front, Send to back, Bring forward, Send backward
+  - [x] Add at front, Add at back
+  - [x] Add in front of
 ---
 ### Светлое будущее
 - Область работы со свойствами 

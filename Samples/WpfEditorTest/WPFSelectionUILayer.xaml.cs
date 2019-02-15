@@ -737,10 +737,15 @@ namespace WpfEditorTest
                         List<IEditorCommand> commands = Window.AddFrameToScene(createdFrame, e.GetPosition(this));
                         commands.Add(new SelectFrameCommand(new List<UIComponent> { createdFrame }));
 						CommandManager.Instance.Execute(new CommandGroup(commands.ToArray()));
-					}
+
+                        foreach (UIComponent component in UIHelper.BFSTraverse(createdFrame))
+                        {
+                            UIManager.MakeComponentNameValid(component, SceneFrame, component);
+                        }
+                    }
 					PaletteWindow.SelectedFrameTemplate = null;
 					ParentHighlightPanel.SelectedFrame = null;
-				}
+                }
 			}
 		}
 	}

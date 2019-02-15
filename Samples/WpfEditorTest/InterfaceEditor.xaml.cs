@@ -30,6 +30,7 @@ using ZWpfLib;
 using Keyboard = System.Windows.Input.Keyboard;
 using WpfEditorTest.DialogWindows;
 using Fusion.Engine.Frames2.Containers;
+using Fusion.Engine.Frames2.Managing;
 
 namespace WpfEditorTest
 {
@@ -365,6 +366,8 @@ namespace WpfEditorTest
                 )
             };
 
+            UIManager.MakeComponentNameValid(createdFrame, SceneFrame);
+
             return commands;
 		}
 
@@ -620,6 +623,13 @@ namespace WpfEditorTest
 
             CommandManager.Instance.Execute(new SelectFrameCommand(pastedComponents));
 
+            foreach (UIComponent pasted in pastedComponents)
+            {
+                foreach (UIComponent component in UIHelper.BFSTraverse(pasted))
+                {
+                    UIManager.MakeComponentNameValid(component, SceneFrame, component);
+                }
+            }
         }
 
 		private void ExecutedSceneConfigCommand( object sender, ExecutedRoutedEventArgs e )
