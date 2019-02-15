@@ -66,9 +66,10 @@ namespace WpfEditorTest
 		private string _currentSceneFile;
 		private string _sceneChangedIndicator;
 		private string _titleWithFileName = ApplicationConfig.BaseTitle + " - " + ApplicationConfig.BaseSceneName;
-		private List<string> _xmlFramesBuffer = new List<string>();
+		private List<string> _xmlComponentsBuffer = new List<string>();
+        private List<Vector> _componentsOffsetBuffer = new List<Vector>();
 
-		public string CurrentSceneFile { get => _currentSceneFile; set { _currentSceneFile = value; this.UpdateTitle(); } }
+        public string CurrentSceneFile { get => _currentSceneFile; set { _currentSceneFile = value; this.UpdateTitle(); } }
 		public string SceneChangedIndicator { get => _sceneChangedIndicator; set { _sceneChangedIndicator = value; this.UpdateTitle(); } }
 
 		public double DefaultSceneWidth { get; private set; }
@@ -344,7 +345,7 @@ namespace WpfEditorTest
 			}
 		}
 
-		internal List<IEditorCommand> AddFrameToScene( UIComponent createdFrame, Point point, List<IEditorCommand> commands )
+		internal List<IEditorCommand> AddFrameToScene(UIComponent createdFrame, Point point)
 		{
 			var hoveredFrame = SelectionLayer.GetHoveredFrameOnScene(point, false) ?? SceneFrame;
 
@@ -355,14 +356,16 @@ namespace WpfEditorTest
 
 			UIContainer container = hoveredFrame as UIContainer;
 
-			commands.Add(new CommandGroup(
-				new FrameParentChangeCommand(createdFrame, container),
-				new FramePropertyChangeCommand(createdFrame, "X", (int)point.X - hoveredFrame.BoundingBox.X),
-				new FramePropertyChangeCommand(createdFrame, "Y", (int)point.Y - hoveredFrame.BoundingBox.Y),
-				new SelectFrameCommand(new List<UIComponent> { createdFrame })
-			));
+            List<IEditorCommand> commands = new List<IEditorCommand>
+            {
+                new CommandGroup(
+                    new FrameParentChangeCommand(createdFrame, container),
+                    new FramePropertyChangeCommand(createdFrame, "X", (int)point.X - hoveredFrame.BoundingBox.X),
+                    new FramePropertyChangeCommand(createdFrame, "Y", (int)point.Y - hoveredFrame.BoundingBox.Y)
+                )
+            };
 
-			return commands;
+            return commands;
 		}
 
 		internal bool TrySaveScene()
@@ -565,10 +568,14 @@ namespace WpfEditorTest
 
 		private void ExecutedCopyFrameCommand( object sender, ExecutedRoutedEventArgs e )
 		{
-            _xmlFramesBuffer.Clear();
+            _xmlComponentsBuffer.Clear();
+            _componentsOffsetBuffer.Clear();
+            Point selectionLayerOffset = new Point(SelectionLayer._frameDragsPanel.RenderTransform.Value.OffsetX, 
+                                                   SelectionLayer._frameDragsPanel.RenderTransform.Value.OffsetY);
             foreach (UIComponent component in SelectionLayer.FrameSelectionPanelList.Keys)
             {
-                _xmlFramesBuffer.Add(Fusion.Core.Utils.UIComponentSerializer.WriteToString(component));
+                _xmlComponentsBuffer.Add(Fusion.Core.Utils.UIComponentSerializer.WriteToString(component));
+                _componentsOffsetBuffer.Add(new Point(component.GlobalTransform.M31, component.GlobalTransform.M32) - selectionLayerOffset);
 
                 /*var upperLeft = this.PointToScreen(new Point(component.X, component.Y));
                 var lowerRight = this.PointToScreen(new Point(component.X + component.Width, component.Y + component.Height));
@@ -591,20 +598,29 @@ namespace WpfEditorTest
 
 		private void ExecutedPasteFrameCmdCommand( object sender, ExecutedRoutedEventArgs e )
 		{
-            foreach (string frameXml in _xmlFramesBuffer)
+            List<UIComponent> pastedComponents = new List<UIComponent>();
+
+            for (int i = 0; i < _xmlComponentsBuffer.Count; i++)
             {
-                if (!string.IsNullOrEmpty(frameXml))
+                string componentXml = _xmlComponentsBuffer[i];
+                Vector componentOffset = _componentsOffsetBuffer[i];
+
+                if (!string.IsNullOrEmpty(componentXml))
                 {
-                    List<IEditorCommand> commands = new List<IEditorCommand>();
-                    AddFrameToScene(
-                        Fusion.Core.Utils.UIComponentSerializer.ReadFromString(frameXml),
-                        System.Windows.Input.Mouse.GetPosition(this), commands
-                        );
+                    UIComponent component = Fusion.Core.Utils.UIComponentSerializer.ReadFromString(componentXml);
+                    pastedComponents.Add(component);
+
+                    List<IEditorCommand> commands = AddFrameToScene(component,
+                        System.Windows.Input.Mouse.GetPosition(SelectionLayer) + componentOffset);
+
                     var command = new CommandGroup(commands.ToArray());
                     CommandManager.Instance.Execute(command);
                 }
             }
-		}
+
+            CommandManager.Instance.Execute(new SelectFrameCommand(pastedComponents));
+
+        }
 
 		private void ExecutedSceneConfigCommand( object sender, ExecutedRoutedEventArgs e )
 		{

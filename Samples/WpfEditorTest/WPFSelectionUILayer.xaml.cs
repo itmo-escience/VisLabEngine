@@ -734,10 +734,9 @@ namespace WpfEditorTest
 
 					if (createdFrame != null)
 					{
-						var command = new CommandGroup(
-							Window.AddFrameToScene(createdFrame, e.GetPosition(this), new List<IEditorCommand>()).ToArray()
-							);
-						CommandManager.Instance.Execute(command);
+                        List<IEditorCommand> commands = Window.AddFrameToScene(createdFrame, e.GetPosition(this));
+                        commands.Add(new SelectFrameCommand(new List<UIComponent> { createdFrame }));
+						CommandManager.Instance.Execute(new CommandGroup(commands.ToArray()));
 					}
 					PaletteWindow.SelectedFrameTemplate = null;
 					ParentHighlightPanel.SelectedFrame = null;
