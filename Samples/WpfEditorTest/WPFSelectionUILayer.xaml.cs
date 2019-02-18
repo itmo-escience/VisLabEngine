@@ -445,11 +445,12 @@ namespace WpfEditorTest
 					panel.MousePressed = true;
 			}
 
-			//this.CaptureMouse();
+			CaptureMouse();
 		}
 
 		private void LocalGrid_MouseLeftButtonUp( object sender, MouseButtonEventArgs e )
 		{
+            ReleaseMouseCapture();
             EndMouseDrag(e.GetPosition(this));
         }
 
@@ -725,14 +726,6 @@ namespace WpfEditorTest
 
         internal void FullMouseMove(object sender, MouseEventArgs e)
         {
-            float indent = 10;
-            Point mousePosition = e.GetPosition(this);
-            if ((mousePosition.X < -indent) || (mousePosition.Y < -indent) || (mousePosition.X > Width + indent) || (mousePosition.Y > Height + indent))
-            {
-                EndMouseDrag(e.GetPosition(this));
-                return;
-            }
-
             LocalGrid_MouseMove(sender, e);
             VisualSelection_MouseMove(sender, e);
         }
