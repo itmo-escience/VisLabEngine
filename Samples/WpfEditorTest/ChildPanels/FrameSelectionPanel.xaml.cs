@@ -39,8 +39,10 @@ namespace WpfEditorTest.ChildPanels
 				_selectedFrame = value;
 				if (_selectedFrame == null) return;
 
-				Width = WidthBuffer = _selectedFrame.Width;
-				Height = HeightBuffer = _selectedFrame.Height;
+				//Width = 
+				WidthBuffer = _selectedFrame.Width * Math.Sign(_selectedFrame.GlobalTransform.M11);
+				//Height =
+				HeightBuffer = _selectedFrame.Height * Math.Sign(_selectedFrame.GlobalTransform.M22);
 
                 var transform = new MatrixTransform(_selectedFrame.GlobalTransform.M11, _selectedFrame.GlobalTransform.M12,
                                                     _selectedFrame.GlobalTransform.M21, _selectedFrame.GlobalTransform.M22,
@@ -67,12 +69,12 @@ namespace WpfEditorTest.ChildPanels
 		        {
 		            case "Width":
 		            {
-		                WidthBuffer = selected.Width;
+		                WidthBuffer = selected.Width * Math.Sign(selected.GlobalTransform.M11);
 		                break;
 		            }
 		            case "Height":
 		            {
-		                HeightBuffer = selected.Height;
+		                HeightBuffer = selected.Height * Math.Sign(selected.GlobalTransform.M22);
 		                break;
 		            }
 		            case "Parent":
@@ -158,7 +160,6 @@ namespace WpfEditorTest.ChildPanels
 			{
 				_widthBuffer = value;
 				this.Width = Math.Abs(_widthBuffer);//Math.Max(0, _widthBuffer);
-				this.RenderTransform = new ScaleTransform(Math.Sign(_widthBuffer), Math.Sign(HeightBuffer));
 			}
 		}
 		public double HeightBuffer
@@ -168,7 +169,6 @@ namespace WpfEditorTest.ChildPanels
 			{
 				_heightBuffer = value;
 				this.Height = Math.Abs(_heightBuffer);// Math.Max(0, _heightBuffer);
-				this.RenderTransform = new ScaleTransform(Math.Sign(_widthBuffer), Math.Sign(HeightBuffer));
 			}
 		}
 
@@ -223,17 +223,13 @@ namespace WpfEditorTest.ChildPanels
 		public void UpdateSelectedFramePosition()
 		{
 			_locked = true;
-			var sumX = 0;
-			var sumY = 0;
-			//_selectedFrame.ForEachAncestor(a => { sumX += a.X; sumY += a.Y; });
 
-			foreach (var item in UIHelper.Ancestors(_selectedFrame))
-			{
-				sumX += (int)(item.X+0.5f); sumY += (int)(item.Y+0.5f);
-			}
+			var parent = _selectedFrame.Parent;
+			var parentMatrixInvert = Matrix3x2.Invert(parent.GlobalTransform);
+			var vectorHelper = Matrix3x2.TransformPoint(parentMatrixInvert, new Fusion.Core.Mathematics.Vector2((int)RenderTransform.Value.OffsetX + 0.5f, (int)RenderTransform.Value.OffsetY + 0.5f));
 
-			_selectedFrame.X = (int)RenderTransform.Value.OffsetX - (sumX/* - _selectedFrame.X*/);
-			_selectedFrame.Y = (int)RenderTransform.Value.OffsetY - (sumY/* - _selectedFrame.Y*/);
+			_selectedFrame.X = vectorHelper.X;
+			_selectedFrame.Y = vectorHelper.Y;
 
 			_oldX = RenderTransform.Value.OffsetX;
 			_oldY = RenderTransform.Value.OffsetY;

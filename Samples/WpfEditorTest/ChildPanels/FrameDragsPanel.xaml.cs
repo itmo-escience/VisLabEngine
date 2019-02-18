@@ -125,11 +125,13 @@ namespace WpfEditorTest.ChildPanels
 			InitialFramesRectangles = new Dictionary<UIComponent, RectangleF>();
 			foreach (UIComponent frame in selectedFrames)
 			{
+
+
 				InitialFramesRectangles.Add(
 					frame,
 					new RectangleF(
-						frame.X - (int)RenderTransform.Value.OffsetX,
-						frame.Y - (int)RenderTransform.Value.OffsetY,
+						frame.GlobalTransform.M31 - (int)RenderTransform.Value.OffsetX,
+						frame.GlobalTransform.M32 - (int)RenderTransform.Value.OffsetY,
 						frame.Width,
 						frame.Height
 					)
@@ -181,7 +183,7 @@ namespace WpfEditorTest.ChildPanels
 			double angle = 0;
 			if (SelectionManager.Instance.SelectedFrames.Count == 1)
 			{
-				angle = SelectionManager.Instance.SelectedFrames.First().Angle;
+				angle = SelectionManager.Instance.SelectedFrames.First().GlobalAngle;
 			}
 			return new Point(
 				RenderTransform.Value.OffsetX + 

@@ -10,6 +10,8 @@ using WpfEditorTest.UndoRedo;
 using Fusion.Engine.Frames2;
 using Fusion.Engine.Frames2.Managing;
 using CommandManager = WpfEditorTest.UndoRedo.CommandManager;
+using Matrix3x2 = Fusion.Core.Mathematics.Matrix3x2;
+using Vector2 = Fusion.Core.Mathematics.Vector2;
 using WpfEditorTest.FrameSelection;
 using WpfEditorTest.ChildPanels;
 using Fusion.Engine.Frames;
@@ -332,16 +334,23 @@ namespace WpfEditorTest
 
 					panel.SelectedFrame.Parent?.Remove(panel.SelectedFrame);
 
+
+					var mouseRelativeToSelected = RelativeToPoint(new Point(panel.SelectedFrame.X, panel.SelectedFrame.Y), point);
+					Matrix3x2 GlobalFrameMatrix = new Matrix3x2(hoveredFrame.GlobalTransform.ToArray());
+					GlobalFrameMatrix.Invert();
+					var vectorHelper = Matrix3x2.TransformPoint(GlobalFrameMatrix, new Vector2((float)point.X, (float)point.Y));
+					point = new Point(vectorHelper.X, vectorHelper.Y);
+
 					commands.Add(new CommandGroup(
 						new FrameParentChangeCommand(panel.SelectedFrame, container, panel.InitFrameParent),
 						new FramePropertyChangeCommand(panel.SelectedFrame, "Transform",
-                        panel.SelectedFrame.Transform,
+						panel.SelectedFrame.Transform,
 						panel.InitialTransform),
 					new FramePropertyChangeCommand(panel.SelectedFrame, "X",
-					(int)point.X - hoveredFrame.X - ((int)point.X - panel.SelectedFrame.X),
+					(int)(point.X - mouseRelativeToSelected.X),
 					(float)panel.InitFramePosition.X),
 					new FramePropertyChangeCommand(panel.SelectedFrame, "Y",
-					(int)point.Y - hoveredFrame.Y - ((int)point.Y - panel.SelectedFrame.Y),
+					(int)(point.Y - mouseRelativeToSelected.Y),
 					(float)panel.InitFramePosition.Y)
 					));
 				}
@@ -364,6 +373,11 @@ namespace WpfEditorTest
 			}
 			panel.MousePressed = false;
 			return commands;
+		}
+
+		private Point RelativeToPoint( Point relativePoint, Point transformingPoint )
+		{
+			return new Point(Math.Round(transformingPoint.X - relativePoint.X, 3), Math.Round(transformingPoint.Y - relativePoint.Y, 3));
 		}
 
 		private void LocalGrid_MouseLeftButtonDown( object sender, MouseButtonEventArgs e )
@@ -632,6 +646,7 @@ namespace WpfEditorTest
 			foreach (var panel in FrameSelectionPanelList.Values)
 			{
 				var initRect = _frameDragsPanel.InitialFramesRectangles[panel.SelectedFrame];
+
 				panel.HeightBuffer = initRect.Height * heightMult;
 				panel.WidthBuffer = initRect.Width * widthMult;
 				TranslateTransform multedTransform = new TranslateTransform
@@ -641,10 +656,11 @@ namespace WpfEditorTest
 				};
 
                 var transform = new TransformGroup();
-                transform.Children.Add(new RotateTransform() { Angle = panel.SelectedFrame.Angle * (180 / Math.PI), CenterX = 0, CenterY = 0 });
-                transform.Children.Add(multedTransform);
+                transform.Children.Add(new RotateTransform() { Angle = panel.SelectedFrame.GlobalAngle * (180 / Math.PI), CenterX = 0, CenterY = 0 });
+				transform.Children.Add(new ScaleTransform(Math.Sign(panel.WidthBuffer), Math.Sign(panel.HeightBuffer)));
+				transform.Children.Add(multedTransform);
 
-                panel.RenderTransform = transform;
+				panel.RenderTransform = transform;
 			}
 		}
 
@@ -661,7 +677,8 @@ namespace WpfEditorTest
 				var transformDelta = new TranslateTransform(panel.InitPanelPosition.X + dX, panel.InitPanelPosition.Y + dY);
                 var transform = new TransformGroup();
                 transform.Children.Add(new RotateTransform() { Angle= panel.SelectedFrame.GlobalAngle * (180/Math.PI), CenterX = 0, CenterY = 0 });
-                transform.Children.Add(transformDelta);
+				transform.Children.Add(new ScaleTransform(Math.Sign(panel.WidthBuffer), Math.Sign(panel.HeightBuffer)));
+				transform.Children.Add(transformDelta);
                 panel.RenderTransform = transform;
 			}
 		}
