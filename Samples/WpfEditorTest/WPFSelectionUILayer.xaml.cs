@@ -455,7 +455,7 @@ namespace WpfEditorTest
 
         private void Grid_MouseLeave(object sender, MouseEventArgs e)
         {
-            EndMouseDrag(e.GetPosition(this));
+            //EndMouseDrag(e.GetPosition(this));
         }
 
         private void EndMouseDrag(Point mousePosition)
@@ -725,6 +725,14 @@ namespace WpfEditorTest
 
         internal void FullMouseMove(object sender, MouseEventArgs e)
         {
+            float indent = 10;
+            Point mousePosition = e.GetPosition(this);
+            if ((mousePosition.X < -indent) || (mousePosition.Y < -indent) || (mousePosition.X > Width + indent) || (mousePosition.Y > Height + indent))
+            {
+                EndMouseDrag(e.GetPosition(this));
+                return;
+            }
+
             LocalGrid_MouseMove(sender, e);
             VisualSelection_MouseMove(sender, e);
         }
