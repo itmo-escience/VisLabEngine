@@ -138,6 +138,26 @@ namespace Fusion.Engine.Frames2
             AddAt(child, index);
         }
 
+        public void BringToFront(UIComponent child)
+        {
+            MoveTo(child, Children.Count);
+        }
+
+        public void SendToBack(UIComponent child)
+        {
+            MoveTo(child, 0);
+        }
+
+        public void BringForward(UIComponent child)
+        {
+            MoveTo(child, Children.IndexOf(child) + 1);
+        }
+
+        public void SendBackward(UIComponent child)
+        {
+            MoveTo(child, Children.IndexOf(child) - 1);
+        }
+
         #endregion
 
         public override void Draw(SpriteLayerD2D layer) { }

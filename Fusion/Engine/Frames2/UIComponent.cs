@@ -172,29 +172,6 @@ namespace Fusion.Engine.Frames2
             }
         }
 
-        #region ZOrder
-
-        public void BringToFront() {
-            Parent?.MoveTo(this, Parent.Children.Count);
-        }
-
-        public void SendToBack()
-        {
-            Parent?.MoveTo(this, 0);
-        }
-
-        public void BringForward()
-        {
-            Parent?.MoveTo(this, Parent.Children.IndexOf(this) + 1);
-        }
-
-        public void SendBackward()
-        {
-            Parent?.MoveTo(this, Parent.Children.IndexOf(this) - 1);
-        }
-
-        #endregion
-
         private bool _visible = true;
         public bool Visible
         {
