@@ -157,7 +157,8 @@ namespace WpfEditorTest.ChildPanels
 			set
 			{
 				_widthBuffer = value;
-				this.Width = Math.Max(0, _widthBuffer);
+				this.Width = Math.Abs(_widthBuffer);//Math.Max(0, _widthBuffer);
+				this.RenderTransform = new ScaleTransform(Math.Sign(_widthBuffer), Math.Sign(HeightBuffer));
 			}
 		}
 		public double HeightBuffer
@@ -166,7 +167,8 @@ namespace WpfEditorTest.ChildPanels
 			set
 			{
 				_heightBuffer = value;
-				this.Height = Math.Max(0, _heightBuffer);
+				this.Height = Math.Abs(_heightBuffer);// Math.Max(0, _heightBuffer);
+				this.RenderTransform = new ScaleTransform(Math.Sign(_widthBuffer), Math.Sign(HeightBuffer));
 			}
 		}
 
@@ -194,8 +196,14 @@ namespace WpfEditorTest.ChildPanels
 				if (_selectedFrame == null) return;
 
 				_locked = true;
-				_selectedFrame.Width = (int)(Width + Math.Min(0, WidthBuffer)+0.5d);
-				_selectedFrame.Height = (int)(Height + Math.Min(0, HeightBuffer)+0.5d);
+				_selectedFrame.Width = (int)(/*Width + */Math.Max(0, Math.Abs(WidthBuffer))+0.5d);
+				_selectedFrame.Height = (int)(/*Height + */Math.Max(0, Math.Abs(HeightBuffer))+0.5d);
+
+				_selectedFrame.Transform = new Matrix3x2(
+					Math.Sign(WidthBuffer), _selectedFrame.Transform.M12,
+					_selectedFrame.Transform.M21, Math.Sign(HeightBuffer),
+					_selectedFrame.Transform.M31, _selectedFrame.Transform.M32
+					);
 				_locked = false;
 
 			};

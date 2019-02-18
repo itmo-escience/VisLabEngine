@@ -331,8 +331,8 @@ namespace WpfEditorTest.ChildPanels
 			var topLeftNew = new Point(topLeftCorner.X * scaleX, topLeftCorner.Y * scaleY);
 			var bottomRightNew = new Point(bottomRightCorner.X * scaleX, bottomRightCorner.Y * scaleY);
 
-			var newWidth = Math.Max(bottomRightNew.X - topLeftNew.X, float.Epsilon);
-			var newHeight = Math.Max(bottomRightNew.Y - topLeftNew.Y, float.Epsilon);
+			var newWidth = Math.Max(Math.Abs(bottomRightNew.X - topLeftNew.X), float.Epsilon)* Math.Sign(bottomRightNew.X - topLeftNew.X);
+			var newHeight = Math.Max(Math.Abs(bottomRightNew.Y - topLeftNew.Y), float.Epsilon)* Math.Sign(bottomRightNew.Y - topLeftNew.Y);
 
 			var topLeftAbsolutePosition = AbsolutePosition(pivot, topLeftNew);
 
