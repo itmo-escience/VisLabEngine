@@ -102,9 +102,12 @@ namespace WpfEditorTest
 			_engine.GameInterface = new CustomGameInterface(_engine);
 			_engine.LoadConfiguration("Config.ini");
 
-			_engine.RenderSystem.StereoMode = Fusion.Engine.Graphics.StereoMode.WpfEditor;
-			_engine.RenderSystem.Width = 1920;
-			_engine.RenderSystem.Height = 1080;
+            DefaultSceneWidth = int.Parse(ConfigurationManager.AppSettings.Get("SceneSizeWidth"));
+            DefaultSceneHeight = int.Parse(ConfigurationManager.AppSettings.Get("SceneSizeHeight"));
+
+            _engine.RenderSystem.StereoMode = Fusion.Engine.Graphics.StereoMode.WpfEditor;
+			_engine.RenderSystem.Width = (int)DefaultSceneWidth;
+			_engine.RenderSystem.Height = (int)DefaultSceneHeight;
 			_engine.RenderSystem.VSyncInterval = 1;
 
 			Directory.SetCurrentDirectory(@"..\..\..\..\GISTest\bin\x64\Debug");
@@ -206,7 +209,12 @@ namespace WpfEditorTest
 			{
 				this.DefaultSceneWidth = e.NewSize.Width;
 				this.DefaultSceneHeight = e.NewSize.Height;
-				ZoomScene();
+                if (SceneFrame != null)
+                {
+                    SceneFrame.Width = (float)e.NewSize.Width;
+                    SceneFrame.Height = (float)e.NewSize.Height;
+                }
+                ZoomScene();
 			};
 			this.UpdateTitle();
 
@@ -646,7 +654,9 @@ namespace WpfEditorTest
 			{
 				SelectionLayer.Width = dlg.SceneWidth;
 				SelectionLayer.Height = dlg.SceneHeight;
-			};
+                DefaultSceneWidth = dlg.SceneWidth;
+                DefaultSceneHeight = dlg.SceneHeight;
+            };
 		}
 
         private void ExecutedRemoveSelectionCommand(object sender, ExecutedRoutedEventArgs e)
@@ -788,17 +798,17 @@ namespace WpfEditorTest
 			Top = int.Parse(ConfigurationManager.AppSettings.Get("MainWindowY"));
 			WindowState = (WindowState)Enum.Parse(typeof(WindowState), ConfigurationManager.AppSettings.Get("MainWindowFullscreen"));
 
-			SelectionLayer.Width = int.Parse(ConfigurationManager.AppSettings.Get("SceneSizeWidth"));
-			SelectionLayer.Height = int.Parse(ConfigurationManager.AppSettings.Get("SceneSizeHeight"));
+            DefaultSceneWidth = int.Parse(ConfigurationManager.AppSettings.Get("SceneSizeWidth"));
+            DefaultSceneHeight = int.Parse(ConfigurationManager.AppSettings.Get("SceneSizeHeight"));
+
+            SelectionLayer.Width = DefaultSceneWidth;
+			SelectionLayer.Height = DefaultSceneHeight;
 
 			Zoomer.Width = SelectionLayer.Width;
 			Zoomer.Height = SelectionLayer.Height;
 			Zoomer.Stretch = Stretch.Uniform;
 			ZoomerSlider.Value = double.Parse(ConfigurationManager.AppSettings.Get("SceneZoom"));
-
-			this.DefaultSceneWidth = Zoomer.Width;
-			this.DefaultSceneHeight = Zoomer.Height;
-		}
+        }
 
 		private void Window_PreviewMouseWheel( object sender, MouseWheelEventArgs e )
 		{
