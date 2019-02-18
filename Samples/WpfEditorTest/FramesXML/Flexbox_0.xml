@@ -1,0 +1,81 @@
+<?xml version="1.0"?>
+<SeralizableObjectHolder>
+  <string>1.5</string>
+  <dictionary>
+    <item>
+      <key>
+        <string>Fusion.Engine.Frames2.Containers.Flexbox</string>
+      </key>
+      <value>
+        <string>Fusion, Version=0.2.6978.23301, Culture=neutral, PublicKeyToken=null</string>
+      </value>
+    </item>
+    <item>
+      <key>
+        <string>Fusion.Engine.Frames2.Components.Image</string>
+      </key>
+      <value>
+        <string>Fusion, Version=0.2.6978.23301, Culture=neutral, PublicKeyToken=null</string>
+      </value>
+    </item>
+  </dictionary>
+  <UIComponent xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:type="Flexbox">
+    <X>500</X>
+    <Y>300</Y>
+    <Width>200</Width>
+    <Height>100</Height>
+    <Angle>1</Angle>
+    <Transform>
+      <M11>1</M11>
+      <M12>0</M12>
+      <M21>0</M21>
+      <M22>1</M22>
+      <M31>0</M31>
+      <M32>0</M32>
+    </Transform>
+    <Visible>true</Visible>
+    <Name>Flexbox_0</Name>
+    <Children>
+      <UIComponent xsi:type="Image">
+        <X>0</X>
+        <Y>0</Y>
+        <Width>100</Width>
+        <Height>100</Height>
+        <Angle>0</Angle>
+        <Transform>
+          <M11>1</M11>
+          <M12>0</M12>
+          <M21>0</M21>
+          <M22>1</M22>
+          <M31>0</M31>
+          <M32>0</M32>
+        </Transform>
+        <Visible>true</Visible>
+        <Name>Image_0</Name>
+        <Opacity>1</Opacity>
+        <SourceFile>C:\image.png</SourceFile>
+      </UIComponent>
+      <UIComponent xsi:type="Image">
+        <X>100</X>
+        <Y>0</Y>
+        <Width>100</Width>
+        <Height>50</Height>
+        <Angle>0</Angle>
+        <Transform>
+          <M11>1</M11>
+          <M12>0</M12>
+          <M21>0</M21>
+          <M22>1</M22>
+          <M31>0</M31>
+          <M32>0</M32>
+        </Transform>
+        <Visible>true</Visible>
+        <Name>Image_1</Name>
+        <Opacity>0.66</Opacity>
+        <SourceFile>C:\image.png</SourceFile>
+      </UIComponent>
+    </Children>
+    <NeedClipping>false</NeedClipping>
+    <MainSize>220</MainSize>
+  </UIComponent>
+</SeralizableObjectHolder>

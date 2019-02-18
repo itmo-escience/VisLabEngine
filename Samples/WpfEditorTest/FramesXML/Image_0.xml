@@ -1,0 +1,33 @@
+<?xml version="1.0"?>
+<SeralizableObjectHolder>
+  <string>1.5</string>
+  <dictionary>
+    <item>
+      <key>
+        <string>Fusion.Engine.Frames2.Components.Image</string>
+      </key>
+      <value>
+        <string>Fusion, Version=0.2.6981.23514, Culture=neutral, PublicKeyToken=null</string>
+      </value>
+    </item>
+  </dictionary>
+  <UIComponent xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:type="Image">
+    <X>1000</X>
+    <Y>100</Y>
+    <Width>100</Width>
+    <Height>100</Height>
+    <Angle>0</Angle>
+    <Transform>
+      <M11>1</M11>
+      <M12>0</M12>
+      <M21>0</M21>
+      <M22>1</M22>
+      <M31>0</M31>
+      <M32>0</M32>
+    </Transform>
+    <Visible>true</Visible>
+    <Name>Image_0</Name>
+    <Opacity>1</Opacity>
+    <SourceFile>C:\image.png</SourceFile>
+  </UIComponent>
+</SeralizableObjectHolder>
