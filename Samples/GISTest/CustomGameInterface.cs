@@ -193,7 +193,7 @@ namespace GISTest
             img3 = new Image(0, 125, 200, 75, fileName, 1);
             img4 = new Image(0, 0, 75, 200, fileName, 1);
 
-            FreePlacement freePlacement = new FreePlacement(300, 300, 200, 200);
+            FreePlacement freePlacement = new FreePlacement(300, 300, 200, 200, true);
             freePlacement.Add(img1);
             freePlacement.Add(img2);
             freePlacement.Add(img3);

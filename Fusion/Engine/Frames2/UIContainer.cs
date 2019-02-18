@@ -37,7 +37,7 @@ namespace Fusion.Engine.Frames2
             }
         }
 
-        public override RectangleF BoundingBox
+        /*public override RectangleF BoundingBox
         {
             get
             {
@@ -50,7 +50,7 @@ namespace Fusion.Engine.Frames2
 
                 return b;
             }
-        }
+        }*/
 
         protected UIContainer() : base()
         {
