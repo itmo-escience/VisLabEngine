@@ -18,7 +18,7 @@
         FocusManager.FocusedElement="{Binding ElementName=window}"
         Closing="Window_Closing"
         KeyUp="Window_KeyUp"
-        Loaded="Window_Loaded" PreviewMouseWheel="Window_PreviewMouseWheel">
+        Loaded="Window_Loaded" PreviewMouseWheel="Window_PreviewMouseWheel" MouseMove="Window_MouseMove">
     <Window.Resources>
         <conv:ButtonEnableConverter x:Key="btnEnableConverter"/>
     </Window.Resources>
