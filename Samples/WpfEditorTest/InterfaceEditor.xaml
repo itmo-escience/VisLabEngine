@@ -65,6 +65,9 @@
         <CommandBinding Command="{x:Static local:InterfaceEditor.SceneConfigCmd}"
                         Executed="ExecutedSceneConfigCommand"
                         CanExecute="AlwaysCanExecute" />
+        <CommandBinding Command="{x:Static local:InterfaceEditor.RemoveSelectionCmd}"
+                        Executed="ExecutedRemoveSelectionCommand"
+                        CanExecute="AlwaysCanExecute" />
     </Window.CommandBindings>
     <Window.InputBindings>
         <KeyBinding Command="{x:Static local:InterfaceEditor.UndoChangeCmd}" Key="Z" Modifiers="Ctrl"/>
@@ -77,6 +80,7 @@
         <KeyBinding Command="{x:Static local:InterfaceEditor.PasteFrameCmd}" Key="V" Modifiers="Ctrl"/>
         <KeyBinding Command="{x:Static local:InterfaceEditor.CutFrameCmd}" Key="X" Modifiers="Ctrl"/>
         <KeyBinding Command="{x:Static local:InterfaceEditor.DeleteFrameCmd}" Key="Delete"/>
+        <KeyBinding Command="{x:Static local:InterfaceEditor.RemoveSelectionCmd}" Key="Esc"/>
 
         <KeyBinding Command="{x:Static local:InterfaceEditor.MoveFrameCmd}" CommandParameter="up" Key="Up"/>
         <KeyBinding Command="{x:Static local:InterfaceEditor.MoveFrameCmd}" CommandParameter="down" Key="Down"/>

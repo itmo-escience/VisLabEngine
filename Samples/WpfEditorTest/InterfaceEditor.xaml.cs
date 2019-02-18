@@ -53,8 +53,9 @@ namespace WpfEditorTest
 		public static RoutedCommand DeleteFrameCmd = new RoutedCommand();
 		public static RoutedCommand AlignFrameCmd = new RoutedCommand();
 		public static RoutedCommand SceneConfigCmd = new RoutedCommand();
+        public static RoutedCommand RemoveSelectionCmd = new RoutedCommand();
 
-		private readonly FrameDetails _details;
+        private readonly FrameDetails _details;
 		private readonly FramePalette _palette;
 		private readonly FrameTreeView _treeView;
 
@@ -648,7 +649,12 @@ namespace WpfEditorTest
 			};
 		}
 
-		private void AlwaysCanExecute( object sender, CanExecuteRoutedEventArgs e )
+        private void ExecutedRemoveSelectionCommand(object sender, ExecutedRoutedEventArgs e)
+        {
+            CommandManager.Instance.Execute(new SelectFrameCommand(new List<UIComponent>()));
+        }
+
+        private void AlwaysCanExecute( object sender, CanExecuteRoutedEventArgs e )
 		{
 			e.CanExecute = true;
 		}

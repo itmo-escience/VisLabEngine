@@ -338,10 +338,10 @@ namespace WpfEditorTest
                         panel.SelectedFrame.Transform,
 						panel.InitialTransform),
 					new FramePropertyChangeCommand(panel.SelectedFrame, "X",
-					(int)point.X - hoveredFrame.BoundingBox.X - ((int)point.X - panel.SelectedFrame.BoundingBox.X),
+					(int)point.X - hoveredFrame.X - ((int)point.X - panel.SelectedFrame.X),
 					(float)panel.InitFramePosition.X),
 					new FramePropertyChangeCommand(panel.SelectedFrame, "Y",
-					(int)point.Y - hoveredFrame.BoundingBox.Y - ((int)point.Y - panel.SelectedFrame.BoundingBox.Y),
+					(int)point.Y - hoveredFrame.Y - ((int)point.Y - panel.SelectedFrame.Y),
 					(float)panel.InitFramePosition.Y)
 					));
 				}
