@@ -235,10 +235,18 @@ namespace WpfEditorTest
 
 		private void RecalcMouseDelta( MouseEventArgs e )
 		{
-			var currentMousePosition = e.GetPosition(this);
+			var currentMousePosition = GetBoundedMousePosition(e);
 			_deltaX = (int)(currentMousePosition.X - _initMousePosition.X);
 			_deltaY = (int)(currentMousePosition.Y - _initMousePosition.Y);
 		}
+
+        private Point GetBoundedMousePosition(MouseEventArgs e)
+        {
+            Point mousePosition = e.GetPosition(this);
+            mousePosition.X = Math.Max(Math.Min(mousePosition.X, Width), 0);
+            mousePosition.Y = Math.Max(Math.Min(mousePosition.Y, Height), 0);
+            return mousePosition;
+        }
 
 		public List<IEditorCommand> ResetSelectedFrame( Point point, FrameSelectionPanel panel )
 		{
@@ -442,28 +450,38 @@ namespace WpfEditorTest
 
 		private void LocalGrid_MouseLeftButtonUp( object sender, MouseButtonEventArgs e )
 		{
-			List<IEditorCommand> commands = new List<IEditorCommand>();
+            EndMouseDrag(e.GetPosition(this));
+        }
 
-			foreach (var panel in FrameSelectionPanelList.Values)
-			{
-				commands.AddRange(this.ReleaseFrame(e.GetPosition(this), panel));
-			}
+        private void Grid_MouseLeave(object sender, MouseEventArgs e)
+        {
+            EndMouseDrag(e.GetPosition(this));
+        }
 
-			_frameDragsPanel.DragMousePressed = false;
+        private void EndMouseDrag(Point mousePosition)
+        {
+            List<IEditorCommand> commands = new List<IEditorCommand>();
 
-			ForgetStickingCoords();
+            foreach (var panel in FrameSelectionPanelList.Values)
+            {
+                commands.AddRange(this.ReleaseFrame(mousePosition, panel));
+            }
 
-			if (commands.Count > 0)
-			{
-				var command = new CommandGroup(commands.ToArray());
-				CommandManager.Instance.Execute(command);
-			}
-			AreaSelectionEnd(SelectionManager.Instance.SelectedFrames);
+            _frameDragsPanel.DragMousePressed = false;
 
-			//this.ReleaseMouseCapture();
-		}
+            ForgetStickingCoords();
 
-		private void LocalGrid_MouseMove( object sender, MouseEventArgs e )
+            if (commands.Count > 0)
+            {
+                var command = new CommandGroup(commands.ToArray());
+                CommandManager.Instance.Execute(command);
+            }
+            AreaSelectionEnd(SelectionManager.Instance.SelectedFrames);
+
+            //this.ReleaseMouseCapture();
+        }
+
+        private void LocalGrid_MouseMove( object sender, MouseEventArgs e )
 		{
 			RecalcMouseDelta(e);
 			if (_frameDragsPanel.DragMousePressed)
@@ -702,10 +720,17 @@ namespace WpfEditorTest
 		private void VisualSelection_MouseMove( object sender, MouseEventArgs e )
 		{
 			if (AreaSelectionEnabled)
-				DrawSelectionRectangle(_initMousePosition, e.GetPosition(this));
+				DrawSelectionRectangle(_initMousePosition, GetBoundedMousePosition(e));
 		}
 
-		private void Grid_PreviewDragOver( object sender, System.Windows.DragEventArgs e )
+        internal void FullMouseMove(object sender, MouseEventArgs e)
+        {
+            LocalGrid_MouseMove(sender, e);
+            VisualSelection_MouseMove(sender, e);
+        }
+
+
+        private void Grid_PreviewDragOver( object sender, System.Windows.DragEventArgs e )
 		{
 			//e.Handled = false;
 
@@ -748,5 +773,5 @@ namespace WpfEditorTest
                 }
 			}
 		}
-	}
+    }
 }

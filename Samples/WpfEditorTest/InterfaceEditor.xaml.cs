@@ -810,7 +810,12 @@ namespace WpfEditorTest
 			}
 		}
 
-		private void Slider_ValueChanged( object sender, RoutedPropertyChangedEventArgs<double> e )
+        private void Window_MouseMove( object sender, MouseEventArgs e)
+        {
+            SelectionLayer.FullMouseMove(sender, e);
+        }
+
+        private void Slider_ValueChanged( object sender, RoutedPropertyChangedEventArgs<double> e )
 		{
 			this.sceneScale = e.NewValue;
 			ZoomScene();

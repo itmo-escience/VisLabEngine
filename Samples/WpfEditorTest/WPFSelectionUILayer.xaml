@@ -8,6 +8,7 @@
       MouseLeftButtonDown="LocalGrid_MouseLeftButtonDown"
       PreviewDragOver="Grid_PreviewDragOver"
       PreviewDrop="Grid_PreviewDrop"
+      MouseLeave="Grid_MouseLeave"
       >
 
     <zWpfLib:DXElement Grid.Row="1" Name="DxElem"
