@@ -181,15 +181,18 @@ namespace WpfEditorTest.ChildPanels
 		{
 			var offset = VisualTreeHelper.GetOffset(border);
 			double angle = 0;
+
+			var globalTransform = SelectionManager.Instance.SelectedFrames.First().GlobalTransform;
+
 			if (SelectionManager.Instance.SelectedFrames.Count == 1)
 			{
 				angle = SelectionManager.Instance.SelectedFrames.First().GlobalAngle;
 			}
 			return new Point(
 				RenderTransform.Value.OffsetX + 
-				(offset.X + border.Width * border.RenderTransformOrigin.X) * Math.Cos(angle) - (offset.Y + border.Height * border.RenderTransformOrigin.Y) * Math.Sin(angle),
+				(offset.X + border.Width * border.RenderTransformOrigin.X) * globalTransform.M11 + (offset.Y + border.Height * border.RenderTransformOrigin.Y) * globalTransform.M21,
 				RenderTransform.Value.OffsetY + 
-				(offset.Y + border.Height * border.RenderTransformOrigin.Y) * Math.Cos(angle) + (offset.X + border.Width * border.RenderTransformOrigin.X) * Math.Sin(angle)
+				(offset.Y + border.Height * border.RenderTransformOrigin.Y) * globalTransform.M22 + (offset.X + border.Width * border.RenderTransformOrigin.X) * globalTransform.M12
 			);
 		}
 

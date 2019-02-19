@@ -447,6 +447,7 @@ namespace WpfEditorTest
                 selectionPanel.InitialTransform = frame.Transform;// new Fusion.Core.Mathematics.RectangleF(frame.X, frame.Y, frame.Width, frame.Height);
 				selectionPanel.InitPanelPosition = new Point(selectionPanel.RenderTransform.Value.OffsetX, selectionPanel.RenderTransform.Value.OffsetY);
 				selectionPanel.InitFramePosition = new Point(frame.X, frame.Y);
+				selectionPanel.InitFrameScale = new Point(frame.Transform.M11, frame.Transform.M22);
 				selectionPanel.InitialFrameSize = new Size(frame.Width, frame.Height);
 				selectionPanel.InitFrameParent = frame.Parent;
 			}
@@ -666,8 +667,9 @@ namespace WpfEditorTest
 			{
 				var initRect = _frameDragsPanel.InitialFramesRectangles[panel.SelectedFrame];
 
-				panel.HeightBuffer = initRect.Height * heightMult;
-				panel.WidthBuffer = initRect.Width * widthMult;
+				panel.WidthBuffer = initRect.Width * widthMult * panel.InitFrameScale.X;
+				panel.HeightBuffer = initRect.Height * heightMult * panel.InitFrameScale.Y;
+
 				TranslateTransform multedTransform = new TranslateTransform
 				{
 					X = dragsPanelX + initRect.X * widthMult,
@@ -676,10 +678,12 @@ namespace WpfEditorTest
 
                 var transform = new TransformGroup();
                 transform.Children.Add(new RotateTransform() { Angle = panel.SelectedFrame.GlobalAngle * (180 / Math.PI), CenterX = 0, CenterY = 0 });
-				transform.Children.Add(new ScaleTransform(Math.Sign(panel.WidthBuffer), Math.Sign(panel.HeightBuffer)));
+				transform.Children.Add(new ScaleTransform(Math.Sign(panel.WidthBuffer), Math.Sign(panel.HeightBuffer),0,0));
 				transform.Children.Add(multedTransform);
 
-				panel.RenderTransform = transform;
+				panel.RenderTransform = new MatrixTransform(panel.SelectedFrame.GlobalTransform.M11, panel.SelectedFrame.GlobalTransform.M12,
+															panel.SelectedFrame.GlobalTransform.M21, panel.SelectedFrame.GlobalTransform.M22,
+															multedTransform.X, multedTransform.Y);// transform;
 			}
 		}
 
