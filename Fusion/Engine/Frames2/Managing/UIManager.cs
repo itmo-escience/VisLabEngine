@@ -77,9 +77,25 @@ namespace Fusion.Engine.Frames2.Managing
 
                 layer.Draw(new TransformCommand(c.GlobalTransform));
                 c.Draw(layer);
+            }
 
-                if (DebugEnabled)
+            if (DebugEnabled)
+            {
+                queue.Enqueue(root);
+
+                while (queue.Any())
                 {
+                    var c = queue.Dequeue();
+
+                    if (c is UIContainer container)
+                    {
+                        foreach (var child in container.Children)
+                        {
+                            queue.Enqueue(child);
+                        }
+                    }
+
+                    layer.Draw(new TransformCommand(c.GlobalTransform));
                     c.DebugDraw(layer);
                 }
             }
