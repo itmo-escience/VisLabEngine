@@ -40,9 +40,9 @@ namespace WpfEditorTest.ChildPanels
 				if (_selectedFrame == null) return;
 
 				//Width = 
-				WidthBuffer = _selectedFrame.Width * Math.Sign(_selectedFrame.GlobalTransform.M11);
+				WidthBuffer = _selectedFrame.Width * Math.Sign(_selectedFrame.Transform.M11);
 				//Height =
-				HeightBuffer = _selectedFrame.Height * Math.Sign(_selectedFrame.GlobalTransform.M22);
+				HeightBuffer = _selectedFrame.Height * Math.Sign(_selectedFrame.Transform.M22);
 
                 var transform = new MatrixTransform(_selectedFrame.GlobalTransform.M11, _selectedFrame.GlobalTransform.M12,
                                                     _selectedFrame.GlobalTransform.M21, _selectedFrame.GlobalTransform.M22,
@@ -98,7 +98,17 @@ namespace WpfEditorTest.ChildPanels
                         _oldY = RenderTransform.Value.OffsetY;
                         break;
                     }
-                    case "X":
+					case "Transform":
+						{
+							var transform = new MatrixTransform(_selectedFrame.GlobalTransform.M11, _selectedFrame.GlobalTransform.M12,
+														_selectedFrame.GlobalTransform.M21, _selectedFrame.GlobalTransform.M22,
+														_selectedFrame.GlobalTransform.M31, _selectedFrame.GlobalTransform.M32);
+							RenderTransform = transform;
+							_oldX = RenderTransform.Value.OffsetX;
+							_oldY = RenderTransform.Value.OffsetY;
+							break;
+						}
+					case "X":
                     case "Y":
                     {
                         var transform = new TransformGroup();
@@ -177,6 +187,7 @@ namespace WpfEditorTest.ChildPanels
 		public Point InitPanelPosition { get; internal set; }
 		public Point InitFramePosition { get; internal set; }
 		public Size InitialFrameSize { get; internal set; }
+		public Point InitFrameScale { get; internal set; }
 
 		public FrameSelectionPanel()
 		{
@@ -200,8 +211,8 @@ namespace WpfEditorTest.ChildPanels
 				_selectedFrame.Height = (int)(/*Height + */Math.Max(0, Math.Abs(HeightBuffer))+0.5d);
 
 				_selectedFrame.Transform = new Matrix3x2(
-					Math.Sign(WidthBuffer), _selectedFrame.Transform.M12,
-					_selectedFrame.Transform.M21, Math.Sign(HeightBuffer),
+					Math.Sign(WidthBuffer)<0?-1:1, _selectedFrame.Transform.M12,
+					_selectedFrame.Transform.M21, Math.Sign(HeightBuffer) < 0 ? -1 : 1,
 					_selectedFrame.Transform.M31, _selectedFrame.Transform.M32
 					);
 				_locked = false;
@@ -228,8 +239,8 @@ namespace WpfEditorTest.ChildPanels
 			var parentMatrixInvert = Matrix3x2.Invert(parent.GlobalTransform);
 			var vectorHelper = Matrix3x2.TransformPoint(parentMatrixInvert, new Fusion.Core.Mathematics.Vector2((int)RenderTransform.Value.OffsetX + 0.5f, (int)RenderTransform.Value.OffsetY + 0.5f));
 
-			_selectedFrame.X = vectorHelper.X;
-			_selectedFrame.Y = vectorHelper.Y;
+			_selectedFrame.X = (int)vectorHelper.X;
+			_selectedFrame.Y = (int)vectorHelper.Y;
 
 			_oldX = RenderTransform.Value.OffsetX;
 			_oldY = RenderTransform.Value.OffsetY;
