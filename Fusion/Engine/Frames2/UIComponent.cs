@@ -172,6 +172,17 @@ namespace Fusion.Engine.Frames2
             }
         }
 
+        public UIComponent RootParent {
+            get {
+                UIComponent parent = this;
+                while (parent.Parent != null)
+                {
+                    parent = parent.Parent;
+                }
+                return parent;
+            }
+        }
+
         private bool _visible = true;
         public bool Visible
         {
@@ -190,7 +201,9 @@ namespace Fusion.Engine.Frames2
         public string Name
         {
             get => _name;
-            set => SetAndNotify(ref _name, value);
+            set {
+                if (UIManager.IsComponentNameValid(value, RootParent, this)) SetAndNotify(ref _name, value);
+            }
         }
 
         protected UIComponent() : this(0, 0, 0, 0)
@@ -201,7 +214,7 @@ namespace Fusion.Engine.Frames2
 
         protected UIComponent(float x, float y, float width, float height)
         {
-            Name = GenerateName(GetType());
+            _name = GenerateName(GetType());
             _x = x;
             _y = y;
             _width = width;
