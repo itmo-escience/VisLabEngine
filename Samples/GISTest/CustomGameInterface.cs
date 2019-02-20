@@ -29,9 +29,9 @@ using Fusion.Engine.Frames2.Containers;
 using Fusion.Engine.Frames2.Controllers;
 using Fusion.Engine.Frames2.Managing;
 using Fusion.Engine.Graphics.SpritesD2D;
-using Label = Fusion.Engine.Graphics.SpritesD2D.Label;
 using KeyEventArgs = Fusion.Engine.Input.KeyEventArgs;
 using Fusion.Engine.Frames2;
+using Label = Fusion.Engine.Frames2.Components.Label;
 
 namespace GISTest
 {
@@ -201,39 +201,19 @@ namespace GISTest
 
             UIManager.Root.Add(freePlacement);
 
-            /*Game.Keyboard.KeyUp += (sender, args) =>
-            {
-                if (args.Key == Keys.Space)
-                {
-                    img2.BringForward();  
-                }
-            };*/
+            var border = new Border(100, 100, 100, 100);
+            var label = new Label("Button", new TextFormatD2D("Calibry", 15), 100, 100, 100, 100);
+            var holder = new FreePlacement(50, 50, 200, 200);
+            holder.Add(border);
+            holder.Add(label);
 
-            /*VerticalAlignment alignment = VerticalAlignment.CENTER;
+            var btn = new ButtonController();
+            btn.Foreground.Attach(label);
+            btn.Background.Attach(border);
 
-            verticalBox1 = new VerticalBox(0, 0, 0, 0, alignment, true);
-            verticalBox1.Add(txt);
-            //verticalBox1.Add(img1);
-            //verticalBox1.Add(img2);
+            //var bgColor = new UIController.PropertyValue()
 
-            verticalBox2 = new VerticalBox(0, 0, 0, 0, alignment);
-            verticalBox2.Add(img3);
-            verticalBox2.Add(img4);
-
-		    var b = new ButtonController("Button", 100, 100);
-            b.AttachTo(verticalBox2);
-
-            verticalBox3 = new VerticalBox(200, 200, 0, 0, alignment);
-            verticalBox3.Add(verticalBox1);
-            verticalBox3.Add(verticalBox2);
-
-            flexbox1 = new Flexbox(500, 300, 220, 0);
-            flexbox1.Add(img1);
-            flexbox1.Add(img2);
-            flexbox1.Angle = 1;
-
-            _userInterface2.Root.Add(verticalBox3);
-            _userInterface2.Root.Add(flexbox1);*/
+            UIManager.Root.Add(holder);
 
             #endregion
 
