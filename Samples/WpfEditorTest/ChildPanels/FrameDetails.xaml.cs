@@ -16,11 +16,11 @@ namespace WpfEditorTest.ChildPanels
 		public FrameDetails()
 		{
 			InitializeComponent();
-			Height = int.Parse(ConfigurationManager.AppSettings.Get("DetailsPanelHeight"));
+			Height = double.Parse(ConfigurationManager.AppSettings.Get("DetailsPanelHeight"));
 			Width = ApplicationConfig.OptionsWindowSize;
 
-			Left = int.Parse(ConfigurationManager.AppSettings.Get("DetailsPanelX"));
-			Top = int.Parse(ConfigurationManager.AppSettings.Get("DetailsPanelY"));
+			Left = double.Parse(ConfigurationManager.AppSettings.Get("DetailsPanelX"));
+			Top = double.Parse(ConfigurationManager.AppSettings.Get("DetailsPanelY"));
 
 			HorizontalAlignment = HorizontalAlignment.Right;
 			VerticalAlignment = VerticalAlignment.Center;

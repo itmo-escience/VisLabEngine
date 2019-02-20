@@ -791,15 +791,15 @@ namespace WpfEditorTest
 
 		private void Window_Loaded( object sender, RoutedEventArgs e )
 		{
-			Height = int.Parse(ConfigurationManager.AppSettings.Get("MainWindowHeight"));
-			Width = int.Parse(ConfigurationManager.AppSettings.Get("MainWindowWidth"));
+			Height = double.Parse(ConfigurationManager.AppSettings.Get("MainWindowHeight"));
+			Width = double.Parse(ConfigurationManager.AppSettings.Get("MainWindowWidth"));
 
-			Left = int.Parse(ConfigurationManager.AppSettings.Get("MainWindowX"));
-			Top = int.Parse(ConfigurationManager.AppSettings.Get("MainWindowY"));
+			Left = double.Parse(ConfigurationManager.AppSettings.Get("MainWindowX"));
+			Top = double.Parse(ConfigurationManager.AppSettings.Get("MainWindowY"));
 			WindowState = (WindowState)Enum.Parse(typeof(WindowState), ConfigurationManager.AppSettings.Get("MainWindowFullscreen"));
 
-            DefaultSceneWidth = int.Parse(ConfigurationManager.AppSettings.Get("SceneSizeWidth"));
-            DefaultSceneHeight = int.Parse(ConfigurationManager.AppSettings.Get("SceneSizeHeight"));
+            DefaultSceneWidth = double.Parse(ConfigurationManager.AppSettings.Get("SceneSizeWidth"));
+            DefaultSceneHeight = double.Parse(ConfigurationManager.AppSettings.Get("SceneSizeHeight"));
 
             SelectionLayer.Width = DefaultSceneWidth;
 			SelectionLayer.Height = DefaultSceneHeight;

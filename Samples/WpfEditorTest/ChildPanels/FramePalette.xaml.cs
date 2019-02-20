@@ -44,11 +44,11 @@ namespace WpfEditorTest.ChildPanels
 		{
 			InitializeComponent();
 
-			Height = int.Parse(ConfigurationManager.AppSettings.Get("PalettePanelHeight"));
+			Height = double.Parse(ConfigurationManager.AppSettings.Get("PalettePanelHeight"));
 			Width = ApplicationConfig.OptionsWindowSize;
 
-			Left = int.Parse(ConfigurationManager.AppSettings.Get("PalettePanelX"));
-			Top = int.Parse(ConfigurationManager.AppSettings.Get("PalettePanelY"));
+			Left = double.Parse(ConfigurationManager.AppSettings.Get("PalettePanelX"));
+			Top = double.Parse(ConfigurationManager.AppSettings.Get("PalettePanelY"));
 
 			this.HorizontalAlignment = HorizontalAlignment.Right;
 			this.VerticalAlignment = VerticalAlignment.Top;

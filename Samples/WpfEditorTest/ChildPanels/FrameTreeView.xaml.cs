@@ -48,11 +48,11 @@ namespace WpfEditorTest.ChildPanels
 		{
 			InitializeComponent();
 
-			Height = int.Parse(ConfigurationManager.AppSettings.Get("TreeViewPanelHeight"));
+			Height = double.Parse(ConfigurationManager.AppSettings.Get("TreeViewPanelHeight"));
 		    Width = ApplicationConfig.OptionsWindowSize;
 
-			Left = int.Parse(ConfigurationManager.AppSettings.Get("TreeViewPanelX"));
-			Top = int.Parse(ConfigurationManager.AppSettings.Get("TreeViewPanelY"));
+			Left = double.Parse(ConfigurationManager.AppSettings.Get("TreeViewPanelX"));
+			Top = double.Parse(ConfigurationManager.AppSettings.Get("TreeViewPanelY"));
 
 			HorizontalAlignment = HorizontalAlignment.Right;
 			VerticalAlignment = VerticalAlignment.Bottom;
