@@ -80,7 +80,7 @@ namespace FusionUI.UI.Factories
                 UnitVPadding = (cbLabel.UnitHeight - UnitCheckboxHeight) / 2,
                 UnitPaddingRight = width - 2 * OffsetX - UnitCheckboxWidth - UIConfig.UnitCheckboxValueOffset,
                 IsChecked = active,
-                Name = label,
+                Name = label,                
             };
             holder.UnitHeight = cbLabel.UnitHeight + 2 * OffsetY;
             checkbox.Changed += switchAction;

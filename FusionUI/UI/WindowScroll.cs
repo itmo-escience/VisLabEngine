@@ -91,7 +91,7 @@ namespace FusionUI.UI
             scrollHolder.UnitY = (DrawHat ? UIConfig.UnitHatHeight : 0) + UnitPaddingTop;
             scrollHolder.UnitX = UnitPaddingLeft;
             scrollHolder.UnitWidth = UnitWidth - UnitPaddingLeft - UnitPaddingRight;
-            scrollHolder.UnitHeight = HeightLimit - UnitPaddingTop - UnitPaddingBottom;            
+            scrollHolder.UnitHeight = Math.Min(UnitHeight, HeightLimit) - UnitPaddingTop - UnitPaddingBottom;            
             holder.UnitWidth = scrollHolder.UnitWidth;
         }
 

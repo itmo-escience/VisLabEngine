@@ -124,6 +124,8 @@ namespace FusionUI.UI.Elements.DropDown
         {
             holderDummyTop = new ScalableFrame(ui, 0, 0, 0, 0, "", Color.Zero);
             holderDummyBottom = new ScalableFrame(ui, 0, 0, 0, 0, "", Color.Zero);
+            AllowShrink = false;
+            ResizedManually = true;
         }
 
         private float unitElementHeight = UIConfig.UnitSelectorRowHeight / 2;
@@ -146,6 +148,7 @@ namespace FusionUI.UI.Elements.DropDown
         protected override void Update(GameTime gameTime)
         {
             base.Update(gameTime);
+            Fusion.Log.Message(UnitHeight.ToString());
             recreateElements();
         }
 
