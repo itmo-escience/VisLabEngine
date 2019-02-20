@@ -101,6 +101,7 @@ namespace FusionUI.UI.Elements
 
                 }
             };
+            this.ActionOut += (ControlActionArgs args, ref bool flag) => { SetActiveStatus(false); };            
         }
 
         public void SetActiveStatus(bool forceValue)
@@ -160,6 +161,8 @@ namespace FusionUI.UI.Elements
 					carretPos = carretPos + text.Length;
 				}
 			}
+
+            if (e.Key == Keys.Enter) SetActiveStatus(false);
 
         }
 

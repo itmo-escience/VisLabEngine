@@ -31,7 +31,7 @@ namespace FusionUI.UI
 
         protected virtual void initialize()
         {
-            
+
         }
 
         private string TooltipText = "";
@@ -58,7 +58,7 @@ namespace FusionUI.UI
             Game.Mouse.Move += MoueMoveAction = (sender, args) =>
             {
                 currentEventArgs.IsTouch = false;
-                currentEventArgs.Position = (Point)args.Position;                
+                currentEventArgs.Position = (Point)args.Position;
                 currentEventArgs.MoveDelta = (Game.Mouse.Position - lastMousePos) ?? Vector2.Zero;
                 lastMousePos = Game.Mouse.Position;
                 if (!this.Active) return;
@@ -77,7 +77,7 @@ namespace FusionUI.UI
                 currentEventArgs.IsClick = args.Key == Keys.LeftButton;
                 currentEventArgs.IsAltClick = args.Key == Keys.RightButton;
                 currentEventArgs.ActionType = ControlActionArgs.ClickActionType.ActionDown;
-                         
+
                 if (base.Ghost || !Active) return;
                 var rootFrame = ApplicationInterface.Instance.rootFrame;
                 var hoveredFrame = MainFrame.GetHoveredFrame(rootFrame, (Point)currentEventArgs.Position);
@@ -93,7 +93,7 @@ namespace FusionUI.UI
                     currentEventArgs.IsAltClick = false;
                     currentEventArgs.IsDoubleClick = false;
                 }
-            };            
+            };
             Game.Keyboard.KeyUp += KeyUpAction = (sender, args) =>
             {
                 lastMousePos = Game.Mouse.Position;
@@ -102,7 +102,7 @@ namespace FusionUI.UI
                 currentEventArgs.Position = Game.Mouse.Position;
                 currentEventArgs.MoveDelta = Game.Mouse.PositionDelta;
                 currentEventArgs.IsClick = args.Key == Keys.LeftButton;
-                currentEventArgs.IsAltClick = args.Key == Keys.RightButton;                
+                currentEventArgs.IsAltClick = args.Key == Keys.RightButton;
                 currentEventArgs.ActionType = ControlActionArgs.ClickActionType.ActionUp;
                 if (base.Ghost || !Active) return;
                 var rootFrame = ApplicationInterface.Instance.rootFrame;
@@ -195,7 +195,7 @@ namespace FusionUI.UI
                 //currentEventArgs.Key = Game.Keyboard.IsKeyDown;
                 currentEventArgs.IsTouch = true;
                 currentEventArgs.Position = args.Position;
-                currentEventArgs.IsClick = true;                
+                currentEventArgs.IsClick = true;
                 currentEventArgs.IsDoubleClick = true;
                 currentEventArgs.ActionType = ControlActionArgs.ClickActionType.ActionDown | ControlActionArgs.ClickActionType.ActionUp | ControlActionArgs.ClickActionType.ActionClick;
                 if (base.Ghost || !Active) return;
@@ -274,7 +274,7 @@ namespace FusionUI.UI
 
                 if (args.IsEventEnd)
                 {
-                    if (base.Ghost || !Active) return;                    
+                    if (base.Ghost || !Active) return;
                     var rootFrame = ApplicationInterface.Instance.rootFrame;
                     var hoveredFrame = MainFrame.GetHoveredFrame(rootFrame, (Point)currentEventArgs.Position);
                     currentEventArgs.ActionType = ControlActionArgs.ClickActionType.ActionUp;
@@ -346,7 +346,7 @@ namespace FusionUI.UI
                 }
             }
         }
-        
+
 
         public Color? ActiveForeColor = UIConfig.ActiveTextColor,
             InactiveForeColor = UIConfig.InactiveTextColor,
@@ -355,7 +355,7 @@ namespace FusionUI.UI
             ActiveBorderColor = UIConfig.BorderColor,
             InactiveBorderColor = UIConfig.BorderColor,
             ActiveImageColor = Color.White,
-            InactiveImageColor = UIConfig.InactiveTextColor;       
+            InactiveImageColor = UIConfig.InactiveTextColor;
 
         public Texture ActiveImage, InactiveImage;
 
@@ -415,9 +415,9 @@ namespace FusionUI.UI
             public bool IsTouch;
 
             public Keys Key = Keys.None;
-            public int X  => Position.X;            
+            public int X  => Position.X;
 
-            public int Y => Position.Y;            
+            public int Y => Position.Y;
             public Point Position = Point.Zero;
 
             public int DX {get { return (int)MoveDelta.X; } }
@@ -476,7 +476,7 @@ namespace FusionUI.UI
                     }
                 }
             }
-            
+
             if (!flag)
             {
                 ActionDown?.Invoke(args, ref flag);
@@ -560,9 +560,9 @@ namespace FusionUI.UI
         }
 
         bool InnerActionOut(ControlActionArgs args)
-        {            
+        {
             bool flag = false;
-            if (!Active || !Visible) return false;            
+            if (!Active || !Visible) return false;
             oldPos = null;
             foreach (var frame in Children.Reverse())
             {
@@ -578,7 +578,7 @@ namespace FusionUI.UI
                     {
                         flag |= sFrame.InnerActionOut(args);
                     }
-                }                
+                }
             }
 
             if (!flag)
@@ -586,7 +586,7 @@ namespace FusionUI.UI
                 ActionOut?.Invoke(args, ref flag);
                 if (Selected) ActionLost?.Invoke(args, ref flag);
             }
-            
+
 
             Selected = false;
             return flag;
@@ -595,7 +595,7 @@ namespace FusionUI.UI
         private KeyUpEventHandler KeyUpAction;
         private KeyDownEventHandler KeyDownAction;
         private MouseMoveHandlerDelegate MoueMoveAction;
-        private TouchTapEventHandler TouchTapAction, TouchManipulateAction, TouchSecondaryTapAction, TouchHoldAction, TouchDoubleTapAction;       
+        private TouchTapEventHandler TouchTapAction, TouchManipulateAction, TouchSecondaryTapAction, TouchHoldAction, TouchDoubleTapAction;
 
         public void Clean()
         {
@@ -621,7 +621,7 @@ namespace FusionUI.UI
                 initialize();
                 firstUpdate = false;
             }
-            
+
             base.Update(gameTime);
             ActionUpdate?.Invoke(gameTime);
         }

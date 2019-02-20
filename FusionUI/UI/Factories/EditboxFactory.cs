@@ -10,7 +10,7 @@ namespace FusionUI.UI.Factories
     {
 
         public static UIContainer<Editbox> EditboxHolder(FrameProcessor ui, float OffsetX, float OffsetY, ScalableFrame parent,
-            string label, out Editbox box, out ScalableFrame labelFrame)
+            string label, out Editbox box, out ScalableFrame labelFrame, string initValue = "")
         {
             UIContainer<Editbox> holder = new UIContainer<Editbox>(ui, parent.UnitPaddingLeft, 0, parent.UnitWidth - parent.UnitPaddingLeft - parent.UnitPaddingRight, UIConfig.UnitEditboxElementHeight + UIConfig.UnitEditboxElementOffset + UIConfig.UnitEditboxLabelHeight + OffsetY, "", Color.Zero)
             {                
@@ -23,7 +23,7 @@ namespace FusionUI.UI.Factories
                 FontHolder = UIConfig.FontBody,
             };
             var inBox = new Editbox(ui, OffsetX, OffsetY + UIConfig.UnitEditboxElementOffset + UIConfig.UnitEditboxLabelHeight,
-                holder.UnitWidth - 2*OffsetX, UIConfig.UnitEditboxElementHeight, "", Color.Zero)
+                holder.UnitWidth - 2*OffsetX, UIConfig.UnitEditboxElementHeight, initValue, Color.Zero)
             {
                 Border = 2,
                 BorderColor = UIConfig.BorderColor,

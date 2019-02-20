@@ -11,6 +11,7 @@ using Fusion.Engine.Frames;
 using Fusion.Engine.Graphics;
 using FusionUI;
 using FusionUI.UI;
+using FusionUI.UI.Elements;
 
 namespace FusionUI.Legenda
 {
@@ -70,7 +71,7 @@ namespace FusionUI.Legenda
 	        }
 	    }
 
-        protected ScalableFrame minLabel, maxLabel;
+        protected Editbox minLabel, maxLabel;
 	    protected ScalableFrame palette;
 	    protected ScalableFrame caption;
 		public ScalableFrame LegendFrame
@@ -105,14 +106,26 @@ namespace FusionUI.Legenda
 					{
 					};
 
-					horLay.Add(minLabel = new ScalableFrame(ui, 0, 0, Width, UIConfig.UnitLegendElementHeight, MinValue, Color.Zero)
+					horLay.Add(minLabel = new Editbox(ui, 0, 0, Width/3, UIConfig.UnitLegendElementHeight, MinValue?? "0", Color.Black)
 					{
-					});
-					horLay.Add(maxLabel = new ScalableFrame(ui, 0, 0, Width, UIConfig.UnitLegendElementHeight, MaxValue, Color.Zero) {
-						TextAlignment = Alignment.MiddleRight,                        
-					});
+                        Border = 1,
+                        HoverColor = Color.White,
+                    });
+					horLay.Add(maxLabel = new Editbox(ui, Width * 2 / 3, 0, Width/3, UIConfig.UnitLegendElementHeight, MaxValue ?? "0", Color.Black) {
+						TextAlignment = Alignment.MiddleRight,
+                        Border = 1,
+                        HoverColor = Color.White,
+                    });
+                    minLabel.PropertyChanged += (sender, args) =>
+                    {
+                        if (args.PropertyName == "Text") MinValue = minLabel.Text;
+                    };
+                    maxLabel.PropertyChanged += (sender, args) =>
+                    {
+                        if (args.PropertyName == "Text") MaxValue = maxLabel.Text;
+                    };
 
-					legendFrame.Add(horLay);
+                    legendFrame.Add(horLay);
 					
 				}
 				return legendFrame;

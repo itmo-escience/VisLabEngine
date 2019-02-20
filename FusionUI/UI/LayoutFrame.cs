@@ -186,7 +186,7 @@ namespace FusionUI.UI
                     //if (!ControlChildrenSize && this.Children.Count > 0) this.Height = (this.Children.Count > 0 ? this.Children.Max(a => a.Height) : 0) + (int)((UnitPaddingTop + UnitPaddingBottom)*ScaleMultiplier);
                     max = UnitPaddingLeft;
                     int lastW = this.Width;
-                    UnitHeight = 0;
+                    UnitWidth = UnitPaddingLeft;
                     for (int i = 0; i < nodes.Count; i++)
                     {
                         var frame = nodes[i];
