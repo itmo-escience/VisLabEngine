@@ -59,7 +59,7 @@ namespace FusionUI.UI
             {
                 HeightLimit += (newH - oldH) / ScaleMultiplier;
             }
-            base.UpdateAnchors(oldW, oldH, newW, newH);   
+            base.UpdateAnchors(oldW, oldH, newW, newH);
             UpdateResize();
             //holder.UpdateAnchors(oldW, oldH, newW, newH);
         }
@@ -70,7 +70,7 @@ namespace FusionUI.UI
             {
 				if (!ResizedManually)
 				{
-					Height = Math.Max(Height, oldH); 
+					Height = Math.Max(Height, oldH);
 				}
             }
             base.UpdateResize(UpdateChildren);
@@ -78,11 +78,11 @@ namespace FusionUI.UI
             var ow = oldW;
             var oh = oldH;
             AutoResize(true);
-            if (oldW != Width || oldH != Height ) {                
+            if (oldW != Width || oldH != Height ) {
                 if (!fr && UpdateChildren)
                 {
                     holder.UpdateAnchors(ow, oh, Width, Height);
-                }                                                
+                }
             }
         }
 
@@ -91,7 +91,7 @@ namespace FusionUI.UI
             scrollHolder.UnitY = (DrawHat ? UIConfig.UnitHatHeight : 0) + UnitPaddingTop;
             scrollHolder.UnitX = UnitPaddingLeft;
             scrollHolder.UnitWidth = UnitWidth - UnitPaddingLeft - UnitPaddingRight;
-            scrollHolder.UnitHeight = HeightLimit - UnitPaddingTop - UnitPaddingBottom;            
+            scrollHolder.UnitHeight = HeightLimit - UnitPaddingTop - UnitPaddingBottom;
             holder.UnitWidth = scrollHolder.UnitWidth;
         }
 
@@ -108,16 +108,16 @@ namespace FusionUI.UI
             ClampPos = false;
             AutoHeight = false;
             UnitWidth = w;
-            UnitHeight = h;            
+            UnitHeight = h;
             UpdateResize();
             SuppressActions = true;
             HeightLimit = h - (HatPanel?.UnitHeight ?? 0) - (BasementPanel?.UnitHeight ?? 0) ;
             scrollHolder = new ScalableFrame(ui, holder.UnitX, holder.UnitY, holder.UnitWidth, HeightLimit - UnitPaddingTop - UnitPaddingBottom, "", Color.Zero)
-            {   
+            {
                 //Border = 1,
                 //BorderColor = Color.Violet,
-                Anchor = FrameAnchor.Left | FrameAnchor.Right | FrameAnchor.Top,                
-            };            
+                Anchor = FrameAnchor.Left | FrameAnchor.Right | FrameAnchor.Top,
+            };
             if (BasementPanel != null)
             {
                 BasementPanel.UnitY = h - BasementPanel.UnitHeight;
@@ -126,6 +126,7 @@ namespace FusionUI.UI
             RemoveBase(holder);
             AddBase(scrollHolder);
             scrollHolder.Add(holder);
+            scrollHolder.SuppressActions = true;
             holder.UnitY = 0;
             holder.UnitWidth = this.UnitWidth - ScrollSize + holder.UnitPaddingRight;
             holder.ZOrder = -100;
@@ -183,7 +184,7 @@ namespace FusionUI.UI
                 if (Selected && args.X > GlobalRectangle.Right - ScrollSize * ScaleMultiplier)
                 {
                     var relativeSize = MaxHeight / RealHeight;
-                    //var relativePos = (1 - relativeSize) * (-ScrollDelta / (RealHeight - MaxHeight));                    
+                    //var relativePos = (1 - relativeSize) * (-ScrollDelta / (RealHeight - MaxHeight));
 
                     float rp = (float) (args.Y - GlobalRectangle.Top) / GlobalRectangle.Height - clickPos * relativeSize;
                     var p = rp / (1 - relativeSize) * (RealHeight - MaxHeight);
@@ -196,10 +197,10 @@ namespace FusionUI.UI
 
         public void SetScroll(float value)
         {
-            var relativeSize = MaxHeight / RealHeight;  
-            if (relativeSize >= 1 || float.IsNaN(relativeSize)) return;            
+            var relativeSize = MaxHeight / RealHeight;
+            if (relativeSize >= 1 || float.IsNaN(relativeSize)) return;
             float rp = value;
-            var p = rp / (1 - relativeSize) * (RealHeight - MaxHeight);            
+            var p = rp / (1 - relativeSize) * (RealHeight - MaxHeight);
             holder.UnitY = -p;
             holder.UnitY = MathUtil.Clamp (holder.UnitY, Math.Min (MaxHeight - RealHeight, 0), 0);
         }
@@ -219,7 +220,7 @@ namespace FusionUI.UI
 				{
 					scrollHolder.UnitHeight = UnitHeight - ((HatPanel?.UnitHeight ?? 0) + (BasementPanel?.UnitHeight ?? 0) + UnitPaddingTop + UnitPaddingBottom);
 				}
-            }                        
+            }
             holder.UnitY = MathUtil.Clamp(holder.UnitY, Math.Min(MaxHeight - RealHeight, 0), 0);
         }
 
