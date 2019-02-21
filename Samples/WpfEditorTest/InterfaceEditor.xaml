@@ -115,7 +115,8 @@
                     <MenuItem Name="miFrameProperties" Header="Frame Properties" Click="MenuItem_Click"/>
                     <MenuItem Name="miSceneTreeView" Header="Scene TreeView" Click="MenuItem_Click"/>
                     <MenuItem Name="miFrameTemplates" Header="Frame Templates" Click="MenuItem_Click"/>
-                </MenuItem>
+                    <MenuItem Name="miConsole" Header="Console" Click="MenuItem_Click"/>
+                    </MenuItem>
                 </Menu>
                 <CheckBox Name="GridToggle" IsChecked="False" Background="#FFEEF5FD" Checked="CheckBox_Checked" Unchecked="CheckBox_Checked" VerticalAlignment="Stretch">
                     <TextBlock Text="ShowGrid" Background="#FFEEF5FD" VerticalAlignment="Center"/>

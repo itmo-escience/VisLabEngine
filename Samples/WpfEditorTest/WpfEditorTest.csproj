@@ -79,6 +79,9 @@
     <Compile Include="ChildPanels\FrameDragsPanel.xaml.cs">
       <DependentUpon>FrameDragsPanel.xaml</DependentUpon>
     </Compile>
+    <Compile Include="ChildWindows\ConsoleWindow.xaml.cs">
+      <DependentUpon>ConsoleWindow.xaml</DependentUpon>
+    </Compile>
     <Compile Include="FrameSelection\SelectionManager.cs" />
     <Compile Include="DialogWindows\SceneConfigWindow.xaml.cs">
       <DependentUpon>SceneConfigWindow.xaml</DependentUpon>
@@ -137,6 +140,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="ChildPanels\ParentHighlightPanel.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="ChildWindows\ConsoleWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

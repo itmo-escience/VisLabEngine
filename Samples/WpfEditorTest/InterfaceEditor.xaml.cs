@@ -31,6 +31,7 @@ using Keyboard = System.Windows.Input.Keyboard;
 using WpfEditorTest.DialogWindows;
 using Fusion.Engine.Frames2.Containers;
 using Fusion.Engine.Frames2.Managing;
+using WpfEditorTest.ChildWindows;
 
 namespace WpfEditorTest
 {
@@ -58,6 +59,7 @@ namespace WpfEditorTest
         private readonly FrameDetails _details;
 		private readonly FramePalette _palette;
 		private readonly FrameTreeView _treeView;
+		private readonly ConsoleWindow _consoleWindow;
 
 		private Binding _childrenBinding;
 		private readonly Game _engine;
@@ -122,10 +124,12 @@ namespace WpfEditorTest
             _details = new FrameDetails();
 			_treeView = new FrameTreeView();
 			_palette = new FramePalette();
+			_consoleWindow = new ConsoleWindow();
 
 			miFrameProperties.Tag = _details;
 			miFrameTemplates.Tag = _palette;
 			miSceneTreeView.Tag = _treeView;
+			miConsole.Tag = _consoleWindow;
 
 			SourceInitialized += ( _, args ) =>
 			{
@@ -141,7 +145,11 @@ namespace WpfEditorTest
 				_palette.Show();
 				if (!bool.Parse(ConfigurationManager.AppSettings.Get("PalettePanelVisibility")))
 					_palette.Hide();
-            };
+				_consoleWindow.Owner = this;
+				_consoleWindow.Show();
+				if (!bool.Parse(ConfigurationManager.AppSettings.Get("ConsoleWindowVisibility")))
+					_consoleWindow.Hide();
+			};
 
 			_treeView.SelectedFrameChangedInUI += ( _, frame ) =>
 			{
@@ -711,9 +719,16 @@ namespace WpfEditorTest
 			settings["PalettePanelX"].Value = _palette.Left.ToString();
 			settings["PalettePanelY"].Value = _palette.Top.ToString();
 			settings["PalettePanelHeight"].Value = _palette.Height.ToString();
+
+			settings["ConsoleWindowX"].Value = _consoleWindow.Left.ToString();
+			settings["ConsoleWindowY"].Value = _consoleWindow.Top.ToString();
+			settings["ConsoleWindowWidth"].Value = _consoleWindow.Width.ToString();
+			settings["ConsoleWindowHeight"].Value = _consoleWindow.Height.ToString();
+
 			settings["DetailsPanelVisibility"].Value = _details.Visibility == Visibility.Visible ? true.ToString() : false.ToString();
 			settings["PalettePanelVisibility"].Value = _palette.Visibility == Visibility.Visible ? true.ToString() : false.ToString();
 			settings["TreeViewPanelVisibility"].Value = _treeView.Visibility == Visibility.Visible ? true.ToString() : false.ToString();
+			settings["ConsoleWindowVisibility"].Value = _consoleWindow.Visibility == Visibility.Visible ? true.ToString() : false.ToString();
 			settings["GridSize"].Value = SelectionLayer.GridSizeMultiplier.ToString() + "x";
 			settings["MainWindowX"].Value = this.Left.ToString();
 			settings["MainWindowY"].Value = this.Top.ToString();

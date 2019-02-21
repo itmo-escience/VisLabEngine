@@ -1,0 +1,25 @@
+﻿<Window x:Class="WpfEditorTest.ChildWindows.ConsoleWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:WpfEditorTest.ChildWindows"
+        mc:Ignorable="d" d:DesignHeight="350" d:DesignWidth="950"
+        Title="ConsoleWindow"
+        WindowStyle="ToolWindow"
+        ShowInTaskbar="False"
+        ResizeMode="CanResize"
+        SizeToContent="Manual"
+        MinWidth="350" MinHeight="150"
+        MaxWidth="950" MaxHeight="350">
+    <Grid Width="auto" Height="auto">
+        <Grid.RowDefinitions>
+            <RowDefinition/>
+            <RowDefinition Height="25"/>
+        </Grid.RowDefinitions>
+        <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto">
+            <TextBlock Name="OutputField" Grid.Row="0" Background="#FFA0A0A0" />
+        </ScrollViewer>
+        <TextBox Name="InputField" Grid.Row="1" Height="25" VerticalAlignment="Bottom" KeyDown="TextBox_KeyDown"/>
+    </Grid>
+</Window>
