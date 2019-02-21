@@ -1,4 +1,7 @@
-﻿using System;
+﻿using Fusion;
+using Fusion.Core.Mathematics;
+using Fusion.Core.Utils;
+using System;
 using System.Collections.Generic;
 using System.Configuration;
 using System.Linq;
@@ -22,7 +25,7 @@ namespace WpfEditorTest.ChildWindows
 	{
 		private string _inputString;
 
-		public ConsoleWindow()
+        public ConsoleWindow()
 		{
 			InitializeComponent();
 
@@ -33,7 +36,21 @@ namespace WpfEditorTest.ChildWindows
 			Top = double.Parse(ConfigurationManager.AppSettings.Get("ConsoleWindowY"));
 
 			Closing += ( s, e ) => { this.Hide(); e.Cancel = true; };
-		}
+
+            Log.AddListener(new LogRecorder());
+            LogRecorder.TraceRecorded += (s, e) =>
+            {
+                Application.Current.Dispatcher.InvokeAsync(() =>
+                {
+                    string messages = "";
+                    foreach (LogMessage message in LogRecorder.GetLines())
+                    {
+                        messages += message.MessageText + Environment.NewLine;
+                    }
+                    OutputField.Text = messages;
+                });
+            };
+        }
 
 		private void TextBox_KeyDown( object sender, KeyEventArgs e )
 		{
@@ -42,8 +59,8 @@ namespace WpfEditorTest.ChildWindows
 				_inputString = InputField.Text;
 				InputField.Text = string.Empty;
 
-				OutputField.Text += _inputString + Environment.NewLine;
-			}
+                Log.Message("Test: " + _inputString);
+            }
 		}
 	}
 }
