@@ -106,13 +106,22 @@ namespace Fusion.Engine.Frames2.Managing
 
             //MouseUp
             _game.Keyboard.KeyUp += (sender, args) => {
-                if (args.Key.IsMouseKey())
-                {
-                    Vector2 mousePosition = _game.Mouse.Position;
-                    foreach (var c in UIHelper.BFSTraverseForPoint(_root, mousePosition))
+                if (!args.Key.IsMouseKey()) return;
+
+                Vector2 mousePosition = _game.Mouse.Position;
+                /*foreach (var c in UIHelper.BFSTraverseForPoint(_root, mousePosition))
                     {
-                        c.InvokeMouseUp(new ClickEventArgs(args.Key, mousePosition));
+                        c.InvokeMouseUp();
                     }
+                    */
+
+                var clickArgs = new ClickEventArgs(args.Key, mousePosition);
+                foreach (var c in UIHelper.BFSTraverse(_root))
+                {
+                    if(c.IsInside(mousePosition))
+                        c.InvokeMouseUp(clickArgs);
+                    else
+                        c.InvokeMouseUpOutside(clickArgs);
                 }
             };
 

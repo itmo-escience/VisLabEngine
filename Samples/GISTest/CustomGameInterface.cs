@@ -1,29 +1,17 @@
 ﻿using System;
-using System.CodeDom;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Fusion.Core.Mathematics;
-using Fusion.Drivers.Graphics;
 using Fusion.Engine.Common;
 using Fusion.Engine.Input;
 using Fusion.Engine.Graphics;
-using Fusion.Core;
-using Fusion.Core.Configuration;
 using Fusion.Framework;
 using Fusion.Build;
 using Fusion.Engine.Graphics.GIS;
-using Fusion.Engine.Graphics.GIS.GlobeMath;
 using Fusion.Engine.Frames;
 using Fusion;
 using Fusion.Core.Shell;
-using System.IO;
 using FusionUI;
 using FusionUI.UI;
-using FusionUI.UI.Factories;
-using FusionUI.UI.Elements;
-using Fusion.Core.Utils;
 using Fusion.Engine.Frames2.Components;
 using Fusion.Engine.Frames2.Containers;
 using Fusion.Engine.Frames2.Controllers;
@@ -184,7 +172,7 @@ namespace GISTest
             #region UITesting
 
             UIManager = new UIManager(Game.RenderSystem);
-		    UIManager.DebugEnabled = true;
+		    UIManager.DebugEnabled = false;
 
             txt = new Fusion.Engine.Frames2.Components.Label("z", new TextFormatD2D("Calibri", 20), 150, 450, 100, 100);
             string fileName = @"C:\image.png";
@@ -201,19 +189,26 @@ namespace GISTest
 
             UIManager.Root.Add(freePlacement);
 
-            var border = new Border(100, 100, 100, 100);
-            var label = new Label("Button", new TextFormatD2D("Calibry", 15), 100, 100, 100, 100);
-            var holder = new FreePlacement(50, 50, 200, 200);
-            holder.Add(border);
-            holder.Add(label);
-
             var btn = new ButtonController();
-            btn.Foreground.Attach(label);
-            btn.Background.Attach(border);
+		    btn.X = 100;
+		    btn.Y = 100;
 
-            //var bgColor = new UIController.PropertyValue()
+            btn.Background.Attach(new Border(0, 0, 100, 100));
+            btn.Foreground.Attach(new Label("Button", new TextFormatD2D("Calibry", 15), 0, 0, 100, 100));
 
-            UIManager.Root.Add(holder);
+
+		    var bgColor = new UIController.PropertyValue("BackgroundColor", Color4.White);
+		    bgColor[ButtonController.Hovered] = new Color4(1.0f, 0.0f, 0.0f, 1.0f);
+		    bgColor[ButtonController.Pressed] = new Color4(0.0f, 1.0f, 1.0f, 1.0f);
+
+		    var color = new UIController.PropertyValue("BackgroundColor", new Color4(1.0f, 1.0f, 0.0f, 1.0f));
+		    color[ButtonController.Hovered] = new Color4(1.0f, 0.0f, 1.0f, 1.0f);
+		    color[ButtonController.Pressed] = new Color4(1.0f, 1.0f, 1.0f, 1.0f);
+
+            btn.Background.Properties.Add(bgColor);
+            btn.Background.Properties.Add(color);
+
+            UIManager.Root.Add(btn);
 
             #endregion
 

@@ -5,52 +5,74 @@ using Fusion.Engine.Frames2.Managing;
 namespace Fusion.Engine.Frames2.Controllers
 {
     public class ButtonController : UIController
-    {       
-        private static readonly State Hovered  = new State("Hovered");
-        private static readonly State Pressed  = new State("Pressed");
+    {
+        public static readonly State Hovered = new State("Hovered");
+        public static readonly State Pressed = new State("Pressed");
 
-        protected override IEnumerable<State> NonDefaultStates => new List<State>
-        {
-            Hovered, Pressed
-        };
+        protected override IEnumerable<State> NonDefaultStates => new List<State> {Hovered, Pressed};
 
         public Slot Foreground { get; }
         public Slot Background { get; }
-        public override IReadOnlyList<Slot> Slots => new List<Slot> {Foreground, Background};
 
         public ButtonController()
         {
-            Foreground = new Slot("Foreground");
-            Background = new Slot("Background");
+            Foreground = new Slot(this, "Foreground");
+            Background = new Slot(this, "Background");
 
-            Foreground.ComponentAttached += (sender, args) =>
+            SlotsInternal.Add(Background);
+            SlotsInternal.Add(Foreground);
+
+            Background.ComponentAttached += (sender, args) =>
             {
                 if (args.Old != null)
                 {
                     args.Old.MouseDown -= OnMouseDown;
                     args.Old.MouseUp -= OnMouseUp;
+                    args.Old.MouseUpOutside -= OnMouseUp;
+                    args.New.Enter -= OnEnter;
+                    args.New.Leave -= OnLeave;
                 }
 
                 args.New.MouseDown += OnMouseDown;
                 args.New.MouseUp += OnMouseUp;
+                args.New.MouseUpOutside += OnMouseUp;
+                args.New.Enter += OnEnter;
+                args.New.Leave += OnLeave;
             };
 
             ButtonClick += (sender, args) => { };
         }
 
+        private void OnEnter(UIComponent sender)
+        {
+            if (CurrentState == State.Default)
+            {
+                ChangeState(Hovered);
+            }
+        }
+
+        private void OnLeave(UIComponent sender)
+        {
+            if (CurrentState == Hovered)
+            {
+                ChangeState(State.Default);
+            }
+        }
+
         private void OnMouseDown(UIComponent sender, ClickEventArgs e)
         {
+            if(CurrentState == Pressed)
+                return;
+
             ChangeState(Pressed);
-            Log.Message("Down");
         }
 
         private void OnMouseUp(UIComponent sender, ClickEventArgs e)
         {
             if(CurrentState == Pressed)
                 ButtonClick?.Invoke(this, new ButtonClickEventArgs(this));
-            
-            ChangeState(State.Default);
-            Log.Message("Up");
+
+            ChangeState(sender.IsInside(e.position) ? Hovered : State.Default);
         }
 
         public event EventHandler<ButtonClickEventArgs> ButtonClick;

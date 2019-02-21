@@ -1,10 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Fusion.Core.Mathematics;
+using Fusion.Engine.Frames2.Containers;
 
 namespace Fusion.Engine.Frames2
 {
-    public abstract class UIController
+    public abstract class UIController : FreePlacement
     {
         public State CurrentState { get; protected set; } = State.Default;
 
@@ -22,7 +24,8 @@ namespace Fusion.Engine.Frames2
 
         protected abstract IEnumerable<State> NonDefaultStates { get; }
 
-        public abstract IReadOnlyList<Slot> Slots { get; }
+        protected readonly List<Slot> SlotsInternal = new List<Slot>();
+        public IReadOnlyList<Slot> Slots => SlotsInternal;
 
         public void ChangeState(State newState)
         {
@@ -32,41 +35,89 @@ namespace Fusion.Engine.Frames2
             foreach (var fragment in Slots)
             {
                 var component = fragment.Component;
-                var type = component.GetType();                
+                var type = component.GetType();
                 foreach (var propertyValue in fragment.Properties)
                 {
                     var info = type.GetProperty(propertyValue.Name);
                     if(info == null) continue;
 
                     info.SetValue(
-                        component, 
+                        component,
                         Convert.ChangeType(
-                            propertyValue[newState], 
-                            info.PropertyType), 
+                            propertyValue[newState],
+                            info.PropertyType),
                         null
                     );
                 }
             }
 
             CurrentState = newState;
+
+            Log.Verbose(CurrentState);
         }
+
+        internal void Attach(Slot slot, UIComponent component)
+        {
+            var idx = SlotsInternal.IndexOf(slot);
+            base.AddAt(component, idx);
+
+            ResizeAccordingly();
+        }
+
+        private void ResizeAccordingly()
+        {
+            var b = base.BoundingBox;
+            foreach (var child in Children)
+            {
+                b = RectangleF.Union(b, child.BoundingBox);
+            }
+
+            // Do not take into account to the left and top
+            Width = b.Width - MathUtil.Clamp(BoundingBox.X - b.X, float.NegativeInfinity, 0);
+            Height = b.Height - MathUtil.Clamp(BoundingBox.Y - b.Y, float.NegativeInfinity, 0);
+        }
+
+        #region Disable default children operations
+
+        public override void Add(UIComponent child)
+        {
+            throw new InvalidOperationException("Direct addition is not supported");
+        }
+
+        public override void AddAt(UIComponent child, int index)
+        {
+            throw new InvalidOperationException("Direct addition is not supported");
+        }
+
+        public override bool Remove(UIComponent child)
+        {
+            throw new InvalidOperationException("Direct removal is not supported");
+        }
+
+        #endregion
 
         public class Slot
         {
             public string Name { get; }
             public UIComponent Component { get; private set; }
+            public UIController Host { get; }
             public List<PropertyValue> Properties { get; } = new List<PropertyValue>();
 
-            public Slot(string name)
+            public Slot(UIController host, string name)
             {
+                Host = host;
                 Name = name;
             }
 
             public void Attach(UIComponent component)
             {
                 var old = Component;
+
                 Component = component;
-                ComponentAttached?.Invoke(this, 
+
+                Host.Attach(this, component);
+
+                ComponentAttached?.Invoke(this,
                     new ComponentAttachedEventArgs(old, component)
                 );
             }
@@ -84,6 +135,8 @@ namespace Fusion.Engine.Frames2
                     New = newComponent;
                 }
             }
+
+            public override string ToString() => Name;
         }
 
         public class PropertyValue
@@ -97,6 +150,8 @@ namespace Fusion.Engine.Frames2
             {
                 Name = name;
                 Default = defaultValue;
+
+                _storedValues[State.Default] = Default;
             }
 
             public object this[State s]
@@ -109,6 +164,8 @@ namespace Fusion.Engine.Frames2
                 }
                 set => _storedValues[s] = value;
             }
+
+            public override string ToString() => Name;
         }
 
         public struct State : IEquatable<State>
@@ -119,7 +176,7 @@ namespace Fusion.Engine.Frames2
                 Name = name;
             }
 
-            public static State Default = new State("default");
+            public static State Default = new State("Default");
 
             public static bool operator ==(State self, State other)
             {
@@ -146,6 +203,13 @@ namespace Fusion.Engine.Frames2
             {
                 return (Name != null ? Name.GetHashCode() : 0);
             }
+
+            public override string ToString()
+            {
+                return $"State: {Name}";
+            }
+
+            public static implicit operator string(State s) => s.ToString();
         }
     }
 }

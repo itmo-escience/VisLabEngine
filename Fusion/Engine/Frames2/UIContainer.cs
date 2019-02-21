@@ -68,13 +68,7 @@ namespace Fusion.Engine.Frames2
 
         public virtual void Add(UIComponent child)
         {
-			//if(_children.Contains(child))
-			//    return;
-
-			//child.Parent = this;
-			//Children.Add(child);
 			AddAt(child, int.MaxValue);
-
 		}
 
 		public virtual void AddAt( UIComponent child, int index )
@@ -92,7 +86,6 @@ namespace Fusion.Engine.Frames2
 			}
 
             UpdateChildrenLayout();
-
         }
 
         protected virtual void UpdateChildrenLayout() { }

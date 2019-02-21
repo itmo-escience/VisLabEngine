@@ -305,6 +305,7 @@ namespace Fusion.Engine.Frames2
         public event MouseDragEvent     MouseDrag;
         public event MouseDownEvent     MouseDown;
         public event MouseUpEvent       MouseUp;
+        public event MouseUpEvent       MouseUpOutside;
         public event ClickEvent         Click;
         public event DoubleClickEvent   DoubleClick;
         public event ScrollEvent        Scroll;
@@ -313,19 +314,20 @@ namespace Fusion.Engine.Frames2
         public event FocusEvent         Focus;
         public event BlurEvent          Blur;
 
-        internal virtual void InvokeKeyDown     (KeyEventArgs e)       => KeyDown?.Invoke(this, e);
-        internal virtual void InvokeKeyUp       (KeyEventArgs e)       => KeyUp?.Invoke(this, e);
-        internal virtual void InvokeKeyPress    (KeyEventArgs e)       => KeyPress?.Invoke(this, e);
-        internal virtual void InvokeMouseMove   (MoveEventArgs e)      => MouseMove?.Invoke(this, e);
-        internal virtual void InvokeMouseDrag   (DragEventArgs e)      => MouseDrag?.Invoke(this, e);
-        internal virtual void InvokeMouseDown   (ClickEventArgs e)     => MouseDown?.Invoke(this, e);
-        internal virtual void InvokeMouseUp     (ClickEventArgs e)     => MouseUp?.Invoke(this, e);
-        internal virtual void InvokeClick       (ClickEventArgs e)     => Click?.Invoke(this, e);
-        internal virtual void InvokeDoubleClick (ClickEventArgs e)     => DoubleClick?.Invoke(this, e);
-        internal virtual void InvokeScroll      (ScrollEventArgs e)    => Scroll?.Invoke(this, e);
-        internal virtual void InvokeEnter       ()                     => Enter?.Invoke(this);
-        internal virtual void InvokeLeave       ()                     => Leave?.Invoke(this);
-        internal virtual void InvokeFocus       ()                     => Focus?.Invoke(this);
-        internal virtual void InvokeBlur        ()                     => Blur?.Invoke(this);
+        internal virtual void InvokeKeyDown       (KeyEventArgs e)       => KeyDown?.Invoke(this, e);
+        internal virtual void InvokeKeyUp         (KeyEventArgs e)       => KeyUp?.Invoke(this, e);
+        internal virtual void InvokeKeyPress      (KeyEventArgs e)       => KeyPress?.Invoke(this, e);
+        internal virtual void InvokeMouseMove     (MoveEventArgs e)      => MouseMove?.Invoke(this, e);
+        internal virtual void InvokeMouseDrag     (DragEventArgs e)      => MouseDrag?.Invoke(this, e);
+        internal virtual void InvokeMouseDown     (ClickEventArgs e)     => MouseDown?.Invoke(this, e);
+        internal virtual void InvokeMouseUp       (ClickEventArgs e)     => MouseUp?.Invoke(this, e);
+        internal virtual void InvokeMouseUpOutside(ClickEventArgs e)     => MouseUpOutside?.Invoke(this, e);
+        internal virtual void InvokeClick         (ClickEventArgs e)     => Click?.Invoke(this, e);
+        internal virtual void InvokeDoubleClick   (ClickEventArgs e)     => DoubleClick?.Invoke(this, e);
+        internal virtual void InvokeScroll        (ScrollEventArgs e)    => Scroll?.Invoke(this, e);
+        internal virtual void InvokeEnter         ()                     => Enter?.Invoke(this);
+        internal virtual void InvokeLeave         ()                     => Leave?.Invoke(this);
+        internal virtual void InvokeFocus         ()                     => Focus?.Invoke(this);
+        internal virtual void InvokeBlur          ()                     => Blur?.Invoke(this);
     }
 }
