@@ -40,5 +40,18 @@ namespace WpfEditorTest.ChildPanels
 
 	        FrameDetailsControls.ItemsSource = propsies.OrderBy(p => p.PropName).ToList();
         }
+
+		public void SetSelectFrame( UIController.Slot slot)
+		{
+			//var publicProperties = slot.GetType().GetProperties(BindingFlags.Public | BindingFlags.Instance);
+
+			//var propsies = (
+			//	from property in publicProperties
+			//	where property.GetMethod != null && property.SetMethod != null && !property.CustomAttributes.Any(ca => ca.AttributeType.Name == "XmlIgnoreAttribute")
+			//	select new MVVMFrameProperty(property, slot)
+			//).ToList();
+
+			//FrameDetailsControls.ItemsSource = propsies.OrderBy(p => p.PropName).ToList();
+		}
 	}
 }

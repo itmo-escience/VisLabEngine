@@ -201,7 +201,7 @@ namespace GISTest
 		    bgColor[ButtonController.Hovered] = new Color4(1.0f, 0.0f, 0.0f, 1.0f);
 		    bgColor[ButtonController.Pressed] = new Color4(0.0f, 1.0f, 1.0f, 1.0f);
 
-		    var color = new UIController.PropertyValue("BackgroundColor", new Color4(1.0f, 1.0f, 0.0f, 1.0f));
+		    var color = new UIController.PropertyValue("ForegroundColor", new Color4(1.0f, 1.0f, 0.0f, 1.0f));
 		    color[ButtonController.Hovered] = new Color4(1.0f, 0.0f, 1.0f, 1.0f);
 		    color[ButtonController.Pressed] = new Color4(1.0f, 1.0f, 1.0f, 1.0f);
 

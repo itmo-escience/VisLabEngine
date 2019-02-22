@@ -34,6 +34,7 @@ namespace WpfEditorTest.ChildPanels
         }
 
         public EventHandler<UIComponent> SelectedFrameChangedInUI;
+		public EventHandler<UIController.Slot> ControllerSlotSelected;
 		public EventHandler RequestFrameDeletionInUI;
 
 		private TextBlock initTreeViewItemHolder;
@@ -73,7 +74,15 @@ namespace WpfEditorTest.ChildPanels
 			this.initTreeViewItemHolder = sender as TextBlock;
 			var objectChecking = (sender as TextBlock).Tag;
 			if (/*objectChecking.GetType().IsSubclassOf(typeof(UIController)) || */objectChecking is UIController.Slot)
+			{
+				ControllerSlotSelected?.Invoke(this, objectChecking as UIController.Slot);
 				return;
+			}
+			else
+			{
+				ControllerSlotSelected?.Invoke(this, null);
+			}
+
 
 			var component = (UIComponent)(sender as TextBlock).Tag;
 

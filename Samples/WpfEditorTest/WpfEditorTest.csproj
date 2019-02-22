@@ -82,6 +82,9 @@
     <Compile Include="ChildWindows\ConsoleWindow.xaml.cs">
       <DependentUpon>ConsoleWindow.xaml</DependentUpon>
     </Compile>
+    <Compile Include="ChildWindows\SlotDetailsWindow.xaml.cs">
+      <DependentUpon>SlotDetailsWindow.xaml</DependentUpon>
+    </Compile>
     <Compile Include="FrameSelection\SelectionManager.cs" />
     <Compile Include="DialogWindows\SceneConfigWindow.xaml.cs">
       <DependentUpon>SceneConfigWindow.xaml</DependentUpon>
@@ -148,6 +151,10 @@
     <Page Include="ChildWindows\ConsoleWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="ChildWindows\SlotDetailsWindow.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
     </Page>
     <Page Include="InterfaceEditor.xaml">
       <SubType>Designer</SubType>
