@@ -104,14 +104,14 @@ namespace WpfEditorTest.ChildPanels
 
 			while (currentFrame.Parent != null && currentFrame.Parent != _scene)
 			{
-				if (currentFrame.Parent is UIContainer)
+				if (currentFrame.Parent is UIController)
 				{
+					components.Add((currentFrame.Parent as UIController).Slots.Where(s => s.Component == currentFrame).FirstOrDefault());
 					currentFrame = currentFrame.Parent;
 					components.Add(currentFrame);
 				}
 				else
 				{
-					components.Add((currentFrame.Parent as UIController).Slots.Where(s=>s.Component == currentFrame).FirstOrDefault());
 					currentFrame = currentFrame.Parent;
 					components.Add(currentFrame);
 				}
