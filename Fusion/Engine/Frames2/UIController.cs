@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using Fusion.Core.Mathematics;
+using Fusion.Engine.Common;
 using Fusion.Engine.Frames2.Containers;
 
 namespace Fusion.Engine.Frames2
@@ -81,17 +82,18 @@ namespace Fusion.Engine.Frames2
 
         public override void Add(UIComponent child)
         {
-            throw new InvalidOperationException("Direct addition is not supported");
+            Log.Error("Direct addition is not supported");
         }
 
         public override void AddAt(UIComponent child, int index)
         {
-            throw new InvalidOperationException("Direct addition is not supported");
+            Log.Error("Direct addition is not supported");
         }
 
         public override bool Remove(UIComponent child)
         {
-            throw new InvalidOperationException("Direct removal is not supported");
+            Log.Error("Direct removal is not supported");
+            return false;
         }
 
         #endregion
@@ -210,6 +212,18 @@ namespace Fusion.Engine.Frames2
             }
 
             public static implicit operator string(State s) => s.ToString();
+        }
+    }
+
+    public class ControllerContainer : UIContainer
+    {
+        public UIController Controller { get; }
+
+        //public ControllerContainer
+
+        public override void Update(GameTime gameTime)
+        {
+            throw new NotImplementedException();
         }
     }
 }

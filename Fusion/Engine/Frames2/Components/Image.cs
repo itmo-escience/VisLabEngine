@@ -78,7 +78,7 @@ namespace Fusion.Engine.Frames2.Components
 			{
 				_image.Width = Width;
 				_image.Height = Height;
-				_image.Opacity = Opacity; 
+				_image.Opacity = Opacity;
 			}
         }
 

@@ -1,13 +1,11 @@
 ﻿using Fusion.Core.Mathematics;
-using Fusion.Engine.Common;
 using Fusion.Engine.Graphics.SpritesD2D;
 
 namespace Fusion.Engine.Frames2.Containers
 {
-
     public enum VerticalAlignment
     {
-        LEFT, CENTER, RIGHT
+        Left, Center, Right
     }
 
     public class VerticalBox : UIContainer
@@ -18,10 +16,6 @@ namespace Fusion.Engine.Frames2.Containers
             set {
                 SetAndNotify(ref _alignment, value);
             }
-        }
-
-        public override void Update(GameTime gameTime) {
-            UpdateChildrenLayout();
         }
 
         protected override void UpdateChildrenLayout()
@@ -42,13 +36,13 @@ namespace Fusion.Engine.Frames2.Containers
             float deltaXMultiplier = 0;
             switch (Alignment)
             {
-                case VerticalAlignment.LEFT:
+                case VerticalAlignment.Left:
                     deltaXMultiplier = 0;
                     break;
-                case VerticalAlignment.CENTER:
+                case VerticalAlignment.Center:
                     deltaXMultiplier = 0.5f;
                     break;
-                case VerticalAlignment.RIGHT:
+                case VerticalAlignment.Right:
                     deltaXMultiplier = 1;
                     break;
             }
@@ -59,16 +53,17 @@ namespace Fusion.Engine.Frames2.Containers
             }
         }
 
+        protected override SolidBrushD2D DebugBrush { get; } = new SolidBrushD2D(new Color4(0, 1, 1, 1));
+        protected override TextFormatD2D DebugTextFormat { get; } = new TextFormatD2D("Consolas", 14);
+
         public VerticalBox() : base() {
-            debugBrush = new SolidBrushD2D(new Color4(0, 1, 1, 1));
-            debugTextFormat = new TextFormatD2D("Consolas", 14);
-            Alignment = VerticalAlignment.LEFT;
+            Alignment = VerticalAlignment.Left;
         }
 
-        public VerticalBox(float x, float y, float width, float height, VerticalAlignment alignment = VerticalAlignment.LEFT, bool needClipping = false) : base(x, y, width, height, needClipping)
+        public VerticalBox(float x, float y, float width, float height, VerticalAlignment alignment = VerticalAlignment.Left, bool needClipping = false) : base(x, y, width, height, needClipping)
         {
-            debugBrush = new SolidBrushD2D(new Color4(0, 1, 1, 1));
-            debugTextFormat = new TextFormatD2D("Consolas", 14);
+            DebugBrush = new SolidBrushD2D(new Color4(0, 1, 1, 1));
+            DebugTextFormat = new TextFormatD2D("Consolas", 14);
             Alignment = alignment;
         }
 
@@ -77,13 +72,13 @@ namespace Fusion.Engine.Frames2.Containers
             base.DebugDraw(layer);
             layer.Draw(new TransformCommand(GlobalTransform));
 
-            layer.Draw(new Rect(0, 0, Width, Height, debugBrush));
+            layer.Draw(new Rect(0, 0, Width, Height, DebugBrush));
 
             float bottomBorder = 0;
             foreach (var child in Children)
             {
                 bottomBorder += child.LocalBoundingBox.Height;
-                layer.Draw(new Line(new Vector2(0, bottomBorder), new Vector2(Width, bottomBorder), debugBrush));
+                layer.Draw(new Line(new Vector2(0, bottomBorder), new Vector2(Width, bottomBorder), DebugBrush));
             }
         }
     }

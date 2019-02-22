@@ -1,5 +1,6 @@
 ﻿using System.Collections.ObjectModel;
 using Fusion.Core.Mathematics;
+using Fusion.Engine.Common;
 using Fusion.Engine.Graphics.SpritesD2D;
 using SharpDX.Direct2D1;
 using SharpDX.Mathematics.Interop;
@@ -154,6 +155,11 @@ namespace Fusion.Engine.Frames2
         #endregion
 
         public override void Draw(SpriteLayerD2D layer) { }
+
+        public override void Update(GameTime gameTime)
+        {
+            UpdateChildrenLayout();
+        }
 
         public PathGeometryD2D GetClippingGeometry(SpriteLayerD2D layer)
         {
