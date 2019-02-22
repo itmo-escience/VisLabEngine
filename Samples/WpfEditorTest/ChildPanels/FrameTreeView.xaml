@@ -4,6 +4,7 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:local="clr-namespace:WpfEditorTest.ChildPanels"
+             xmlns:conv="clr-namespace:WpfEditorTest.WPFConverters"
              mc:Ignorable="d"
              d:DesignHeight="264" d:DesignWidth="264"
         Title="Scene TreeView"
@@ -13,18 +14,36 @@
         SizeToContent="Manual"
         MinWidth="350" MinHeight="150"
         MaxWidth="350" MaxHeight="950" KeyDown="Window_KeyDown">
-    <ScrollViewer Height="auto" Width="auto" Background="LightGray">
-        <AdornerDecorator>
-        <TreeView Name="ElementHierarchyView" Background="LightGray" Height="auto" Width="auto" AllowDrop="True" Drop="ElementHierarchyView_Drop">
-            <TreeView.ItemTemplate>
-                <HierarchicalDataTemplate ItemsSource="{Binding Path=Children}">
-                    <TextBlock Text="{Binding Name}" Tag="{Binding}" 
+    <Window.Resources>
+        <conv:EnumerateConverter x:Key="enumConverter"/>
+        <HierarchicalDataTemplate x:Key="tvTemplate1" ItemsSource="{Binding Path=Children}">
+            <TextBlock Text="{Binding Name}" Tag="{Binding}" 
                                MouseDown="TextBlock_MouseDown" DragOver="TextBlock_PreviewDragOver" Drop="TextBlock_PreviewDrop" 
                                PreviewDragLeave="TextBlock_PreviewDragLeave" PreviewDragEnter="TextBlock_PreviewDragEnter"
                                MouseMove="TextBlock_MouseMove"/>
-                </HierarchicalDataTemplate>
-            </TreeView.ItemTemplate>
-        </TreeView>
+        </HierarchicalDataTemplate>
+        <HierarchicalDataTemplate x:Key="tvTemplate2" ItemsSource="{Binding Path=Slots}">
+            <TextBlock Text="{Binding Name}" Tag="{Binding}" 
+                               MouseDown="TextBlock_MouseDown" DragOver="TextBlock_PreviewDragOver" Drop="TextBlock_PreviewDrop" 
+                               PreviewDragLeave="TextBlock_PreviewDragLeave" PreviewDragEnter="TextBlock_PreviewDragEnter"
+                               MouseMove="TextBlock_MouseMove" FontStyle="Italic"/>
+        </HierarchicalDataTemplate>
+        <HierarchicalDataTemplate x:Key="tvTemplate3" ItemsSource="{Binding Path=Component, Converter={StaticResource enumConverter}}">
+            <TextBlock Text="{Binding Name}" Tag="{Binding}" 
+                               MouseDown="TextBlock_MouseDown" DragOver="TextBlock_PreviewDragOver" Drop="TextBlock_PreviewDrop" 
+                               PreviewDragLeave="TextBlock_PreviewDragLeave" PreviewDragEnter="TextBlock_PreviewDragEnter"
+                               MouseMove="TextBlock_MouseMove" FontStyle="Italic" Foreground="Purple"/>
+        </HierarchicalDataTemplate>
+    </Window.Resources>
+    <ScrollViewer Height="auto" Width="auto" Background="LightGray">
+        <AdornerDecorator>
+            <TreeView Name="ElementHierarchyView"
+                      Background="LightGray" Height="auto" Width="auto" AllowDrop="True" Drop="ElementHierarchyView_Drop">
+                <TreeView.ItemTemplateSelector>
+                    <conv:DataTemplateSelectorOfTreeView tv1Template="{StaticResource tvTemplate1}" tv2Template="{StaticResource tvTemplate2}"
+                                                         tv3Template="{StaticResource tvTemplate3}"/>
+                </TreeView.ItemTemplateSelector>
+            </TreeView>
         </AdornerDecorator>
     </ScrollViewer>
 </Window>

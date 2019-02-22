@@ -105,7 +105,9 @@
     <Compile Include="ChildPanels\ParentHighlightPanel.xaml.cs">
       <DependentUpon>ParentHighlightPanel.xaml</DependentUpon>
     </Compile>
+    <Compile Include="WPFConverters\EnumerateConverter.cs" />
     <Compile Include="WPFConverters\ButtonEnableConverter.cs" />
+    <Compile Include="WPFConverters\DataTemplateSelectorOfTreeView.cs" />
     <Compile Include="WPFConverters\DataTemplateSelectorOfProperty.cs" />
     <Compile Include="UndoRedo\FrameParentChangeCommand.cs" />
     <Compile Include="ChildPanels\MVVMFrameProperty.cs" />

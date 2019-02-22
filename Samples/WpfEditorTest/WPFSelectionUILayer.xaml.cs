@@ -429,8 +429,11 @@ namespace WpfEditorTest
 					}
 					else
 					{
-						if (!SelectionManager.Instance.SelectedFrames.Contains(hovered))
+						if (!SelectionManager.Instance.SelectedFrames.Contains(hovered) )
 						{
+							if (hovered.Parent.GetType().IsSubclassOf(typeof(UIController)))
+								hovered = hovered.Parent;
+
 							command = new SelectFrameCommand(new List<UIComponent> { hovered });
 						}
 					}
