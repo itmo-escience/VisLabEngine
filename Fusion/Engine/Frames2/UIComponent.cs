@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Xml.Serialization;
 using Fusion.Core.Mathematics;
@@ -222,8 +221,6 @@ namespace Fusion.Engine.Frames2
             _isTransformDirty = true;
         }
 
-        // TODO: Anchors
-
         internal void InternalUpdate(GameTime gameTime)
         {
             UpdateTransforms();
@@ -236,17 +233,17 @@ namespace Fusion.Engine.Frames2
         public abstract void Update(GameTime gameTime);
         public abstract void Draw(SpriteLayerD2D layer);
 
-        protected SolidBrushD2D debugBrush = new SolidBrushD2D(new Color4(0, 1, 0, 1));
-        protected TextFormatD2D debugTextFormat = new TextFormatD2D("Consolas", 12);
+        protected virtual SolidBrushD2D DebugBrush { get; } = new SolidBrushD2D(new Color4(0, 1, 0, 1));
+        protected virtual TextFormatD2D DebugTextFormat { get; } = new TextFormatD2D("Consolas", 12);
         public virtual void DebugDraw(SpriteLayerD2D layer)
         {
             var b = BoundingBox;
             layer.Draw(TransformCommand.Identity);
-            layer.Draw(new Rect(b.X, b.Y, b.Width, b.Height, debugBrush));
+            layer.Draw(new Rect(b.X, b.Y, b.Width, b.Height, DebugBrush));
 
-            string debugText = $"{Name} X:{b.X:0.00} Y:{b.Y:0.00} W:{b.Width:0.00} H:{b.Height:0.00}";
-            TextLayoutD2D dtl = new TextLayoutD2D(debugText, debugTextFormat, float.MaxValue, float.MaxValue);
-            layer.Draw(new Label(debugText, new RectangleF(b.X, b.Y - dtl.Height, dtl.Width + 1, dtl.Height), debugTextFormat, debugBrush));
+            var debugText = $"{Name} X:{b.X:0.00} Y:{b.Y:0.00} W:{b.Width:0.00} H:{b.Height:0.00}";
+            var dtl = new TextLayoutD2D(debugText, DebugTextFormat, float.MaxValue, float.MaxValue);
+            layer.Draw(new Label(debugText, new RectangleF(b.X, b.Y - dtl.Height, dtl.Width + 1, dtl.Height), DebugTextFormat, DebugBrush));
         }
 
         #region Naming
