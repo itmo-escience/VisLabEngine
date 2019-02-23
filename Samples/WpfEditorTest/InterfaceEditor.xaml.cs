@@ -126,7 +126,7 @@ namespace WpfEditorTest
 			_details = new FrameDetails();
 			_treeView = new FrameTreeView();
 			_palette = new FramePalette();
-			_consoleWindow = new ConsoleWindow();
+			_consoleWindow = new ConsoleWindow(_engine.Invoker);
 
 			miSlotDetails.Tag = _slotDetails;
 			miFrameProperties.Tag = _details;
