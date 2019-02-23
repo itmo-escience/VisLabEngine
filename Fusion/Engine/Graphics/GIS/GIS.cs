@@ -210,7 +210,7 @@ namespace Fusion.Engine.Graphics.GIS
                     }
 
                 }        
-                Log.Debug("{0}", constantData.Dummy.Y);        
+                //Log.Debug("{0}", constantData.Dummy.Y);        
                 constBuffer.SetData(constantData);
 
 
