@@ -76,5 +76,16 @@ namespace WpfEditorTest.ChildWindows
                 }
             }
 		}
+
+		private void chbx1_Checked( object sender, RoutedEventArgs e )
+		{
+			var checkBox = sender as CheckBox;
+			LogMessageType logType = (LogMessageType)checkBox.Tag;
+			bool check = checkBox.IsChecked != null ? checkBox.IsChecked == true ? true : false : false;
+			if (check)
+			{
+
+			}
+		}
 	}
 }
