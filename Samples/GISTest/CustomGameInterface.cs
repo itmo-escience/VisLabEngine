@@ -189,20 +189,22 @@ namespace GISTest
 
             UIManager.Root.Add(freePlacement);
 
-            var btn = new ButtonController();
-		    btn.X = 100;
-		    btn.Y = 100;
+            #endregion
+
+
+            #region button
+            var btn = new ButtonController(100, 100);
 
             btn.Background.Attach(new Border(0, 0, 100, 100));
             btn.Foreground.Attach(new Label("Button", new TextFormatD2D("Calibry", 15), 0, 0, 100, 100));
 
 
 		    var bgColor = new UIController.PropertyValue("BackgroundColor", Color4.White);
-		    bgColor[ButtonController.Hovered] = new Color4(1.0f, 0.0f, 0.0f, 1.0f);
+		    bgColor[UIController.State.Hovered] = new Color4(1.0f, 0.0f, 0.0f, 1.0f);
 		    bgColor[ButtonController.Pressed] = new Color4(0.0f, 1.0f, 1.0f, 1.0f);
 
-		    var color = new UIController.PropertyValue("ForegroundColor", new Color4(1.0f, 1.0f, 0.0f, 1.0f));
-		    color[ButtonController.Hovered] = new Color4(1.0f, 0.0f, 1.0f, 1.0f);
+		    var color = new UIController.PropertyValue("BackgroundColor", new Color4(1.0f, 1.0f, 0.0f, 1.0f));
+		    color[UIController.State.Hovered] = new Color4(1.0f, 0.0f, 1.0f, 1.0f);
 		    color[ButtonController.Pressed] = new Color4(1.0f, 1.0f, 1.0f, 1.0f);
 
             btn.Background.Properties.Add(bgColor);
@@ -211,6 +213,16 @@ namespace GISTest
             UIManager.Root.Add(btn);
 
             #endregion
+
+            #region textbox
+
+		    var tb = new TextBoxController(300, 100);
+            tb.Background.Attach(new Border(0, 0, 100, 100));
+
+            UIManager.Root.Add(tb);
+            #endregion
+
+
 
             userInterface.RootFrame = this.rootFrame = new MainFrame(FrameProcessor);
 			viewLayer.SpriteLayers.Add(userInterface.FramesSpriteLayer);

@@ -1,13 +1,6 @@
 ﻿using Fusion.Core.Mathematics;
-using Fusion.Engine.Common;
-using Fusion.Engine.Graphics.SpritesD2D;
-using SharpDX.Direct2D1;
-using SharpDX.Mathematics.Interop;
-using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Fusion.Engine.Frames2.Managing
 {
@@ -100,15 +93,11 @@ namespace Fusion.Engine.Frames2.Managing
             }
         }
 
-        public static List<UIComponent> GetAllComponentsByPoint(UIContainer root, Vector2 innerPoint)
-        {
-            List<UIComponent> components = new List<UIComponent>();
-            foreach (var c in UIHelper.BFSTraverseForPoint(root, innerPoint)) components.Add(c);
-            return components;
-        }
-
         public static IEnumerable<UIContainer> Ancestors(UIComponent component)
         {
+            if(component == null)
+                yield break;
+
             var current = component.Parent;
             while (current != null)
             {

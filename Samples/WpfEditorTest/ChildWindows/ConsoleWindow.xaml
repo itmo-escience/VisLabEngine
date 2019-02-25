@@ -33,7 +33,7 @@
             </ToolBar>
         </ToolBarTray>
         <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto" Name="ScrollViewer" Grid.Row="1">
-            <TextBlock Name="OutputField"  Background="#FFA0A0A0" />
+            <TextBox Name="OutputField" Background="#FFA0A0A0" IsReadOnly="True"/>
         </ScrollViewer>
         <TextBox Name="InputField" Grid.Row="2" Height="25" VerticalAlignment="Bottom" KeyDown="TextBox_KeyDown"/>
     </Grid>

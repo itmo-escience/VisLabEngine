@@ -55,13 +55,18 @@ namespace Fusion.Engine.Frames2.Managing
     public delegate void FocusEvent(UIComponent sender);
     public delegate void BlurEvent(UIComponent sender);
 
-    public class KeyEventArgs : EventArgs
+    public class BubblingEventArgs : EventArgs
     {
-        public Keys key;
+        public bool ShouldPropagate { get; set; } = true;
+    }
+
+    public class KeyEventArgs : BubblingEventArgs
+    {
+        public Keys Key { get; }
 
         public KeyEventArgs(Keys key)
         {
-            this.key = key;
+            Key = key;
         }
 
         public static explicit operator KeyEventArgs(Input.KeyEventArgs args)
@@ -70,57 +75,58 @@ namespace Fusion.Engine.Frames2.Managing
         }
     }
 
-    public class MoveEventArgs : EventArgs
+    public class MoveEventArgs : BubblingEventArgs
     {
-        public Vector2 position;
-        public Vector2 offset;
+        public Vector2 Position { get; }
+        public Vector2 Offset { get; }
+
+        public MoveEventArgs(Vector2 position, Vector2 offset)
+        {
+            Position = position;
+            Offset = offset;
+        }
 
         public static explicit operator MoveEventArgs(MouseMoveEventArgs args)
         {
-            MoveEventArgs temp = new MoveEventArgs
-            {
-                position = args.Position,
-                offset = args.Offset
-            };
-            return temp;
+            return new MoveEventArgs(args.Position, args.Offset);
         }
     }
 
-    public class ClickEventArgs : EventArgs
+    public class ClickEventArgs : BubblingEventArgs
     {
-        public Keys key;
-        public Vector2 position;
+        public Keys Key { get; }
+        public Vector2 Position { get; }
 
         public ClickEventArgs(Keys key, Vector2 position)
         {
-            this.key = key;
-            this.position = position;
+            Key = key;
+            Position = position;
         }
     }
 
-    public class DragEventArgs : EventArgs
+    public class DragEventArgs : BubblingEventArgs
     {
-        public Keys key;
-        public Vector2 position;
-        public Vector2 offset;
+        public Keys Key { get; }
+        public Vector2 Position { get; }
+        public Vector2 Offset { get; }
 
         public DragEventArgs(Keys key, MouseMoveEventArgs args)
         {
-            this.key = key;
-            position = args.Position;
-            offset = args.Offset;
+            Key = key;
+            Position = args.Position;
+            Offset = args.Offset;
         }
     }
 
-    public class ScrollEventArgs : EventArgs
+    public class ScrollEventArgs : BubblingEventArgs
     {
-        public Vector2 position;
-        public int wheelDelta;
+        public Vector2 Position { get; }
+        public int WheelDelta { get; }
 
         public ScrollEventArgs(Vector2 position, MouseScrollEventArgs args)
         {
-            this.position = position;
-            wheelDelta = args.WheelDelta;
+            Position = position;
+            WheelDelta = args.WheelDelta;
         }
     }
 }

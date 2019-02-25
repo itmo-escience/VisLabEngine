@@ -3,11 +3,10 @@ using System.Collections.Generic;
 using System.Linq;
 using Fusion.Core.Mathematics;
 using Fusion.Engine.Common;
-using Fusion.Engine.Frames2.Containers;
 
 namespace Fusion.Engine.Frames2
 {
-    public abstract class UIController : FreePlacement
+    public abstract class UIController : UIContainer
     {
         public State CurrentState { get; protected set; } = State.Default;
 
@@ -16,6 +15,9 @@ namespace Fusion.Engine.Frames2
             get
             {
                 yield return State.Default;
+                yield return State.Hovered;
+                yield return State.Disabled;
+
                 foreach (var state in NonDefaultStates)
                 {
                     yield return state;
@@ -23,7 +25,9 @@ namespace Fusion.Engine.Frames2
             }
         }
 
-        protected abstract IEnumerable<State> NonDefaultStates { get; }
+        protected UIController(float x, float y, float width, float height) : base(x, y, width, height, true) { }
+
+        protected virtual IEnumerable<State> NonDefaultStates => new List<State>();
 
         protected readonly List<Slot> SlotsInternal = new List<Slot>();
         public IReadOnlyList<Slot> Slots => SlotsInternal;
@@ -78,6 +82,36 @@ namespace Fusion.Engine.Frames2
             Height = b.Height - MathUtil.Clamp(BoundingBox.Y - b.Y, float.NegativeInfinity, 0);
         }
 
+        private bool _initialized = false;
+
+        private void Initialize()
+        {
+            foreach (var slot in Slots)
+            {
+                if (slot.Component != null)
+                {
+                    Attach(slot, slot.Component);
+                }
+                slot.ComponentAttached += ComponentAttachedToSlot;
+            }
+            _initialized = true;
+        }
+
+        private void ComponentAttachedToSlot(object sender, Slot.ComponentAttachedEventArgs e)
+        {
+            var slot = (Slot) sender;
+
+            Attach(slot, e.New);
+        }
+
+        public override void Update(GameTime gameTime)
+        {
+            if(!_initialized)
+                Initialize();
+
+            base.Update(gameTime);
+        }
+
         #region Disable default children operations
 
         public override void Add(UIComponent child)
@@ -102,12 +136,10 @@ namespace Fusion.Engine.Frames2
         {
             public string Name { get; }
             public UIComponent Component { get; private set; }
-            public UIController Host { get; }
             public List<PropertyValue> Properties { get; } = new List<PropertyValue>();
 
-            public Slot(UIController host, string name)
+            public Slot(string name)
             {
-                Host = host;
                 Name = name;
             }
 
@@ -116,8 +148,6 @@ namespace Fusion.Engine.Frames2
                 var old = Component;
 
                 Component = component;
-
-                Host.Attach(this, component);
 
                 ComponentAttached?.Invoke(this,
                     new ComponentAttachedEventArgs(old, component)
@@ -178,7 +208,9 @@ namespace Fusion.Engine.Frames2
                 Name = name;
             }
 
-            public static State Default = new State("Default");
+            public static State Default  = new State("Default");
+            public static State Hovered  = new State("Hovered");
+            public static State Disabled = new State("Disabled");
 
             public static bool operator ==(State self, State other)
             {
@@ -212,18 +244,6 @@ namespace Fusion.Engine.Frames2
             }
 
             public static implicit operator string(State s) => s.ToString();
-        }
-    }
-
-    public class ControllerContainer : UIContainer
-    {
-        public UIController Controller { get; }
-
-        //public ControllerContainer
-
-        public override void Update(GameTime gameTime)
-        {
-            throw new NotImplementedException();
         }
     }
 }
