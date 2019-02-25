@@ -1,4 +1,5 @@
-﻿using Fusion.Engine.Frames2;
+﻿using Fusion.Engine.Common;
+using Fusion.Engine.Frames2;
 
 namespace WpfEditorTest.UndoRedo
 {
@@ -34,14 +35,18 @@ namespace WpfEditorTest.UndoRedo
 
 		public void Do()
 		{
-			_oldParent?.Remove(_frame);
-			_newParent?.AddAt(_frame,_index);
+            Game.ResourceWorker.Post(r => {
+                _oldParent?.Remove(_frame);
+                _newParent?.AddAt(_frame, _index);
+            }, null, int.MaxValue);
 		}
 
 		public void Undo()
 		{
-			_newParent?.Remove(_frame);
-			_oldParent?.AddAt(_frame,_index);
-		}
+            Game.ResourceWorker.Post(r => {
+                _newParent?.Remove(_frame);
+			    _oldParent?.AddAt(_frame,_index);
+            }, null, int.MaxValue);
+        }
 	}
 }
