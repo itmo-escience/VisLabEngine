@@ -49,7 +49,7 @@ namespace Fusion.Engine.Graphics.GIS
 
         public ScalarFieldSlice(Game engine, string palette, float minValue, float maxValue) : base(engine)
         {
-            _shader = Game.Content.Load<Ubershader>("globe.SFieldSlice.hlsl");
+            _shader = _game.Content.Load<Ubershader>("globe.SFieldSlice.hlsl");
             _factory = _shader.CreateFactory(
                 typeof(PointFlags), 
                 Primitive.TriangleList, 
@@ -58,7 +58,7 @@ namespace Fusion.Engine.Graphics.GIS
                 RasterizerState.CullNone,
                 DepthStencilState.Default
             );
-            _minMaxValueTimeFractureBuffer = new ConstantBuffer(Game.GraphicsDevice, typeof(ConstData));
+            _minMaxValueTimeFractureBuffer = new ConstantBuffer(_game.GraphicsDevice, typeof(ConstData));
             _constData = new ConstData();
 
             SetPalette(palette);
@@ -74,7 +74,7 @@ namespace Fusion.Engine.Graphics.GIS
 
         public void SetPalette(string palette)
         {
-            Palette = Game.Content.Load<Texture2D>(palette);
+            Palette = _game.Content.Load<Texture2D>(palette);
         }
 
         public void SetPoints(
@@ -99,16 +99,16 @@ namespace Fusion.Engine.Graphics.GIS
             if (_slicePoints == null || _slicePoints.Length == 0)
                 return;            
 
-            _pointsBuffer = new VertexBuffer(Game.GraphicsDevice, typeof(Gis.CartPoint), _slicePoints.Length);
+            _pointsBuffer = new VertexBuffer(_game.GraphicsDevice, typeof(Gis.CartPoint), _slicePoints.Length);
             _pointsBuffer.SetData(_slicePoints);
 
-            _indicesBuffer = new IndexBuffer(Game.GraphicsDevice, _indices.Length);
+            _indicesBuffer = new IndexBuffer(_game.GraphicsDevice, _indices.Length);
             _indicesBuffer.SetData(_indices);
 
-            _borderPointsBuffer = new VertexBuffer(Game.GraphicsDevice, typeof(Gis.CartPoint), _borderPoints.Length);
+            _borderPointsBuffer = new VertexBuffer(_game.GraphicsDevice, typeof(Gis.CartPoint), _borderPoints.Length);
             _borderPointsBuffer.SetData(_borderPoints);
 
-            _borderIndicesBuffer = new IndexBuffer(Game.GraphicsDevice, _borderIndices.Length);
+            _borderIndicesBuffer = new IndexBuffer(_game.GraphicsDevice, _borderIndices.Length);
             _borderIndicesBuffer.SetData(_borderIndices);
         }
 
@@ -142,21 +142,21 @@ namespace Fusion.Engine.Graphics.GIS
         {
             if (_pointsBuffer == null || _indicesBuffer == null) return;
 
-            Game.GraphicsDevice.VertexShaderConstants[0] = constBuffer;
-            Game.GraphicsDevice.VertexShaderConstants[1] = _minMaxValueTimeFractureBuffer;
-            Game.GraphicsDevice.PipelineState = _factory[(int) PointFlags.DRAW_SLICE];
+            _game.GraphicsDevice.VertexShaderConstants[0] = constBuffer;
+            _game.GraphicsDevice.VertexShaderConstants[1] = _minMaxValueTimeFractureBuffer;
+            _game.GraphicsDevice.PipelineState = _factory[(int) PointFlags.DRAW_SLICE];
 
-            Game.GraphicsDevice.PixelShaderResources[0] = Palette;
-            Game.GraphicsDevice.PixelShaderSamplers[0] = SamplerState.LinearClamp;
-            Game.GraphicsDevice.VertexShaderResources[1] = _prevBuffer;
-            Game.GraphicsDevice.VertexShaderResources[2] = _nextBuffer;
+            _game.GraphicsDevice.PixelShaderResources[0] = Palette;
+            _game.GraphicsDevice.PixelShaderSamplers[0] = SamplerState.LinearClamp;
+            _game.GraphicsDevice.VertexShaderResources[1] = _prevBuffer;
+            _game.GraphicsDevice.VertexShaderResources[2] = _nextBuffer;
 
-            Game.GraphicsDevice.SetupVertexInput(_pointsBuffer, _indicesBuffer);
-            Game.GraphicsDevice.DrawIndexed(_indicesBuffer.Capacity, 0, 0);
+            _game.GraphicsDevice.SetupVertexInput(_pointsBuffer, _indicesBuffer);
+            _game.GraphicsDevice.DrawIndexed(_indicesBuffer.Capacity, 0, 0);
 
-            Game.GraphicsDevice.PipelineState = _factory[(int)PointFlags.DRAW_BORDER];
-            Game.GraphicsDevice.SetupVertexInput(_borderPointsBuffer, _borderIndicesBuffer);
-            Game.GraphicsDevice.DrawIndexed(_borderIndicesBuffer.Capacity, 0, 0);
+            _game.GraphicsDevice.PipelineState = _factory[(int)PointFlags.DRAW_BORDER];
+            _game.GraphicsDevice.SetupVertexInput(_borderPointsBuffer, _borderIndicesBuffer);
+            _game.GraphicsDevice.DrawIndexed(_borderIndicesBuffer.Capacity, 0, 0);
         }
 
         public override void Dispose()

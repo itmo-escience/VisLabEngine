@@ -66,10 +66,10 @@ namespace Fusion.Engine.Graphics.GIS
 			MapDimX = mapDimX;
 			MapDimY = mapDimY;
 
-			HeatTexture = new Texture2D(Game.GraphicsDevice, MapDimX, MapDimY, ColorFormat.R32F, false);
-			Temp		= new RenderTarget2D(Game.GraphicsDevice, ColorFormat.R32F, MapDimX, MapDimY, true);
-			FirstFinal	= new RenderTarget2D(Game.GraphicsDevice, ColorFormat.R32F, MapDimX, MapDimY, true);
-			SecondFinal = new RenderTarget2D(Game.GraphicsDevice, ColorFormat.R32F, MapDimX, MapDimY, true);
+			HeatTexture = new Texture2D(_game.GraphicsDevice, MapDimX, MapDimY, ColorFormat.R32F, false);
+			Temp		= new RenderTarget2D(_game.GraphicsDevice, ColorFormat.R32F, MapDimX, MapDimY, true);
+			FirstFinal	= new RenderTarget2D(_game.GraphicsDevice, ColorFormat.R32F, MapDimX, MapDimY, true);
+			SecondFinal = new RenderTarget2D(_game.GraphicsDevice, ColorFormat.R32F, MapDimX, MapDimY, true);
 
 			Final	= SecondFinal;
 			Prev	= FirstFinal;
@@ -78,7 +78,7 @@ namespace Fusion.Engine.Graphics.GIS
 
 			//HeatMapPalettes		= new Texture2D[1];
 			//HeatMapPalettes[0]	= Game.Content.Load<Texture2D>("palette");
-			Palette = Game.Content.Load<Texture2D>("palette");
+			Palette = _game.Content.Load<Texture2D>("palette");
 
 			//cB			= new ConstantBuffer(Game.GraphicsDevice, typeof(ConstData));
 			//constData	= new ConstData();
@@ -109,7 +109,7 @@ namespace Fusion.Engine.Graphics.GIS
 		    //Log.Message($"AAAA{Data.Average()}");
             HeatTexture.SetData(Data);
 
-			var game = Game;
+			var game = _game;
 
 			if (Final == FirstFinal) {
 				Final = SecondFinal;
@@ -119,11 +119,11 @@ namespace Fusion.Engine.Graphics.GIS
 				Prev = SecondFinal;
 			}
 
-			Game.GraphicsDevice.DeviceContext.CopyResource(HeatTexture.SRV.Resource, Final.Surface.Resource);
+			_game.GraphicsDevice.DeviceContext.CopyResource(HeatTexture.SRV.Resource, Final.Surface.Resource);
 
 		    if (IsNeedBlur)
 		    {
-		        Game.RenderSystem.Filter.GaussBlur(Final, Temp, HeatSigma, 0);
+		        _game.RenderSystem.Filter.GaussBlur(Final, Temp, HeatSigma, 0);
 		    }
 		    //game.GraphicsDevice.PipelineState = blurFactory[(int)(PolyFlags.COMPUTE_SHADER | PolyFlags.BLUR_VERTICAL)];
 			//
@@ -155,7 +155,7 @@ namespace Fusion.Engine.Graphics.GIS
 			constData.Data = new Vector4(MaxHeatMapLevel, MinHeatMapLevel, HeatMapTransparency, InterpFactor);
 			cb.SetData(constData);
 
-			Game.GraphicsDevice.PipelineState = factory[
+			_game.GraphicsDevice.PipelineState = factory[
 			(int)(
 				PolyFlags.PIXEL_SHADER |
 				PolyFlags.VERTEX_SHADER |
@@ -164,19 +164,19 @@ namespace Fusion.Engine.Graphics.GIS
 
 			//if(((PolyFlags)Flags).HasFlag(PolyFlags.DRAW_HEAT))
 
-			Game.GraphicsDevice.VertexShaderConstants[0] = constBuffer;
-			Game.GraphicsDevice.PixelShaderConstants[0] = constBuffer;
-			Game.GraphicsDevice.PixelShaderConstants[1] = cb;
+			_game.GraphicsDevice.VertexShaderConstants[0] = constBuffer;
+			_game.GraphicsDevice.PixelShaderConstants[0] = constBuffer;
+			_game.GraphicsDevice.PixelShaderConstants[1] = cb;
 
-			Game.GraphicsDevice.PixelShaderSamplers[0] = TextureSampling;
-			Game.GraphicsDevice.PixelShaderSamplers[1] = MapSampling;
+			_game.GraphicsDevice.PixelShaderSamplers[0] = TextureSampling;
+			_game.GraphicsDevice.PixelShaderSamplers[1] = MapSampling;
 
-			Game.GraphicsDevice.PixelShaderResources[0] = Palette;
-			Game.GraphicsDevice.PixelShaderResources[1] = Final;
-			Game.GraphicsDevice.PixelShaderResources[2] = Prev;
+			_game.GraphicsDevice.PixelShaderResources[0] = Palette;
+			_game.GraphicsDevice.PixelShaderResources[1] = Final;
+			_game.GraphicsDevice.PixelShaderResources[2] = Prev;
 
-			Game.GraphicsDevice.SetupVertexInput(currentBuffer, indexBuffer);
-			Game.GraphicsDevice.DrawIndexed(indexBuffer.Capacity, 0, 0);
+			_game.GraphicsDevice.SetupVertexInput(currentBuffer, indexBuffer);
+			_game.GraphicsDevice.DrawIndexed(indexBuffer.Capacity, 0, 0);
 
 			//game.GraphicsDevice.ResetStates();
 		}

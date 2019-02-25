@@ -68,7 +68,7 @@ namespace Fusion.Engine.Graphics.GIS
 
         public void SetBuildingsData(SceneLayer.BuildingData[] buildings)
         {
-            BuildingsData = new StructuredBuffer(Game.GraphicsDevice, typeof(SceneLayer.BuildingData), buildings.Length, StructuredBufferFlags.None);
+            BuildingsData = new StructuredBuffer(_game.GraphicsDevice, typeof(SceneLayer.BuildingData), buildings.Length, StructuredBufferFlags.None);
             BuildingsData.SetData(buildings);
         }
 
@@ -79,12 +79,12 @@ namespace Fusion.Engine.Graphics.GIS
 
         protected virtual void Initialize(SceneLayer.ScenePoint[] points, int[] indeces, bool isDynamic)
         {
-            shader = Game.Content.Load<Ubershader>("globe.Scene.hlsl");
+            shader = _game.Content.Load<Ubershader>("globe.Scene.hlsl");
             factory = shader.CreateFactory(typeof(SceneLayer.Flags), EnumFunc);
 
             var vbOptions = isDynamic ? VertexBufferOptions.Dynamic : VertexBufferOptions.Default;
 
-            firstBuffer = new VertexBuffer(Game.GraphicsDevice, typeof(SceneLayer.ScenePoint), points.Length, vbOptions);
+            firstBuffer = new VertexBuffer(_game.GraphicsDevice, typeof(SceneLayer.ScenePoint), points.Length, vbOptions);
             firstBuffer.SetData(points);
             currentBuffer = firstBuffer;            
 
@@ -93,7 +93,7 @@ namespace Fusion.Engine.Graphics.GIS
 
             PointsCpu = points;
 
-            cb = new ConstantBuffer(Game.GraphicsDevice, typeof(ConstData));
+            cb = new ConstantBuffer(_game.GraphicsDevice, typeof(ConstData));
             constData = new ConstData();
             constData.Data = Vector4.One;
 
@@ -123,24 +123,24 @@ namespace Fusion.Engine.Graphics.GIS
                 return;
             }
             
-            Game.GraphicsDevice.PipelineState = factory[Flags];
+            _game.GraphicsDevice.PipelineState = factory[Flags];
 
             SceneData.AppearanceParams = new Vector2(Settings.StartAppearAnimationPercentage, Settings.EndAppearAnimationPercentage);
             SceneData.DisappearanceParams = new Vector2(Settings.StartDisappearAnimationPercentage, Settings.EndDisappearAnimationPercentage);
             sceneBuffer.SetData(SceneData);
 
-            Game.GraphicsDevice.VertexShaderConstants[0] = constBuffer;
-            Game.GraphicsDevice.VertexShaderConstants[1] = sceneBuffer;
-            Game.GraphicsDevice.PixelShaderConstants[1] = sceneBuffer;
+            _game.GraphicsDevice.VertexShaderConstants[0] = constBuffer;
+            _game.GraphicsDevice.VertexShaderConstants[1] = sceneBuffer;
+            _game.GraphicsDevice.PixelShaderConstants[1] = sceneBuffer;
 
-            Game.GraphicsDevice.VertexShaderResources[3] = BuildingsData;
-            Game.GraphicsDevice.PixelShaderResources[3] = BuildingsData;
+            _game.GraphicsDevice.VertexShaderResources[3] = BuildingsData;
+            _game.GraphicsDevice.PixelShaderResources[3] = BuildingsData;
 
-            Game.GraphicsDevice.PixelShaderSamplers[0] = Sampler;
-            Game.GraphicsDevice.PixelShaderSamplers[1] = SamplerState.AnisotropicClamp;
+            _game.GraphicsDevice.PixelShaderSamplers[0] = Sampler;
+            _game.GraphicsDevice.PixelShaderSamplers[1] = SamplerState.AnisotropicClamp;
 
-            Game.GraphicsDevice.SetupVertexInput(currentBuffer, indexBuffer);
-            Game.GraphicsDevice.DrawIndexed(indexBuffer.Capacity, 0, 0);
+            _game.GraphicsDevice.SetupVertexInput(currentBuffer, indexBuffer);
+            _game.GraphicsDevice.DrawIndexed(indexBuffer.Capacity, 0, 0);
 
             //game.GraphicsDevice.ResetStates();
         }

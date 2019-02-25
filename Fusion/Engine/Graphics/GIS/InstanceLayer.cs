@@ -101,7 +101,7 @@ namespace Fusion.Engine.Graphics.GIS
 
         public void SetBuildingsData(SceneLayer.BuildingData[] buildings)
         {
-            BuildingsData = new StructuredBuffer(Game.GraphicsDevice, typeof(SceneLayer.BuildingData), buildings.Length, StructuredBufferFlags.None);
+            BuildingsData = new StructuredBuffer(_game.GraphicsDevice, typeof(SceneLayer.BuildingData), buildings.Length, StructuredBufferFlags.None);
             BuildingsData.SetData(buildings, 0, Math.Min(buildings.Length, BuildingsData.StructureCapacity));
         }
 
@@ -154,8 +154,8 @@ namespace Fusion.Engine.Graphics.GIS
             Transparency = 1.0f;
 
             constData = new ConstDataStruct();
-            modelBuf = new ConstantBuffer(Game.GraphicsDevice, typeof(ConstDataStruct));
-            shader = Game.Content.Load<Ubershader>("globe.Instance.hlsl");
+            modelBuf = new ConstantBuffer(_game.GraphicsDevice, typeof(ConstDataStruct));
+            shader = _game.Content.Load<Ubershader>("globe.Instance.hlsl");
             sceneBuffer = new ConstantBuffer(engine.GraphicsDevice, typeof(SceneLayer.ConstData));            
 
             factory = shader.CreateFactory(typeof(ModelFlags), Primitive.TriangleList, VertexInputElement.FromStructure<VertexColorTextureTBNRigid>(), BlendState.AlphaBlend, RasterizerState.CullCW, DepthStencilState.Default);
@@ -187,8 +187,8 @@ namespace Fusion.Engine.Graphics.GIS
 
         public override void Draw(GameTime gameTime, ConstantBuffer constBuffer)
         {
-            var dev = Game.GraphicsDevice;
-            var gis = Game.RenderSystem.Gis;
+            var dev = _game.GraphicsDevice;
+            var gis = _game.RenderSystem.Gis;
 
             CartesianPos = GeoHelper.SphericalToCartesian(DMathUtil.DegreesToRadians(LonLatPosition),
                 gis.Camera.EarthRadius);

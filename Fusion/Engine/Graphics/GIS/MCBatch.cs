@@ -50,11 +50,11 @@ namespace Fusion.Engine.Graphics.GIS
         public void SetWholeData(float[] data, int dimX, int dimY, int dimZ)
         {
             DataFirstFrameGpu?.Dispose();
-            DataFirstFrameGpu = new Texture3D(Game.GraphicsDevice, dimX, dimY, dimZ, ColorFormat.R32F, false);
+            DataFirstFrameGpu = new Texture3D(_game.GraphicsDevice, dimX, dimY, dimZ, ColorFormat.R32F, false);
             DataFirstFrameGpu.SetData(data); 
 
             DataSecondFrameGpu?.Dispose();
-            DataSecondFrameGpu = new Texture3D(Game.GraphicsDevice, dimX, dimY, dimZ, ColorFormat.R32F, false);
+            DataSecondFrameGpu = new Texture3D(_game.GraphicsDevice, dimX, dimY, dimZ, ColorFormat.R32F, false);
             DataSecondFrameGpu.SetData(data);
 
             dataFrameSize = (dimX - 1) * (dimY - 1) * (dimZ - 1);
@@ -69,7 +69,7 @@ namespace Fusion.Engine.Graphics.GIS
             DataFirstFrameGpu.Dispose();
             DataFirstFrameGpu = DataSecondFrameGpu;
 
-            DataSecondFrameGpu = new Texture3D(Game.GraphicsDevice, dimX, dimY, dimZ, ColorFormat.R32F, false);
+            DataSecondFrameGpu = new Texture3D(_game.GraphicsDevice, dimX, dimY, dimZ, ColorFormat.R32F, false);
             DataSecondFrameGpu.SetData(data); 
             dataFrameSize = (dimX - 1) * (dimY - 1) * (dimZ - 1);
         }
@@ -163,7 +163,7 @@ namespace Fusion.Engine.Graphics.GIS
                 }
                 
                 depthBuffer?.Dispose();
-                depthBuffer = new StructuredBuffer(Game.GraphicsDevice, sizeof(float), depths.Length, StructuredBufferFlags.None);
+                depthBuffer = new StructuredBuffer(_game.GraphicsDevice, sizeof(float), depths.Length, StructuredBufferFlags.None);
                 depthBuffer.SetData(depths);
             }
         }
@@ -173,10 +173,10 @@ namespace Fusion.Engine.Graphics.GIS
                    
         public MCBatch(Game engine) : base(engine)
         {
-            shader = Game.Content.Load<Ubershader>("globe.marchingCubes.hlsl");    
+            shader = _game.Content.Load<Ubershader>("globe.marchingCubes.hlsl");    
             factory = shader.CreateFactory(typeof(FieldFlags), EnumFunc);
              
-            cB = new ConstantBuffer(Game.GraphicsDevice, typeof(ConstData)); 
+            cB = new ConstantBuffer(_game.GraphicsDevice, typeof(ConstData)); 
         }
 
         public override void Dispose()
@@ -206,26 +206,26 @@ namespace Fusion.Engine.Graphics.GIS
         private Texture2D palette;
         public override void Draw(GameTime gameTime, ConstantBuffer constBuffer)
         {
-            Game.GraphicsDevice.GeometryShaderConstants[0] = constBuffer;   
-            Game.GraphicsDevice.VertexShaderConstants[0] = constBuffer;
+            _game.GraphicsDevice.GeometryShaderConstants[0] = constBuffer;   
+            _game.GraphicsDevice.VertexShaderConstants[0] = constBuffer;
             //var m = GeoHelper.CalculateBasisOnSurface(new DVector2(parameters.Lon, parameters.Lat));
             //parameters.Right = new Vector4(m.Right.ToVector3(), 0);
             //parameters.Forward = new Vector4(m.Forward.ToVector3(), 0);              
             cB.SetData(parameters);   
-            Game.GraphicsDevice.VertexShaderConstants[1] = cB;   
-            Game.GraphicsDevice.GeometryShaderConstants[1] = cB;      
-            Game.GraphicsDevice.PixelShaderConstants[1] = cB; 
+            _game.GraphicsDevice.VertexShaderConstants[1] = cB;   
+            _game.GraphicsDevice.GeometryShaderConstants[1] = cB;      
+            _game.GraphicsDevice.PixelShaderConstants[1] = cB; 
 
-            Game.GraphicsDevice.GeometryShaderSamplers[0] = Sampler;
+            _game.GraphicsDevice.GeometryShaderSamplers[0] = Sampler;
 
-            Game.GraphicsDevice.GeometryShaderResources[1] = DataFirstFrameGpu;     
-            Game.GraphicsDevice.GeometryShaderResources[2] = DataSecondFrameGpu; 
-            Game.GraphicsDevice.GeometryShaderResources[3] = depthBuffer;
+            _game.GraphicsDevice.GeometryShaderResources[1] = DataFirstFrameGpu;     
+            _game.GraphicsDevice.GeometryShaderResources[2] = DataSecondFrameGpu; 
+            _game.GraphicsDevice.GeometryShaderResources[3] = depthBuffer;
 
             if (Palette != null) 
             {
                 Flags = FieldFlags.DrawIsoSurface | FieldFlags.LerpBuffers | FieldFlags.UsePalette | FieldFlags.MoveVertices;
-                Game.GraphicsDevice.PixelShaderResources[0] = Palette;  
+                _game.GraphicsDevice.PixelShaderResources[0] = Palette;  
             }
             else
             {
@@ -233,11 +233,11 @@ namespace Fusion.Engine.Graphics.GIS
             }
 
             
-            Game.GraphicsDevice.PipelineState = factory[(int)Flags];
+            _game.GraphicsDevice.PipelineState = factory[(int)Flags];
 
-            Game.GraphicsDevice.SetupVertexInput(null, null);    
+            _game.GraphicsDevice.SetupVertexInput(null, null);    
 
-            Game.GraphicsDevice.Draw(dataFrameSize, 0);          
+            _game.GraphicsDevice.Draw(dataFrameSize, 0);          
                
         } 
 

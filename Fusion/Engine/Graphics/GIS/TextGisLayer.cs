@@ -41,11 +41,11 @@ namespace Fusion.Engine.Graphics.GIS
 		public TextGisLayer(Game game, int capacity, GlobeCamera camera) : base(game)
 		{
 			GlobeCamera		= camera;
-			TextSpriteLayer = new SpriteLayer(Game.RenderSystem, 2048);
+			TextSpriteLayer = new SpriteLayer(_game.RenderSystem, 2048);
 
 			GeoTextArray		= new GeoText[capacity];
 			LinesCountToDraw	= capacity;
-			Font				= Game.Content.Load<DiscTexture>("conchars");
+			Font				= _game.Content.Load<DiscTexture>("conchars");
 			//spriteFont		= Game.Content.Load<SpriteFont>(@"Fonts\textFont");
 
 			MinZoom = 6380;

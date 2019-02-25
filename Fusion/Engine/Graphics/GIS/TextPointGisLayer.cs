@@ -42,7 +42,7 @@ namespace Fusion.Engine.Graphics.GIS
             SizeMultiplier = mult * 1;
             DotsBuffer.SetData(dotsData);
             base.Draw(gameTime, constBuffer);
-            var whiteTex = this.Game.RenderSystem.WhiteTexture;
+            var whiteTex = this._game.RenderSystem.WhiteTexture;
             for (int i = 0; i < PointsCountToDraw; i++ )
             {                
                 var cartPos = GeoHelper.SphericalToCartesian(new DVector2(PointsCpu[i].Lon, PointsCpu[i].Lat),

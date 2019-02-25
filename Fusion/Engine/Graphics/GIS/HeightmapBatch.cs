@@ -15,9 +15,9 @@ namespace Fusion.Engine.Graphics.GIS
     {
         public HeightmapBatch(Game engine) : base(engine)
         {
-            cB = new ConstantBuffer(Game.GraphicsDevice, typeof(MCBatch.ConstData));
+            cB = new ConstantBuffer(_game.GraphicsDevice, typeof(MCBatch.ConstData));
             parameters.Color = new Vector4(0.25f, 0.25f, 0.25f, 1);
-            shader = Game.Content.Load<Ubershader>("globe.Heightmap.hlsl"); 
+            shader = _game.Content.Load<Ubershader>("globe.Heightmap.hlsl"); 
             factory = shader.CreateFactory(typeof(FieldFlags), EnumFunc);            
         }
 
@@ -114,23 +114,23 @@ namespace Fusion.Engine.Graphics.GIS
         {
             if (!isInit) return;           
             cB.SetData(parameters);
-            Game.GraphicsDevice.GeometryShaderConstants[0] = constBuffer;
-            Game.GraphicsDevice.VertexShaderConstants[0] = constBuffer;
-            Game.GraphicsDevice.VertexShaderConstants[1] = cB;
-            Game.GraphicsDevice.GeometryShaderConstants[1] = cB;
-            Game.GraphicsDevice.PixelShaderConstants[1] = cB;
+            _game.GraphicsDevice.GeometryShaderConstants[0] = constBuffer;
+            _game.GraphicsDevice.VertexShaderConstants[0] = constBuffer;
+            _game.GraphicsDevice.VertexShaderConstants[1] = cB;
+            _game.GraphicsDevice.GeometryShaderConstants[1] = cB;
+            _game.GraphicsDevice.PixelShaderConstants[1] = cB;
 
-            Game.GraphicsDevice.GeometryShaderSamplers[0] = Sampler;
+            _game.GraphicsDevice.GeometryShaderSamplers[0] = Sampler;
 
-            Game.GraphicsDevice.GeometryShaderResources[0] = Data;
+            _game.GraphicsDevice.GeometryShaderResources[0] = Data;
 
             var flags = FieldFlags.DrawLocal;
 
-            Game.GraphicsDevice.PipelineState = factory[(int)flags];
+            _game.GraphicsDevice.PipelineState = factory[(int)flags];
 
-            Game.GraphicsDevice.SetupVertexInput(null, null);
+            _game.GraphicsDevice.SetupVertexInput(null, null);
 
-            Game.GraphicsDevice.Draw(Size * Size, 0);
+            _game.GraphicsDevice.Draw(Size * Size, 0);
             
         }
 

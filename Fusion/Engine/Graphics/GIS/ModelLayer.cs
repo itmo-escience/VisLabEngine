@@ -119,8 +119,8 @@ namespace Fusion.Engine.Graphics.GIS
 			Transparency = 1.0f;
 
 			constData	= new ConstDataStruct();
-			modelBuf	= new ConstantBuffer(Game.GraphicsDevice, typeof(ConstDataStruct));
-			shader		= Game.Content.Load<Ubershader>("globe.Model.hlsl");
+			modelBuf	= new ConstantBuffer(_game.GraphicsDevice, typeof(ConstDataStruct));
+			shader		= _game.Content.Load<Ubershader>("globe.Model.hlsl");
 			
 			factory		= shader.CreateFactory( typeof(ModelFlags), Primitive.TriangleList, VertexInputElement.FromStructure<VertexColorTextureTBNRigid>(), BlendState.AlphaBlend, RasterizerState.CullCW, DepthStencilState.Default);
 			factoryXray = shader.CreateFactory( typeof(ModelFlags), Primitive.TriangleList, VertexInputElement.FromStructure<VertexColorTextureTBNRigid>(), BlendState.AlphaBlend, RasterizerState.CullCW, DepthStencilState.Default);
@@ -150,8 +150,8 @@ namespace Fusion.Engine.Graphics.GIS
 
 		public override void Draw(GameTime gameTime, ConstantBuffer constBuffer)
 		{ 
-			var dev = Game.GraphicsDevice;
-			var gis = Game.RenderSystem.Gis;
+			var dev = _game.GraphicsDevice;
+			var gis = _game.RenderSystem.Gis;
 
 			CartesianPos = GeoHelper.SphericalToCartesian(DMathUtil.DegreesToRadians(LonLatPosition), gis.Camera.EarthRadius);
 

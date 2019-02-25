@@ -109,7 +109,7 @@ namespace Fusion.Engine.Graphics.GIS
 			secondRoot = Math.Ceiling(secondRoot);
 			GroupSize = (int)secondRoot;
 
-			shader	= Game.Content.Load<Ubershader>("globe.TrafficEvents.hlsl");
+			shader	= _game.Content.Load<Ubershader>("globe.TrafficEvents.hlsl");
 			factory = shader.CreateFactory(typeof(TrafficFlags), EnumFunc);
 
 			EachFrame = new EachFrameData {
@@ -159,33 +159,33 @@ namespace Fusion.Engine.Graphics.GIS
 		{
 			EachFrameCB.SetData(EachFrame);
 
-			Game.GraphicsDevice.PipelineState = factory[(int)TrafficFlags.FillTrafficBuffer];
+			_game.GraphicsDevice.PipelineState = factory[(int)TrafficFlags.FillTrafficBuffer];
 
-			Game.GraphicsDevice.ComputeShaderResources[0] = Events;
-			Game.GraphicsDevice.SetCSRWBuffer(0, Particles, 0);
+			_game.GraphicsDevice.ComputeShaderResources[0] = Events;
+			_game.GraphicsDevice.SetCSRWBuffer(0, Particles, 0);
 
-			Game.GraphicsDevice.ComputeShaderConstants[1] = EachFrameCB;
-			Game.GraphicsDevice.ComputeShaderConstants[2] = ParticlesCB;
+			_game.GraphicsDevice.ComputeShaderConstants[1] = EachFrameCB;
+			_game.GraphicsDevice.ComputeShaderConstants[2] = ParticlesCB;
 
 			PixHelper.BeginEvent(new SharpDX.Mathematics.Interop.RawColorBGRA(255, 0, 0, 255), "Update Traffic");
-			Game.GraphicsDevice.Dispatch(GroupSize, GroupSize, 1);
+			_game.GraphicsDevice.Dispatch(GroupSize, GroupSize, 1);
 			PixHelper.EndEvent();
 
-			Game.GraphicsDevice.SetCSRWBuffer(0, null);
+			_game.GraphicsDevice.SetCSRWBuffer(0, null);
 
 			DrawCount = Particles.GetStructureCount();
 
 
-			Game.GraphicsDevice.PipelineState = factory[(int)(TrafficFlags.DrawTraffic | Flags)];
-			Game.GraphicsDevice.VertexShaderConstants[0] = constBuffer;
-			Game.GraphicsDevice.VertexShaderConstants[1] = EachFrameCB;
+			_game.GraphicsDevice.PipelineState = factory[(int)(TrafficFlags.DrawTraffic | Flags)];
+			_game.GraphicsDevice.VertexShaderConstants[0] = constBuffer;
+			_game.GraphicsDevice.VertexShaderConstants[1] = EachFrameCB;
 			//Game.GraphicsDevice.GeometryShaderConstants[0]	= constBuffer;
 
-			Game.GraphicsDevice.SetupVertexInput(fbxMesh.VertexBuffer, fbxMesh.IndexBuffer);
+			_game.GraphicsDevice.SetupVertexInput(fbxMesh.VertexBuffer, fbxMesh.IndexBuffer);
 
-			Game.GraphicsDevice.VertexShaderResources[0] = Particles;
+			_game.GraphicsDevice.VertexShaderResources[0] = Particles;
 
-			Game.GraphicsDevice.DrawInstancedIndexed(fbxMesh.IndexBuffer.Capacity, DrawCount, 0, 0, 0);
+			_game.GraphicsDevice.DrawInstancedIndexed(fbxMesh.IndexBuffer.Capacity, DrawCount, 0, 0, 0);
         }
 
 

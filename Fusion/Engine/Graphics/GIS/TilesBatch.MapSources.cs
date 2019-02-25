@@ -43,21 +43,21 @@ namespace Fusion.Engine.Graphics.GIS
 		protected void RegisterMapSources()
 		{
             MapSources.Clear();
-			MapSources.Add(new OpenStreetMap(Game)		);
-			MapSources.Add(new GoogleMap(Game)			);
-			MapSources.Add(new GoogleSatelliteMap(Game)	);
-			MapSources.Add(new YandexMap(Game)			);
-			MapSources.Add(new YandexSatelliteMap(Game)	);
-			MapSources.Add(new PencilMap(Game)			);
-			MapSources.Add(new SpaceStationMap(Game)	);
-			MapSources.Add(new PirateMap(Game)			);
-			MapSources.Add(new BaseBingMapsSource(Game)	);
-			MapSources.Add(new BingMapSatellite(Game)	);
-			MapSources.Add(new Dark(Game)				);
-			MapSources.Add(new MoiseevMap(Game)			);
-			MapSources.Add(new DarkV9(Game)				);
-			MapSources.Add(new LightMap(Game)			);
-			MapSources.Add(new CartoCdnMap(Game)		);
+			MapSources.Add(new OpenStreetMap(_game)		);
+			MapSources.Add(new GoogleMap(_game)			);
+			MapSources.Add(new GoogleSatelliteMap(_game)	);
+			MapSources.Add(new YandexMap(_game)			);
+			MapSources.Add(new YandexSatelliteMap(_game)	);
+			MapSources.Add(new PencilMap(_game)			);
+			MapSources.Add(new SpaceStationMap(_game)	);
+			MapSources.Add(new PirateMap(_game)			);
+			MapSources.Add(new BaseBingMapsSource(_game)	);
+			MapSources.Add(new BingMapSatellite(_game)	);
+			MapSources.Add(new Dark(_game)				);
+			MapSources.Add(new MoiseevMap(_game)			);
+			MapSources.Add(new DarkV9(_game)				);
+			MapSources.Add(new LightMap(_game)			);
+			MapSources.Add(new CartoCdnMap(_game)		);
 		}
 
 	    public MapSource CurrentMapSourecEnum;

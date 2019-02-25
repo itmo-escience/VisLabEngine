@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Fusion.Core.Mathematics;
+using Fusion.Engine.Common;
 using Fusion.Engine.Graphics.GIS.DataSystem.MapSources;
 using Fusion.Engine.Graphics.GIS.GlobeMath;
 using Fusion.Engine.Input;
@@ -128,7 +129,7 @@ namespace Fusion.Engine.Graphics.GIS
         {
             if (determineInProcess) return;
             determineInProcess = true;
-            Gis.ResourceWorker.Post(r =>
+            Game.ResourceWorker.Post(r =>
             {
                 r.ProcessQueue.Post(t =>
                 {

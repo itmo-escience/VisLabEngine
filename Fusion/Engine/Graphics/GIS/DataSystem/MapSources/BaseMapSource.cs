@@ -197,7 +197,7 @@ namespace Fusion.Engine.Graphics.GIS.DataSystem.MapSources
 		    if (flag)
 		    {
 		        requests++;
-		        Gis.ResourceWorker.Post(r =>
+		        Game.ResourceWorker.Post(r =>
 		        {
 		            var tile = r.Data as MapTile;
 
