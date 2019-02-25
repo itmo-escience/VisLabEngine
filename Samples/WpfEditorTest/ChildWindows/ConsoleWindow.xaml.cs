@@ -54,6 +54,7 @@ namespace WpfEditorTest.ChildWindows
                         }
                     }
                     OutputField.Text = messages;
+                    ScrollViewer.ScrollToEnd();
                 });
             };
         }
