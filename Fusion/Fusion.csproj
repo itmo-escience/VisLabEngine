@@ -165,6 +165,7 @@
     <Compile Include="Core\Shell\NoRollbackCommand.cs" />
     <Compile Include="Core\Shell\Invoker.Helper.cs" />
     <Compile Include="Core\StringConverter.cs" />
+    <Compile Include="Core\Utils\SerializableList.cs" />
     <Compile Include="Core\Utils\UIComponentSerializer.cs" />
     <Compile Include="Core\Utils\LogListener.cs" />
     <Compile Include="Core\Utils\LogMessage.cs" />

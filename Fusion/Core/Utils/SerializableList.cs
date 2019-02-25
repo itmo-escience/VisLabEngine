@@ -5,17 +5,15 @@ using System.Linq;
 using System.Runtime.Serialization;
 using System.Text;
 using System.Threading.Tasks;
+using System.Xml;
+using System.Xml.Schema;
+using System.Xml.Serialization;
 
 namespace Fusion.Core.Utils
 {
-    class SerializableList<T> : List<T>, ISerializable, INotifyPropertyChanged
+    public class SerializableList<T> : List<T>, IXmlSerializable, INotifyPropertyChanged where T : IXmlSerializable
     {
         public event PropertyChangedEventHandler PropertyChanged;
-
-        public void GetObjectData(SerializationInfo info, StreamingContext context)
-        {
-            //
-        }
 
         public new void Add(T item)
         {
@@ -99,6 +97,43 @@ namespace Fusion.Core.Utils
         {
             base.Sort(startIndex, endIndex, comparer);
             PropertyChanged?.Invoke(null, (PropertyChangedEventArgs)EventArgs.Empty);
+        }
+
+        public XmlSchema GetSchema()
+        {
+            return null;
+        }
+
+        public void ReadXml(XmlReader reader)
+        {
+            XmlSerializer serializer = new XmlSerializer(typeof(T));
+
+            bool wasEmpty = reader.IsEmptyElement;
+            reader.Read();
+
+            if (wasEmpty)
+                return;
+
+            while (reader.NodeType != XmlNodeType.EndElement)
+            {
+                reader.ReadStartElement("item");
+                Add((T)serializer.Deserialize(reader));
+                reader.ReadEndElement();
+                reader.MoveToContent();
+            }
+            reader.ReadEndElement();
+        }
+
+        public void WriteXml(XmlWriter writer)
+        {
+            XmlSerializer serializer = new XmlSerializer(typeof(T));
+
+            foreach (T value in this)
+            {
+                writer.WriteStartElement("item");
+                serializer.Serialize(writer, value);
+                writer.WriteEndElement();
+            }
         }
     }
 }
