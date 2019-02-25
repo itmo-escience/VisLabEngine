@@ -56,7 +56,8 @@ namespace WpfEditorTest
 		public static RoutedCommand SceneConfigCmd = new RoutedCommand();
         public static RoutedCommand RemoveSelectionCmd = new RoutedCommand();
 
-        private readonly FrameDetails _details;
+		private readonly SlotDetailsWindow _slotDetails;
+		private readonly FrameDetails _details;
 		private readonly FramePalette _palette;
 		private readonly FrameTreeView _treeView;
 		private readonly ConsoleWindow _consoleWindow;
@@ -121,11 +122,13 @@ namespace WpfEditorTest
 
 		    Closing += (sender, args) => { if (args.Cancel == false) tokenSource.Cancel(); };
 
-            _details = new FrameDetails();
+			_slotDetails = new SlotDetailsWindow();
+			_details = new FrameDetails();
 			_treeView = new FrameTreeView();
 			_palette = new FramePalette();
-			_consoleWindow = new ConsoleWindow();
+			_consoleWindow = new ConsoleWindow(_engine.Invoker);
 
+			miSlotDetails.Tag = _slotDetails;
 			miFrameProperties.Tag = _details;
 			miFrameTemplates.Tag = _palette;
 			miSceneTreeView.Tag = _treeView;
@@ -133,6 +136,10 @@ namespace WpfEditorTest
 
 			SourceInitialized += ( _, args ) =>
 			{
+				_slotDetails.Owner = this;
+				_slotDetails.Show();
+				if (!bool.Parse(ConfigurationManager.AppSettings.Get("SlotDetailsWindowVisibility")))
+					_slotDetails.Hide();
 				_details.Owner = this;
 				_details.Show();
 				if (!bool.Parse(ConfigurationManager.AppSettings.Get("DetailsPanelVisibility")))
@@ -155,6 +162,10 @@ namespace WpfEditorTest
 			{
 				var command = new SelectFrameCommand(new List<UIComponent> { frame });
 				CommandManager.Instance.Execute(command);
+			};
+			_treeView.ControllerSlotSelected += ( _, slot ) =>
+			{
+				_slotDetails.SetSelectFrame(slot);
 			};
 			_treeView.RequestFrameDeletionInUI += ( _, __ ) => TryDeleteSelectedFrame();
 
@@ -710,6 +721,9 @@ namespace WpfEditorTest
 
 			var configFile = ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.None);
 			var settings = configFile.AppSettings.Settings;
+			settings["SlotDetailsWindowX"].Value = _slotDetails.Left.ToString();
+			settings["SlotDetailsWindowY"].Value = _slotDetails.Top.ToString();
+			settings["SlotDetailsWindowHeight"].Value = _slotDetails.Height.ToString();
 			settings["DetailsPanelX"].Value = _details.Left.ToString();
 			settings["DetailsPanelY"].Value = _details.Top.ToString();
 			settings["DetailsPanelHeight"].Value = _details.Height.ToString();

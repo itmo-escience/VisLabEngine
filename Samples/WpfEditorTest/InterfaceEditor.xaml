@@ -116,6 +116,7 @@
                     <MenuItem Name="miSceneTreeView" Header="Scene TreeView" Click="MenuItem_Click"/>
                     <MenuItem Name="miFrameTemplates" Header="Frame Templates" Click="MenuItem_Click"/>
                     <MenuItem Name="miConsole" Header="Console" Click="MenuItem_Click"/>
+                    <MenuItem Name="miSlotDetails" Header="SlotDetails" Click="MenuItem_Click"/>
                     </MenuItem>
                 </Menu>
                 <CheckBox Name="GridToggle" IsChecked="False" Background="#FFEEF5FD" Checked="CheckBox_Checked" Unchecked="CheckBox_Checked" VerticalAlignment="Stretch">
@@ -160,7 +161,7 @@
             </ToolBar>
         </ToolBarTray>
         <ScrollViewer Name="ZoomerScroll" Grid.Row="1" HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto" Background="#FFA0A0A0" PreviewKeyDown="ZoomerScroll_PreviewKeyDown">
-            <Viewbox Name="Zoomer" HorizontalAlignment="Left" VerticalAlignment="Top">
+            <Viewbox Name="Zoomer" HorizontalAlignment="Center" VerticalAlignment="Center">
                 <local:WPFSelectionUILayer x:Name="SelectionLayer">
                 </local:WPFSelectionUILayer>
             </Viewbox>

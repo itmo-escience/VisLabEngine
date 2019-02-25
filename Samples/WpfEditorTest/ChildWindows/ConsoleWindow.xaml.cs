@@ -1,5 +1,6 @@
 ﻿using Fusion;
 using Fusion.Core.Mathematics;
+using Fusion.Core.Shell;
 using Fusion.Core.Utils;
 using System;
 using System.Collections.Generic;
@@ -23,9 +24,9 @@ namespace WpfEditorTest.ChildWindows
 	/// </summary>
 	public partial class ConsoleWindow : Window
 	{
-		private string _inputString;
+        Invoker _invoker;
 
-        public ConsoleWindow()
+        public ConsoleWindow(Invoker invoker)
 		{
 			InitializeComponent();
 
@@ -37,6 +38,8 @@ namespace WpfEditorTest.ChildWindows
 
 			Closing += ( s, e ) => { this.Hide(); e.Cancel = true; };
 
+            _invoker = invoker;
+
             Log.AddListener(new LogRecorder());
             LogRecorder.TraceRecorded += (s, e) =>
             {
@@ -45,9 +48,13 @@ namespace WpfEditorTest.ChildWindows
                     string messages = "";
                     foreach (LogMessage message in LogRecorder.GetLines())
                     {
-                        messages += message.MessageText + Environment.NewLine;
+                        if (message.MessageType != LogMessageType.Debug)
+                        {
+                            messages += message.MessageText + Environment.NewLine;
+                        }
                     }
                     OutputField.Text = messages;
+                    ScrollViewer.ScrollToEnd();
                 });
             };
         }
@@ -56,11 +63,29 @@ namespace WpfEditorTest.ChildWindows
 		{
 			if (e.Key == Key.Enter)
 			{
-				_inputString = InputField.Text;
-				InputField.Text = string.Empty;
-
-                Log.Message("Test: " + _inputString);
+                string cmd = InputField.Text;
+                InputField.Text = string.Empty;
+                try
+                {
+                    Log.Message(">{0}", cmd);
+                    _invoker.Push(cmd);
+                }
+                catch (Exception exp)
+                {
+                    Log.Error(exp.Message);
+                }
             }
+		}
+
+		private void chbx1_Checked( object sender, RoutedEventArgs e )
+		{
+			var checkBox = sender as CheckBox;
+			LogMessageType logType = (LogMessageType)checkBox.Tag;
+			bool check = checkBox.IsChecked != null ? checkBox.IsChecked == true ? true : false : false;
+			if (check)
+			{
+
+			}
 		}
 	}
 }

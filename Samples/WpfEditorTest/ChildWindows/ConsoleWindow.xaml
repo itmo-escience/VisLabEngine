@@ -4,6 +4,7 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:WpfEditorTest.ChildWindows"
+        xmlns:fusion ="clr-namespace:Fusion;assembly=Fusion"
         mc:Ignorable="d" d:DesignHeight="350" d:DesignWidth="950"
         Title="ConsoleWindow"
         WindowStyle="ToolWindow"
@@ -11,15 +12,30 @@
         ResizeMode="CanResize"
         SizeToContent="Manual"
         MinWidth="350" MinHeight="150"
-        MaxWidth="950" MaxHeight="350">
+        MaxWidth="950">
     <Grid Width="auto" Height="auto">
         <Grid.RowDefinitions>
+            <RowDefinition Height="25"/>
             <RowDefinition/>
             <RowDefinition Height="25"/>
         </Grid.RowDefinitions>
-        <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto">
-            <TextBlock Name="OutputField" Grid.Row="0" Background="#FFA0A0A0" />
+        <ToolBarTray Name="MenuToolBar" Grid.Row="0" IsLocked="True" >
+            <ToolBar>
+                <Menu>
+                    <MenuItem Name="LogTypeMenuItem" Header="LogFilter">
+                        <CheckBox Name="chbx1" Content="Debug" Checked="chbx1_Checked" Unchecked="chbx1_Checked" Tag="{x:Static fusion:LogMessageType.Debug}"/>
+                        <CheckBox Name="chbx2" Content="Verbose" Checked="chbx1_Checked" Unchecked="chbx1_Checked" Tag="{x:Static fusion:LogMessageType.Verbose}"/>
+                        <CheckBox Name="chbx3" Content="Information" Checked="chbx1_Checked" Unchecked="chbx1_Checked" Tag="{x:Static fusion:LogMessageType.Information}"/>
+                        <CheckBox Name="chbx4" Content="Warning" Checked="chbx1_Checked" Unchecked="chbx1_Checked" Tag="{x:Static fusion:LogMessageType.Warning}"/>
+                        <CheckBox Name="chbx5" Content="Error" Checked="chbx1_Checked" Unchecked="chbx1_Checked" Tag="{x:Static fusion:LogMessageType.Error}"/>
+                        <CheckBox Name="chbx10" Content="Fatal" Checked="chbx1_Checked" Unchecked="chbx1_Checked" Tag="{x:Static fusion:LogMessageType.Fatal}"/>
+                    </MenuItem>
+                </Menu>
+            </ToolBar>
+        </ToolBarTray>
+        <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto" Name="ScrollViewer">
+            <TextBox Name="OutputField" Grid.Row="0" Background="#FFA0A0A0" IsReadOnly="True"/>
         </ScrollViewer>
-        <TextBox Name="InputField" Grid.Row="1" Height="25" VerticalAlignment="Bottom" KeyDown="TextBox_KeyDown"/>
+        <TextBox Name="InputField" Grid.Row="2" Height="25" VerticalAlignment="Bottom" KeyDown="TextBox_KeyDown"/>
     </Grid>
 </Window>

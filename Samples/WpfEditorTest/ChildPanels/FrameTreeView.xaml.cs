@@ -34,6 +34,7 @@ namespace WpfEditorTest.ChildPanels
         }
 
         public EventHandler<UIComponent> SelectedFrameChangedInUI;
+		public EventHandler<UIController.Slot> ControllerSlotSelected;
 		public EventHandler RequestFrameDeletionInUI;
 
 		private TextBlock initTreeViewItemHolder;
@@ -71,6 +72,18 @@ namespace WpfEditorTest.ChildPanels
 		private void TextBlock_MouseDown( object sender, MouseButtonEventArgs e )
 		{
 			this.initTreeViewItemHolder = sender as TextBlock;
+			var objectChecking = (sender as TextBlock).Tag;
+			if (/*objectChecking.GetType().IsSubclassOf(typeof(UIController)) || */objectChecking is UIController.Slot)
+			{
+				ControllerSlotSelected?.Invoke(this, objectChecking as UIController.Slot);
+				return;
+			}
+			else
+			{
+				ControllerSlotSelected?.Invoke(this, null);
+			}
+
+
 			var component = (UIComponent)(sender as TextBlock).Tag;
 
 			SelectedFrameChangedInUI?.Invoke(this, component);
@@ -96,18 +109,29 @@ namespace WpfEditorTest.ChildPanels
 		public void SetSelected( ItemsControl parent, UIComponent child )
 		{
 			var currentFrame = child;
-			List<UIComponent> frames = new List<UIComponent>();
+			List<object> components = new List<object>();
 
 			while (currentFrame.Parent != null && currentFrame.Parent != _scene)
 			{
-				currentFrame = currentFrame.Parent;
-				frames.Add(currentFrame);
+				if (currentFrame.Parent is UIController)
+				{
+					components.Add((currentFrame.Parent as UIController).Slots.Where(s => s.Component == currentFrame).FirstOrDefault());
+					currentFrame = currentFrame.Parent;
+					components.Add(currentFrame);
+				}
+				else
+				{
+					currentFrame = currentFrame.Parent;
+					components.Add(currentFrame);
+				}
+
+
 			}
 
-			frames.Reverse();
+			components.Reverse();
 			TreeViewItem childNode;
 
-			foreach (var frame in frames)
+			foreach (var frame in components)
 			{
 				childNode = parent.ItemContainerGenerator.ContainerFromItem(frame) as TreeViewItem;
 				childNode.IsExpanded = true;

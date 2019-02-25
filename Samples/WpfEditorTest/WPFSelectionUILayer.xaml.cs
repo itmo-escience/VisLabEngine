@@ -391,6 +391,7 @@ namespace WpfEditorTest
 		private void LocalGrid_MouseLeftButtonDown( object sender, MouseButtonEventArgs e )
 		{
 			var hovered = GetHoveredFrameOnScene(e.GetPosition(this), true);
+			var enableSelection = true;
 			_initMousePosition = e.GetPosition(this);
 
 			if (!_frameDragsPanel.DragMousePressed)
@@ -407,14 +408,32 @@ namespace WpfEditorTest
 						}
 						else
 						{
-							framesToSelect.Add(hovered);
+							foreach (var frame in SelectionManager.Instance.SelectedFrames)
+							{
+								if (frame is UIContainer container)
+								{
+									if (container.Children.Contains(hovered))
+									{
+										enableSelection = false;
+									}
+								}
+								if (frame.Parent == hovered)
+								{
+									enableSelection = false;
+								}
+							}
+							if (enableSelection)
+								framesToSelect.Add(hovered);  
 						}
 						command = new SelectFrameCommand(framesToSelect);
 					}
 					else
 					{
-						if (!SelectionManager.Instance.SelectedFrames.Contains(hovered))
+						if (!SelectionManager.Instance.SelectedFrames.Contains(hovered) )
 						{
+							if (hovered.Parent.GetType().IsSubclassOf(typeof(UIController)))
+								hovered = hovered.Parent;
+
 							command = new SelectFrameCommand(new List<UIComponent> { hovered });
 						}
 					}

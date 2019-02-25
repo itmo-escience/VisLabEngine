@@ -62,7 +62,7 @@ namespace Fusion.Engine.Frames2.Managing
 
     public class KeyEventArgs : BubblingEventArgs
     {
-        public Keys Key;
+        public Keys Key { get; }
 
         public KeyEventArgs(Keys key)
         {
