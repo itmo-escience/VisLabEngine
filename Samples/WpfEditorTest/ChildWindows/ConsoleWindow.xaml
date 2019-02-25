@@ -21,8 +21,8 @@
         </Grid.RowDefinitions>
         <ToolBarTray Name="MenuToolBar" Grid.Row="0" IsLocked="True" >
             <ToolBar>
-                <TextBlock Text="Log Filter"></TextBlock>
-                <ComboBox Name="LogTypeMenuItem" Width="100" SelectionChanged="LogTypeMenuItem_SelectionChanged">
+                <TextBlock Text="Log Filter" VerticalAlignment="Center" HorizontalAlignment="Center"></TextBlock>
+                <ComboBox Name="LogTypeComboBox" Width="100" SelectionChanged="LogTypeMenuItem_SelectionChanged">
                     <ComboBoxItem Content="Debug" Tag="{x:Static fusion:LogMessageType.Debug}"/>
                     <ComboBoxItem Content="Verbose" Tag="{x:Static fusion:LogMessageType.Verbose}"/>
                     <ComboBoxItem Content="Information" Tag="{x:Static fusion:LogMessageType.Information}"/>

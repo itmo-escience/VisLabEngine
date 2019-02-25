@@ -36,6 +36,8 @@ namespace WpfEditorTest.ChildWindows
 			Left = double.Parse(ConfigurationManager.AppSettings.Get("ConsoleWindowX"));
 			Top = double.Parse(ConfigurationManager.AppSettings.Get("ConsoleWindowY"));
 
+			LogTypeComboBox.SelectedIndex = int.Parse(ConfigurationManager.AppSettings.Get("ConsoleFilterItemIndex"));
+
 			Closing += ( s, e ) => { this.Hide(); e.Cancel = true; };
 
             _invoker = invoker;
@@ -79,7 +81,6 @@ namespace WpfEditorTest.ChildWindows
 
 		private void LogTypeMenuItem_SelectionChanged( object sender, SelectionChangedEventArgs e )
 		{
-
 			var comboBox = sender as ComboBox;
 			LogMessageType logType = (LogMessageType)(comboBox.SelectedItem as FrameworkElement).Tag;
 			if (true)

@@ -754,6 +754,8 @@ namespace WpfEditorTest
 			settings["SceneSizeWidth"].Value = this.DefaultSceneWidth.ToString();
 			settings["SceneSizeHeight"].Value = this.DefaultSceneHeight.ToString();
 
+			settings["ConsoleFilterItemIndex"].Value = _consoleWindow.LogTypeComboBox.SelectedIndex.ToString();
+
 			configFile.Save(ConfigurationSaveMode.Modified);
 			ConfigurationManager.RefreshSection(configFile.AppSettings.SectionInformation.Name);
 		}
