@@ -162,13 +162,13 @@ namespace Fusion.Engine.Graphics.GIS
 
 		public ScalarVectorField(Game game, Gis.GeoPoint[] points, int[] indeces, bool isVector = false, bool isDynamic = false) : base(game)
 		{
-			shader		= _game.Content.Load<Ubershader>("globe.SVField.hlsl");
+			shader		= Game.Content.Load<Ubershader>("globe.SVField.hlsl");
 			factory		= shader.CreateFactory(typeof(FieldFlags), EnumFunc);
 			//factoryXray = shader.CreateFactory(typeof(FieldFlags), Primitive.TriangleList, VertexInputElement.FromStructure<Gis.GeoPoint>(), BlendState.Additive, RasterizerState.CullCW, DepthStencilState.None);
 
 			var vbOptions = isDynamic ? VertexBufferOptions.Dynamic : VertexBufferOptions.Default;
 
-			vB = new VertexBuffer(_game.GraphicsDevice, typeof(Gis.GeoPoint), points.Length, vbOptions);
+			vB = new VertexBuffer(Game.GraphicsDevice, typeof(Gis.GeoPoint), points.Length, vbOptions);
 			vB.SetData(points);
 
 			iB = new IndexBuffer(Game.Instance.GraphicsDevice, indeces.Length);
@@ -176,7 +176,7 @@ namespace Fusion.Engine.Graphics.GIS
 
 			PointsCpu = points;
 
-			cB = new ConstantBuffer(_game.GraphicsDevice, typeof(ConstData));
+			cB = new ConstantBuffer(Game.GraphicsDevice, typeof(ConstData));
 			Parameters.constData = new ConstData();
 			Parameters.constData.FactorMinMaxDeltatime				= Vector4.One;
 			Parameters.constData.VectorLeftRightTopBottomMargins	= new Vector4(MathUtil.Rad(-180.0f), MathUtil.Rad(-90.0f), MathUtil.Rad(360.0f), MathUtil.Rad(180.0f));
@@ -191,11 +191,11 @@ namespace Fusion.Engine.Graphics.GIS
 			//}
 
 			if (isVector) {
-				VelocityMap = new RenderTarget2D(_game.GraphicsDevice, ColorFormat.Rg32F, 2048, 2048);
+				VelocityMap = new RenderTarget2D(Game.GraphicsDevice, ColorFormat.Rg32F, 2048, 2048);
 				ArrowTexture = game.Content.Load<Texture2D>("arrow");
             }
             IsVector = isVector;			
-			Palette = _game.Content.Load <Texture2D>("pallete");
+			Palette = Game.Content.Load <Texture2D>("pallete");
 		}
 
 
@@ -207,7 +207,7 @@ namespace Fusion.Engine.Graphics.GIS
 			}
 
 
-			flowShader = _game.Content.Load<Ubershader>("globe.FlowLines.hlsl");
+			flowShader = Game.Content.Load<Ubershader>("globe.FlowLines.hlsl");
 			flowFactory = new StateFactory(flowShader, typeof(SopliFlags), (state, i) => {
 				state.VertexInputElements	= null;
 				state.BlendState			= BlendState.AlphaBlend;
@@ -218,7 +218,7 @@ namespace Fusion.Engine.Graphics.GIS
 			});
 			
 			particlesCount	= flowLineSize*initialPositions.Length;
-            flowLines		= new StructuredBuffer(_game.GraphicsDevice, typeof(Particle), particlesCount, StructuredBufferFlags.None);
+            flowLines		= new StructuredBuffer(Game.GraphicsDevice, typeof(Particle), particlesCount, StructuredBufferFlags.None);
 
 			var particles = new Particle[particlesCount];
 
@@ -233,7 +233,7 @@ namespace Fusion.Engine.Graphics.GIS
 			}
 
 			var indeces = new int[2*(flowLineSize - 1)*initialPositions.Length];
-			flowIndeces = new IndexBuffer(_game.GraphicsDevice, indeces.Length);
+			flowIndeces = new IndexBuffer(Game.GraphicsDevice, indeces.Length);
 
 			int indInd = 0;
 			for(int lineInd = 0; lineInd < initialPositions.Length; lineInd++) {
@@ -256,7 +256,7 @@ namespace Fusion.Engine.Graphics.GIS
 			partData.LineLengthWidthOpacity		= new Vector4(flowLineSize, 0.1f, 0.0f, 0.0f);
 			partData.GroupdimMaxparticles	= new Vector4(groupSize, particlesCount, 0, 0);
 			
-			particlesCBuffer = new ConstantBuffer(_game.GraphicsDevice, typeof(ParticlesData));
+			particlesCBuffer = new ConstantBuffer(Game.GraphicsDevice, typeof(ParticlesData));
 			particlesCBuffer.SetData(partData);
         }
 
@@ -296,51 +296,51 @@ namespace Fusion.Engine.Graphics.GIS
 		    Parameters.MinValue = MathUtil.Lerp(Parameters.MinValueNI, Parameters.MaxValueNI, Parameters.MinValueMult);            
             cB.SetData(Parameters.constData);            
 
-			_game.GraphicsDevice.VertexShaderConstants[0]	= constBuffer;
-			_game.GraphicsDevice.VertexShaderConstants[1]	= cB;
-			_game.GraphicsDevice.PixelShaderConstants[1]		= cB;
+			Game.GraphicsDevice.VertexShaderConstants[0]	= constBuffer;
+			Game.GraphicsDevice.VertexShaderConstants[1]	= cB;
+			Game.GraphicsDevice.PixelShaderConstants[1]		= cB;
 
-			_game.GraphicsDevice.SetupVertexInput(vB, iB);
+			Game.GraphicsDevice.SetupVertexInput(vB, iB);
 
 			// Vector part
 			if (VelocityMap != null) {
 				DepthStencilSurface depth;
 				RenderTargetSurface[] surfaces;
-				_game.GraphicsDevice.GetTargets(out depth, out surfaces);
+				Game.GraphicsDevice.GetTargets(out depth, out surfaces);
 
-				_game.GraphicsDevice.SetTargets(null, VelocityMap);
+				Game.GraphicsDevice.SetTargets(null, VelocityMap);
 
-				_game.GraphicsDevice.PipelineState = factory[(int)FieldFlags.DrawVectorData];
+				Game.GraphicsDevice.PipelineState = factory[(int)FieldFlags.DrawVectorData];
 
-				_game.GraphicsDevice.VertexShaderResources[5] = VectorDataFirstFrameGpu;
-				_game.GraphicsDevice.VertexShaderResources[6] = VectorDataSecondFrameGpu;
+				Game.GraphicsDevice.VertexShaderResources[5] = VectorDataFirstFrameGpu;
+				Game.GraphicsDevice.VertexShaderResources[6] = VectorDataSecondFrameGpu;
 
 				PixHelper.BeginEvent(new SharpDX.Mathematics.Interop.RawColorBGRA(255, 0, 0, 255), "Draw vector data");
-				_game.GraphicsDevice.DrawIndexed(iB.Capacity, 0, 0);
+				Game.GraphicsDevice.DrawIndexed(iB.Capacity, 0, 0);
 				PixHelper.EndEvent();
 
 				// Restore previous targets
-				_game.GraphicsDevice.SetTargets(depth, surfaces);
+				Game.GraphicsDevice.SetTargets(depth, surfaces);
 			}
 
 			// Scalar part
-			_game.GraphicsDevice.PipelineState = factory[(int)FieldFlags.DrawScalarData | (int)Flags];
+			Game.GraphicsDevice.PipelineState = factory[(int)FieldFlags.DrawScalarData | (int)Flags];
 
 			if (Palette != null)
-				_game.GraphicsDevice.PixelShaderResources[0] = Palette;
+				Game.GraphicsDevice.PixelShaderResources[0] = Palette;
 
 			if(VelocityMap != null)
-				_game.GraphicsDevice.PixelShaderResources[1] = VelocityMap;
+				Game.GraphicsDevice.PixelShaderResources[1] = VelocityMap;
 
-			_game.GraphicsDevice.VertexShaderResources[3] = ScalarDataFirstFrameGpu;
-			_game.GraphicsDevice.VertexShaderResources[4] = ScalarDataSecondFrameGpu;
+			Game.GraphicsDevice.VertexShaderResources[3] = ScalarDataFirstFrameGpu;
+			Game.GraphicsDevice.VertexShaderResources[4] = ScalarDataSecondFrameGpu;
 
-			_game.GraphicsDevice.PixelShaderResources[7] = ArrowTexture;
+			Game.GraphicsDevice.PixelShaderResources[7] = ArrowTexture;
 
-			_game.GraphicsDevice.PixelShaderSamplers[0] = Sampler;
-			_game.GraphicsDevice.PixelShaderSamplers[1] = SamplerState.AnisotropicClamp;
+			Game.GraphicsDevice.PixelShaderSamplers[0] = Sampler;
+			Game.GraphicsDevice.PixelShaderSamplers[1] = SamplerState.AnisotropicClamp;
 			
-			_game.GraphicsDevice.DrawIndexed(iB.Capacity, 0, 0);
+			Game.GraphicsDevice.DrawIndexed(iB.Capacity, 0, 0);
 
 
 			// Sopli part
@@ -350,35 +350,35 @@ namespace Fusion.Engine.Graphics.GIS
 				// Update sopli
 				PixHelper.BeginEvent(new SharpDX.Mathematics.Interop.RawColorBGRA(255, 0, 0, 255), "Sopli updating");
 
-				_game.GraphicsDevice.PipelineState = flowFactory[(int)SopliFlags.UpdateSopli];
+				Game.GraphicsDevice.PipelineState = flowFactory[(int)SopliFlags.UpdateSopli];
 
 				partData.LineLengthWidthOpacity.Z = Parameters.LinesOpacity;
                 particlesCBuffer.SetData(partData);
 
-				_game.GraphicsDevice.ComputeShaderConstants[1] = cB;
-				_game.GraphicsDevice.ComputeShaderConstants[2] = particlesCBuffer;
+				Game.GraphicsDevice.ComputeShaderConstants[1] = cB;
+				Game.GraphicsDevice.ComputeShaderConstants[2] = particlesCBuffer;
 
-				_game.GraphicsDevice.ComputeShaderResources[1] = VelocityMap;
-				_game.GraphicsDevice.ComputeShaderSamplers[0] = Sampler;
+				Game.GraphicsDevice.ComputeShaderResources[1] = VelocityMap;
+				Game.GraphicsDevice.ComputeShaderSamplers[0] = Sampler;
 
-				_game.GraphicsDevice.SetCSRWBuffer(0, flowLines);
+				Game.GraphicsDevice.SetCSRWBuffer(0, flowLines);
 
-				_game.GraphicsDevice.Dispatch(groupSize, groupSize, 1);
+				Game.GraphicsDevice.Dispatch(groupSize, groupSize, 1);
 
-				_game.GraphicsDevice.SetCSRWBuffer(0, null);
+				Game.GraphicsDevice.SetCSRWBuffer(0, null);
 
 				PixHelper.EndEvent();
 
 				// Draw sopli
 				PixHelper.BeginEvent(new SharpDX.Mathematics.Interop.RawColorBGRA(255, 0, 0, 255), "Sopli drawing");
 
-				_game.GraphicsDevice.VertexShaderResources[5] = flowLines;
-                _game.GraphicsDevice.VertexShaderConstants[2] = particlesCBuffer;
+				Game.GraphicsDevice.VertexShaderResources[5] = flowLines;
+                Game.GraphicsDevice.VertexShaderConstants[2] = particlesCBuffer;
 				
-				_game.GraphicsDevice.PipelineState = flowFactory[(int)SopliFlags.DrawSopli];
+				Game.GraphicsDevice.PipelineState = flowFactory[(int)SopliFlags.DrawSopli];
 				
-				_game.GraphicsDevice.SetupVertexInput(null, flowIndeces);
-				_game.GraphicsDevice.DrawIndexed(flowIndeces.Capacity, 0, 0);
+				Game.GraphicsDevice.SetupVertexInput(null, flowIndeces);
+				Game.GraphicsDevice.DrawIndexed(flowIndeces.Capacity, 0, 0);
 
 				PixHelper.EndEvent();
 			}

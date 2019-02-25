@@ -68,10 +68,10 @@ namespace Fusion.Engine.Graphics.GIS
 
 			var vbOptions = isDynamic ? VertexBufferOptions.Dynamic : VertexBufferOptions.Default;
 
-			currentBuffer	= new VertexBuffer(_game.GraphicsDevice, typeof(Gis.CartPoint), maxPointsCount * 4, vbOptions);
+			currentBuffer	= new VertexBuffer(Game.GraphicsDevice, typeof(Gis.CartPoint), maxPointsCount * 4, vbOptions);
 			PointsCpu		= new Gis.CartPoint[maxPointsCount*4];
 
-			indBuf = new IndexBuffer(_game.GraphicsDevice, indeces.Length);
+			indBuf = new IndexBuffer(Game.GraphicsDevice, indeces.Length);
 			for (int i = 0; i < maxPointsCount; i += 1) {
 				indeces[i*6 + 0] = i*4 + 0;
 				indeces[i*6 + 1] = i*4 + 1;
@@ -83,7 +83,7 @@ namespace Fusion.Engine.Graphics.GIS
 			}
 			indBuf.SetData(indeces);
 
-			shader	= _game.Content.Load<Ubershader>("globe.Debug.hlsl");
+			shader	= Game.Content.Load<Ubershader>("globe.Debug.hlsl");
 			factory = shader.CreateFactory(typeof(PointFlags), Primitive.TriangleList, VertexInputElement.FromStructure<Gis.CartPoint>(), BlendState.AlphaBlend, RasterizerState.CullCW, DepthStencilState.None);
 
 		}
@@ -153,16 +153,16 @@ namespace Fusion.Engine.Graphics.GIS
 
 			DotsBuffer.SetData(dotsData);
 			
-			_game.GraphicsDevice.VertexShaderConstants[0] = constBuffer;
-			_game.GraphicsDevice.VertexShaderConstants[1]	= DotsBuffer;
-			_game.GraphicsDevice.PipelineState = factory[(int)(PointFlags.DRAW_TEXTURED_POLY)]; // | PointFlags.POINT_FADING
+			Game.GraphicsDevice.VertexShaderConstants[0] = constBuffer;
+			Game.GraphicsDevice.VertexShaderConstants[1]	= DotsBuffer;
+			Game.GraphicsDevice.PipelineState = factory[(int)(PointFlags.DRAW_TEXTURED_POLY)]; // | PointFlags.POINT_FADING
 
-			_game.GraphicsDevice.PixelShaderResources[0] = TextureAtlas;
-			_game.GraphicsDevice.PixelShaderSamplers[0]	= SamplerState.LinearClamp;
+			Game.GraphicsDevice.PixelShaderResources[0] = TextureAtlas;
+			Game.GraphicsDevice.PixelShaderSamplers[0]	= SamplerState.LinearClamp;
 
 			if (PointsCpu.Any()) {
-				_game.GraphicsDevice.SetupVertexInput(currentBuffer, indBuf);
-				_game.GraphicsDevice.DrawIndexed(indeces.Length, 0, 0);
+				Game.GraphicsDevice.SetupVertexInput(currentBuffer, indBuf);
+				Game.GraphicsDevice.DrawIndexed(indeces.Length, 0, 0);
 			}
 		}
 

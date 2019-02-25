@@ -74,8 +74,8 @@ namespace Fusion.Engine.Graphics.GIS
 
             CurrentMapSource = MapSources[9];
 
-            frame = _game.Content.Load<Texture2D>("redframe.tga");
-            shader = _game.Content.Load<Ubershader>("globe.TileBatch.hlsl");
+            frame = Game.Content.Load<Texture2D>("redframe.tga");
+            shader = Game.Content.Load<Ubershader>("globe.TileBatch.hlsl");
             factory = shader.CreateFactory(typeof(TileFlags), Primitive.PatchList4CP, VertexInputElement.FromStructure<InstPoint>(), BlendState.AlphaBlend, RasterizerState.CullCW, DepthStencilState.Default);
             factoryWire = shader.CreateFactory(typeof(TileFlags), Primitive.PatchList4CP, VertexInputElement.FromStructure<InstPoint>(), BlendState.AlphaBlend, RasterizerState.Wireframe, DepthStencilState.Default);
               
@@ -152,7 +152,7 @@ namespace Fusion.Engine.Graphics.GIS
                 var id = instData;
 
                 PixHelper.BeginEvent(new SharpDX.Mathematics.Interop.RawColorBGRA(255, 0, 0, 255), "Draw Tiles");
-                var dev = _game.GraphicsDevice;
+                var dev = Game.GraphicsDevice;
 
                 dev.VertexShaderConstants[0] = constBuffer;
                 dev.HullShaderConstants[0] = constBuffer;
@@ -165,16 +165,16 @@ namespace Fusion.Engine.Graphics.GIS
                 dev.PixelShaderResources[1] = frame;
 
 
-                TileFlags flags = _game.Keyboard.IsKeyDown(Keys.M) /*&& Game.Keyboard.IsKeyDown(Keys.LeftAlt)*/ ? TileFlags.SHOW_FRAMES : 0;
+                TileFlags flags = Game.Keyboard.IsKeyDown(Keys.M) /*&& Game.Keyboard.IsKeyDown(Keys.LeftAlt)*/ ? TileFlags.SHOW_FRAMES : 0;
 
                 flags |= FixWater ? TileFlags.FIX_WATER : 0;
                 flags |= yandexMercator ? TileFlags.YANDEX : 0;
-                if (_game.Keyboard.IsKeyDown(Keys.T))
+                if (Game.Keyboard.IsKeyDown(Keys.T))
                 {
                     flags |= TileFlags.TESSELLATE;
                 }
 
-                dev.PipelineState = _game.Keyboard.IsKeyDown(Keys.M)/* && Game.Keyboard.IsKeyDown(Keys.LeftAlt)*/ ? factoryWire[(int)flags] : factory[(int)flags];
+                dev.PipelineState = Game.Keyboard.IsKeyDown(Keys.M)/* && Game.Keyboard.IsKeyDown(Keys.LeftAlt)*/ ? factoryWire[(int)flags] : factory[(int)flags];
                 if (instData.Count > 0)
                 {
                     instDataGpu.SetData(id.ToArray(), 0, Math.Min(id.Count, tilesLimit));

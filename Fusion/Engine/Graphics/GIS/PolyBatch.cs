@@ -112,13 +112,13 @@ namespace Fusion.Engine.Graphics.GIS
 
 		protected void Initialize(Gis.GeoPoint[] points, int[] indeces, bool isDynamic, bool reInit = false)
 		{
-			shader		= _game.Content.Load<Ubershader>("globe.Poly.hlsl");
+			shader		= Game.Content.Load<Ubershader>("globe.Poly.hlsl");
 			factory		= shader.CreateFactory(typeof(PolyFlags), EnumFunc);
 			factoryXray = shader.CreateFactory(typeof(PolyFlags), Primitive.TriangleList, VertexInputElement.FromStructure<Gis.GeoPoint>(), BlendState.Additive, RasterizerState.CullCW, DepthStencilState.None);
 
 			var vbOptions = isDynamic ? VertexBufferOptions.Dynamic : VertexBufferOptions.Default;
 
-			firstBuffer = new VertexBuffer(_game.GraphicsDevice, typeof(Gis.GeoPoint), points.Length, vbOptions);
+			firstBuffer = new VertexBuffer(Game.GraphicsDevice, typeof(Gis.GeoPoint), points.Length, vbOptions);
 			firstBuffer.SetData(points);
 			currentBuffer = firstBuffer;
 
@@ -131,7 +131,7 @@ namespace Fusion.Engine.Graphics.GIS
 			IndecesToDrawCount = indeces.Length;
 
 
-			cb			= new ConstantBuffer(_game.GraphicsDevice, typeof(ConstData));
+			cb			= new ConstantBuffer(Game.GraphicsDevice, typeof(ConstData));
 		    if (!reInit)
 		    {
 		        constData = new ConstData();
@@ -177,32 +177,32 @@ namespace Fusion.Engine.Graphics.GIS
 			}
 
 			if (((PolyFlags) Flags).HasFlag(PolyFlags.XRAY)) {
-				_game.GraphicsDevice.PipelineState = factoryXray[Flags];
+				Game.GraphicsDevice.PipelineState = factoryXray[Flags];
 			}
 			else {
-				_game.GraphicsDevice.PipelineState = factory[Flags];
+				Game.GraphicsDevice.PipelineState = factory[Flags];
 			}
 
 			if (((PolyFlags)Flags).HasFlag(PolyFlags.DRAW_TEXTURED)) {
 				if(Texture != null)
-					_game.GraphicsDevice.PixelShaderResources[0] = Texture; 
+					Game.GraphicsDevice.PixelShaderResources[0] = Texture; 
 			}
 
 		    if (((PolyFlags) Flags).HasFlag(PolyFlags.LIFETIME))
 		    {
-				_game.GraphicsDevice.VertexShaderConstants[1] = cb;
+				Game.GraphicsDevice.VertexShaderConstants[1] = cb;
 			}
 
 		    cb.SetData (constData);
-            _game.GraphicsDevice.PixelShaderConstants[1] = cb;
+            Game.GraphicsDevice.PixelShaderConstants[1] = cb;
 
-            _game.GraphicsDevice.VertexShaderConstants[0] = constBuffer;
+            Game.GraphicsDevice.VertexShaderConstants[0] = constBuffer;
 
-			_game.GraphicsDevice.PixelShaderSamplers[0] = Sampler;
-			_game.GraphicsDevice.PixelShaderSamplers[1] = SamplerState.AnisotropicClamp;
+			Game.GraphicsDevice.PixelShaderSamplers[0] = Sampler;
+			Game.GraphicsDevice.PixelShaderSamplers[1] = SamplerState.AnisotropicClamp;
 
-			_game.GraphicsDevice.SetupVertexInput(currentBuffer, indexBuffer);
-			_game.GraphicsDevice.DrawIndexed(IndecesToDrawCount, FirstIndex, 0);
+			Game.GraphicsDevice.SetupVertexInput(currentBuffer, indexBuffer);
+			Game.GraphicsDevice.DrawIndexed(IndecesToDrawCount, FirstIndex, 0);
 
 			//game.GraphicsDevice.ResetStates();
 		}

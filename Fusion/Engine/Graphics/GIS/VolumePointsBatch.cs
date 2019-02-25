@@ -64,11 +64,11 @@ namespace Fusion.Engine.Graphics.GIS
         public void SetWholeData(float[] data, int dimX, int dimY, int dimZ)   
         {
             DataFirstFrameGpu?.Dispose();
-            DataFirstFrameGpu = new Texture3D(_game.GraphicsDevice, dimX, dimY, dimZ, ColorFormat.R32F, false);
+            DataFirstFrameGpu = new Texture3D(Game.GraphicsDevice, dimX, dimY, dimZ, ColorFormat.R32F, false);
             DataFirstFrameGpu.SetData(data); 
 
             DataSecondFrameGpu?.Dispose();
-            DataSecondFrameGpu = new Texture3D(_game.GraphicsDevice, dimX, dimY, dimZ, ColorFormat.R32F, false);
+            DataSecondFrameGpu = new Texture3D(Game.GraphicsDevice, dimX, dimY, dimZ, ColorFormat.R32F, false);
             DataSecondFrameGpu.SetData(data);
 
             dataFrameSize = dimX * dimY * dimX;
@@ -84,10 +84,10 @@ namespace Fusion.Engine.Graphics.GIS
             indBuffer?.Dispose();
             posBuffer?.Dispose();
             indecies?.Dispose();
-            distBuffer = new StructuredBuffer(_game.GraphicsDevice, typeof(float), cc, StructuredBufferFlags.None);
-            posBuffer = new StructuredBuffer(_game.GraphicsDevice, typeof(Vector4), cc, StructuredBufferFlags.None);
-            indBuffer = new StructuredBuffer(_game.GraphicsDevice, typeof(uint), cc, StructuredBufferFlags.None);            
-            indecies = new IndexBuffer(_game.GraphicsDevice, cc);
+            distBuffer = new StructuredBuffer(Game.GraphicsDevice, typeof(float), cc, StructuredBufferFlags.None);
+            posBuffer = new StructuredBuffer(Game.GraphicsDevice, typeof(Vector4), cc, StructuredBufferFlags.None);
+            indBuffer = new StructuredBuffer(Game.GraphicsDevice, typeof(uint), cc, StructuredBufferFlags.None);            
+            indecies = new IndexBuffer(Game.GraphicsDevice, cc);
         }
 
         private IndexBuffer indecies;
@@ -96,7 +96,7 @@ namespace Fusion.Engine.Graphics.GIS
             DataFirstFrameGpu.Dispose();
             DataFirstFrameGpu = DataSecondFrameGpu;
 
-            DataSecondFrameGpu = new Texture3D(_game.GraphicsDevice, dimX, dimY, dimZ, ColorFormat.R32F, false);
+            DataSecondFrameGpu = new Texture3D(Game.GraphicsDevice, dimX, dimY, dimZ, ColorFormat.R32F, false);
             DataSecondFrameGpu.SetData(data); 
             dataFrameSize = dimX * dimY * dimX;            
         }
@@ -196,7 +196,7 @@ namespace Fusion.Engine.Graphics.GIS
                 }
                 
                 depthBuffer?.Dispose();
-                depthBuffer = new StructuredBuffer(_game.GraphicsDevice, sizeof(float), depths.Length, StructuredBufferFlags.None);
+                depthBuffer = new StructuredBuffer(Game.GraphicsDevice, sizeof(float), depths.Length, StructuredBufferFlags.None);
                 depthBuffer.SetData(depths);
             }
         }
@@ -206,10 +206,10 @@ namespace Fusion.Engine.Graphics.GIS
                    
         public VPBatch(Game engine) : base(engine)
         {
-            shader = _game.Content.Load<Ubershader>("globe.VolumPoints.hlsl");    
+            shader = Game.Content.Load<Ubershader>("globe.VolumPoints.hlsl");    
             factory = shader.CreateFactory(typeof(FieldFlags), EnumFunc);
              
-            cB = new ConstantBuffer(_game.GraphicsDevice, typeof(ConstData));            
+            cB = new ConstantBuffer(Game.GraphicsDevice, typeof(ConstData));            
         }
 
 
@@ -230,31 +230,31 @@ namespace Fusion.Engine.Graphics.GIS
             //}
             //indBuffer.SetData(indecies);
              
-            using (ConstantBuffer sortCB = new ConstantBuffer(_game.GraphicsDevice, sizeof(uint) * 4))
+            using (ConstantBuffer sortCB = new ConstantBuffer(Game.GraphicsDevice, sizeof(uint) * 4))
             {         
-                _game.GraphicsDevice.SetCSRWBuffer(0, distBuffer, 0);
-                _game.GraphicsDevice.SetCSRWBuffer(1, indBuffer, 0);
-                _game.GraphicsDevice.SetCSRWBuffer(2, posBuffer, 0);
+                Game.GraphicsDevice.SetCSRWBuffer(0, distBuffer, 0);
+                Game.GraphicsDevice.SetCSRWBuffer(1, indBuffer, 0);
+                Game.GraphicsDevice.SetCSRWBuffer(2, posBuffer, 0);
 
-                _game.GraphicsDevice.PipelineState = factory[(int)FieldFlags.Depth_Calc];
-                _game.GraphicsDevice.Dispatch((int)Math.Ceiling((float)dataFrameSize / BITONIC_BLOCK_SIZE), 1, 1); 
+                Game.GraphicsDevice.PipelineState = factory[(int)FieldFlags.Depth_Calc];
+                Game.GraphicsDevice.Dispatch((int)Math.Ceiling((float)dataFrameSize / BITONIC_BLOCK_SIZE), 1, 1); 
 
                 //float[] dist = new float[cc];
                 //int[] inds = new int[cc];
                 sortCB.SetData(new uint[] { (uint)cc, 0, 0, 0 }); 
-                _game.GraphicsDevice.ComputeShaderConstants[2] = sortCB; 
+                Game.GraphicsDevice.ComputeShaderConstants[2] = sortCB; 
                 for (uint level = 2; level <= cc; level <<= 1)   
                 {
                     sortCB.SetData(new uint[] {(uint) level, 0, 0, 0}); 
-                    _game.GraphicsDevice.PipelineState = factory[(int) FieldFlags.Depth_Sort_FirstMerge];
-                    _game.GraphicsDevice.Dispatch((int) Math.Ceiling((float) cc / BITONIC_BLOCK_SIZE), 1, 1);
+                    Game.GraphicsDevice.PipelineState = factory[(int) FieldFlags.Depth_Sort_FirstMerge];
+                    Game.GraphicsDevice.Dispatch((int) Math.Ceiling((float) cc / BITONIC_BLOCK_SIZE), 1, 1);
                     if (level > BITONIC_BLOCK_SIZE)
                     {
                         for (uint l = level / 2; l >= BITONIC_BLOCK_SIZE; l >>= 1)     
                         {
                             sortCB.SetData(new uint[] {(uint) level, l, 0, 0}); 
-                            _game.GraphicsDevice.PipelineState = factory[(int) FieldFlags.Depth_Sort_Transpose];
-                            _game.GraphicsDevice.Dispatch((int) Math.Ceiling((float) cc / BITONIC_BLOCK_SIZE), 1, 1);
+                            Game.GraphicsDevice.PipelineState = factory[(int) FieldFlags.Depth_Sort_Transpose];
+                            Game.GraphicsDevice.Dispatch((int) Math.Ceiling((float) cc / BITONIC_BLOCK_SIZE), 1, 1);
                         }    
                     }  
 
@@ -268,9 +268,9 @@ namespace Fusion.Engine.Graphics.GIS
                     //    Log.Message($"{level}: Yes!");
                     //}
                 }     
-                _game.GraphicsDevice.SetCSRWBuffer(0, null, 0);
-                _game.GraphicsDevice.SetCSRWBuffer(1, null, 0);
-                _game.GraphicsDevice.SetCSRWBuffer(2, null, 0);
+                Game.GraphicsDevice.SetCSRWBuffer(0, null, 0);
+                Game.GraphicsDevice.SetCSRWBuffer(1, null, 0);
+                Game.GraphicsDevice.SetCSRWBuffer(2, null, 0);
 
                 //distBuffer.GetData(dist);
                 //indBuffer.GetData(inds);
@@ -323,17 +323,17 @@ namespace Fusion.Engine.Graphics.GIS
         private Texture2D palette;
         public override void Draw(GameTime gameTime, ConstantBuffer constBuffer)
         {                
-            _game.GraphicsDevice.GeometryShaderConstants[0] = constBuffer;   
-            _game.GraphicsDevice.VertexShaderConstants[0] = constBuffer;
-            _game.GraphicsDevice.ComputeShaderConstants[0] = constBuffer;
+            Game.GraphicsDevice.GeometryShaderConstants[0] = constBuffer;   
+            Game.GraphicsDevice.VertexShaderConstants[0] = constBuffer;
+            Game.GraphicsDevice.ComputeShaderConstants[0] = constBuffer;
             parameters.Dummy.X = 0;//(float)gameTime.Total.TotalSeconds / 100;  
             cB.SetData(parameters);           
-            _game.GraphicsDevice.VertexShaderConstants[1] = cB;     
-            _game.GraphicsDevice.GeometryShaderConstants[1] = cB;      
-            _game.GraphicsDevice.PixelShaderConstants[1] = cB;
+            Game.GraphicsDevice.VertexShaderConstants[1] = cB;     
+            Game.GraphicsDevice.GeometryShaderConstants[1] = cB;      
+            Game.GraphicsDevice.PixelShaderConstants[1] = cB;
             
-            _game.GraphicsDevice.ComputeShaderConstants[1] = cB;
-            _game.GraphicsDevice.GeometryShaderSamplers[0] = Sampler;
+            Game.GraphicsDevice.ComputeShaderConstants[1] = cB;
+            Game.GraphicsDevice.GeometryShaderSamplers[0] = Sampler;
 
 
             var count = 1 << (int)Math.Ceiling(Math.Log(dataFrameSize, 2));
@@ -342,11 +342,11 @@ namespace Fusion.Engine.Graphics.GIS
             
 
             GPUSort(constBuffer);
-            _game.GraphicsDevice.GeometryShaderResources[0] = Palette;
-            _game.GraphicsDevice.GeometryShaderResources[1] = DataFirstFrameGpu;  
-            _game.GraphicsDevice.GeometryShaderResources[2] = DataSecondFrameGpu;
-            _game.GraphicsDevice.GeometryShaderResources[3] = depthBuffer;            
-            _game.GraphicsDevice.GeometryShaderResources[4] = posBuffer;  
+            Game.GraphicsDevice.GeometryShaderResources[0] = Palette;
+            Game.GraphicsDevice.GeometryShaderResources[1] = DataFirstFrameGpu;  
+            Game.GraphicsDevice.GeometryShaderResources[2] = DataSecondFrameGpu;
+            Game.GraphicsDevice.GeometryShaderResources[3] = depthBuffer;            
+            Game.GraphicsDevice.GeometryShaderResources[4] = posBuffer;  
             if (Palette != null)  
             {
                 Flags = FieldFlags.Draw_points | FieldFlags.LerpBuffers | FieldFlags.UsePalette | FieldFlags.MoveVertices;
@@ -356,10 +356,10 @@ namespace Fusion.Engine.Graphics.GIS
             {
                 Flags = FieldFlags.Draw_points | FieldFlags.LerpBuffers | FieldFlags.MoveVertices;          
             }                                      
-            _game.GraphicsDevice.PipelineState = factory[(int)Flags];                
-            _game.GraphicsDevice.DeviceContext.CopyResource(indBuffer.SRV.Resource, indecies.Buffer);  
-            _game.GraphicsDevice.SetupVertexInput(null, indecies);                
-            _game.GraphicsDevice.DrawIndexed(dataFrameSize, 0, 0); 
+            Game.GraphicsDevice.PipelineState = factory[(int)Flags];                
+            Game.GraphicsDevice.DeviceContext.CopyResource(indBuffer.SRV.Resource, indecies.Buffer);  
+            Game.GraphicsDevice.SetupVertexInput(null, indecies);                
+            Game.GraphicsDevice.DrawIndexed(dataFrameSize, 0, 0); 
             //Game.GraphicsDevice.Draw(dataFrameSize, 0);
         } 
 

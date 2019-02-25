@@ -585,8 +585,8 @@ namespace Fusion.Engine.Graphics.GIS
 
 			CalculateVertices(out vertices, out indexes, tileDensity, left, right, top, bottom);
 
-			vb = new VertexBuffer(_game.GraphicsDevice, typeof(Gis.GeoPoint), vertices.Length);
-			ib = new IndexBuffer(_game.GraphicsDevice, indexes.Length);
+			vb = new VertexBuffer(Game.GraphicsDevice, typeof(Gis.GeoPoint), vertices.Length);
+			ib = new IndexBuffer(Game.GraphicsDevice, indexes.Length);
 			ib.SetData(indexes);
 			vb.SetData(vertices, 0, vertices.Length);
 		}

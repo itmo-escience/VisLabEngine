@@ -78,7 +78,7 @@ namespace Fusion.Engine.Graphics.GIS
 
 			Flags = (int)(PointFlags.DOTS_SCREENSPACE | PointFlags.TEST);
 
-			shader	= _game.Content.Load<Ubershader>("globe.CartesianPoint.hlsl");
+			shader	= Game.Content.Load<Ubershader>("globe.CartesianPoint.hlsl");
 			factory = shader.CreateFactory( typeof(PointFlags), Primitive.PointList, new VertexInputElement[] {
 				new VertexInputElement("TEXCOORD", 0, Drivers.Graphics.VertexFormat.UInt2, 0, 0),
  				new VertexInputElement("TEXCOORD", 1, Drivers.Graphics.VertexFormat.UInt2, 0, 8),
@@ -101,8 +101,8 @@ namespace Fusion.Engine.Graphics.GIS
 
 		public override void Update(GameTime gameTime)
 		{
-			dotsData.View				= _game.RenderSystem.Gis.Camera.ViewMatrixFloat;
-			dotsData.Proj				= _game.RenderSystem.Gis.Camera.ProjMatrixFloat;
+			dotsData.View				= Game.RenderSystem.Gis.Camera.ViewMatrixFloat;
+			dotsData.Proj				= Game.RenderSystem.Gis.Camera.ProjMatrixFloat;
 			dotsData.SizeMult			= new Vector4(SizeMultiplier, 0.0f, 0.0f, AlphaFactor);
 			dotsData.Dummy				= new Vector4();
 
@@ -114,7 +114,7 @@ namespace Fusion.Engine.Graphics.GIS
 		{
 			Update(gameTime);
 
-			var dev = _game.GraphicsDevice;
+			var dev = Game.GraphicsDevice;
 
 			dev.PipelineState = factory[Flags];
 

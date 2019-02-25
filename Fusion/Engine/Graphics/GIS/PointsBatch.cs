@@ -111,7 +111,7 @@ namespace Fusion.Engine.Graphics.GIS
 			
 			Flags		= (int) (PointFlags.DOTS_WORLDSPACE);
 
-			shader	= _game.Content.Load<Ubershader>("globe.Point.hlsl");
+			shader	= Game.Content.Load<Ubershader>("globe.Point.hlsl");
 			factory = shader.CreateFactory( typeof(PointFlags), Primitive.PointList, VertexInputElement.FromStructure<Gis.GeoPoint>(), BlendState.AlphaBlend, RasterizerState.CullCCW, DepthStencilState.None);
 
 			ColorDatas = new ColorData[16];
@@ -151,7 +151,7 @@ namespace Fusion.Engine.Graphics.GIS
 		{
 			if (TextureAtlas == null) return;
 
-			var curCamera = camera ?? _game.RenderSystem.Gis.Camera;
+			var curCamera = camera ?? Game.RenderSystem.Gis.Camera;
 
 			dotsData.View				= curCamera.ViewMatrixFloat;
 			dotsData.Proj				= curCamera.ProjMatrixFloat;
@@ -169,7 +169,7 @@ namespace Fusion.Engine.Graphics.GIS
 
 			Update(gameTime);
 
-			var dev = _game.GraphicsDevice;
+			var dev = Game.GraphicsDevice;
 
 			//dev.ResetStates();
 

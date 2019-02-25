@@ -117,17 +117,17 @@ namespace Fusion.Engine.Graphics.GIS
 
             fbxBuf.SetData(constData);
 			
-			_game.GraphicsDevice.PipelineState				= factory[(int)FbxFlags.NONE];
-			_game.GraphicsDevice.VertexShaderConstants[0]	= constBuffer;
-			_game.GraphicsDevice.VertexShaderConstants[1]	= fbxBuf;
-			_game.GraphicsDevice.PixelShaderConstants[1]		= fbxBuf;
+			Game.GraphicsDevice.PipelineState				= factory[(int)FbxFlags.NONE];
+			Game.GraphicsDevice.VertexShaderConstants[0]	= constBuffer;
+			Game.GraphicsDevice.VertexShaderConstants[1]	= fbxBuf;
+			Game.GraphicsDevice.PixelShaderConstants[1]		= fbxBuf;
 
-			_game.GraphicsDevice.VertexShaderResources[0] = points;
+			Game.GraphicsDevice.VertexShaderResources[0] = points;
 
-			_game.GraphicsDevice.SetupVertexInput(FbxMesh.VertexBuffer, FbxMesh.IndexBuffer);
+			Game.GraphicsDevice.SetupVertexInput(FbxMesh.VertexBuffer, FbxMesh.IndexBuffer);
 
 			PixHelper.BeginEvent(new SharpDX.Mathematics.Interop.RawColorBGRA(255, 0, 0, 255), "Draw fbx layer");
-			_game.GraphicsDevice.DrawInstancedIndexed(FbxMesh.IndexBuffer.Capacity, DrawCount, 0, 0, 0);
+			Game.GraphicsDevice.DrawInstancedIndexed(FbxMesh.IndexBuffer.Capacity, DrawCount, 0, 0, 0);
             PixHelper.EndEvent();
 		}
 

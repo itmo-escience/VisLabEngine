@@ -34,7 +34,7 @@ namespace Fusion.Engine.Graphics.GIS
 			shader	= game.Content.Load<Ubershader>("globe.Debug.hlsl");
 			factory = shader.CreateFactory(typeof(DebugFlags), Primitive.LineList, VertexInputElement.FromStructure<Gis.CartPoint>(), BlendState.AlphaBlend, RasterizerState.CullCW, DepthStencilState.None);
 
-			buf = new VertexBuffer(_game.GraphicsDevice, typeof(Gis.CartPoint), 500000, VertexBufferOptions.Dynamic);
+			buf = new VertexBuffer(Game.GraphicsDevice, typeof(Gis.CartPoint), 500000, VertexBufferOptions.Dynamic);
 
 			boxes = new List<Gis.CartPoint>();
 			lines = new List<Gis.CartPoint>();
@@ -43,8 +43,8 @@ namespace Fusion.Engine.Graphics.GIS
 
 		public override void Draw(GameTime gameTime, ConstantBuffer constBuffer)
 		{
-			_game.GraphicsDevice.VertexShaderConstants[0]	= constBuffer;
-			_game.GraphicsDevice.PipelineState				= factory[(int)(DebugFlags.DRAW_LINES)];
+			Game.GraphicsDevice.VertexShaderConstants[0]	= constBuffer;
+			Game.GraphicsDevice.PipelineState				= factory[(int)(DebugFlags.DRAW_LINES)];
 
 			if (isDirty) {
 				isDirty = false;
@@ -53,8 +53,8 @@ namespace Fusion.Engine.Graphics.GIS
 			}
 
 			if (lines.Any()) {
-				_game.GraphicsDevice.SetupVertexInput(buf, null);
-				_game.GraphicsDevice.Draw(lines.Count, 0);
+				Game.GraphicsDevice.SetupVertexInput(buf, null);
+				Game.GraphicsDevice.Draw(lines.Count, 0);
 			}
 		}
 

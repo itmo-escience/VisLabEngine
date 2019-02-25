@@ -78,7 +78,7 @@ namespace Fusion.Engine.Graphics.GIS
 
 	    public class GisLayer
 	    {
-		    protected Game _game;
+		    protected Game Game;
 
 			public bool IsActive	= true;
 			public bool IsVisible	= true;
@@ -98,7 +98,7 @@ namespace Fusion.Engine.Graphics.GIS
 
 		    public GisLayer(Game engine)
 		    {
-			    _game = engine;
+			    Game = engine;
 		    }
 	    }
 

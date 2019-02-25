@@ -91,7 +91,7 @@ namespace Fusion.Engine.Graphics.GIS
 		    OverallColor = Color4.White;
 
 		    _isDynamic = isDynamic;
-            _shader = _game.Content.Load<Ubershader>("globe.Line.hlsl");
+            _shader = Game.Content.Load<Ubershader>("globe.Line.hlsl");
 			_factory = _shader.CreateFactory( typeof(LineFlags), Primitive.LineList, VertexInputElement.FromStructure<Gis.GeoPoint>(), BlendState.AlphaBlend, RasterizerState.CullNone, DepthStencilState.None);
 			_thinFactory = _shader.CreateFactory( typeof(LineFlags), Primitive.LineList, VertexInputElement.FromStructure<Gis.GeoPoint>(), BlendState.AlphaBlend, RasterizerState.CullNone, DepthStencilState.None);
 			_linesConstantBuffer = new ConstantBuffer(engine.GraphicsDevice, typeof(LinesConstDataStruct));		    
@@ -135,7 +135,7 @@ namespace Fusion.Engine.Graphics.GIS
 
 		public override void Draw(GameTime gameTime, ConstantBuffer constBuffer)
 		{
-			var dev = _game.GraphicsDevice;
+			var dev = Game.GraphicsDevice;
 
 			if (((LineFlags) Flags).HasFlag(LineFlags.THIN_LINE)) {
 				dev.PipelineState = _thinFactory[Flags];

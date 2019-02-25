@@ -59,8 +59,8 @@ namespace Fusion.Engine.Graphics.GIS
 
 			CurrentMapSource = MapSources[9];
 
-			frame	= _game.Content.Load<Texture2D>("redframe.tga");
-			shader	= _game.Content.Load<Ubershader>("globe.Tile.hlsl");
+			frame	= Game.Content.Load<Texture2D>("redframe.tga");
+			shader	= Game.Content.Load<Ubershader>("globe.Tile.hlsl");
 			factory = shader.CreateFactory( typeof(TileFlags), Primitive.TriangleList, VertexInputElement.FromStructure<Gis.GeoPoint>(), BlendState.AlphaBlend, RasterizerState.CullCW, DepthStencilState.Default);
 			factoryWire = shader.CreateFactory(typeof(TileFlags), Primitive.TriangleList, VertexInputElement.FromStructure<Gis.GeoPoint>(), BlendState.AlphaBlend, RasterizerState.Wireframe, DepthStencilState.Default);
 		}
@@ -91,12 +91,12 @@ namespace Fusion.Engine.Graphics.GIS
 
 			CurrentMapSource.Update(gameTime);
 
-			if (_game.Keyboard.IsKeyDown(Keys.OemPlus)) {
+			if (Game.Keyboard.IsKeyDown(Keys.OemPlus)) {
 				viewerHeight += viewerHeight*0.005;
 				Console.WriteLine("Height: " + viewerHeight);
 			}
 
-			if (_game.Keyboard.IsKeyDown(Keys.OemMinus)) {
+			if (Game.Keyboard.IsKeyDown(Keys.OemMinus)) {
 				viewerHeight -= viewerHeight*0.005;
 				Console.WriteLine("Height: " + viewerHeight);
 			}
@@ -129,7 +129,7 @@ namespace Fusion.Engine.Graphics.GIS
       //      var camPos = new DBoundingBox(localCameraPos, localCameraPos + DVector3.One);
 		    //Gis.Debug.DrawSphere(100, Color.Red, DMatrix.Translation(localCameraPos));
 
-            var dev = _game.GraphicsDevice;
+            var dev = Game.GraphicsDevice;
 
 			dev.VertexShaderConstants[0]	= constBuffer;
 		    dev.PixelShaderConstants[0]     = constBuffer;
@@ -137,11 +137,11 @@ namespace Fusion.Engine.Graphics.GIS
 			dev.PixelShaderResources[1]		= frame;
 
 
-		    TileFlags flags = _game.Keyboard.IsKeyDown(Keys.M) && _game.Keyboard.IsKeyDown(Keys.LeftAlt) ? TileFlags.SHOW_FRAMES : 0;
+		    TileFlags flags = Game.Keyboard.IsKeyDown(Keys.M) && Game.Keyboard.IsKeyDown(Keys.LeftAlt) ? TileFlags.SHOW_FRAMES : 0;
 
             flags |= FixWater ? TileFlags.FIX_WATER : 0;
 
-            dev.PipelineState = _game.Keyboard.IsKeyDown(Keys.M) && _game.Keyboard.IsKeyDown(Keys.LeftAlt) ? factoryWire[(int)flags] : factory[(int)flags];
+            dev.PipelineState = Game.Keyboard.IsKeyDown(Keys.M) && Game.Keyboard.IsKeyDown(Keys.LeftAlt) ? factoryWire[(int)flags] : factory[(int)flags];
 			//dev.PipelineState = factory[0];
 
 		    if (tilesToRender.Count > maxTilesToRender)
