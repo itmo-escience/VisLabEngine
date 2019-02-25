@@ -30,7 +30,7 @@ namespace Fusion.Engine.Frames2.Managing
 
     public delegate void KeyDownEvent(UIComponent sender, KeyEventArgs e);
     public delegate void KeyUpEvent(UIComponent sender, KeyEventArgs e);
-    public delegate void KeyPressEvent(UIComponent sender, KeyEventArgs e);
+    public delegate void KeyPressEvent(UIComponent sender, KeyPressEventArgs e);
 
     public delegate void MouseMoveEvent(UIComponent sender, MoveEventArgs e);
 
@@ -75,6 +75,20 @@ namespace Fusion.Engine.Frames2.Managing
         }
     }
 
+    public class KeyPressEventArgs : BubblingEventArgs
+    {
+        public char KeyChar { get; }
+
+        public KeyPressEventArgs(char keyChar)
+        {
+            KeyChar = keyChar;
+        }
+
+        public static explicit operator KeyPressEventArgs(Input.KeyPressArgs args)
+        {
+            return new KeyPressEventArgs(args.KeyChar);
+        }
+    }
     public class MoveEventArgs : BubblingEventArgs
     {
         public Vector2 Position { get; }

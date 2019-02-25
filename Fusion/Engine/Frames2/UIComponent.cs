@@ -314,7 +314,7 @@ namespace Fusion.Engine.Frames2
 
         internal virtual void InvokeKeyDown         (KeyEventArgs e)       => KeyDown?.Invoke(this, e);
         internal virtual void InvokeKeyUp           (KeyEventArgs e)       => KeyUp?.Invoke(this, e);
-        internal virtual void InvokeKeyPress        (KeyEventArgs e)       => KeyPress?.Invoke(this, e);
+        internal virtual void InvokeKeyPress        (KeyPressEventArgs e)  => KeyPress?.Invoke(this, e);
         internal virtual void InvokeMouseMove       (MoveEventArgs e)      => MouseMove?.Invoke(this, e);
         internal virtual void InvokeMouseDrag       (DragEventArgs e)      => MouseDrag?.Invoke(this, e);
         internal virtual void InvokeMouseDown       (ClickEventArgs e)     => MouseDown?.Invoke(this, e);

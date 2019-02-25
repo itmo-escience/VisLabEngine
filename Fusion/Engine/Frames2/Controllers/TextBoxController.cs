@@ -51,18 +51,28 @@ namespace Fusion.Engine.Frames2.Controllers
             }
         }
 
-        private void OnKeyPress(UIComponent sender, KeyEventArgs e)
+        private const char Backspace = (char)8;
+        private const char Escape = (char)27;
+
+        private void OnKeyPress(UIComponent sender, KeyPressEventArgs e)
         {
             if(CurrentState != Editing)
                 return;
 
-            if (e.Key == Keys.Escape)
+            if (e.KeyChar == Escape)
             {
-                ChangeState(State.Default);
-                return;
+
             }
 
-            _label.Text += e.Key.ToString();
+            switch (e.KeyChar)
+            {
+                case Backspace:
+                    _label.Text = _label.Text.Substring(0, _label.Text.Length - 1); break;
+                case Escape:
+                    ChangeState(State.Default);
+                    return;
+                default: _label.Text += e.KeyChar; break;
+            }
 
             Input?.Invoke(this, new InputEventArgs(_label.Text));
         }
