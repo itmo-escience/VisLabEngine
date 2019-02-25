@@ -21,16 +21,15 @@
         </Grid.RowDefinitions>
         <ToolBarTray Name="MenuToolBar" Grid.Row="0" IsLocked="True" >
             <ToolBar>
-                <Menu>
-                    <MenuItem Name="LogTypeMenuItem" Header="LogFilter">
-                        <CheckBox Name="chbx1" Content="Debug" Checked="chbx1_Checked" Unchecked="chbx1_Checked" Tag="{x:Static fusion:LogMessageType.Debug}"/>
-                        <CheckBox Name="chbx2" Content="Verbose" Checked="chbx1_Checked" Unchecked="chbx1_Checked" Tag="{x:Static fusion:LogMessageType.Verbose}"/>
-                        <CheckBox Name="chbx3" Content="Information" Checked="chbx1_Checked" Unchecked="chbx1_Checked" Tag="{x:Static fusion:LogMessageType.Information}"/>
-                        <CheckBox Name="chbx4" Content="Warning" Checked="chbx1_Checked" Unchecked="chbx1_Checked" Tag="{x:Static fusion:LogMessageType.Warning}"/>
-                        <CheckBox Name="chbx5" Content="Error" Checked="chbx1_Checked" Unchecked="chbx1_Checked" Tag="{x:Static fusion:LogMessageType.Error}"/>
-                        <CheckBox Name="chbx10" Content="Fatal" Checked="chbx1_Checked" Unchecked="chbx1_Checked" Tag="{x:Static fusion:LogMessageType.Fatal}"/>
-                    </MenuItem>
-                </Menu>
+                <TextBlock Text="Log Filter"></TextBlock>
+                <ComboBox Name="LogTypeMenuItem" Width="100" SelectionChanged="LogTypeMenuItem_SelectionChanged">
+                    <ComboBoxItem Content="Debug" Tag="{x:Static fusion:LogMessageType.Debug}"/>
+                    <ComboBoxItem Content="Verbose" Tag="{x:Static fusion:LogMessageType.Verbose}"/>
+                    <ComboBoxItem Content="Information" Tag="{x:Static fusion:LogMessageType.Information}"/>
+                    <ComboBoxItem Content="Warning" Tag="{x:Static fusion:LogMessageType.Warning}"/>
+                    <ComboBoxItem Content="Error" Tag="{x:Static fusion:LogMessageType.Error}"/>
+                    <ComboBoxItem Content="Fatal" Tag="{x:Static fusion:LogMessageType.Fatal}"/>
+                </ComboBox>
             </ToolBar>
         </ToolBarTray>
         <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto" Name="ScrollViewer" Grid.Row="1">

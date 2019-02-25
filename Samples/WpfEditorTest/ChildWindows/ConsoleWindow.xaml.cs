@@ -77,12 +77,12 @@ namespace WpfEditorTest.ChildWindows
             }
 		}
 
-		private void chbx1_Checked( object sender, RoutedEventArgs e )
+		private void LogTypeMenuItem_SelectionChanged( object sender, SelectionChangedEventArgs e )
 		{
-			var checkBox = sender as CheckBox;
-			LogMessageType logType = (LogMessageType)checkBox.Tag;
-			bool check = checkBox.IsChecked != null ? checkBox.IsChecked == true ? true : false : false;
-			if (check)
+
+			var comboBox = sender as ComboBox;
+			LogMessageType logType = (LogMessageType)(comboBox.SelectedItem as FrameworkElement).Tag;
+			if (true)
 			{
 
 			}
