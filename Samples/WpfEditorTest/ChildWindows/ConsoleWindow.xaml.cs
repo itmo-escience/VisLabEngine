@@ -25,6 +25,7 @@ namespace WpfEditorTest.ChildWindows
 	public partial class ConsoleWindow : Window
 	{
         Invoker _invoker;
+        LogMessageType _lowestMessageLevelToPrint;
 
         public ConsoleWindow(Invoker invoker)
 		{
@@ -47,16 +48,7 @@ namespace WpfEditorTest.ChildWindows
             {
                 Application.Current.Dispatcher.InvokeAsync(() =>
                 {
-                    string messages = "";
-                    foreach (LogMessage message in LogRecorder.GetLines())
-                    {
-                        if (message.MessageType != LogMessageType.Debug)
-                        {
-                            messages += message.MessageText + Environment.NewLine;
-                        }
-                    }
-                    OutputField.Text = messages;
-                    ScrollViewer.ScrollToEnd();
+                    UpdatOutputText();
                 });
             };
         }
@@ -82,11 +74,22 @@ namespace WpfEditorTest.ChildWindows
 		private void LogTypeMenuItem_SelectionChanged( object sender, SelectionChangedEventArgs e )
 		{
 			var comboBox = sender as ComboBox;
-			LogMessageType logType = (LogMessageType)(comboBox.SelectedItem as FrameworkElement).Tag;
-			if (true)
-			{
+			_lowestMessageLevelToPrint = (LogMessageType)(comboBox.SelectedItem as FrameworkElement).Tag;
+            UpdatOutputText();
+        }
 
-			}
-		}
+        private void UpdatOutputText()
+        {
+            string messages = "";
+            foreach (LogMessage message in LogRecorder.GetLines())
+            {
+                if (message.MessageType >= _lowestMessageLevelToPrint)
+                {
+                    messages += message.MessageText + Environment.NewLine;
+                }
+            }
+            OutputField.Text = messages;
+            ScrollViewer.ScrollToEnd();
+        }
 	}
 }
