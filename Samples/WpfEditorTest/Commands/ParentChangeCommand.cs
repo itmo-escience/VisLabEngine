@@ -1,5 +1,6 @@
 ﻿using Fusion.Engine.Common;
 using Fusion.Engine.Frames2;
+using System.Windows;
 
 namespace WpfEditorTest.UndoRedo
 {
@@ -36,16 +37,20 @@ namespace WpfEditorTest.UndoRedo
 		public void Do()
 		{
             Game.ResourceWorker.Post(r => {
-                _oldParent?.Remove(_frame);
-                _newParent?.AddAt(_frame, _index);
+                r.ProcessQueue.Post(t => {
+                    _oldParent?.Remove(_frame);
+                    _newParent?.AddAt(_frame, _index);
+                }, null, int.MaxValue);
             }, null, int.MaxValue);
 		}
 
 		public void Undo()
 		{
             Game.ResourceWorker.Post(r => {
-                _newParent?.Remove(_frame);
-			    _oldParent?.AddAt(_frame,_index);
+                r.ProcessQueue.Post(t => {
+                    _newParent?.Remove(_frame);
+                    _oldParent?.AddAt(_frame, _index);
+                }, null, int.MaxValue);
             }, null, int.MaxValue);
         }
 	}

@@ -32,14 +32,18 @@ namespace WpfEditorTest.UndoRedo
 		public void Do()
 		{
             Game.ResourceWorker.Post(r => {
-                _propertyToChange.SetValue(_frame, _valueToSet);
+                r.ProcessQueue.Post(t => {
+                    _propertyToChange.SetValue(_frame, _valueToSet);
+                }, null, int.MaxValue);
             }, null, int.MaxValue);
         }
 
 		public void Undo()
 		{
             Game.ResourceWorker.Post(r => {
-                _propertyToChange.SetValue(_frame, _previousValue);
+                r.ProcessQueue.Post(t => {
+                    _propertyToChange.SetValue(_frame, _previousValue);
+                }, null, int.MaxValue);
             }, null, int.MaxValue);
         }
 	}

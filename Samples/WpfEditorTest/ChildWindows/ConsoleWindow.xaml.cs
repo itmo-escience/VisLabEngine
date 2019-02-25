@@ -48,7 +48,7 @@ namespace WpfEditorTest.ChildWindows
             {
                 Application.Current.Dispatcher.InvokeAsync(() =>
                 {
-                    UpdatOutputText();
+                    UpdateOutputText();
                 });
             };
         }
@@ -75,10 +75,10 @@ namespace WpfEditorTest.ChildWindows
 		{
 			var comboBox = sender as ComboBox;
 			_lowestMessageLevelToPrint = (LogMessageType)(comboBox.SelectedItem as FrameworkElement).Tag;
-            UpdatOutputText();
+            UpdateOutputText();
         }
 
-        private void UpdatOutputText()
+        private void UpdateOutputText()
         {
             string messages = "";
             foreach (LogMessage message in LogRecorder.GetLines())

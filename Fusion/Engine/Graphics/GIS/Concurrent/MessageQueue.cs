@@ -296,40 +296,48 @@ namespace Fusion.Engine.Graphics.GIS.Concurrent
 
 		private void PriorityRun()
 		{
-			try
-			{
-				WorkRequest req = null;
+            try
+            {
+                WorkRequest req = null;
 
-				do {
-					lock (queue) {
-						if (queue.Count > 0) {
-							queue.Sort((x,y)=> x.Priority.CompareTo(y.Priority));
-							req = queue.Last();
-							queue.RemoveAt(queue.Count - 1);
-						}
-						else {
-							Monitor.Wait(queue);
+                do
+                {
+                    lock (queue)
+                    {
+                        if (queue.Count > 0)
+                        {
+                            queue.Sort((x, y) => x.Priority.CompareTo(y.Priority));
+                            req = queue.Last();
+                            queue.RemoveAt(queue.Count - 1);
+                        }
+                        else
+                        {
+                            Monitor.Wait(queue);
 
-							queue.Sort((x, y) => x.Priority.CompareTo(y.Priority));
-							req = queue.Last();
-							queue.RemoveAt(queue.Count - 1);
-						}
-					}
+                            queue.Sort((x, y) => x.Priority.CompareTo(y.Priority));
+                            req = queue.Last();
+                            queue.RemoveAt(queue.Count - 1);
+                        }
+                    }
 
-					try {
-						ProcessMessage(req);
-					}
-					catch (OperationCanceledException e) {
+                    try
+                    {
+                        ProcessMessage(req);
+                    }
+                    catch (OperationCanceledException e)
+                    {
 
-					}
+                    }
 
-				} while (state == State.Running);
-			}
-			finally {
-				lock (queue) {
-					state = State.Stopped;
-				}
-			}
+                } while (state == State.Running);
+            }
+            finally
+            {
+                lock (queue)
+                {
+                    state = State.Stopped;
+                }
+            }
 		}
 
 
