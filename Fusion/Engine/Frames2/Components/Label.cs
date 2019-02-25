@@ -55,7 +55,10 @@ namespace Fusion.Engine.Frames2.Components
 
         private Graphics.SpritesD2D.Label _label;
 
-        public Label() : base() {}
+        public Label() : base()
+        {
+            _isDirtyText = true;
+        }
 
         public Label(string text, TextFormatD2D textFormat, float x, float y, float width, float height) : base(x, y, width, height)
         {
@@ -63,6 +66,8 @@ namespace Fusion.Engine.Frames2.Components
             _maxWidth = width;
             _maxHeight = height;
             Text = text;
+
+            _isDirtyText = true;
         }
 
         public override void Update(GameTime gameTime)
@@ -80,7 +85,8 @@ namespace Fusion.Engine.Frames2.Components
 
         public override void Draw(SpriteLayerD2D layer)
         {
-            layer.Draw(_label);
+            if(_label != null)
+                layer.Draw(_label);
         }
     }
 }

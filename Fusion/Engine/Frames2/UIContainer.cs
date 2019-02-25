@@ -154,8 +154,6 @@ namespace Fusion.Engine.Frames2
 
         #endregion
 
-        public override void Draw(SpriteLayerD2D layer) { }
-
         public override void Update(GameTime gameTime)
         {
             UpdateChildrenLayout();
