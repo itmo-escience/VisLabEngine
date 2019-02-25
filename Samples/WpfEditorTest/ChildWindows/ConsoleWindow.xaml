@@ -18,7 +18,7 @@
             <RowDefinition Height="25"/>
         </Grid.RowDefinitions>
         <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto" Name="ScrollViewer">
-            <TextBlock Name="OutputField" Grid.Row="0" Background="#FFA0A0A0" />
+            <TextBox Name="OutputField" Grid.Row="0" Background="#FFA0A0A0" IsReadOnly="True"/>
         </ScrollViewer>
         <TextBox Name="InputField" Grid.Row="1" Height="25" VerticalAlignment="Bottom" KeyDown="TextBox_KeyDown"/>
     </Grid>
