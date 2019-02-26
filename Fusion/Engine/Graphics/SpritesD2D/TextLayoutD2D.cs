@@ -91,6 +91,7 @@ namespace Fusion.Engine.Graphics.SpritesD2D
             {
                 var tf = _formatFactory.CreateTextFormat(layout.TextFormat);
                 result = new TextLayout(_factory, layout.Text, tf, layout.MaxWidth, layout.MaxHeight);
+                _cache[layout] = result;
             }
 
             return result;

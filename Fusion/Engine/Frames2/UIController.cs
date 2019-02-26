@@ -34,7 +34,6 @@ namespace Fusion.Engine.Frames2
 
         public void ChangeState(State newState)
         {
-            if(newState == CurrentState) return;
             if(!States.Contains(newState)) return;
 
             foreach (var fragment in Slots)
@@ -94,6 +93,8 @@ namespace Fusion.Engine.Frames2
                 }
                 slot.ComponentAttached += ComponentAttachedToSlot;
             }
+
+            ChangeState(State.Default);
             _initialized = true;
         }
 

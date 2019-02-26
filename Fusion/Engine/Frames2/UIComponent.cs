@@ -243,7 +243,7 @@ namespace Fusion.Engine.Frames2
 
             var debugText = $"{Name} X:{b.X:0.00} Y:{b.Y:0.00} W:{b.Width:0.00} H:{b.Height:0.00}";
             var dtl = new TextLayoutD2D(debugText, DebugTextFormat, float.MaxValue, float.MaxValue);
-            layer.Draw(new Label(debugText, new RectangleF(b.X, b.Y - dtl.Height, dtl.Width + 1, dtl.Height), DebugTextFormat, DebugBrush));
+            layer.Draw(new Text(debugText, new RectangleF(b.X, b.Y - dtl.Height, dtl.Width + 1, dtl.Height), DebugTextFormat, DebugBrush));
         }
 
         #region Naming
