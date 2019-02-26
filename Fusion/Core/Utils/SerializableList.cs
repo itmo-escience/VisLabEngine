@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Linq;
 using System.Reflection;
@@ -12,92 +13,103 @@ using System.Xml.Serialization;
 
 namespace Fusion.Core.Utils
 {
-    public class SerializableList<T> : List<T>, IXmlSerializable, INotifyPropertyChanged
+    public class SerializableList<T> : List<T>, IXmlSerializable, INotifyCollectionChanged
     {
-        public event PropertyChangedEventHandler PropertyChanged;
+        public event NotifyCollectionChangedEventHandler CollectionChanged;
+
+        public SerializableList() : base()
+        {
+            CollectionChanged += (s, e) =>
+            {
+                int i;
+            };
+        }
+
+        public SerializableList(SerializableList<T> list) : base(list)
+        {
+            CollectionChanged += (s, e) =>
+            {
+                int i;
+            };
+        }
 
         public new void Add(T item)
         {
             base.Add(item);
-            PropertyChanged?.Invoke(null, (PropertyChangedEventArgs)EventArgs.Empty);
+            CollectionChanged?.Invoke(this, new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Add, item));
         }
 
         public new void AddRange(IEnumerable<T> range)
         {
             base.AddRange(range);
-            PropertyChanged?.Invoke(null, (PropertyChangedEventArgs)EventArgs.Empty);
+            CollectionChanged?.Invoke(this, new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Add, range));
         }
 
         public new void Clear()
         {
             base.Clear();
-            PropertyChanged?.Invoke(null, (PropertyChangedEventArgs)EventArgs.Empty);
-        }
-
-        public new void ForEach(Action<T> action)
-        {
-            base.ForEach(action);
-            PropertyChanged?.Invoke(null, (PropertyChangedEventArgs)EventArgs.Empty);
+            CollectionChanged?.Invoke(this, new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Reset));
         }
 
         public new void Insert(Int32 index, T item)
         {
             base.Insert(index, item);
-            PropertyChanged?.Invoke(null, (PropertyChangedEventArgs)EventArgs.Empty);
+            CollectionChanged?.Invoke(this, new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Add, item, index));
         }
 
         public new void InsertRange(Int32 index, IEnumerable<T> range)
         {
             base.InsertRange(index, range);
-            PropertyChanged?.Invoke(null, (PropertyChangedEventArgs)EventArgs.Empty);
+            CollectionChanged?.Invoke(this, new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Add, range, index));
         }
 
         public new void Remove(T item)
         {
-            base.Remove(item);
-            PropertyChanged?.Invoke(null, (PropertyChangedEventArgs)EventArgs.Empty);
+            bool isRemoved = base.Remove(item);
+            if (isRemoved) CollectionChanged?.Invoke(this, new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Remove, item));
         }
 
         public new void RemoveAt(Int32 index)
         {
+            T item = this[index];
             base.RemoveAt(index);
-            PropertyChanged?.Invoke(null, (PropertyChangedEventArgs)EventArgs.Empty);
+            CollectionChanged?.Invoke(this, new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Remove, item, index));
         }
 
         public new void Reverse()
         {
             base.Reverse();
-            PropertyChanged?.Invoke(null, (PropertyChangedEventArgs)EventArgs.Empty);
+            CollectionChanged?.Invoke(this, new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Move, this));
         }
 
         public new void Reverse(Int32 startIndex, Int32 endIndex)
         {
             base.Reverse(startIndex, endIndex);
-            PropertyChanged?.Invoke(null, (PropertyChangedEventArgs)EventArgs.Empty);
+            CollectionChanged?.Invoke(this, new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Move, GetRange(startIndex, endIndex - startIndex + 1)));
         }
 
         public new void Sort()
         {
             base.Sort();
-            PropertyChanged?.Invoke(null, (PropertyChangedEventArgs)EventArgs.Empty);
+            CollectionChanged?.Invoke(this, new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Move, this));
         }
 
         public new void Sort(Comparison<T> comparer)
         {
             base.Sort(comparer);
-            PropertyChanged?.Invoke(null, (PropertyChangedEventArgs)EventArgs.Empty);
+            CollectionChanged?.Invoke(this, new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Move, this));
         }
 
         public new void Sort(IComparer<T> comparer)
         {
             base.Sort(comparer);
-            PropertyChanged?.Invoke(null, (PropertyChangedEventArgs)EventArgs.Empty);
+            CollectionChanged?.Invoke(this, new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Move, this));
         }
 
         public new void Sort(Int32 startIndex, Int32 endIndex, IComparer<T> comparer)
         {
             base.Sort(startIndex, endIndex, comparer);
-            PropertyChanged?.Invoke(null, (PropertyChangedEventArgs)EventArgs.Empty);
+            CollectionChanged?.Invoke(this, new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Move, GetRange(startIndex, endIndex - startIndex + 1)));
         }
 
         public XmlSchema GetSchema()

@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using Fusion.Core.Mathematics;
+using Fusion.Core.Utils;
 using Fusion.Engine.Common;
 using Fusion.Engine.Graphics.SpritesD2D;
 using SharpDX.Direct2D1;
@@ -10,8 +11,8 @@ namespace Fusion.Engine.Frames2
 {
     public abstract class UIContainer : UIComponent
     {
-        private readonly List<UIComponent> _children;
-        public List<UIComponent> Children {
+        private readonly SerializableList<UIComponent> _children;
+        public SerializableList<UIComponent> Children {
             get { return _children; }
             set {
                 foreach (UIComponent child in value)
@@ -56,15 +57,15 @@ namespace Fusion.Engine.Frames2
 
         protected UIContainer() : base()
         {
-            _children = new List<UIComponent>();
-            Children = new List<UIComponent>(_children);
+            _children = new SerializableList<UIComponent>();
+            Children = new SerializableList<UIComponent>(_children);
             _needClipping = false;
         }
 
         protected UIContainer(float x, float y, float width, float height, bool needClipping = false) : base(x, y, width, height)
         {
-            _children = new List<UIComponent>();
-            Children = new List<UIComponent>(_children);
+            _children = new SerializableList<UIComponent>();
+            Children = new SerializableList<UIComponent>(_children);
             _needClipping = needClipping;
         }
 
