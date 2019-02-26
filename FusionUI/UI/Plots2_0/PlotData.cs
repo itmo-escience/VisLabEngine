@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using Fusion.Core.Mathematics;
+using Fusion.Engine.Common;
 using Fusion.Engine.Graphics.GIS;
 using Fusion.Engine.Graphics.GIS.GlobeMath;
 using FusionUI.UI.Plots;
@@ -207,7 +208,7 @@ namespace FusionUI.UI.Plots2_0
             acessTimes[ind][depth] = DateTime.Now;
             if (delayed)
             {
-                Gis.ResourceWorker.Post((x) =>
+                Game.ResourceWorker.Post((x) =>
                 {
                     x.ProcessQueue.Post((xx) =>
                     {

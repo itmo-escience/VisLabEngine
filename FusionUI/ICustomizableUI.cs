@@ -1,4 +1,5 @@
 ﻿using Fusion.Engine.Frames2;
+using Fusion.Engine.Frames2.Managing;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,5 +11,6 @@ namespace FusionUI
 	public interface ICustomizableUI
 	{
 		UIContainer GetUIRoot();
-	}
+        UIManager GetUIManager();
+    }
 }

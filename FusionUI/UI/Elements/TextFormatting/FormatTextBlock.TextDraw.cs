@@ -258,7 +258,7 @@ namespace FusionUI.UI.Elements.TextFormatting
                                     ei - i - 7);
                                 i = ei;
                                 tagStack.Push(tag);
-                                Gis.ResourceWorker.Post(r =>
+                                Game.ResourceWorker.Post(r =>
                                 {
                                     r.ProcessQueue.Post(t =>
                                     {

@@ -25,6 +25,7 @@ namespace WpfEditorTest.ChildWindows
 	public partial class ConsoleWindow : Window
 	{
         Invoker _invoker;
+        LogMessageType _lowestMessageLevelToPrint;
 
         public ConsoleWindow(Invoker invoker)
 		{
@@ -36,6 +37,8 @@ namespace WpfEditorTest.ChildWindows
 			Left = double.Parse(ConfigurationManager.AppSettings.Get("ConsoleWindowX"));
 			Top = double.Parse(ConfigurationManager.AppSettings.Get("ConsoleWindowY"));
 
+			LogTypeComboBox.SelectedIndex = int.Parse(ConfigurationManager.AppSettings.Get("ConsoleFilterItemIndex"));
+
 			Closing += ( s, e ) => { this.Hide(); e.Cancel = true; };
 
             _invoker = invoker;
@@ -45,16 +48,7 @@ namespace WpfEditorTest.ChildWindows
             {
                 Application.Current.Dispatcher.InvokeAsync(() =>
                 {
-                    string messages = "";
-                    foreach (LogMessage message in LogRecorder.GetLines())
-                    {
-                        if (message.MessageType != LogMessageType.Debug)
-                        {
-                            messages += message.MessageText + Environment.NewLine;
-                        }
-                    }
-                    OutputField.Text = messages;
-                    ScrollViewer.ScrollToEnd();
+                    UpdateOutputText();
                 });
             };
         }
@@ -77,15 +71,25 @@ namespace WpfEditorTest.ChildWindows
             }
 		}
 
-		private void chbx1_Checked( object sender, RoutedEventArgs e )
+		private void LogTypeMenuItem_SelectionChanged( object sender, SelectionChangedEventArgs e )
 		{
-			var checkBox = sender as CheckBox;
-			LogMessageType logType = (LogMessageType)checkBox.Tag;
-			bool check = checkBox.IsChecked != null ? checkBox.IsChecked == true ? true : false : false;
-			if (check)
-			{
+			var comboBox = sender as ComboBox;
+			_lowestMessageLevelToPrint = (LogMessageType)(comboBox.SelectedItem as FrameworkElement).Tag;
+            UpdateOutputText();
+        }
 
-			}
-		}
+        private void UpdateOutputText()
+        {
+            string messages = "";
+            foreach (LogMessage message in LogRecorder.GetLines())
+            {
+                if (message.MessageType >= _lowestMessageLevelToPrint)
+                {
+                    messages += message.MessageText + Environment.NewLine;
+                }
+            }
+            OutputField.Text = messages;
+            ScrollViewer.ScrollToEnd();
+        }
 	}
 }

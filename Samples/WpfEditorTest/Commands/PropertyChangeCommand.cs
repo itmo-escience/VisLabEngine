@@ -1,4 +1,5 @@
-﻿using Fusion.Engine.Frames2;
+﻿using Fusion.Engine.Common;
+using Fusion.Engine.Frames2;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -30,12 +31,20 @@ namespace WpfEditorTest.UndoRedo
 
 		public void Do()
 		{
-			_propertyToChange.SetValue(_frame, _valueToSet);
-		}
+            Game.ResourceWorker.Post(r => {
+                r.ProcessQueue.Post(t => {
+                    _propertyToChange.SetValue(_frame, _valueToSet);
+                }, null, int.MaxValue);
+            }, null, int.MaxValue);
+        }
 
 		public void Undo()
 		{
-			_propertyToChange.SetValue(_frame, _previousValue);
-		}
+            Game.ResourceWorker.Post(r => {
+                r.ProcessQueue.Post(t => {
+                    _propertyToChange.SetValue(_frame, _previousValue);
+                }, null, int.MaxValue);
+            }, null, int.MaxValue);
+        }
 	}
 }

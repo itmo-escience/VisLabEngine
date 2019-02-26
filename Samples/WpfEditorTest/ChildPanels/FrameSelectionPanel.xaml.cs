@@ -207,8 +207,8 @@ namespace WpfEditorTest.ChildPanels
 				if (_selectedFrame == null) return;
 
 				_locked = true;
-				_selectedFrame.Width = (int)(/*Width + */Math.Max(0, Math.Abs(WidthBuffer))+0.5d);
-				_selectedFrame.Height = (int)(/*Height + */Math.Max(0, Math.Abs(HeightBuffer))+0.5d);
+				_selectedFrame.Width = (float)Math.Max(0, Math.Abs(WidthBuffer));
+				_selectedFrame.Height = (float)Math.Max(0, Math.Abs(HeightBuffer));
 
 				_selectedFrame.Transform = new Matrix3x2(
 					Math.Sign(WidthBuffer)<0?-1:1, _selectedFrame.Transform.M12,

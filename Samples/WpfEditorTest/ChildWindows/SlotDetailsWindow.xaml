@@ -8,6 +8,7 @@
              xmlns:system ="clr-namespace:System;assembly=mscorlib"
              xmlns:math ="clr-namespace:Fusion.Core.Mathematics;assembly=Fusion"
              xmlns:frames ="clr-namespace:Fusion.Engine.Frames;assembly=Fusion"
+             xmlns:frames2 ="clr-namespace:Fusion.Engine.Frames2;assembly=Fusion"
              xmlns:wpfTool ="http://schemas.xceed.com/wpf/xaml/toolkit"
              mc:Ignorable="d"
              d:DesignHeight="264" d:DesignWidth="264"
@@ -24,8 +25,8 @@
         <conv:DataTemplateSelectorOfProperty x:Key="propTemplateSelector"/>
         <conv:BoolToIndexConverter x:Key="boolToIndexConverter" />
 
-        
-        
+
+
         <DataTemplate x:Key="TransformProp">
             <DockPanel Height="auto" Width="auto">
                 <Grid Height="auto" Width="auto">
