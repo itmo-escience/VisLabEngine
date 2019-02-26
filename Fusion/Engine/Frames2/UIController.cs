@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
+using System.Reflection;
 using Fusion.Core.Mathematics;
 using Fusion.Engine.Common;
 
@@ -136,7 +138,7 @@ namespace Fusion.Engine.Frames2
         {
             public string Name { get; }
             public UIComponent Component { get; private set; }
-            public List<PropertyValue> Properties { get; } = new List<PropertyValue>();
+            public ObservableCollection<PropertyValue> Properties { get; } = new ObservableCollection<PropertyValue>();
 
             public Slot(string name)
             {
@@ -175,16 +177,24 @@ namespace Fusion.Engine.Frames2
         {
             public string Name { get; }
             public object Default { get; }
+			public MVVMFrameProperty PropertyInfo { get; }
 
-            private readonly Dictionary<State, object> _storedValues = new Dictionary<State, object>();
+			private readonly Dictionary<State, object> _storedValues = new Dictionary<State, object>();
 
-            public PropertyValue(string name, object defaultValue)
+            public PropertyValue(string name, object defaultValue, UIComponent component)
             {
                 Name = name;
                 Default = defaultValue;
 
                 _storedValues[State.Default] = Default;
-            }
+
+				var property = component.GetType().GetProperty(name);
+
+				if (property != null)
+				{
+					PropertyInfo = new MVVMFrameProperty(property, component);
+				}
+			}
 
             public object this[State s]
             {

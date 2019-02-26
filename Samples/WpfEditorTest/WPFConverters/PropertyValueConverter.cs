@@ -22,14 +22,14 @@ namespace WpfEditorTest.WPFConverters
 				return targetType.ToString();
 			}
 
-			if (value.GetType() == typeof(Fusion.Core.Mathematics.Color))
+			if (value.GetType() == typeof(Fusion.Core.Mathematics.Color4))
 			{
-				Fusion.Core.Mathematics.Color fuCol = (Fusion.Core.Mathematics.Color)value;
+				Fusion.Core.Mathematics.Color4 fuCol = (Fusion.Core.Mathematics.Color4)value;
 				System.Windows.Media.Color col = new System.Windows.Media.Color();
-				col.A = fuCol.A;
-				col.R = fuCol.R;
-				col.G = fuCol.G;
-				col.B = fuCol.B;
+				col.A = (byte)(fuCol.Alpha * 255);
+				col.R = (byte)(fuCol.Red * 255);
+				col.G = (byte)(fuCol.Green * 255);
+				col.B = (byte)(fuCol.Blue * 255);
 
 				return col;
 			}
@@ -68,7 +68,7 @@ namespace WpfEditorTest.WPFConverters
 			if (value.GetType() == typeof(System.Windows.Media.Color))
 			{
 				System.Windows.Media.Color col = (System.Windows.Media.Color)value;
-				Fusion.Core.Mathematics.Color fuCol = new Fusion.Core.Mathematics.Color(col.R,col.G,col.B,col.A);
+				Fusion.Core.Mathematics.Color4 fuCol = new Fusion.Core.Mathematics.Color4(col.R / 255, col.G / 255, col.B / 255, col.A / 255);
 				return fuCol;
 			}
 

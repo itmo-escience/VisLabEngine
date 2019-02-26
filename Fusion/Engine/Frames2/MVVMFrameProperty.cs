@@ -6,9 +6,8 @@ using System.Linq;
 using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
-using WpfEditorTest.UndoRedo;
 
-namespace WpfEditorTest.ChildPanels
+namespace Fusion.Engine.Frames2
 {
 	public class MVVMFrameProperty : IMVVMProperty
 	{
@@ -61,8 +60,7 @@ namespace WpfEditorTest.ChildPanels
 			{
 				var convertedValue = Convert.ChangeType(value, PropInfo.PropertyType);
 
-				var command = new FramePropertyChangeCommand(Obj, PropName, value);
-				CommandManager.Instance.Execute(command);
+				Obj.GetType().GetProperty(PropName).SetValue(Obj, value);
 
 				OnPropertyChanged();
 			}

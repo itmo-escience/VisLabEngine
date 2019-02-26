@@ -1,4 +1,5 @@
 ﻿using Fusion.Core.Mathematics;
+using Fusion.Engine.Frames2;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -16,11 +17,11 @@ namespace WpfEditorTest.WPFConverters
 		{
 			FrameworkElement element = container as FrameworkElement;
 
-			if (element != null && item != null && item is MVVMFrameProperty)
+			if (element != null && item != null && item.GetType().GetInterfaces().Contains(typeof(IMVVMProperty)))
 			{
-				MVVMFrameProperty Prop = item as MVVMFrameProperty;
+				IMVVMProperty Prop = item as IMVVMProperty;
 
-				if (Prop.PropType == typeof(Fusion.Core.Mathematics.Color))
+				if (Prop.PropType == typeof(Fusion.Core.Mathematics.Color4))
 					return
 						element.FindResource("ColorProp") as DataTemplate;
 				if (Prop.PropType == typeof(Matrix3x2))

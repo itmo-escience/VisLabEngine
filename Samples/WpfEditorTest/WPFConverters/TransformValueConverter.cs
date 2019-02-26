@@ -23,9 +23,9 @@ namespace WpfEditorTest.WPFConverters
 				return targetType.ToString();
 			}
 
-			if (value.GetType() == typeof(MVVMFrameProperty))
+			if (value.GetType().GetInterfaces().Contains(typeof(IMVVMProperty)))
 			{
-				elementToUpdate = ((MVVMFrameProperty)value).Obj;
+				elementToUpdate = ((IMVVMProperty)value).Obj;
 				return null;
 			}
 
