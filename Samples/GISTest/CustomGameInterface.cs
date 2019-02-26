@@ -20,6 +20,9 @@ using Fusion.Engine.Graphics.SpritesD2D;
 using KeyEventArgs = Fusion.Engine.Input.KeyEventArgs;
 using Fusion.Engine.Frames2;
 using Label = Fusion.Engine.Frames2.Components.Label;
+using Fusion.Core.Utils;
+using System.Xml.Serialization;
+using System.IO;
 
 namespace GISTest
 {
@@ -184,8 +187,35 @@ namespace GISTest
             FreePlacement freePlacement = new FreePlacement(300, 300, 200, 200, true);
             freePlacement.Add(img1);
             freePlacement.Add(img2);
-            freePlacement.Add(img3);
-            freePlacement.Add(img4);
+            //freePlacement.Add(img3);
+            //freePlacement.Add(img4);
+
+            //
+
+            SerializableList<UIComponent> list = new SerializableList<UIComponent>();
+            list.Add(img3);
+            list.Add(img4);
+
+            XmlSerializer formatter = new XmlSerializer(typeof(SerializableList<UIComponent>));
+            string xml;
+            using (StringWriter sw = new StringWriter())
+            {
+                formatter.Serialize(sw, list);
+                xml = sw.ToString();
+            }
+
+            System.Console.WriteLine(xml);
+
+            list = new SerializableList<UIComponent>();
+            using (StringReader sr = new StringReader(xml))
+            {
+                list = (SerializableList<UIComponent>)formatter.Deserialize(sr);
+            }
+
+            freePlacement.Add(list[0]);
+            freePlacement.Add(list[1]);
+
+            //
 
             UIManager.Root.Add(freePlacement);
 

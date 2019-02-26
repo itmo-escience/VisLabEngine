@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
+using System.Reflection;
 using System.Runtime.Serialization;
 using System.Text;
 using System.Threading.Tasks;
@@ -11,7 +12,7 @@ using System.Xml.Serialization;
 
 namespace Fusion.Core.Utils
 {
-    public class SerializableList<T> : List<T>, IXmlSerializable, INotifyPropertyChanged where T : IXmlSerializable
+    public class SerializableList<T> : List<T>, IXmlSerializable, INotifyPropertyChanged
     {
         public event PropertyChangedEventHandler PropertyChanged;
 
@@ -106,32 +107,60 @@ namespace Fusion.Core.Utils
 
         public void ReadXml(XmlReader reader)
         {
-            XmlSerializer serializer = new XmlSerializer(typeof(T));
-
             bool wasEmpty = reader.IsEmptyElement;
             reader.Read();
 
             if (wasEmpty)
                 return;
 
+            XmlSerializer typesSerializer = new XmlSerializer(typeof(SerializableDictionary<string, string>));
+            var types = (SerializableDictionary<string, string>)typesSerializer.Deserialize(reader);
+
+            var frameTypes = new List<Type>();
+            foreach (var keyValuePair in types)
+            {
+                var assembly = Assembly.Load(keyValuePair.Value);
+                frameTypes.Add(assembly.GetType(keyValuePair.Key));
+            }
+
+            XmlSerializer serializer = new XmlSerializer(typeof(T), frameTypes.ToArray());
+
             while (reader.NodeType != XmlNodeType.EndElement)
             {
                 reader.ReadStartElement("item");
-                Add((T)serializer.Deserialize(reader));
+                object item = serializer.Deserialize(reader);
+                Add((T)item);
                 reader.ReadEndElement();
-                reader.MoveToContent();
             }
             reader.ReadEndElement();
         }
 
         public void WriteXml(XmlWriter writer)
         {
-            XmlSerializer serializer = new XmlSerializer(typeof(T));
+            SerializableDictionary<string, string> typeList = new SerializableDictionary<string, string>();
+            foreach (T value in this)
+            {
+                if (!typeList.Keys.Contains(value.GetType().FullName))
+                {
+                    typeList.Add(value.GetType().FullName, Assembly.GetAssembly(value.GetType()).FullName);
+                }
+            }
 
+            XmlSerializer typesSerializer = new XmlSerializer(typeof(SerializableDictionary<string, string>));
+            typesSerializer.Serialize(writer, typeList);
+
+            List<Type> frameTypes = new List<Type>();
+            foreach (var keyValuePair in typeList)
+            {
+                var assembly = Assembly.Load(keyValuePair.Value);
+                frameTypes.Add(assembly.GetType(keyValuePair.Key));
+            }
+
+            XmlSerializer valuesSerializer = new XmlSerializer(typeof(T), frameTypes.ToArray());
             foreach (T value in this)
             {
                 writer.WriteStartElement("item");
-                serializer.Serialize(writer, value);
+                valuesSerializer.Serialize(writer, value);
                 writer.WriteEndElement();
             }
         }
