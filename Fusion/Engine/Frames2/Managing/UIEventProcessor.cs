@@ -46,7 +46,7 @@ namespace Fusion.Engine.Frames2.Managing
         private void SubscribeToInputEvents()
         {
             //KeyDown
-            _game.Keyboard.KeyDown += (sender, args) =>
+            _game.Keyboard.FormKeyDown += (sender, args) =>
             {
                 var keyArgs = (KeyEventArgs) args;
                 _focusComponent?.InvokeKeyDown(keyArgs);
@@ -64,7 +64,7 @@ namespace Fusion.Engine.Frames2.Managing
             };
 
             //KeyUp
-            _game.Keyboard.KeyUp += (sender, args) =>
+            _game.Keyboard.FormKeyUp += (sender, args) =>
             {
                 if (args.Key == _lastKey)
                 {
@@ -80,6 +80,19 @@ namespace Fusion.Engine.Frames2.Managing
                     if (!keyArgs.ShouldPropagate) break;
 
                     c.InvokeKeyUp(keyArgs);
+                }
+            };
+
+            _game.Keyboard.FormKeyPress += (sender, args) =>
+            {
+                var keyArgs = new KeyPressEventArgs(args.KeyChar);
+                _focusComponent?.InvokeKeyPress(keyArgs);
+
+                foreach (var c in UIHelper.Ancestors(_focusComponent))
+                {
+                    if (!keyArgs.ShouldPropagate) break;
+
+                    c.InvokeKeyPress(keyArgs);
                 }
             };
 
@@ -262,32 +275,6 @@ namespace Fusion.Engine.Frames2.Managing
 
         public void Update(GameTime time)
         {
-            var shouldRepeat =_keyPressState != KeyPressState.Idle && (
-                _keyPressState == KeyPressState.JustPressed && (time.Total.TotalMilliseconds - _lastKeyRepetitionMs > KeyPressRepetitionDelay) ||
-                _keyPressState == KeyPressState.Pressing && (time.Total.TotalMilliseconds - _lastKeyRepetitionMs > KeyPressRepetitionFrequency)
-                );
-
-            //KeyPress
-            if (!_lastKey.IsMouseKey() && _game.Keyboard.IsKeyDown(_lastKey) && shouldRepeat)
-            {
-                _lastKeyRepetitionMs = time.Total.TotalMilliseconds;
-
-                var keyArgs = new KeyEventArgs(_lastKey);
-                _focusComponent?.InvokeKeyPress(keyArgs);
-
-                foreach (var c in UIHelper.Ancestors(_focusComponent))
-                {
-                    if (!keyArgs.ShouldPropagate) break;
-
-                    c.InvokeKeyPress(keyArgs);
-                }
-
-                if (_keyPressState == KeyPressState.JustPressed)
-                {
-                    _keyPressState = KeyPressState.Pressing;
-                }
-            }
-
             //Enter + Leave (mouse)
             InvokeEnterAndLeaveComponentsEvents();
         }

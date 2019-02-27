@@ -24,9 +24,6 @@ namespace Fusion.Engine.Graphics.GIS
 		public static float MinValue { set; get; }
 		[Config]
 		public static float IsolineDensity { set; get; }
-
-
-		public static readonly MessageQueue ResourceWorker = new MessageQueue();
 		
 		public GlobeCamera Camera;
 		ConstantBuffer constBuffer;
@@ -115,10 +112,7 @@ namespace Fusion.Engine.Graphics.GIS
 	    }
 
 
-	    public Gis(Game Game) : base(Game)
-	    {
-			ResourceWorker.StartMainThread();
-	    }
+	    public Gis(Game Game) : base(Game) {}
 
 
 	    public override void Initialize()

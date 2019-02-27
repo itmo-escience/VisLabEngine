@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using SharpDX;
 using SharpDX.Direct2D1;
 using Matrix3x2 = Fusion.Core.Mathematics.Matrix3x2;
 using RectangleF = Fusion.Core.Mathematics.RectangleF;
@@ -139,16 +138,16 @@ namespace Fusion.Engine.Graphics.SpritesD2D
         }
     }
 
-    public sealed class Label : IDrawCommand
+    public sealed class Text : IDrawCommand
     {
-        public readonly string Text;
+        public readonly string Value;
         public readonly TextFormatD2D Format;
         public readonly IBrushD2D Brush;
         public readonly RectangleF Location;
 
-        public Label(string text, RectangleF location, TextFormatD2D format, IBrushD2D brush)
+        public Text(string value, RectangleF location, TextFormatD2D format, IBrushD2D brush)
         {
-            Text = text;
+            Value = value;
             Format = format;
             Brush = brush;
             Location = location;
@@ -156,7 +155,7 @@ namespace Fusion.Engine.Graphics.SpritesD2D
 
         public void Apply(RenderTargetD2D target)
         {
-            target.DrawText(Text, Format, Location, Brush);
+            target.DrawText(Value, Format, Location, Brush);
         }
     }
 

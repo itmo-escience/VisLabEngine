@@ -28,7 +28,7 @@ using Fusion.Engine.Server;
 using Lidgren.Network;
 using Fusion.Engine.Storage;
 using Fusion.Engine.Audio;
-
+using Fusion.Engine.Graphics.GIS.Concurrent;
 
 namespace Fusion.Engine.Common {
 
@@ -119,11 +119,12 @@ namespace Fusion.Engine.Common {
 		/// </summary>
 		public UserStorage UserStorage { get { return userStorage; } }
 
+        public static readonly MessageQueue ResourceWorker = new MessageQueue();
 
-		/// <summary>
-		/// Sets and gets game window icon.
-		/// </summary>
-		public System.Drawing.Icon Icon {
+        /// <summary>
+        /// Sets and gets game window icon.
+        /// </summary>
+        public System.Drawing.Icon Icon {
 			get {
 				return windowIcon;
 			}
@@ -376,7 +377,8 @@ namespace Fusion.Engine.Common {
 
 			userStorage			=	new UserStorage(this);
 
-		}
+            ResourceWorker.StartMainThread();
+        }
 
 
 
