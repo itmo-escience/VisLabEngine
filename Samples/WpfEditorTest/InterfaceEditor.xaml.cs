@@ -32,6 +32,8 @@ using WpfEditorTest.DialogWindows;
 using Fusion.Engine.Frames2.Containers;
 using Fusion.Engine.Frames2.Managing;
 using WpfEditorTest.ChildWindows;
+using System.Collections.ObjectModel;
+using WpfEditorTest.Utility;
 
 namespace WpfEditorTest
 {
@@ -74,7 +76,9 @@ namespace WpfEditorTest
 		private List<string> _xmlComponentsBuffer = new List<string>();
         private List<Vector> _componentsOffsetBuffer = new List<Vector>();
 
-        public string CurrentSceneFile { get => _currentSceneFile; set { _currentSceneFile = value; this.UpdateTitle(); } }
+		public ObservableCollection<SceneDataContainer> LoadedScenes { get; set; } = new ObservableCollection<SceneDataContainer>();
+
+		public string CurrentSceneFile { get => _currentSceneFile; set { _currentSceneFile = value; this.UpdateTitle(); } }
 		public string SceneChangedIndicator { get => _sceneChangedIndicator; set { _sceneChangedIndicator = value; this.UpdateTitle(); } }
 
 		public double DefaultSceneWidth { get; private set; }
@@ -182,13 +186,14 @@ namespace WpfEditorTest
 		        {
 		            RootFrame = (_engine.GameInterface as CustomGameInterface).GetUIRoot();
 					var rootChildren = new List<UIComponent>(RootFrame.Children);
-		            SceneFrame = new FreePlacement(0, 0, RootFrame.Width, RootFrame.Height);//RootFrame.Children.FirstOrDefault() as UIContainer;
+					var startScene = new SceneDataContainer(RootFrame.Width, RootFrame.Height);
+		            SceneFrame = startScene.Scene;//RootFrame.Children.FirstOrDefault() as UIContainer;
 					foreach (var child in rootChildren)
 					{
 						RootFrame.Remove(child);
 						SceneFrame.Add(child);
 					}
-					DragFieldFrame = new FreePlacement(0, 0, RootFrame.Width, RootFrame.Height);
+					DragFieldFrame = new FreePlacement(0, 0, RootFrame.Width, RootFrame.Height) { Name = "DRAG_FIELD" };
 					//    ,"DragFieldFrame", Fusion.Core.Mathematics.Color.Zero)
 					//{
 					//    Anchor = FrameAnchor.All,
@@ -197,7 +202,10 @@ namespace WpfEditorTest
 					RootFrame.Add(SceneFrame);
 		            RootFrame.Add(DragFieldFrame);
 
-		            SelectionLayer.DxElem.Renderer = _engine;
+					LoadedScenes.Add(startScene);
+
+
+					SelectionLayer.DxElem.Renderer = _engine;
 
 		            var binding = new Binding("Children")
 		            {
@@ -212,6 +220,7 @@ namespace WpfEditorTest
 
 			UndoButton.DataContext = CommandManager.Instance;
 			RedoButton.DataContext = CommandManager.Instance;
+			LoadedScenesTabs.DataContext = LoadedScenes;
 
 			CommandManager.Instance.ChangedDirty += ( s, e ) => {
 				this.SceneChangedIndicator = e ? "*" : "";
@@ -303,9 +312,12 @@ namespace WpfEditorTest
 						CommandManager.Instance.ExecuteWithoutMemorising(command);
 					}
 
-					SceneFrame = createdFrame as UIContainer;
+					var loadedScene = new SceneDataContainer(createdFrame as UIContainer) { SceneFileFullPath = openDialog.FileName, SceneName = openDialog.FileName.Split('\\').Last().Split('.').First() };
+
+					SceneFrame = loadedScene.Scene;
 					RootFrame.Add(SceneFrame);
 					_treeView.AttachScene(SceneFrame);
+					LoadedScenes.Add(loadedScene);
 					//DragFieldFrame.ZOrder = 1000000;
 
 					_childrenBinding = new Binding("Children")
@@ -336,12 +348,14 @@ namespace WpfEditorTest
 				var command = new CommandGroup(commands.ToArray());
 				CommandManager.Instance.ExecuteWithoutMemorising(command);
 			}
+			var newScene = new SceneDataContainer(RootFrame.Width, RootFrame.Height);
 
-			SceneFrame = new FreePlacement(0, 0, RootFrame.Width, RootFrame.Height);
+			SceneFrame = newScene.Scene;
 
 			//new FusionUI.UI.ScalableFrame(0, 0, this.RootFrame.UnitWidth, this.RootFrame.UnitHeight, "Scene", Fusion.Core.Mathematics.Color.Zero) { Anchor = FrameAnchor.All };
 			RootFrame.Add(SceneFrame);
 			_treeView.AttachScene(SceneFrame);
+			LoadedScenes.Add(newScene);
 			//DragFieldFrame.ZOrder = 1000000;
 
 			_childrenBinding = new Binding("Children")
@@ -743,6 +757,8 @@ namespace WpfEditorTest
 			settings["PalettePanelVisibility"].Value = _palette.Visibility == Visibility.Visible ? true.ToString() : false.ToString();
 			settings["TreeViewPanelVisibility"].Value = _treeView.Visibility == Visibility.Visible ? true.ToString() : false.ToString();
 			settings["ConsoleWindowVisibility"].Value = _consoleWindow.Visibility == Visibility.Visible ? true.ToString() : false.ToString();
+			settings["SlotDetailsWindowVisibility"].Value = _slotDetails.Visibility == Visibility.Visible ? true.ToString() : false.ToString();
+
 			settings["GridSize"].Value = SelectionLayer.GridSizeMultiplier.ToString() + "x";
 			settings["MainWindowX"].Value = this.Left.ToString();
 			settings["MainWindowY"].Value = this.Top.ToString();
@@ -883,6 +899,14 @@ namespace WpfEditorTest
 						e.Handled = false;
 						break;
 					}
+			}
+		}
+
+		private void LoadedScenesTabs_SelectionChanged( object sender, SelectionChangedEventArgs e )
+		{
+			if (e.Source is TabControl)
+			{
+				//do work when tab is changed
 			}
 		}
 	}
