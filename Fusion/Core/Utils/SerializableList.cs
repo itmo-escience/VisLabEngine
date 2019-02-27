@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.ComponentModel;
@@ -13,103 +14,92 @@ using System.Xml.Serialization;
 
 namespace Fusion.Core.Utils
 {
-    public class SerializableList<T> : List<T>, IXmlSerializable, INotifyCollectionChanged
+    public class SerializableList<T> : IXmlSerializable, INotifyCollectionChanged, IEnumerable<T>
     {
+        private SynchronizedCollection<T> _items;
         public event NotifyCollectionChangedEventHandler CollectionChanged;
+        public object SyncRoot { get; set; } = new object();
 
-        public SerializableList() : base()
+        public int Count
         {
-            CollectionChanged += (s, e) =>
+            get => _items.Count;
+        }
+
+        public SerializableList() {
+            _items = new SynchronizedCollection<T>(SyncRoot);
+
+        }
+
+        public SerializableList(SerializableList<T> list)
+        {
+            _items = new SynchronizedCollection<T>(SyncRoot, list._items);
+        }
+
+        public bool Contains(T item)
+        {
+            return _items.Contains(item);
+        }
+
+        public int IndexOf(T item)
+        {
+            return _items.IndexOf(item);
+        }
+
+        private void InvokeAsyncCollectionChanged(NotifyCollectionChangedEventArgs e)
+        {
+            System.Windows.Application.Current.Dispatcher.InvokeAsync(() =>
             {
-                int i;
-            };
+                CollectionChanged?.Invoke(this, e);
+                Log.Debug(e.Action.ToString());
+            });
         }
 
-        public SerializableList(SerializableList<T> list) : base(list)
+        public void Add(T item)
         {
-            CollectionChanged += (s, e) =>
-            {
-                int i;
-            };
+            _items.Add(item);
+            InvokeAsyncCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Add, item));
         }
 
-        public new void Add(T item)
+        public void Clear()
         {
-            base.Add(item);
-            CollectionChanged?.Invoke(this, new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Add, item));
+            _items.Clear();
+            InvokeAsyncCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Reset));
         }
 
-        public new void AddRange(IEnumerable<T> range)
+        public void Insert(Int32 index, T item)
         {
-            base.AddRange(range);
-            CollectionChanged?.Invoke(this, new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Add, range));
+            _items.Insert(index, item);
+            InvokeAsyncCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Add, item, index));
         }
 
-        public new void Clear()
+        public void Remove(T item)
         {
-            base.Clear();
-            CollectionChanged?.Invoke(this, new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Reset));
+            int index = _items.IndexOf(item);
+            bool isRemoved = _items.Remove(item);
+            if (isRemoved) InvokeAsyncCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Remove, item, index));
         }
 
-        public new void Insert(Int32 index, T item)
-        {
-            base.Insert(index, item);
-            CollectionChanged?.Invoke(this, new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Add, item, index));
-        }
-
-        public new void InsertRange(Int32 index, IEnumerable<T> range)
-        {
-            base.InsertRange(index, range);
-            CollectionChanged?.Invoke(this, new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Add, range, index));
-        }
-
-        public new void Remove(T item)
-        {
-            bool isRemoved = base.Remove(item);
-            if (isRemoved) CollectionChanged?.Invoke(this, new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Remove, item));
-        }
-
-        public new void RemoveAt(Int32 index)
+        public void RemoveAt(Int32 index)
         {
             T item = this[index];
-            base.RemoveAt(index);
-            CollectionChanged?.Invoke(this, new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Remove, item, index));
+            _items.RemoveAt(index);
+            InvokeAsyncCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Remove, item, index));
         }
 
-        public new void Reverse()
+        public void Reverse()
         {
-            base.Reverse();
-            CollectionChanged?.Invoke(this, new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Move, this));
+            _items.Reverse();
+            InvokeAsyncCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Move, this));
         }
 
-        public new void Reverse(Int32 startIndex, Int32 endIndex)
-        {
-            base.Reverse(startIndex, endIndex);
-            CollectionChanged?.Invoke(this, new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Move, GetRange(startIndex, endIndex - startIndex + 1)));
-        }
-
-        public new void Sort()
-        {
-            base.Sort();
-            CollectionChanged?.Invoke(this, new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Move, this));
-        }
-
-        public new void Sort(Comparison<T> comparer)
-        {
-            base.Sort(comparer);
-            CollectionChanged?.Invoke(this, new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Move, this));
-        }
-
-        public new void Sort(IComparer<T> comparer)
-        {
-            base.Sort(comparer);
-            CollectionChanged?.Invoke(this, new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Move, this));
-        }
-
-        public new void Sort(Int32 startIndex, Int32 endIndex, IComparer<T> comparer)
-        {
-            base.Sort(startIndex, endIndex, comparer);
-            CollectionChanged?.Invoke(this, new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Move, GetRange(startIndex, endIndex - startIndex + 1)));
+        public T this[Int32 index] {
+            get {
+                return _items[index];
+            }
+            set {
+                T oldValue = _items[index];
+                InvokeAsyncCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Replace, value, oldValue));
+            }
         }
 
         public XmlSchema GetSchema()
@@ -175,6 +165,16 @@ namespace Fusion.Core.Utils
                 valuesSerializer.Serialize(writer, value);
                 writer.WriteEndElement();
             }
+        }
+
+        public IEnumerator<T> GetEnumerator()
+        {
+            return _items.GetEnumerator();
+        }
+
+        IEnumerator IEnumerable.GetEnumerator()
+        {
+            return _items.GetEnumerator();
         }
     }
 }
