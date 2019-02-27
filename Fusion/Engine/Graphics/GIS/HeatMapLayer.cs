@@ -39,7 +39,7 @@ namespace Fusion.Engine.Graphics.GIS
 		public float MaxHeatMapLevel;
 		public float MinHeatMapLevel;
 		public float HeatMapTransparency;
-		
+
 		StateFactory blurFactory;
 
 		//protected static Texture2D[] HeatMapPalettes;
@@ -48,14 +48,20 @@ namespace Fusion.Engine.Graphics.GIS
 		public override void Dispose()
 		{
 			if(HeatTexture	!= null) HeatTexture.Dispose();
-			if(Temp			!= null) Temp.Dispose();		
-			if(FirstFinal	!= null) FirstFinal.Dispose();	
+			if(Temp			!= null) Temp.Dispose();
+			if(FirstFinal	!= null) FirstFinal.Dispose();
 			if(SecondFinal	!= null) SecondFinal.Dispose();
 			if(cb			!= null) cb.Dispose();
-			
+
 			base.Dispose();
 		}
 
+	    public float[] GetCurrentFrame()
+	    {
+	        float[] d = new float[Data.Length];
+            Final.GetData(d);
+	        return d;
+	    }
 
 		public HeatMapLayer(Game engine, Gis.GeoPoint[] points, int[] indeces, int mapDimX, int mapDimY, bool isDynamic = false) : base(engine)
 		{
@@ -103,7 +109,7 @@ namespace Fusion.Engine.Graphics.GIS
             //Log.Message($"PPPP{Data.Average()}");
 		    for (int i = 0; i < Data.Length; i++)
 		    {
-		        //Data[i] = (float)Math.Log(Data[i] + 1);	
+		        //Data[i] = (float)Math.Log(Data[i] + 1);
 		        //Data[i] = Data[i] * Data[i];
 		    }
 		    //Log.Message($"AAAA{Data.Average()}");
@@ -225,7 +231,7 @@ namespace Fusion.Engine.Graphics.GIS
 
 			var lonFactor = (lonLat.X - Left)	/ (Right - Left);
 			var latFactor = (lonLat.Y - Bottom) / (Top - Bottom);
-			
+
 			int x = (int)(lonFactor * MapDimX);
 			int y = (int)(latFactor * MapDimY);
 
@@ -261,13 +267,15 @@ namespace Fusion.Engine.Graphics.GIS
 		    double newtop = leftTop.Y;
 
 		    double newSize = Math.Max(rightBottom.X - leftTop.X, rightBottom.Y - leftTop.Y);
-            double newright		= leftTop.X + newSize;			
+            double newright		= leftTop.X + newSize;
 			double newbottom	= leftTop.Y + newSize;
 
+		    rightBottom = projection.TileToWorldPos(newright, newbottom, 0);
+
 			var newRightBottom = projection.TileToWorldPos(newright, newbottom, 0);
-			bottom = newRightBottom.Y;		    
-            
-            CalculateVertices(out vertices, out indexes, density, left, right, top, bottom, projection);
+			bottom = newRightBottom.Y;
+
+            CalculateVertices(out vertices, out indexes, density, left, rightBottom.X, top, rightBottom.Y, projection);
 
 			return new HeatMapLayer(engine, vertices, indexes, dimX, dimY, false)
 			{
