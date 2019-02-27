@@ -7,7 +7,7 @@ using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Fusion.Engine.Frames2
+namespace WpfEditorTest.Utility
 {
 	public interface IMVVMProperty : INotifyPropertyChanged
 	{

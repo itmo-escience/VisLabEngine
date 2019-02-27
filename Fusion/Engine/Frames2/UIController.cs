@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
-using System.Reflection;
 using Fusion.Core.Mathematics;
 using Fusion.Engine.Common;
 
@@ -177,23 +176,16 @@ namespace Fusion.Engine.Frames2
         {
             public string Name { get; }
             public object Default { get; }
-			public MVVMFrameProperty PropertyInfo { get; }
+
 
 			private readonly Dictionary<State, object> _storedValues = new Dictionary<State, object>();
 
-            public PropertyValue(string name, object defaultValue, UIComponent component)
+            public PropertyValue(string name, object defaultValue)
             {
                 Name = name;
                 Default = defaultValue;
 
                 _storedValues[State.Default] = Default;
-
-				var property = component.GetType().GetProperty(name);
-
-				if (property != null)
-				{
-					PropertyInfo = new MVVMFrameProperty(property, component);
-				}
 			}
 
             public object this[State s]

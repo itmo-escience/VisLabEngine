@@ -92,6 +92,7 @@
     </Compile>
     <Compile Include="UndoRedo\SelectFrameCommand.cs" />
     <Compile Include="Utility\CustomTreeViewAdorner.cs" />
+    <Compile Include="Utility\IMVVMProperty.cs" />
     <Compile Include="Utility\MVVMControllerData.cs" />
     <Compile Include="Utility\StickingCoordinates.cs" />
     <Compile Include="WPFConverters\BoolToIndexConverter.cs" />

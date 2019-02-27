@@ -7,7 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Data;
-using WpfEditorTest.ChildPanels;
+using WpfEditorTest.Utility;
 
 namespace WpfEditorTest.WPFConverters
 {

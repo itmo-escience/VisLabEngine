@@ -38,11 +38,8 @@ namespace WpfEditorTest.Utility
 
 	public class ControllerStateData : INotifyPropertyChanged
 	{
-		private ObservableCollection<string> _availableProperties = new ObservableCollection<string>();
-
 		public string Name { get; set; }
 		public UIController.Slot Slot { get; set; }
-		public ObservableCollection<string> AvailableProperties { get; set; }
 		public ObservableCollection<ControllerSlotProperty> Properties { get; set; } = new ObservableCollection<ControllerSlotProperty>();
 
 		public ControllerStateData( UIController.State state, UIController.Slot slot, UIController controller )
@@ -51,34 +48,18 @@ namespace WpfEditorTest.Utility
 			Slot = slot;
 			foreach (var property in Slot.Properties)
 			{
-				var propertyData = new ControllerSlotProperty(Slot, property, controller);
+				var propertyData = new ControllerSlotProperty(Slot, property, controller, state);
 				Properties.Add(propertyData);
 			}
-			RecalculatePublicProperties();
 
 			Slot.Properties.CollectionChanged += (s, e) =>{
 				Properties.Clear();
 				foreach (var property in Slot.Properties)
 				{
-					var propertyData = new ControllerSlotProperty(Slot, property, controller);
+					var propertyData = new ControllerSlotProperty(Slot, property, controller,state);
 					Properties.Add(propertyData);
 				}
-
-				RecalculatePublicProperties();
-				OnPropertyChanged(nameof(AvailableProperties));
 			};
-
-			void RecalculatePublicProperties()
-			{
-				var publicProperties = Slot.Component.GetType().GetProperties(BindingFlags.Public | BindingFlags.Instance);
-				var propsies = (
-					from prop in publicProperties
-					where prop.GetMethod != null && prop.SetMethod != null && !prop.CustomAttributes.Any(ca => ca.AttributeType.Name == "XmlIgnoreAttribute")
-						&& !Slot.Properties.Any(p => p.Name == prop.Name)
-					select prop.Name
-				).ToList();
-				AvailableProperties = new ObservableCollection<string>(propsies);
-			}
 		}
 
 		public override string ToString() => Name;
@@ -95,13 +76,23 @@ namespace WpfEditorTest.Utility
 	{
 		public string Name { get; set; }
 		public UIController.Slot Slot { get; set; }
+		public UIController.State State { get; set; }
 		public UIController.PropertyValue PropertyValue { get; set; }
+		public MVVMControllerSlotProperty SlotPropertyInfo { get; }
 
-		public ControllerSlotProperty( UIController.Slot slot, UIController.PropertyValue propertyValue, UIController controller )
+		public ControllerSlotProperty( UIController.Slot slot, UIController.PropertyValue propertyValue, UIController controller, UIController.State state )
 		{
 			Name = propertyValue.Name;
 			Slot = slot;
+			State = state;
 			PropertyValue = propertyValue;
+
+			var property = slot.Component.GetType().GetProperty(propertyValue.Name);
+
+			if (property != null)
+			{
+				SlotPropertyInfo = new MVVMControllerSlotProperty(property, slot.Component, slot, state);
+			}
 		}
 
 		public event PropertyChangedEventHandler PropertyChanged;
@@ -119,6 +110,8 @@ namespace WpfEditorTest.Utility
 		public List<UIController.State> StateValues = new List<UIController.State>();
 		public Dictionary<ControllerStateData, UIController.State> StateAssotiativeDictionary = new Dictionary<ControllerStateData, UIController.State>();
 
+		public ObservableCollection<string> AvailableProperties { get; set; }
+
 		public string Name { get; set; }
 
 		public ControllerSlotData( UIController.Slot slot, UIController controller )
@@ -133,6 +126,25 @@ namespace WpfEditorTest.Utility
 				StateValues.Add(state);
 				StateAssotiativeDictionary.Add(stateData, state);
 			}
+
+			RecalculatePublicProperties();
+
+			Slot.Properties.CollectionChanged += ( s, e ) => {
+				RecalculatePublicProperties();
+				OnPropertyChanged(nameof(AvailableProperties));
+			};
+
+			void RecalculatePublicProperties()
+			{
+				var publicProperties = Slot.Component.GetType().GetProperties(BindingFlags.Public | BindingFlags.Instance);
+				var propsies = (
+					from prop in publicProperties
+					where prop.GetMethod != null && prop.SetMethod != null && !prop.CustomAttributes.Any(ca => ca.AttributeType.Name == "XmlIgnoreAttribute")
+						&& !Slot.Properties.Any(p => p.Name == prop.Name)
+					select prop.Name
+				).ToList();
+				AvailableProperties = new ObservableCollection<string>(propsies);
+			}
 		}
 
 		public event PropertyChangedEventHandler PropertyChanged;
@@ -140,6 +152,34 @@ namespace WpfEditorTest.Utility
 		protected void OnPropertyChanged( [System.Runtime.CompilerServices.CallerMemberName] string changedProperty = "" )
 		{
 			PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(changedProperty));
+		}
+	}
+
+	public class MVVMControllerSlotProperty : MVVMFrameProperty
+	{
+		public MVVMControllerSlotProperty( PropertyInfo prop, UIComponent obj, UIController.Slot slot, UIController.State state ) : base(prop, obj)
+		{
+			Slot = slot;
+			State = state;
+		}
+
+		public UIController.Slot Slot { get; set; }
+		public UIController.State State { get; set; }
+
+		public override object Prop
+		{
+			get => Slot.Properties.Where(p => p.Name == PropName).FirstOrDefault()[State];
+			set
+			{
+				var convertedValue = Convert.ChangeType(value, PropInfo.PropertyType);
+
+				if (convertedValue != null)
+				{
+					Slot.Properties.Where(p => p.Name == PropName).FirstOrDefault()[State] = value;
+				}
+
+				OnPropertyChanged();
+			}
 		}
 	}
 }

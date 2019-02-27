@@ -259,11 +259,9 @@
     <Compile Include="Engine\Frames2\Containers\FreePlacement.cs" />
     <Compile Include="Engine\Frames2\Containers\VerticalBox.cs" />
     <Compile Include="Engine\Frames2\Controllers\TextBoxController.cs" />
-    <Compile Include="Engine\Frames2\IMVVMProperty.cs" />
     <Compile Include="Engine\Frames2\Managing\EditionSceneManager.cs" />
     <Compile Include="Engine\Frames2\Managing\Events.cs" />
     <Compile Include="Engine\Frames2\Managing\UIHelper.cs" />
-    <Compile Include="Engine\Frames2\MVVMFrameProperty.cs" />
     <Compile Include="Engine\Frames2\UIComponent.cs" />
     <Compile Include="Engine\Frames2\UIController.cs" />
     <Compile Include="Engine\Frames2\IUIMouseAware.cs" />

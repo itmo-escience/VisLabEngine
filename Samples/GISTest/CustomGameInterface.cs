@@ -195,17 +195,15 @@ namespace GISTest
             #region button
             var btn = new ButtonController(100, 100);
 
-			var border = new Border(0, 0, 100, 100);
-
-			btn.Background.Attach(border);
+			btn.Background.Attach(new Border(0, 0, 100, 100));
             btn.Foreground.Attach(new Label("Button", new TextFormatD2D("Calibry", 15), 0, 0, 100, 100));
 
 
-		    var bgColor = new UIController.PropertyValue("BackgroundColor", Color4.White, border);
+		    var bgColor = new UIController.PropertyValue("BackgroundColor", Color4.White);
 		    bgColor[UIController.State.Hovered] = new Color4(1.0f, 0.0f, 0.0f, 1.0f);
 		    bgColor[ButtonController.Pressed] = new Color4(0.0f, 1.0f, 1.0f, 1.0f);
 
-		    var color = new UIController.PropertyValue("BackgroundColor", new Color4(1.0f, 1.0f, 0.0f, 1.0f), border);
+		    var color = new UIController.PropertyValue("BackgroundColor", new Color4(1.0f, 1.0f, 0.0f, 1.0f));
 		    color[UIController.State.Hovered] = new Color4(1.0f, 0.0f, 1.0f, 1.0f);
 		    color[ButtonController.Pressed] = new Color4(1.0f, 1.0f, 1.0f, 1.0f);
 

@@ -36,7 +36,7 @@
                     FontFamily="Times New Roman"
                     Text="{Binding Name}" FontWeight="Bold" FontStyle="Italic"/>
                 </Border>
-                <ContentPresenter Content="{Binding PropertyValue.PropertyInfo}" ContentTemplateSelector="{StaticResource propTemplateSelector}">
+                <ContentPresenter Content="{Binding SlotPropertyInfo}" ContentTemplateSelector="{StaticResource propTemplateSelector}">
                 </ContentPresenter>
             </DockPanel>
         </DataTemplate>
@@ -291,44 +291,50 @@
         </ItemsControl.Template>
         <ItemsControl.ItemTemplate>
             <DataTemplate>
-                <StackPanel Height="auto" Width="auto" Orientation="Vertical">
-                    <Border BorderThickness="1" BorderBrush="Gray" MinHeight="32" MinWidth="100">
-                        <TextBlock TextAlignment ="Left"
+                <Border BorderThickness="1" BorderBrush="Gray" MinHeight="32" MinWidth="100">
+                <Expander Header="{Binding Name}" VerticalAlignment="Center">
+                    <StackPanel Height="auto" Width="auto" Orientation="Vertical">
+                    <!--<Border BorderThickness="1" BorderBrush="Gray" MinHeight="32" MinWidth="100">
+                            <TextBlock TextAlignment ="Left"
 			                TextWrapping = "Wrap"
 			                VerticalAlignment = "Center"
                             FontFamily="Times New Roman"
                             Text="{Binding Name}" FontWeight="Bold" FontSize="18"/>
-                    </Border>
-                    <ItemsControl ItemsSource="{Binding States}">
-                        <!--ItemTemplateSelector="{StaticResource propTemplateSelector}"-->
-                        <ItemsControl.ItemTemplate>
-                            <DataTemplate>
-                                <StackPanel Height="auto" Width="auto" Orientation="Vertical">
-                                    <Border BorderThickness="1" BorderBrush="Gray" MinHeight="32" MinWidth="100">
-                                        <TextBlock TextAlignment ="Left"
+                        </Border>-->
+                        <ContentPresenter Content="{Binding}" 
+                        ContentTemplate="{StaticResource BaseClass2}"/>
+                        <ItemsControl ItemsSource="{Binding States}">
+                            <!--ItemTemplateSelector="{StaticResource propTemplateSelector}"-->
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                        <Expander Header="{Binding Name}">
+                                    <StackPanel Height="auto" Width="auto" Orientation="Vertical">
+                                        <!--<Border BorderThickness="1" BorderBrush="Gray" MinHeight="32" MinWidth="100">
+                                            <TextBlock TextAlignment ="Left"
 			                                TextWrapping = "Wrap"
 			                                VerticalAlignment = "Center"
                                             FontFamily="Times New Roman"
                                             Text="{Binding Name}" FontStyle="Italic"/>
-                                    </Border>
-                                    <ItemsControl ItemsSource="{Binding Properties}">
-                                        <!--ItemTemplateSelector="{StaticResource propTemplateSelector}"-->
-                                        <ItemsControl.ItemTemplate>
-                                            <DataTemplate>
-                                                <StackPanel Height="auto" Width="auto" Orientation="Vertical">
-                                                    <ContentPresenter Content="{Binding}" 
+                                        </Border>-->
+                                        <ItemsControl ItemsSource="{Binding Properties}">
+                                            <!--ItemTemplateSelector="{StaticResource propTemplateSelector}"-->
+                                            <ItemsControl.ItemTemplate>
+                                                <DataTemplate>
+                                                    <StackPanel Height="auto" Width="auto" Orientation="Vertical">
+                                                        <ContentPresenter Content="{Binding}" 
                                                         ContentTemplate="{StaticResource BaseClass}"/>
-                                                </StackPanel>
-                                            </DataTemplate>
-                                        </ItemsControl.ItemTemplate>
-                                    </ItemsControl>
-                                    <ContentPresenter Content="{Binding}" 
-                                        ContentTemplate="{StaticResource BaseClass2}"/>
-                                </StackPanel>
-                            </DataTemplate>
-                        </ItemsControl.ItemTemplate>
-                    </ItemsControl>
-                </StackPanel>
+                                                    </StackPanel>
+                                                </DataTemplate>
+                                            </ItemsControl.ItemTemplate>
+                                        </ItemsControl>
+                                    </StackPanel>
+                                        </Expander>
+                                    </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                    </StackPanel>
+                </Expander>
+                </Border>
             </DataTemplate>
         </ItemsControl.ItemTemplate>
     </ItemsControl>
