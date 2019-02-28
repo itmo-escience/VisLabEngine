@@ -47,11 +47,11 @@ namespace Fusion.Core.Utils
 
         private void InvokeAsyncCollectionChanged(NotifyCollectionChangedEventArgs e)
         {
-            System.Windows.Application.Current.Dispatcher.InvokeAsync(() =>
+            CollectionChanged?.Invoke(this, e);
+            /*System.Windows.Application.Current.Dispatcher.InvokeAsync(() =>
             {
-                CollectionChanged?.Invoke(this, e);
-                //Log.Debug(e.Action.ToString());
-            });
+
+            });*/
         }
 
         public void Add(T item)

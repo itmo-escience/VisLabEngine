@@ -204,8 +204,8 @@ namespace WpfEditorTest
 		            var binding = new Binding("Children")
 		            {
 		                Source = SceneFrame,
-		                UpdateSourceTrigger = UpdateSourceTrigger.PropertyChanged,
-		                Mode = BindingMode.OneWay
+		                //UpdateSourceTrigger = UpdateSourceTrigger.PropertyChanged,
+		                //Mode = BindingMode.OneWay
 		            };
 		            _treeView.ElementHierarchyView.SetBinding(TreeView.ItemsSourceProperty, binding);
 					_treeView.AttachScene(SceneFrame);

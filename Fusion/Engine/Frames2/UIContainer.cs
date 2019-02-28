@@ -11,8 +11,8 @@ namespace Fusion.Engine.Frames2
 {
     public abstract class UIContainer : UIComponent
     {
-        private readonly SerializableList<UIComponent> _children;
-        public SerializableList<UIComponent> Children {
+        private readonly AsyncObservableCollection<UIComponent> _children;
+        public AsyncObservableCollection<UIComponent> Children {
             get { return _children; }
             set {
                 foreach (UIComponent child in value)
@@ -57,22 +57,22 @@ namespace Fusion.Engine.Frames2
 
         protected UIContainer() : base()
         {
-            _children = new SerializableList<UIComponent>();
-            Children = new SerializableList<UIComponent>(_children);
-            /*_children.CollectionChanged += (s, e) =>
+            _children = new AsyncObservableCollection<UIComponent>();
+            Children = new AsyncObservableCollection<UIComponent>(_children);
+            _children.CollectionChanged += (s, e) =>
             {
                 NotifyPropertyChanged(nameof(Children));
-            };*/
+            };
             _needClipping = false;
         }
 
         protected UIContainer(float x, float y, float width, float height, bool needClipping = false) : base(x, y, width, height)
         {
-            _children = new SerializableList<UIComponent>();
-            Children = new SerializableList<UIComponent>(_children);
+            _children = new AsyncObservableCollection<UIComponent>();
+            Children = new AsyncObservableCollection<UIComponent>(_children);
             _children.CollectionChanged += (s, e) =>
             {
-                NotifyPropertyChanged(nameof(Children));
+                //NotifyPropertyChanged(nameof(Children));
 
                 string text;
                 text = $"{Name}.Children.{e.Action.ToString()}";
