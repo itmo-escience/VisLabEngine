@@ -79,6 +79,7 @@
     <Compile Include="ChildPanels\FrameDragsPanel.xaml.cs">
       <DependentUpon>FrameDragsPanel.xaml</DependentUpon>
     </Compile>
+    <Compile Include="ChildPanels\MVVMFrameProperty.cs" />
     <Compile Include="ChildWindows\ConsoleWindow.xaml.cs">
       <DependentUpon>ConsoleWindow.xaml</DependentUpon>
     </Compile>
@@ -91,6 +92,8 @@
     </Compile>
     <Compile Include="Commands\SelectFrameCommand.cs" />
     <Compile Include="Utility\CustomTreeViewAdorner.cs" />
+    <Compile Include="Utility\IMVVMProperty.cs" />
+    <Compile Include="Utility\MVVMControllerData.cs" />
     <Compile Include="Utility\StickingCoordinates.cs" />
     <Compile Include="WPFConverters\BoolToIndexConverter.cs" />
     <Compile Include="ChildPanels\FrameDetails.xaml.cs">
@@ -113,7 +116,6 @@
     <Compile Include="WPFConverters\DataTemplateSelectorOfTreeView.cs" />
     <Compile Include="WPFConverters\DataTemplateSelectorOfProperty.cs" />
     <Compile Include="Commands\ParentChangeCommand.cs" />
-    <Compile Include="ChildPanels\MVVMFrameProperty.cs" />
     <Compile Include="WPFConverters\PropertyValueConverter.cs" />
     <Compile Include="ApplicationConfig.cs" />
     <Compile Include="Commands\CommandGroup.cs" />

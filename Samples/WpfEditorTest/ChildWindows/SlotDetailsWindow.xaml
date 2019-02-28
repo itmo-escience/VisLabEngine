@@ -25,7 +25,48 @@
         <conv:DataTemplateSelectorOfProperty x:Key="propTemplateSelector"/>
         <conv:BoolToIndexConverter x:Key="boolToIndexConverter" />
 
-
+        <DataTemplate x:Key="BaseClass">
+            <!-- base class template here -->
+            <DockPanel Height="auto" Width="auto">
+                <Button Content="-" Width="35" Click="ButtonRemove_Click" Tag="{Binding}"></Button>
+                <Border BorderThickness="1" BorderBrush="Gray" MinHeight="32" MinWidth="100">
+                    <TextBlock TextAlignment ="Left"
+			        TextWrapping = "Wrap"
+			        VerticalAlignment = "Center"
+                    FontFamily="Times New Roman"
+                    Text="{Binding Name}" FontWeight="Bold" FontStyle="Italic"/>
+                </Border>
+                <ContentPresenter Content="{Binding SlotPropertyInfo}" ContentTemplateSelector="{StaticResource propTemplateSelector}">
+                </ContentPresenter>
+            </DockPanel>
+        </DataTemplate>
+        <DataTemplate x:Key="BaseClass2">
+            <!-- base class template here -->
+            <DockPanel Height="auto" Width="auto">
+                <Button Content="+" Width="35" Click="ButtonAdd_Click" Tag="{Binding Slot}"></Button>
+                <ComboBox ItemsSource="{Binding AvailableProperties}" MinHeight="32" MinWidth="100">
+                </ComboBox>
+            </DockPanel>
+        </DataTemplate>
+        <DataTemplate x:Key="BaseClass3">
+            <Border>
+                <ItemsControl ItemsSource="{Binding Properties}">
+                    <!--ItemTemplateSelector="{StaticResource propTemplateSelector}"-->
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate>
+                            <StackPanel Height="auto" Width="auto" Orientation="Vertical">
+                                <ContentPresenter Content="{Binding}" 
+                                    ContentTemplate="{StaticResource BaseClass}"/>
+                            </StackPanel>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+            </Border>
+        </DataTemplate>
+        <DataTemplateSelector x:Key="BaseClass4">
+            
+            <!-- base class template here -->
+        </DataTemplateSelector>
 
         <DataTemplate x:Key="TransformProp">
             <DockPanel Height="auto" Width="auto">
@@ -231,7 +272,7 @@
         </DataTemplate>
     </Window.Resources>
     
-    <ItemsControl x:Name="FrameDetailsControls" ItemTemplateSelector="{StaticResource propTemplateSelector}" 
+    <ItemsControl x:Name="ControllerDetailsControls" 
                       VirtualizingStackPanel.IsVirtualizing="True">
         <ItemsControl.ItemsPanel>
             <ItemsPanelTemplate>
@@ -242,12 +283,59 @@
             <ControlTemplate>
                 <ScrollViewer
                         Padding="{TemplateBinding Control.Padding}"
-                        Focusable="False"
-                        CanContentScroll="True">
+                        Focusable="False">
                     <ItemsPresenter
-                            SnapsToDevicePixels="{TemplateBinding UIElement.SnapsToDevicePixels}" />
+                            SnapsToDevicePixels="{TemplateBinding UIElement.SnapsToDevicePixels}"/>
                 </ScrollViewer>
             </ControlTemplate>
         </ItemsControl.Template>
+        <ItemsControl.ItemTemplate>
+            <DataTemplate>
+                <Border BorderThickness="1" BorderBrush="Gray" MinHeight="32" MinWidth="100">
+                <Expander Header="{Binding Name}" VerticalAlignment="Center">
+                    <StackPanel Height="auto" Width="auto" Orientation="Vertical">
+                    <!--<Border BorderThickness="1" BorderBrush="Gray" MinHeight="32" MinWidth="100">
+                            <TextBlock TextAlignment ="Left"
+			                TextWrapping = "Wrap"
+			                VerticalAlignment = "Center"
+                            FontFamily="Times New Roman"
+                            Text="{Binding Name}" FontWeight="Bold" FontSize="18"/>
+                        </Border>-->
+                        <ContentPresenter Content="{Binding}" 
+                        ContentTemplate="{StaticResource BaseClass2}"/>
+                        <ItemsControl ItemsSource="{Binding States}">
+                            <!--ItemTemplateSelector="{StaticResource propTemplateSelector}"-->
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                        <Expander Header="{Binding Name}">
+                                    <StackPanel Height="auto" Width="auto" Orientation="Vertical">
+                                        <!--<Border BorderThickness="1" BorderBrush="Gray" MinHeight="32" MinWidth="100">
+                                            <TextBlock TextAlignment ="Left"
+			                                TextWrapping = "Wrap"
+			                                VerticalAlignment = "Center"
+                                            FontFamily="Times New Roman"
+                                            Text="{Binding Name}" FontStyle="Italic"/>
+                                        </Border>-->
+                                        <ItemsControl ItemsSource="{Binding Properties}">
+                                            <!--ItemTemplateSelector="{StaticResource propTemplateSelector}"-->
+                                            <ItemsControl.ItemTemplate>
+                                                <DataTemplate>
+                                                    <StackPanel Height="auto" Width="auto" Orientation="Vertical">
+                                                        <ContentPresenter Content="{Binding}" 
+                                                        ContentTemplate="{StaticResource BaseClass}"/>
+                                                    </StackPanel>
+                                                </DataTemplate>
+                                            </ItemsControl.ItemTemplate>
+                                        </ItemsControl>
+                                    </StackPanel>
+                                        </Expander>
+                                    </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                    </StackPanel>
+                </Expander>
+                </Border>
+            </DataTemplate>
+        </ItemsControl.ItemTemplate>
     </ItemsControl>
 </Window>

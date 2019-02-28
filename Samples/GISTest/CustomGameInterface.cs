@@ -227,7 +227,7 @@ namespace GISTest
             #region button
             var btn = new ButtonController(100, 100);
 
-            btn.Background.Attach(new Border(0, 0, 100, 100));
+			btn.Background.Attach(new Border(0, 0, 100, 100));
             btn.Foreground.Attach(new Label("Button", new TextFormatD2D("Calibry", 15), 0, 0, 100, 100));
 
 

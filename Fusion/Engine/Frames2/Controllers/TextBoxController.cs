@@ -2,8 +2,6 @@
 using System.Collections.Generic;
 using Fusion.Engine.Frames2.Managing;
 using Fusion.Engine.Graphics.SpritesD2D;
-using Fusion.Engine.Input;
-using KeyEventArgs = Fusion.Engine.Frames2.Managing.KeyEventArgs;
 using Label = Fusion.Engine.Frames2.Components.Label;
 
 namespace Fusion.Engine.Frames2.Controllers
@@ -51,18 +49,23 @@ namespace Fusion.Engine.Frames2.Controllers
             }
         }
 
-        private void OnKeyPress(UIComponent sender, KeyEventArgs e)
+        private const char BackspaceCharCode = (char)8;
+        private const char EscapeCharCode = (char)27;
+
+        private void OnKeyPress(UIComponent sender, KeyPressEventArgs e)
         {
             if(CurrentState != Editing)
                 return;
 
-            if (e.Key == Keys.Escape)
+            switch (e.KeyChar)
             {
-                ChangeState(State.Default);
-                return;
+                case BackspaceCharCode:
+                    _label.Text = _label.Text.Substring(0, _label.Text.Length - 1); break;
+                case EscapeCharCode:
+                    ChangeState(State.Default);
+                    return;
+                default: _label.Text += e.KeyChar; break;
             }
-
-            _label.Text += e.Key.ToString();
 
             Input?.Invoke(this, new InputEventArgs(_label.Text));
         }
@@ -89,6 +92,12 @@ namespace Fusion.Engine.Frames2.Controllers
         {
             if(CurrentState == State.Hovered)
                 ChangeState(State.Default);
+        }
+
+        public override void Draw(SpriteLayerD2D layer)
+        {
+            base.Draw(layer);
+
         }
     }
 }

@@ -7,10 +7,11 @@ using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using WpfEditorTest.UndoRedo;
+using WpfEditorTest.Utility;
 
 namespace WpfEditorTest.ChildPanels
 {
-	public class MVVMFrameProperty : INotifyPropertyChanged
+	public class MVVMFrameProperty : IMVVMProperty
 	{
 		public MVVMFrameProperty( PropertyInfo prop, UIComponent obj )
 		{
@@ -54,7 +55,7 @@ namespace WpfEditorTest.ChildPanels
 		}
 
 		private object _prop;
-		public object Prop
+		public virtual object Prop
 		{
 			get => _prop;
 			set

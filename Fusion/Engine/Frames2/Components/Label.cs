@@ -17,6 +17,16 @@ namespace Fusion.Engine.Frames2.Components
             }
         }
 
+        private TextLayoutD2D _textLayout;
+        public TextLayoutD2D TextLayout
+        {
+            get => _textLayout;
+            set
+            {
+                _textLayout = value;
+                NotifyPropertyChanged();
+            }
+        }
 
         private float _maxWidth;
         public float MaxWidth {
@@ -53,12 +63,15 @@ namespace Fusion.Engine.Frames2.Components
             }
         }
 
-        private Graphics.SpritesD2D.Label _label;
+        private Text _textCommand;
 
         public Label() : base()
         {
             _isDirtyText = true;
         }
+
+        public Label(string text, string fontName, float fontSize, float x, float y, float width, float height)
+            : this(text, new TextFormatD2D(fontName, fontSize), x, y, width, height) { }
 
         public Label(string text, TextFormatD2D textFormat, float x, float y, float width, float height) : base(x, y, width, height)
         {
@@ -70,10 +83,20 @@ namespace Fusion.Engine.Frames2.Components
             _isDirtyText = true;
         }
 
+        public Label(string text, TextLayoutD2D textLayout, float x, float y, float width, float height) : base(x, y, width, height)
+        {
+            _textLayout = textLayout;
+            _maxWidth = width;
+            _maxHeight = height;
+            Text = text;
+
+            _isDirtyText = true;
+        }
+
         public override void Update(GameTime gameTime)
         {
             if (_isDirtyText)
-                _label = new Graphics.SpritesD2D.Label(
+                _textCommand = new Text(
                     Text,
                     new RectangleF(0, 0, Width, Height),
                     _textFormat,
@@ -85,8 +108,8 @@ namespace Fusion.Engine.Frames2.Components
 
         public override void Draw(SpriteLayerD2D layer)
         {
-            if(_label != null)
-                layer.Draw(_label);
+            if(_textCommand != null)
+                layer.Draw(_textCommand);
         }
     }
 }

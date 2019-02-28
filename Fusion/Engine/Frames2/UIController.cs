@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using Fusion.Core.Mathematics;
 using Fusion.Engine.Common;
@@ -34,7 +35,6 @@ namespace Fusion.Engine.Frames2
 
         public void ChangeState(State newState)
         {
-            if(newState == CurrentState) return;
             if(!States.Contains(newState)) return;
 
             foreach (var fragment in Slots)
@@ -94,6 +94,8 @@ namespace Fusion.Engine.Frames2
                 }
                 slot.ComponentAttached += ComponentAttachedToSlot;
             }
+
+            ChangeState(State.Default);
             _initialized = true;
         }
 
@@ -136,7 +138,7 @@ namespace Fusion.Engine.Frames2
         {
             public string Name { get; }
             public UIComponent Component { get; private set; }
-            public List<PropertyValue> Properties { get; } = new List<PropertyValue>();
+            public ObservableCollection<PropertyValue> Properties { get; } = new ObservableCollection<PropertyValue>();
 
             public Slot(string name)
             {
@@ -176,7 +178,8 @@ namespace Fusion.Engine.Frames2
             public string Name { get; }
             public object Default { get; }
 
-            private readonly Dictionary<State, object> _storedValues = new Dictionary<State, object>();
+
+			private readonly Dictionary<State, object> _storedValues = new Dictionary<State, object>();
 
             public PropertyValue(string name, object defaultValue)
             {
@@ -184,7 +187,7 @@ namespace Fusion.Engine.Frames2
                 Default = defaultValue;
 
                 _storedValues[State.Default] = Default;
-            }
+			}
 
             public object this[State s]
             {
