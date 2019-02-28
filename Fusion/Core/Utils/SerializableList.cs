@@ -50,7 +50,7 @@ namespace Fusion.Core.Utils
             System.Windows.Application.Current.Dispatcher.InvokeAsync(() =>
             {
                 CollectionChanged?.Invoke(this, e);
-                Log.Debug(e.Action.ToString());
+                //Log.Debug(e.Action.ToString());
             });
         }
 
@@ -75,8 +75,13 @@ namespace Fusion.Core.Utils
         public void Remove(T item)
         {
             int index = _items.IndexOf(item);
-            bool isRemoved = _items.Remove(item);
-            if (isRemoved) InvokeAsyncCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Remove, item, index));
+            /*bool isRemoved = _items.Remove(item);
+            if (isRemoved) InvokeAsyncCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Remove, item, index));*/
+            if (index != -1)
+            {
+                _items.Remove(item);
+                InvokeAsyncCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Remove, item, index));
+            }
         }
 
         public void RemoveAt(Int32 index)

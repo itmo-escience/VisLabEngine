@@ -59,6 +59,10 @@ namespace Fusion.Engine.Frames2
         {
             _children = new SerializableList<UIComponent>();
             Children = new SerializableList<UIComponent>(_children);
+            /*_children.CollectionChanged += (s, e) =>
+            {
+                NotifyPropertyChanged(nameof(Children));
+            };*/
             _needClipping = false;
         }
 
@@ -66,6 +70,16 @@ namespace Fusion.Engine.Frames2
         {
             _children = new SerializableList<UIComponent>();
             Children = new SerializableList<UIComponent>(_children);
+            _children.CollectionChanged += (s, e) =>
+            {
+                NotifyPropertyChanged(nameof(Children));
+
+                string text;
+                text = $"{Name}.Children.{e.Action.ToString()}";
+                if (e.Action == System.Collections.Specialized.NotifyCollectionChangedAction.Add) text += $"({((UIComponent)(e.NewItems?[0])).Name})";
+                if (e.Action == System.Collections.Specialized.NotifyCollectionChangedAction.Remove) text += $"({((UIComponent)(e.OldItems?[0])).Name})";
+                Log.Debug(text);
+            };
             _needClipping = needClipping;
         }
 
