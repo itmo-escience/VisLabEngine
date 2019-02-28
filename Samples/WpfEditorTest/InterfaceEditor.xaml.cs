@@ -183,12 +183,14 @@ namespace WpfEditorTest
 		            RootFrame = (_engine.GameInterface as CustomGameInterface).GetUIRoot();
 					var rootChildren = new List<UIComponent>(RootFrame.Children);
 		            SceneFrame = new FreePlacement(0, 0, RootFrame.Width, RootFrame.Height);//RootFrame.Children.FirstOrDefault() as UIContainer;
+                    SceneFrame.Name = "SceneFrame";
 					foreach (var child in rootChildren)
 					{
 						RootFrame.Remove(child);
 						SceneFrame.Add(child);
 					}
 					DragFieldFrame = new FreePlacement(0, 0, RootFrame.Width, RootFrame.Height);
+                    DragFieldFrame.Name = "DragFieldFrame";
 					//    ,"DragFieldFrame", Fusion.Core.Mathematics.Color.Zero)
 					//{
 					//    Anchor = FrameAnchor.All,

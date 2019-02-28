@@ -23,6 +23,7 @@ using Label = Fusion.Engine.Frames2.Components.Label;
 using Fusion.Core.Utils;
 using System.Xml.Serialization;
 using System.IO;
+using System.Collections.ObjectModel;
 
 namespace GISTest
 {
@@ -185,6 +186,7 @@ namespace GISTest
             img4 = new Image(0, 0, 75, 200, fileName, 1);
 
             FreePlacement freePlacement = new FreePlacement(300, 300, 200, 200, true);
+            freePlacement.Name = "ImageFreePlacement";
             freePlacement.Add(img1);
             freePlacement.Add(img2);
             //freePlacement.Add(img3);

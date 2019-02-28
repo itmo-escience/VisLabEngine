@@ -19,6 +19,7 @@ namespace Fusion.Engine.Frames2.Managing
         public UIManager(RenderSystem rs)
         {
             Root = new FreePlacement(0, 0, rs.Width, rs.Height);
+            Root.Name = "Root";
 
             UIEventProcessor = new UIEventProcessor(Root);
 
