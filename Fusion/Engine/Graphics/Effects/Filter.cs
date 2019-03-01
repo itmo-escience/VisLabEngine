@@ -18,7 +18,7 @@ namespace Fusion.Engine.Graphics
 	public class Filter : GameModule {
 		readonly GraphicsDevice rs;
 
-		const int MaxBlurTaps	=	33;
+		const int MaxBlurTaps	=	24;
 
 		[Flags]
 		enum ShaderFlags : int
@@ -51,8 +51,8 @@ namespace Fusion.Engine.Graphics
 		[StructLayout( LayoutKind.Explicit )]
 		struct LinearDepth
 		{
-			[FieldOffset(0)]	public	float	linearizeDepthA;        
-			[FieldOffset(4)]	public	float	linearizeDepthB;        
+			[FieldOffset(0)]	public	float	linearizeDepthA;
+			[FieldOffset(4)]	public	float	linearizeDepthB;
 		}
 
 
@@ -63,7 +63,7 @@ namespace Fusion.Engine.Graphics
 		ConstantBuffer	matrixCB;
 		ConstantBuffer	vectorCB;
 		ConstantBuffer	bufLinearizeDepth;
-		
+
 		public Filter( Game Game ) : base( Game )
 		{
 			rs = Game.GraphicsDevice;
@@ -74,7 +74,7 @@ namespace Fusion.Engine.Graphics
 		/// <summary>
 		/// Initializes Filter service
 		/// </summary>
-		public override void Initialize() 
+		public override void Initialize()
 		{
 			bufLinearizeDepth	= new ConstantBuffer( rs, 128 );
 			gaussWeightsCB		= new ConstantBuffer( rs, typeof(Vector4), MaxBlurTaps );
@@ -89,7 +89,7 @@ namespace Fusion.Engine.Graphics
 
 
 		/// <summary>
-		/// 
+		///
 		/// </summary>
 		void LoadContent ()
 		{
@@ -99,7 +99,7 @@ namespace Fusion.Engine.Graphics
 
 
 		/// <summary>
-		/// 
+		///
 		/// </summary>
 		/// <param name="ps"></param>
 		/// <param name="flags"></param>
@@ -123,7 +123,7 @@ namespace Fusion.Engine.Graphics
 
 
 		/// <summary>
-		/// 
+		///
 		/// </summary>
 		/// <param name="disposing"></param>
 		protected override void Dispose(bool disposing)
@@ -150,9 +150,9 @@ namespace Fusion.Engine.Graphics
 		}
 
 		/*-----------------------------------------------------------------------------------------------
-		 * 
+		 *
 		 *	Base filters
-		 * 
+		 *
 		-----------------------------------------------------------------------------------------------*/
 
 		/// <summary>
@@ -196,7 +196,7 @@ namespace Fusion.Engine.Graphics
 
 				rs.SetTargets( null, dst );
 				SetViewport(dst);
-				
+
 				if (flipToCubeFace) {
 					rs.PipelineState		=	factory[ (int)(ShaderFlags.DOWNSAMPLE_2_4x4|ShaderFlags.TO_CUBE_FACE) ];
 				} else {
@@ -280,7 +280,7 @@ namespace Fusion.Engine.Graphics
 
 
 		/// <summary>
-		/// 
+		///
 		/// </summary>
 		/// <param name="dst">target to copy to</param>
 		/// <param name="src">target to copy from</param>
@@ -308,7 +308,7 @@ namespace Fusion.Engine.Graphics
 
 
 		/// <summary>
-		/// 
+		///
 		/// </summary>
 		/// <param name="dst">target to copy to</param>
 		/// <param name="src">target to copy from</param>
@@ -335,7 +335,7 @@ namespace Fusion.Engine.Graphics
 
 
 		/// <summary>
-		/// 
+		///
 		/// </summary>
 		/// <param name="dst">target to copy to</param>
 		/// <param name="src">target to copy from</param>
@@ -392,7 +392,7 @@ namespace Fusion.Engine.Graphics
 
 
 		/// <summary>
-		/// 
+		///
 		/// </summary>
 		/// <param name="dst"></param>
 		/// <param name="cubeSrc"></param>
@@ -406,8 +406,8 @@ namespace Fusion.Engine.Graphics
 
 			using( new PixEvent("PrefilterEnvMap") ) {
 
-				var sides =	new[]{ ShaderFlags.PREFILTER_ENVMAP | ShaderFlags.POSX, ShaderFlags.PREFILTER_ENVMAP | ShaderFlags.NEGX, 
-								   ShaderFlags.PREFILTER_ENVMAP | ShaderFlags.POSY, ShaderFlags.PREFILTER_ENVMAP | ShaderFlags.NEGY, 
+				var sides =	new[]{ ShaderFlags.PREFILTER_ENVMAP | ShaderFlags.POSX, ShaderFlags.PREFILTER_ENVMAP | ShaderFlags.NEGX,
+								   ShaderFlags.PREFILTER_ENVMAP | ShaderFlags.POSY, ShaderFlags.PREFILTER_ENVMAP | ShaderFlags.NEGY,
 								   ShaderFlags.PREFILTER_ENVMAP | ShaderFlags.POSZ, ShaderFlags.PREFILTER_ENVMAP | ShaderFlags.NEGZ };
 
 				//	loop through mip levels from second to last specular mip level :
@@ -417,12 +417,12 @@ namespace Fusion.Engine.Graphics
 					float step		= 1.0f / width;
 
 					vectorCB.SetData( new Vector4( roughness, step,0,0 ) );
-					
-								
+
+
 					for (int face=0; face<6; face++) {
 
 						rs.SetTargets( null, envMap.GetSurface( mip, (CubeFace)face ) );
-					
+
 						rs.SetViewport( 0,0, width, height );
 
 						rs.PixelShaderConstants[0]	=	vectorCB;
@@ -447,7 +447,7 @@ namespace Fusion.Engine.Graphics
 
 
 		/// <summary>
-		/// 
+		///
 		/// </summary>
 		/// <param name="srcDst">source and destination target</param>
 		/// <param name="temporary">temporaru target for two pass filter</param>
@@ -466,7 +466,7 @@ namespace Fusion.Engine.Graphics
                 rs.SetTargets( null, temporary );
 				rs.VertexShaderResources[0] = srcDst;
 				rs.PixelShaderResources[0] = srcDst;
-                
+
 				rs.Draw( Primitive.TriangleList, 3, 0 );
 
                 shaders.SetPixelShader( (int)(ShaderFlags.GAUSS_BLUR_3x3 | ShaderFlags.PASS2) );
@@ -481,10 +481,10 @@ namespace Fusion.Engine.Graphics
 			rs.ResetStates();
 		}	*/
 
-		
+
 
 		/// <summary>
-		/// 
+		///
 		/// </summary>
 		/// <param name="srcDst"></param>
 		/// <param name="temporary"></param>
@@ -498,7 +498,7 @@ namespace Fusion.Engine.Graphics
 
 
 		/// <summary>
-		/// 
+		///
 		/// </summary>
 		/// <param name="srcDst"></param>
 		/// <param name="temporary"></param>
@@ -515,7 +515,7 @@ namespace Fusion.Engine.Graphics
 
 
 		/// <summary>
-		/// 
+		///
 		/// </summary>
 		/// <param name="srcDst"></param>
 		/// <param name="temporary"></param>
@@ -550,7 +550,7 @@ namespace Fusion.Engine.Graphics
 				rs.PixelShaderResources[2]	=	normalData;
 
 				rs.PixelShaderConstants[0]	=	gaussWeightsCB;
-				
+
 				rs.PixelShaderSamplers[0]	=	SamplerState.LinearPointClamp;
 				rs.PixelShaderSamplers[1]	=	SamplerState.PointClamp;
 
@@ -590,7 +590,7 @@ namespace Fusion.Engine.Graphics
 		}
 
 
-		Vector4[] GetGaussWeightsBuffer( float sigma, int mipLevel ) 
+		Vector4[] GetGaussWeightsBuffer( float sigma, int mipLevel )
 		{
 			var taps = new Vector4[MaxBlurTaps];
 

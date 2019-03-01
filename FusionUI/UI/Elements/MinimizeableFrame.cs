@@ -35,6 +35,7 @@ namespace FusionUI.UI.Elements
                     : Game.Content.Load<DiscTexture>("ui-new/fv-icons_open-list");
             }
         }
+
         public void GenerateTopNode(string text)
         {
             TopNode = new ScalableFrame(ui, 0, 0, UnitWidth - UnitPaddingLeft - UnitPaddingRight, UIConfig.UnitHatHeight, text, UIConfig.ButtonColor)
@@ -43,10 +44,10 @@ namespace FusionUI.UI.Elements
                 //UnitPadding = 2,
                 UnitTextOffsetX = 2,
                 UnitTextOffsetY = 2,
-                UnitImageOffsetX = (UnitWidth - UnitPaddingLeft - UnitPaddingRight) / 2 - UIConfig.UnitHatHeight/ 2, 
+                UnitImageOffsetX = (UnitWidth - UnitPaddingLeft - UnitPaddingRight) / 2 - UIConfig.UnitHatHeight/ 2,
                 ImageMode = FrameImageMode.Fitted,
             };
-            
+
 
             TopNode.ActionClick += (ControlActionArgs args, ref bool flag) =>
             {

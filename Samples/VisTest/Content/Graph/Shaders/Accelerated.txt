@@ -1,0 +1,22 @@
+[1]	A. Bezgodov, A. Karsakov, A. Zagarskikh, and V. Karbovskii, “The Framework for Rapid Graphics Application Development: The Multi-scale Problem Visualization,” Procedia Comput. Sci., vol. 51, pp. 2729–2733, 2015.
+[2]	N. O. Nikitin, D. S. Spirin, A. A. Visheratin, and A. V Kalyuzhnaya, “Statistics-based Models of Flood-causing Cyclones for the Baltic Sea Region,” Procedia Comput. Sci., vol. 101, pp. 272–281, 2016.
+[3]	A. V Kalyuzhnaya, D. Nasonov, S. V Ivanov, S. S. Kosukhin, and A. V Boukhanovsky, “Towards a scenario-based solution for extreme metocean event simulation applying urgent computing,” Futur. Gener. Comput. Syst., 2017.
+[4]	A. M. MacEachren and M.-J. Kraak, “Exploratory cartographic visualization: advancing the agenda,” Comput. Geosci., vol. 23, no. 4, pp. 335–343, 1997.
+[5]	M. Claudel, T. Nagel, and C. Ratti, “From origins to destinations: the past, present and future of visualizing flow maps,” Built Environ., vol. 42, no. 3, pp. 338–355, 2016.
+[6]	P. C. Wong, H.-W. Shen, C. R. Johnson, C. Chen, and R. B. Ross, “The top 10 challenges in extreme-scale visual analytics,” IEEE Comput. Graph. Appl., vol. 32, no. 4, pp. 63–67, 2012.
+[7]	P. C. Wong, H.-W. Shen, and C. Chen, “Top ten interaction challenges in extreme-scale visual analytics,” in Expanding the frontiers of visual analytics and visualization, Springer, 2012, pp. 197–207.
+[8]	S. Dübel, M. Röhlig, H. Schumann, and M. Trapp, “2D and 3D presentation of spatial data: a systematic review,” in 3DVis (3DVis), 2014 IEEE VIS International Workshop on, 2014, pp. 11–18.
+[9]	C. Ware and M. D. Plumlee, “Designing a better weather display,” Inf. Vis., vol. 12, no. 3–4, pp. 221–239, 2013.
+[10] P. C. Wong, H.-W. Shen, R. Leung, S. Hagos, T.-Y. Lee, X. Tong, and K. Lu, “Visual analytics of large-scale climate model data,” in Large Data Analysis and Visualization (LDAV), 2014 IEEE 4th Symposium on, 2014, pp. 85–92.
+[11] J. Liang, J. Gong, W. Li, and A. N. Ibrahim, “Visualizing 3D atmospheric data with spherical volume texture on virtual globes,” Comput. Geosci., vol. 68, pp. 81–91, 2014.
+[12] J. Sanyal, S. Zhang, J. Dyer, A. Mercer, P. Amburn, and R. Moorhead, “Noodles: A tool for visualization of numerical weather model ensemble uncertainty,” IEEE Trans. Vis. Comput. Graph., vol. 16, no. 6, pp. 1421–1430, 2010.
+[13] K. Potter, A. Wilson, P.-T. Bremer, D. Williams, C. Doutriaux, V. Pascucci, and C. R. Johnson, “Ensemble-vis: A framework for the statistical visualization of ensemble data,” in Data Mining Workshops, 2009. ICDMW’09. IEEE International Conference on, 2009, pp. 233–240.
+[14] J. Clyne, P. Mininni, A. Norton, and M. Rast, “Interactive desktop analysis of high resolution simulations: application to turbulent plume dynamics and current sheet formation,” New J. Phys., vol. 9, no. 8, p. 301, 2007.
+[15] E. Santos, J. Poco, Y. Wei, S. Liu, B. Cook, D. N. Williams, and C. T. Silva, “UV-CDAT: Analyzing climate datasets from a user’s perspective,” Comput. Sci. Eng., vol. 15, no. 1, pp. 94–103, 2013.
+[16] “Windy, Windyty. Wind map & weather forecast.” [Online]. Available: windy.com.
+[17] “The Weather Channel | Weather.com.” [Online]. Available: weather.com.
+[18] “Weather Forecast & Reports - Long Range & Local | Wunderground | Weather Underground.” [Online]. Available: https://www.wunderground.com/.
+[19] “NASA WorldWind.” [Online]. Available: https://worldwind.arc.nasa.gov/.
+[20] “Cesium - WebGL Virtual Glob... | cesiumjs.org.” [Online]. Available: https://cesiumjs.org/.
+[21] W. Li and S. Wang, “PolarGlobe: A web-wide virtual globe system for visualizing multidimensional, time-varying, big climate data,” Int. J. Geogr. Inf. Sci., pp. 1–21, 2017.
+[22] M. Hecher, C. Traxler, G. Hesina, A. L. Fuhrmann, and D. W. Fellner, “Web-based Visualization Platform for Geospatial Data.,” in IVAPP, 2015, pp. 311–316.
