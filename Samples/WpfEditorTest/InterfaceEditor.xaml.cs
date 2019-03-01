@@ -188,12 +188,14 @@ namespace WpfEditorTest
 					var rootChildren = new List<UIComponent>(RootFrame.Children);
 					var startScene = new SceneDataContainer(RootFrame.Width, RootFrame.Height);
 		            SceneFrame = startScene.Scene;//RootFrame.Children.FirstOrDefault() as UIContainer;
+                    SceneFrame.Name = "SceneFrame";
 					foreach (var child in rootChildren)
 					{
 						RootFrame.Remove(child);
 						SceneFrame.Add(child);
 					}
 					DragFieldFrame = new FreePlacement(0, 0, RootFrame.Width, RootFrame.Height) { Name = "DRAG_FIELD" };
+                    DragFieldFrame.Name = "DragFieldFrame";
 					//    ,"DragFieldFrame", Fusion.Core.Mathematics.Color.Zero)
 					//{
 					//    Anchor = FrameAnchor.All,
@@ -210,8 +212,8 @@ namespace WpfEditorTest
 		            var binding = new Binding("Children")
 		            {
 		                Source = SceneFrame,
-		                UpdateSourceTrigger = UpdateSourceTrigger.PropertyChanged,
-		                Mode = BindingMode.OneWay
+		                //UpdateSourceTrigger = UpdateSourceTrigger.PropertyChanged,
+		                //Mode = BindingMode.OneWay
 		            };
 		            _treeView.ElementHierarchyView.SetBinding(TreeView.ItemsSourceProperty, binding);
 					_treeView.AttachScene(SceneFrame);
