@@ -85,7 +85,7 @@ namespace WpfEditorTest.ChildWindows
 			if (prop!=null)
 			{
 				var value = prop.GetValue(slot.Component);
-				slot.Properties.Add(new UIController.PropertyValue(box.Text, value));
+				slot.Properties.Add(new UIController.PropertyValueStates<>(box.Text, value));
 			}
 		}
 	}

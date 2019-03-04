@@ -4,18 +4,20 @@ using Fusion.Engine.Frames2.Managing;
 
 namespace Fusion.Engine.Frames2.Controllers
 {
-    public class ButtonController : UIController
-    {
-        public static State Pressed = new State("Pressed");
-        protected override IEnumerable<State> NonDefaultStates => new List<State> {Pressed};
+    public class ButtonType : IControllerType { }
 
-        public Slot Foreground { get; }
-        public Slot Background { get; }
+    public class ButtonController : UIController<ButtonType>
+    {
+        public static State<ButtonType> Pressed = new State<ButtonType>("Pressed");
+        protected override IEnumerable<State<ButtonType>> NonDefaultStates => new List<State<ButtonType>> {Pressed};
+
+        public Slot<ButtonType> Foreground { get; }
+        public Slot<ButtonType> Background { get; }
 
         public ButtonController(float x, float y) : base(x, y, 100, 100)
         {
-            Foreground = new Slot("Foreground");
-            Background = new Slot("Background");
+            Foreground = new Slot<ButtonType>("Foreground");
+            Background = new Slot<ButtonType>("Background");
 
             SlotsInternal.Add(Background);
             SlotsInternal.Add(Foreground);
@@ -31,17 +33,17 @@ namespace Fusion.Engine.Frames2.Controllers
 
         private void OnEnter(UIComponent sender)
         {
-            if (CurrentState == State.Default)
+            if (CurrentState == State<ButtonType>.Default)
             {
-                ChangeState(State.Hovered);
+                ChangeState(State<ButtonType>.Hovered);
             }
         }
 
         private void OnLeave(UIComponent sender)
         {
-            if (CurrentState == State.Hovered)
+            if (CurrentState == State<ButtonType>.Hovered)
             {
-                ChangeState(State.Default);
+                ChangeState(State<ButtonType>.Default);
             }
         }
 
@@ -58,7 +60,7 @@ namespace Fusion.Engine.Frames2.Controllers
             if(CurrentState == Pressed)
                 ButtonClick?.Invoke(this, new ButtonClickEventArgs(this));
 
-            ChangeState(sender.IsInside(e.Position) ? State.Hovered : State.Default);
+            ChangeState(sender.IsInside(e.Position) ? State<ButtonType>.Hovered : State<ButtonType>.Default);
         }
 
         public event EventHandler<ButtonClickEventArgs> ButtonClick;

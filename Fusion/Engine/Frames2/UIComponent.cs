@@ -84,7 +84,7 @@ namespace Fusion.Engine.Frames2
         }
 
         private Matrix3x2 _globalTransform = Matrix3x2.Identity;
-        public Matrix3x2 GlobalTransform
+        public Matrix3x2 GlobalTransform 
         {
             get
             {

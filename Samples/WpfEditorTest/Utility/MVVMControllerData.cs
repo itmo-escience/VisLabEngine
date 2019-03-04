@@ -77,10 +77,10 @@ namespace WpfEditorTest.Utility
 		public string Name { get; set; }
 		public UIController.Slot Slot { get; set; }
 		public UIController.State State { get; set; }
-		public UIController.PropertyValue PropertyValue { get; set; }
+		public UIController.PropertyValueStates<> PropertyValue { get; set; }
 		public MVVMControllerSlotProperty SlotPropertyInfo { get; }
 
-		public ControllerSlotProperty( UIController.Slot slot, UIController.PropertyValue propertyValue, UIController controller, UIController.State state )
+		public ControllerSlotProperty( UIController.Slot slot, UIController.PropertyValueStates<> propertyValue, UIController controller, UIController.State state )
 		{
 			Name = propertyValue.Name;
 			Slot = slot;

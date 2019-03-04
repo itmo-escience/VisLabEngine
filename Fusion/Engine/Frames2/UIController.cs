@@ -7,17 +7,19 @@ using Fusion.Engine.Common;
 
 namespace Fusion.Engine.Frames2
 {
-    public abstract class UIController : UIContainer
-    {
-        public State CurrentState { get; protected set; } = State.Default;
+    public interface IControllerType { }
 
-        public IEnumerable<State> States
+    public abstract class UIController<T> : UIContainer where T : IControllerType
+    {
+        public State<T> CurrentState { get; protected set; } = State<T>.Default;
+
+        public IEnumerable<State<T>> States
         {
             get
             {
-                yield return State.Default;
-                yield return State.Hovered;
-                yield return State.Disabled;
+                yield return State<T>.Default;
+                yield return State<T>.Hovered;
+                yield return State<T>.Disabled;
 
                 foreach (var state in NonDefaultStates)
                 {
@@ -28,14 +30,14 @@ namespace Fusion.Engine.Frames2
 
         protected UIController(float x, float y, float width, float height) : base(x, y, width, height, true) { }
 
-        protected virtual IEnumerable<State> NonDefaultStates => new List<State>();
+        protected virtual IEnumerable<State<T>> NonDefaultStates => new List<State<T>>();
 
-        protected readonly List<Slot> SlotsInternal = new List<Slot>();
-        public IReadOnlyList<Slot> Slots => SlotsInternal;
+        protected readonly List<Slot> SlotsInternal = new List<ControllerSlot<T>>();
+        //public IReadOnlyList<Slot<T>> Slots => SlotsInternal;
 
-        public void ChangeState(State newState)
+        public void ChangeState(State<T> newState)
         {
-            if(!States.Contains(newState)) return;
+            if (!States.Contains(newState)) return;
 
             foreach (var fragment in Slots)
             {
@@ -44,7 +46,7 @@ namespace Fusion.Engine.Frames2
                 foreach (var propertyValue in fragment.Properties)
                 {
                     var info = type.GetProperty(propertyValue.Name);
-                    if(info == null) continue;
+                    if (info == null) continue;
 
                     info.SetValue(
                         component,
@@ -61,7 +63,7 @@ namespace Fusion.Engine.Frames2
             Log.Verbose(CurrentState);
         }
 
-        internal void Attach(Slot slot, UIComponent component)
+        internal void Attach(Slot<T> slot, UIComponent component)
         {
             var idx = SlotsInternal.IndexOf(slot);
             base.AddAt(component, idx);
@@ -95,20 +97,20 @@ namespace Fusion.Engine.Frames2
                 slot.ComponentAttached += ComponentAttachedToSlot;
             }
 
-            ChangeState(State.Default);
+            ChangeState(State<T>.Default);
             _initialized = true;
         }
 
-        private void ComponentAttachedToSlot(object sender, Slot.ComponentAttachedEventArgs e)
+        private void ComponentAttachedToSlot(object sender, SlotAttachmentChangedEventArgs e)
         {
-            var slot = (Slot) sender;
+            var slot = (Slot<T>)sender;
 
             Attach(slot, e.New);
         }
 
         public override void Update(GameTime gameTime)
         {
-            if(!_initialized)
+            if (!_initialized)
                 Initialize();
 
             base.Update(gameTime);
@@ -133,120 +135,88 @@ namespace Fusion.Engine.Frames2
         }
 
         #endregion
+    }
 
-        public class Slot
+    
+
+    public interface IControllerSlot<T> : ISlot where T : IControllerType
+    {
+        ObservableCollection<PropertyValueStates<T>> Properties { get; }
+    }
+
+    public struct State<T> : IEquatable<State<T>> where T : IControllerType
+    {
+        public readonly string Name;
+        public State(string name)
         {
-            public string Name { get; }
-            public UIComponent Component { get; private set; }
-            public ObservableCollection<PropertyValue> Properties { get; } = new ObservableCollection<PropertyValue>();
-
-            public Slot(string name)
-            {
-                Name = name;
-            }
-
-            public void Attach(UIComponent component)
-            {
-                var old = Component;
-
-                Component = component;
-
-                ComponentAttached?.Invoke(this,
-                    new ComponentAttachedEventArgs(old, component)
-                );
-            }
-
-            public event EventHandler<ComponentAttachedEventArgs> ComponentAttached;
-
-            public class ComponentAttachedEventArgs : EventArgs
-            {
-                public UIComponent Old { get; }
-                public UIComponent New { get; }
-
-                public ComponentAttachedEventArgs(UIComponent oldComponent, UIComponent newComponent)
-                {
-                    Old = oldComponent;
-                    New = newComponent;
-                }
-            }
-
-            public override string ToString() => Name;
+            Name = name;
         }
 
-        public class PropertyValue
+        public static State<T> Default = new State<T>("Default");
+        public static State<T> Hovered = new State<T>("Hovered");
+        public static State<T> Disabled = new State<T>("Disabled");
+
+        public static bool operator ==(State<T> self, State<T> other)
         {
-            public string Name { get; }
-            public object Default { get; }
-
-
-			private readonly Dictionary<State, object> _storedValues = new Dictionary<State, object>();
-
-            public PropertyValue(string name, object defaultValue)
-            {
-                Name = name;
-                Default = defaultValue;
-
-                _storedValues[State.Default] = Default;
-			}
-
-            public object this[State s]
-            {
-                get
-                {
-                    if (!_storedValues.TryGetValue(s, out var result))
-                        result = Default;
-                    return result;
-                }
-                set => _storedValues[s] = value;
-            }
-
-            public override string ToString() => Name;
+            return self.Equals(other);
         }
 
-        public struct State : IEquatable<State>
+        public static bool operator !=(State<T> self, State<T> other)
         {
-            public readonly string Name;
-            public State(string name)
-            {
-                Name = name;
-            }
-
-            public static State Default  = new State("Default");
-            public static State Hovered  = new State("Hovered");
-            public static State Disabled = new State("Disabled");
-
-            public static bool operator ==(State self, State other)
-            {
-                return self.Equals(other);
-            }
-
-            public static bool operator !=(State self, State other)
-            {
-                return !self.Equals(other);
-            }
-
-            public bool Equals(State other)
-            {
-                return string.Equals(Name, other.Name);
-            }
-
-            public override bool Equals(object obj)
-            {
-                if (ReferenceEquals(null, obj)) return false;
-                return obj is State other && Equals(other);
-            }
-
-            public override int GetHashCode()
-            {
-                return (Name != null ? Name.GetHashCode() : 0);
-            }
-
-            public override string ToString()
-            {
-                return $"State: {Name}";
-            }
-
-            public static implicit operator string(State s) => s.ToString();
+            return !self.Equals(other);
         }
+
+        public bool Equals(State<T> other)
+        {
+            return string.Equals(Name, other.Name);
+        }
+
+        public override bool Equals(object obj)
+        {
+            if (ReferenceEquals(null, obj)) return false;
+            return obj is State<T> other && Equals(other);
+        }
+
+        public override int GetHashCode()
+        {
+            return (Name != null ? Name.GetHashCode() : 0);
+        }
+
+        public override string ToString()
+        {
+            return $"State: {Name}";
+        }
+
+        public static implicit operator string(State<T> s) => s.ToString();
+    }
+
+    public class PropertyValueStates<T> where T : IControllerType
+    {
+        public string Name { get; }
+        public object Default { get; }
+
+
+        private readonly Dictionary<State<T>, object> _storedValues = new Dictionary<State<T>, object>();
+
+        public PropertyValueStates(string name, object defaultValue)
+        {
+            Name = name;
+            Default = defaultValue;
+
+            _storedValues[State<T>.Default] = Default;
+        }
+
+        public object this[State<T> s]
+        {
+            get
+            {
+                if (!_storedValues.TryGetValue(s, out var result))
+                    result = Default;
+                return result;
+            }
+            set => _storedValues[s] = value;
+        }
+
+        public override string ToString() => Name;
     }
 }
