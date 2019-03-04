@@ -20,7 +20,7 @@ using Fusion.Engine.Common;
 namespace Fusion.Drivers.Graphics {
 	public class Texture2D : ShaderResource {
 
-		D3D.Texture2D	tex2D;
+        internal D3D.Texture2D Tex2D;
 		ColorFormat		format;
 		int				mipCount;
 
@@ -29,8 +29,11 @@ namespace Fusion.Drivers.Graphics {
 
 			public override object Load ( ContentManager content, Stream stream, Type requestedType, string assetPath )
 			{
-				bool srgb = assetPath.ToLowerInvariant().Contains("|srgb");
-				return new Texture2D( content.Game.GraphicsDevice, stream, srgb );
+                var lower = assetPath.ToLowerInvariant();
+                bool srgb = lower.Contains("|srgb");
+                bool noMips = lower.Contains("|nomips");
+
+                return new Texture2D( content.Game.GraphicsDevice, stream, srgb, noMips );
 			}
 		}
 		
@@ -62,8 +65,8 @@ namespace Fusion.Drivers.Graphics {
 			texDesc.Width			=	Width;
 													 
 			lock (device.DeviceContext) {
-				tex2D	=	new D3D.Texture2D( device.Device, texDesc );
-				SRV		=	new ShaderResourceView( device.Device, tex2D );
+				Tex2D	=	new D3D.Texture2D( device.Device, texDesc );
+				SRV		=	new ShaderResourceView( device.Device, Tex2D );
 			}
 		}
 		
@@ -98,9 +101,9 @@ namespace Fusion.Drivers.Graphics {
 		/// </summary>
 		/// <param name="device"></param>
 		/// <param name="path"></param>
-		public Texture2D ( GraphicsDevice device, Stream stream, bool forceSRgb = false) : base( device )
+		public Texture2D ( GraphicsDevice device, Stream stream, bool forceSRgb = false, bool noMips = false) : base( device )
 		{
-			CreateFromFile( stream.ReadAllBytes(), stream is FileStream ? (stream as FileStream).Name : "stream", forceSRgb);
+			CreateFromFile( stream.ReadAllBytes(), stream is FileStream ? (stream as FileStream).Name : "stream", forceSRgb, noMips);
 		}
 
 
@@ -125,7 +128,7 @@ namespace Fusion.Drivers.Graphics {
 		/// <param name="height"></param>
 		/// <param name="format"></param>
 		/// <param name="mips"></param>
-		void CreateFromFile ( byte[] fileInMemory, string name, bool forceSRgb)
+		void CreateFromFile ( byte[] fileInMemory, string name, bool forceSRgb, bool noMips = false)
 		{
 			if (device == null) return;
 
@@ -140,23 +143,23 @@ namespace Fusion.Drivers.Graphics {
 					(char)fileInMemory[2]=='S' &&
 					(char)fileInMemory[3]==' ' ) {
 	
-					result = DdsLoader.CreateTextureFromMemory( device.Device.NativePointer, fileInMemory, forceSRgb, ref resource, ref resourceView );
+					result = DdsLoader.CreateTextureFromMemory( device.Device.NativePointer, fileInMemory, forceSRgb, noMips, ref resource, ref resourceView );
 				} else {
-					result = WicLoader.CreateTextureFromMemory( device.Device.NativePointer, fileInMemory, forceSRgb, ref resource, ref resourceView );
+					result = WicLoader.CreateTextureFromMemory( device.Device.NativePointer, fileInMemory, forceSRgb, noMips, ref resource, ref resourceView );
 				}
 
 				if (!result) {	
 					throw new GraphicsException( "Failed to load texture: " + name );
 				}
 
-				tex2D	=	new D3D.Texture2D( resource );
+				Tex2D	=	new D3D.Texture2D( resource );
 				SRV		=	new D3D.ShaderResourceView( resourceView );
 
-				Width		=	tex2D.Description.Width;
-				Height		=	tex2D.Description.Height;
+				Width		=	Tex2D.Description.Width;
+				Height		=	Tex2D.Description.Height;
 				Depth		=	1;
-				mipCount	=	tex2D.Description.MipLevels;
-				format		= Converter.Convert( tex2D.Description.Format );
+				mipCount	=	Tex2D.Description.MipLevels;
+				format		= Converter.Convert( Tex2D.Description.Format );
 			}
 		}
 
@@ -184,11 +187,11 @@ namespace Fusion.Drivers.Graphics {
 					(char)fileInMemory[3] == ' ')
 				{
 
-					result = DdsLoader.CreateTextureFromMemory(device.Device.NativePointer, fileInMemory, forceSRgb, ref resource, ref resourceView);
+					result = DdsLoader.CreateTextureFromMemory(device.Device.NativePointer, fileInMemory, forceSRgb, false, ref resource, ref resourceView);
 				}
 				else
 				{
-					result = WicLoader.CreateTextureFromMemory(device.Device.NativePointer, fileInMemory, forceSRgb, ref resource, ref resourceView);
+					result = WicLoader.CreateTextureFromMemory(device.Device.NativePointer, fileInMemory, forceSRgb, false, ref resource, ref resourceView);
 				}
 
 				if (!result)
@@ -196,14 +199,14 @@ namespace Fusion.Drivers.Graphics {
 					throw new GraphicsException("Failed to load texture: " + name);
 				}
 
-				ret.tex2D = new D3D.Texture2D(resource);
+				ret.Tex2D = new D3D.Texture2D(resource);
 				ret.SRV = new D3D.ShaderResourceView(resourceView);
 
-				ret.Width		= ret.tex2D.Description.Width;
-				ret.Height		= ret.tex2D.Description.Height;
+				ret.Width		= ret.Tex2D.Description.Width;
+				ret.Height		= ret.Tex2D.Description.Height;
 				ret.Depth		= 1;
-				ret.mipCount	= ret.tex2D.Description.MipLevels;
-				ret.format		= Converter.Convert(ret.tex2D.Description.Format);
+				ret.mipCount	= ret.Tex2D.Description.MipLevels;
+				ret.format		= Converter.Convert(ret.Tex2D.Description.Format);
 			}
 
 			return ret;
@@ -218,7 +221,7 @@ namespace Fusion.Drivers.Graphics {
 		protected override void Dispose ( bool disposing )
 		{
 			if (disposing) {
-				SafeDispose( ref tex2D );
+				SafeDispose( ref Tex2D );
 				SafeDispose( ref SRV );
 				//SafeDispose( ref srgbResource );
 				//SafeDispose( ref linearResource );
@@ -303,7 +306,7 @@ namespace Fusion.Drivers.Graphics {
 				region.Right	= x + w;
 
 				lock (device.DeviceContext) {
-					device.DeviceContext.UpdateSubresource(box, tex2D, level, region);
+					device.DeviceContext.UpdateSubresource(box, Tex2D, level, region);
 				}
 				
 			} finally {

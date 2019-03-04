@@ -11,7 +11,7 @@ namespace Native {
 		public ref class DdsLoader
 		{
 		public:
-			static bool CreateTextureFromMemory ( IntPtr device, array<Byte>^ fileInMemory, bool forceSRgb, IntPtr %resource, IntPtr %srv );
+			static bool CreateTextureFromMemory ( IntPtr device, array<Byte>^ fileInMemory, bool forceSRgb, bool noMips, IntPtr %resource, IntPtr %srv );
 		};
 	}
 }

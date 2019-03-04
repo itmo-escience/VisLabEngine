@@ -102,7 +102,7 @@ namespace Fusion.Drivers.Graphics {
 			IntPtr	resource		=	new IntPtr(0);
 			IntPtr	resourceView	=	new IntPtr(0);
 
-			var r = DdsLoader.CreateTextureFromMemory( device.Device.NativePointer, fileInMemory, forceSRgb, ref resource, ref resourceView );
+			var r = DdsLoader.CreateTextureFromMemory( device.Device.NativePointer, fileInMemory, forceSRgb, false, ref resource, ref resourceView );
 
 			if (!r) {	
 				throw new GraphicsException( "Failed to load texture: " + name );

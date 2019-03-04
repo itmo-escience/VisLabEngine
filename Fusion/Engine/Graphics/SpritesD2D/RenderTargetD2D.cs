@@ -10,6 +10,7 @@ using PixelFormat = SharpDX.Direct2D1.PixelFormat;
 using RectangleF = Fusion.Core.Mathematics.RectangleF;
 using Size2 = Fusion.Core.Mathematics.Size2;
 using Vector2 = Fusion.Core.Mathematics.Vector2;
+using Device = SharpDX.Direct3D11.Device;
 
 namespace Fusion.Engine.Graphics.SpritesD2D
 {
@@ -18,7 +19,7 @@ namespace Fusion.Engine.Graphics.SpritesD2D
     /// </summary>
     public sealed class RenderTargetD2D
     {
-        private readonly RenderTarget _target;
+        internal readonly RenderTarget RenderTarget;
         private readonly BrushFactory _brushFactory;
         private readonly TextFormatFactory _dwFactory;
         private readonly TextLayoutFactory _layoutFactory;
@@ -26,39 +27,39 @@ namespace Fusion.Engine.Graphics.SpritesD2D
         /// <remarks>This constructor must be internal in order to encapsulate Direct2D dependency.</remarks>
         internal RenderTargetD2D(RenderTarget renderTarget)
         {
-            _target = renderTarget;
-            _brushFactory = new BrushFactory(_target);
+            RenderTarget = renderTarget;
+            _brushFactory = new BrushFactory(RenderTarget);
             _dwFactory = new TextFormatFactory();
             _layoutFactory = TextLayoutFactory.Instance;
         }
 
         /// <inheritdoc cref="RenderTarget.BeginDraw()"/>
-        public void BeginDraw() => _target.BeginDraw();
+        public void BeginDraw() => RenderTarget.BeginDraw();
 
         /// <inheritdoc cref="RenderTarget.EndDraw()"/>
-        public void EndDraw() => _target.EndDraw();
+        public void EndDraw() => RenderTarget.EndDraw();
 
         /// <inheritdoc cref="RenderTarget.EndDraw(out long, out long)"/>
-        public void EndDraw(out long tag1, out long tag2) => _target.EndDraw(out tag1, out tag2);
+        public void EndDraw(out long tag1, out long tag2) => RenderTarget.EndDraw(out tag1, out tag2);
 
         /// <inheritdoc cref="Clear(Core.Mathematics.Color4)"/>
-        public void Clear() => _target.Clear(null);
+        public void Clear() => RenderTarget.Clear(null);
 
         /// <inheritdoc cref="RenderTarget.Clear(RawColor4?)"/>
-        public void Clear(Color4 color) => _target.Clear(color.ToRawColor4());
+        public void Clear(Color4 color) => RenderTarget.Clear(color.ToRawColor4());
 
         /// <inheritdoc cref="RenderTarget.Flush()"/>
-        public void Flush() => _target.Flush();
+        public void Flush() => RenderTarget.Flush();
 
         /// <inheritdoc cref="RenderTarget.Flush(out long, out long)"/>
-        public void Flush(out long tag1, out long tag2) => _target.Flush(out tag1, out tag2);
+        public void Flush(out long tag1, out long tag2) => RenderTarget.Flush(out tag1, out tag2);
 
         /// <inheritdoc cref="RenderTarget.PushAxisAlignedClip(RawRectangleF, AntialiasMode)"/>
         public void PushAxisAlignedClip(RectangleF clippingRecrangle, AntialiasModeD2D antialiasMode) =>
-            _target.PushAxisAlignedClip(createAlignedRectangle(clippingRecrangle.ToRawRectangleF()), antialiasMode.ToAntialiasMode());
+            RenderTarget.PushAxisAlignedClip(createAlignedRectangle(clippingRecrangle.ToRawRectangleF()), antialiasMode.ToAntialiasMode());
 
         /// <inheritdoc cref="RenderTarget.PopAxisAlignedClip()"/>
-        public void PopAxisAlignedClip() => _target.PopAxisAlignedClip();
+        public void PopAxisAlignedClip() => RenderTarget.PopAxisAlignedClip();
 
         private RawVector2 createAlignedVector(RawVector2 vector)
         {
@@ -71,16 +72,16 @@ namespace Fusion.Engine.Graphics.SpritesD2D
         }
 
         public void DrawEllipse(Vector2 center, float rX, float rY, IBrushD2D brush) =>
-            _target.DrawEllipse(new SharpDX.Direct2D1.Ellipse(createAlignedVector(center.ToRawVector2()), rX, rY), _brushFactory.GetOrCreateBrush(brush));
+            RenderTarget.DrawEllipse(new SharpDX.Direct2D1.Ellipse(createAlignedVector(center.ToRawVector2()), rX, rY), _brushFactory.GetOrCreateBrush(brush));
 
         public void DrawEllipse(Vector2 center, float rX, float rY, IBrushD2D brush, float strokeWidth) =>
-            _target.DrawEllipse(new SharpDX.Direct2D1.Ellipse(createAlignedVector(center.ToRawVector2()), rX, rY), _brushFactory.GetOrCreateBrush(brush), strokeWidth);
+            RenderTarget.DrawEllipse(new SharpDX.Direct2D1.Ellipse(createAlignedVector(center.ToRawVector2()), rX, rY), _brushFactory.GetOrCreateBrush(brush), strokeWidth);
 
         public void DrawLine(Vector2 p0, Vector2 p1, IBrushD2D brush) =>
-            _target.DrawLine(createAlignedVector(p0.ToRawVector2()), createAlignedVector(p1.ToRawVector2()), _brushFactory.GetOrCreateBrush(brush));
+            RenderTarget.DrawLine(createAlignedVector(p0.ToRawVector2()), createAlignedVector(p1.ToRawVector2()), _brushFactory.GetOrCreateBrush(brush));
 
         public void DrawLine(Vector2 p0, Vector2 p1, IBrushD2D brush, float strokeWidth) =>
-            _target.DrawLine(createAlignedVector(p0.ToRawVector2()), createAlignedVector(p1.ToRawVector2()), _brushFactory.GetOrCreateBrush(brush), strokeWidth);
+            RenderTarget.DrawLine(createAlignedVector(p0.ToRawVector2()), createAlignedVector(p1.ToRawVector2()), _brushFactory.GetOrCreateBrush(brush), strokeWidth);
 
         public void DrawStrokeLine(Vector2 p0, Vector2 p1, IBrushD2D brush, float strokeWidth = 1)
         {
@@ -88,14 +89,14 @@ namespace Fusion.Engine.Graphics.SpritesD2D
             {
                 DashStyle = DashStyle.Dash,
             };
-            _target.DrawLine(createAlignedVector(p0.ToRawVector2()), createAlignedVector(p1.ToRawVector2()), _brushFactory.GetOrCreateBrush(brush), strokeWidth, new StrokeStyle(_target.Factory, prop));
+            RenderTarget.DrawLine(createAlignedVector(p0.ToRawVector2()), createAlignedVector(p1.ToRawVector2()), _brushFactory.GetOrCreateBrush(brush), strokeWidth, new StrokeStyle(RenderTarget.Factory, prop));
         }
 
         public void DrawRect(RectangleF rectangle, IBrushD2D brush) =>
-            _target.DrawRectangle(createAlignedRectangle(rectangle.ToRawRectangleF()), _brushFactory.GetOrCreateBrush(brush));
+            RenderTarget.DrawRectangle(createAlignedRectangle(rectangle.ToRawRectangleF()), _brushFactory.GetOrCreateBrush(brush));
 
         public void DrawRect(RectangleF rectangle, IBrushD2D brush, float strokeWidth) =>
-            _target.DrawRectangle(createAlignedRectangle(rectangle.ToRawRectangleF()), _brushFactory.GetOrCreateBrush(brush), strokeWidth);
+            RenderTarget.DrawRectangle(createAlignedRectangle(rectangle.ToRawRectangleF()), _brushFactory.GetOrCreateBrush(brush), strokeWidth);
 
         public void DrawStrokeRect(RectangleF rectangle, IBrushD2D brush, float strokeWidth = 1)
         {
@@ -103,23 +104,23 @@ namespace Fusion.Engine.Graphics.SpritesD2D
             {
                 DashStyle = DashStyle.Dash,
             };
-            _target.DrawRectangle(createAlignedRectangle(rectangle.ToRawRectangleF()), _brushFactory.GetOrCreateBrush(brush), strokeWidth, new StrokeStyle(_target.Factory, prop));
+            RenderTarget.DrawRectangle(createAlignedRectangle(rectangle.ToRawRectangleF()), _brushFactory.GetOrCreateBrush(brush), strokeWidth, new StrokeStyle(RenderTarget.Factory, prop));
         }
 
         public void FillEllipse(Vector2 center, float rX, float rY, IBrushD2D brush) =>
-            _target.FillEllipse(new SharpDX.Direct2D1.Ellipse(createAlignedVector(center.ToRawVector2()), rX, rY), _brushFactory.GetOrCreateBrush(brush));
+            RenderTarget.FillEllipse(new SharpDX.Direct2D1.Ellipse(createAlignedVector(center.ToRawVector2()), rX, rY), _brushFactory.GetOrCreateBrush(brush));
 
         public void FillRect(RectangleF rectangle, IBrushD2D brush) =>
-            _target.FillRectangle(createAlignedRectangle(rectangle.ToRawRectangleF()), _brushFactory.GetOrCreateBrush(brush));
+            RenderTarget.FillRectangle(createAlignedRectangle(rectangle.ToRawRectangleF()), _brushFactory.GetOrCreateBrush(brush));
 
         public void DrawText(string text, TextFormatD2D textFormat, RectangleF rectangleF, IBrushD2D brush) =>
-            _target.DrawText(text, _dwFactory.CreateTextFormat(textFormat), createAlignedRectangle(rectangleF.ToRawRectangleF()), _brushFactory.GetOrCreateBrush(brush));
+            RenderTarget.DrawText(text, _dwFactory.CreateTextFormat(textFormat), createAlignedRectangle(rectangleF.ToRawRectangleF()), _brushFactory.GetOrCreateBrush(brush));
 
         public void DrawTextLayout(Vector2 origin, TextLayoutD2D layout, IBrushD2D brush) =>
-            _target.DrawTextLayout(createAlignedVector(origin.ToRawVector2()), _layoutFactory.CreateTextLayout(layout), _brushFactory.GetOrCreateBrush(brush));
+            RenderTarget.DrawTextLayout(createAlignedVector(origin.ToRawVector2()), _layoutFactory.CreateTextLayout(layout), _brushFactory.GetOrCreateBrush(brush));
 
         public void DrawBitmap(BitmapD2D bitmap, RectangleF destinationRectangle, float opacity, RectangleF sourceRectangle) =>
-            _target.DrawBitmap(bitmap.Bitmap, createAlignedRectangle(destinationRectangle.ToRawRectangleF()), opacity, BitmapInterpolationMode.NearestNeighbor, createAlignedRectangle(sourceRectangle.ToRawRectangleF()));
+            RenderTarget.DrawBitmap(bitmap._bitmap, createAlignedRectangle(destinationRectangle.ToRawRectangleF()), opacity, BitmapInterpolationMode.NearestNeighbor, createAlignedRectangle(sourceRectangle.ToRawRectangleF()));
 
         private readonly Stack<Layer> _layers = new Stack<Layer>();
         public void PushLayer(PathGeometryD2D clippingGeometry, AntialiasModeD2D antialiasMode)
@@ -135,92 +136,31 @@ namespace Fusion.Engine.Graphics.SpritesD2D
                 OpacityBrush = null
             };
 
-            var layer = new Layer(_target);
+            var layer = new Layer(RenderTarget);
             _layers.Push(layer);
-            _target.PushLayer(ref layerParameters, layer);
+            RenderTarget.PushLayer(ref layerParameters, layer);
         }
 
         public void PopLayer()
         {
             var l = _layers.Pop();
             l.Dispose();
-            _target.PopLayer();
+            RenderTarget.PopLayer();
         }
 
         public DrawingStateBlockD2D SaveDrawingState()
         {
-            var s = new DrawingStateBlock(_target.Factory);
-            _target.SaveDrawingState(s);
+            var s = new DrawingStateBlock(RenderTarget.Factory);
+            RenderTarget.SaveDrawingState(s);
             return new DrawingStateBlockD2D(s);
         }
 
-        public void RestoreDrawingState(DrawingStateBlockD2D state) => _target.RestoreDrawingState(state.State);
+        public void RestoreDrawingState(DrawingStateBlockD2D state) => RenderTarget.RestoreDrawingState(state.State);
 
         public Matrix3x2 Transform
         {
-            get => _target.Transform.ToMatrix3x2();
-            set => _target.Transform = value.ToRawMatrix3X2();
-        }
-
-        /// <summary>
-        /// Converts Image to Bitmap
-        /// </summary>
-        /// <param name="image">Image to convert</param>
-        /// <returns>A D2D1 Bitmap</returns>
-        internal Bitmap ToBitmap(System.Drawing.Image image)
-        {
-            var bitmap = (System.Drawing.Bitmap) image;
-            var sourceArea = new System.Drawing.Rectangle(0, 0, bitmap.Width, bitmap.Height);
-            var bitmapProperties = new BitmapProperties(new PixelFormat(SharpDX.DXGI.Format.R8G8B8A8_UNorm, AlphaMode.Premultiplied));
-
-            // Transform pixels from BGRA to RGBA
-            int stride = bitmap.Width * sizeof(int);
-            using (var tempStream = new DataStream(bitmap.Height * stride, true, true))
-            {
-                // Lock System.Drawing.Bitmap
-                var bitmapData = bitmap.LockBits(sourceArea, ImageLockMode.ReadOnly, System.Drawing.Imaging.PixelFormat.Format32bppPArgb);
-
-                // Convert all pixels
-                for (int y = 0; y < bitmap.Height; y++)
-                {
-                    int offset = bitmapData.Stride * y;
-                    for (int x = 0; x < bitmap.Width; x++)
-                    {
-                        // Not optimized
-                        byte B = Marshal.ReadByte(bitmapData.Scan0, offset++);
-                        byte G = Marshal.ReadByte(bitmapData.Scan0, offset++);
-                        byte R = Marshal.ReadByte(bitmapData.Scan0, offset++);
-                        byte A = Marshal.ReadByte(bitmapData.Scan0, offset++);
-                        int rgba = R | (G << 8) | (B << 16) | (A << 24);
-                        tempStream.Write(rgba);
-                    }
-
-                }
-                bitmap.UnlockBits(bitmapData);
-                tempStream.Position = 0;
-
-                return new Bitmap(_target, new SharpDX.Size2(bitmap.Width, bitmap.Height), tempStream, stride, bitmapProperties);
-            }
-        }
-
-        public BitmapD2D LoadBitmap(DataStream bitmapStream, SharpDX.Size2 size)
-        {
-            var bitmapProperties = new BitmapProperties(new PixelFormat(SharpDX.DXGI.Format.R8G8B8A8_UNorm, AlphaMode.Premultiplied));
-            var stride = size.Width * sizeof(int);
-            return new BitmapD2D(new Bitmap(_target, size, bitmapStream, stride, bitmapProperties));
-        }
-
-        private void ZZZ()
-        {
-        }
-    }
-
-    public class BitmapD2D
-    {
-        internal Bitmap Bitmap { get; }
-        internal BitmapD2D(Bitmap bitmap)
-        {
-            Bitmap = bitmap;
+            get => RenderTarget.Transform.ToMatrix3x2();
+            set => RenderTarget.Transform = value.ToRawMatrix3X2();
         }
     }
 
