@@ -1,15 +1,15 @@
 ﻿// Copyright (c) 2010-2014 SharpDX - Alexandre Mutel
-// 
+//
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
 // in the Software without restriction, including without limitation the rights
 // to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
 // copies of the Software, and to permit persons to whom the Software is
 // furnished to do so, subject to the following conditions:
-// 
+//
 // The above copyright notice and this permission notice shall be included in
 // all copies or substantial portions of the Software.
-// 
+//
 // THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
 // IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
 // FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -102,7 +102,7 @@ namespace Fusion.Core.Mathematics
             B = blue;
             A = 255;
         }
-        
+
         /// <summary>
         /// Initializes a new instance of the <see cref="Color"/> struct.  Passed values are clamped within byte range.
         /// </summary>
@@ -116,7 +116,18 @@ namespace Fusion.Core.Mathematics
             B = ToByte(blue);
             A = ToByte(alpha);
         }
-        
+
+        /// <summary>
+        /// Converts the color from a hsb values.
+        /// </summary>
+        /// <param name="h">A radian value of hue on color circle</param>
+        /// <param name="s">A value of saturation</param>
+        /// <param name="v">A value of brightness</param>
+        /// <returns>A color.</returns>
+
+
+
+
         /// <summary>
         /// Initializes a new instance of the <see cref="Color"/> struct.  Alpha is set to 255.  Passed values are clamped within byte range.
         /// </summary>
@@ -476,7 +487,7 @@ namespace Fusion.Core.Mathematics
                 }
             }
             return s;
-        } 
+        }
 
         /// <summary>
         /// Adds two colors.
@@ -735,12 +746,12 @@ namespace Fusion.Core.Mathematics
         public static Color FromHSB(float h, float s, float v)
         {
             h = MathUtil.RadiansToDegrees(h);
-            h = (h + (float)Math.Ceiling(h / 360) * 360) % 360;            
-            int hi = (int)(Math.Floor(h / 60) % 6);            
+            h = (h + (float)Math.Ceiling(h / 360) * 360) % 360;
+            int hi = (int)(Math.Floor(h / 60) % 6);
             float vMin = (1 - s) * v;
             float a = (v - vMin) * (h % 60) / 60;
             var vInc = vMin + a;
-            var vDec = v - a;            
+            var vDec = v - a;
             switch (hi)
             {
                 case 0: return new Color(v, vInc, vMin);
@@ -751,7 +762,28 @@ namespace Fusion.Core.Mathematics
                 case 5: return new Color(v, vMin, vDec);
                 default: return Color.Zero; //impossible
             }
-            
+
+        }
+
+        public void ToHSB(out float h, out float s, out float v)
+        {
+            var Max = Math.Max(Math.Max(R, G), B);
+            var Min = Math.Min(Math.Min(R, G), B);
+            var max = (float)Max / 256;
+            var min = (float)Min / 256;
+            float r = (float)R / 255, g = (float)G / 255, b = (float)B / 255;
+            if (Max == Min) h = 0;
+            else if (Max == R && G >= B)
+                h = (float)Math.PI * 2 * ((g - b) / (max - min) / 6);
+            else if (Max == R)
+                h = (float)Math.PI * 2 * ((g - b) / (max - min) / 6 + 1);
+            else if (Max == G)
+                h = (float)Math.PI * 2 * ((b - r) / (max - min) / 6 + 1.0f / 3);
+            else
+                h = (float)Math.PI * 2 * ((r - g) / (max - min) / 6 + 2.0f / 3);
+            s = Max == 0 ? 0 : 1 - (float)min / max;
+
+            v = max;
         }
 
         /// <summary>
@@ -786,7 +818,7 @@ namespace Fusion.Core.Mathematics
         /// <param name="amount">Value between 0 and 1 indicating the weight of <paramref name="end"/>.</param>
         /// <param name="result">When the method completes, contains the linear interpolation of the two colors.</param>
         /// <remarks>
-        /// Passing <paramref name="amount"/> a value of 0 will cause <paramref name="start"/> to be returned; a value of 1 will cause <paramref name="end"/> to be returned. 
+        /// Passing <paramref name="amount"/> a value of 0 will cause <paramref name="start"/> to be returned; a value of 1 will cause <paramref name="end"/> to be returned.
         /// </remarks>
         public static void Lerp(ref Color start, ref Color end, float amount, out Color result)
         {
@@ -804,7 +836,7 @@ namespace Fusion.Core.Mathematics
         /// <param name="amount">Value between 0 and 1 indicating the weight of <paramref name="end"/>.</param>
         /// <returns>The linear interpolation of the two colors.</returns>
         /// <remarks>
-        /// Passing <paramref name="amount"/> a value of 0 will cause <paramref name="start"/> to be returned; a value of 1 will cause <paramref name="end"/> to be returned. 
+        /// Passing <paramref name="amount"/> a value of 0 will cause <paramref name="start"/> to be returned; a value of 1 will cause <paramref name="end"/> to be returned.
         /// </remarks>
         public static Color Lerp(Color start, Color end, float amount)
         {
@@ -916,7 +948,7 @@ namespace Fusion.Core.Mathematics
         /// <returns>The adjusted color.</returns>
         public static Color AdjustContrast(Color value, float contrast)
         {
-            return new Color(                
+            return new Color(
                 ToByte(0.5f + contrast * (value.R / 255.0f - 0.5f)),
                 ToByte(0.5f + contrast * (value.G / 255.0f - 0.5f)),
                 ToByte(0.5f + contrast * (value.B / 255.0f- 0.5f)),
@@ -949,7 +981,7 @@ namespace Fusion.Core.Mathematics
         {
             float grey = value.R / 255.0f * 0.2125f + value.G / 255.0f * 0.7154f + value.B / 255.0f * 0.0721f;
 
-            return new Color(                
+            return new Color(
                 ToByte(grey + saturation * (value.R / 255.0f - grey)),
                 ToByte(grey + saturation * (value.G / 255.0f - grey)),
                 ToByte(grey + saturation * (value.B / 255.0f - grey)),
@@ -1226,7 +1258,7 @@ namespace Fusion.Core.Mathematics
         /// Returns a hash code for this instance.
         /// </summary>
         /// <returns>
-        /// A hash code for this instance, suitable for use in hashing algorithms and data structures like a hash table. 
+        /// A hash code for this instance, suitable for use in hashing algorithms and data structures like a hash table.
         /// </returns>
         public override int GetHashCode()
         {
