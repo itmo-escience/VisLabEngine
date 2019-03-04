@@ -145,8 +145,12 @@ namespace WpfEditorTest.ChildPanels
 					.ContainerFromItem(frame)
 					as ItemsControl;
 			}
+			parent.UpdateLayout();
 			childNode = parent.ItemContainerGenerator.ContainerFromItem(child) as TreeViewItem;
-			childNode.IsSelected = true;
+			if (childNode != null)
+			{
+				childNode.IsSelected = true; 
+			}
 		}
 
 		public static bool IsInFirstHalf( FrameworkElement container, Point mousePosition)
@@ -185,7 +189,7 @@ namespace WpfEditorTest.ChildPanels
 				customAdorner.Visibility = Visibility.Visible;
 				var toAncestor = (treeViewItemHolder.TransformToAncestor(ElementHierarchyView) as Transform);
 
-				if (treeViewItemHolder.Tag is UIContainer)
+				if (treeViewItemHolder.Tag is UIContainer && !(treeViewItemHolder.Tag is UIController))
 				{
 					e.Effects = DragDropEffects.Copy | DragDropEffects.Move;
 					treeViewItemHolder.Background = ApplicationConfig.TreeViewItemHolderAllowedHoveredColor;
@@ -237,7 +241,7 @@ namespace WpfEditorTest.ChildPanels
 			if (e.Data.GetDataPresent(DataFormats.FileDrop))
 			{
 				UIComponent dataComponent = (UIComponent)e.Data.GetData(DataFormats.FileDrop);
-				if (dataComponent !=null && treeViewItemHolder != this.initTreeViewItemHolder)
+				if (dataComponent !=null && treeViewItemHolder != this.initTreeViewItemHolder && treeViewItemHolder.Tag is UIComponent)
 				{
 					IEditorCommand command = null;
 					int index = (treeViewItemHolder.Tag as UIComponent).Parent.Children.IndexOf(treeViewItemHolder.Tag as UIComponent);
@@ -255,7 +259,7 @@ namespace WpfEditorTest.ChildPanels
 							}
 						case 0:
 							{
-								if (treeViewItemHolder.Tag is UIContainer)
+								if (treeViewItemHolder.Tag is UIContainer && !(treeViewItemHolder.Tag is UIController))
 									command = new FrameParentChangeCommand(dataComponent, treeViewItemHolder.Tag as UIContainer, dataComponent.Parent);
 								break;
 							}
