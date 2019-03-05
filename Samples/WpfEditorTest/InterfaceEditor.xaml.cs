@@ -918,7 +918,7 @@ namespace WpfEditorTest
 			bool unloadingConfirmed = this.CheckForChanges(sceneData);
 			if (!unloadingConfirmed)
 			{
-				return unloadingConfirmed;
+				return !unloadingConfirmed;
 			}
 
 			if (index == 0)
