@@ -55,10 +55,11 @@ namespace Fusion.Engine.Frames2.Controllers
 
         private void OnMouseUp(UIComponent sender, ClickEventArgs e)
         {
-            if(CurrentState == Pressed)
+            if (CurrentState == Pressed)
+            {
                 ButtonClick?.Invoke(this, new ButtonClickEventArgs(this));
-
-            ChangeState(sender.IsInside(e.Position) ? State.Hovered : State.Default);
+                ChangeState(sender.IsInside(e.Position) ? State.Hovered : State.Default);
+            }
         }
 
         public event EventHandler<ButtonClickEventArgs> ButtonClick;
