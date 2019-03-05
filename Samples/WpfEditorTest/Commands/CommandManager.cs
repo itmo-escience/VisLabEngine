@@ -67,6 +67,15 @@ namespace WpfEditorTest.UndoRedo
 			command.Do();
 		}
 
+		public void ExecuteWithoutSettingDirty( IEditorCommand command )
+		{
+			command.Do();
+			_undoCommands.Push(command);
+			_doCommands.Clear();
+			OnPropertyChanged(nameof(UndoStackIsNotEmpty));
+			OnPropertyChanged(nameof(RedoStackIsNotEmpty));
+		}
+
 		public void Reset()
 		{
 			_undoCommands.Clear();

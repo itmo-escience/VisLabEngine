@@ -6,6 +6,7 @@ using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows;
 
 namespace WpfEditorTest.Utility
 {
@@ -20,14 +21,26 @@ namespace WpfEditorTest.Utility
 		public string SceneFileFullPath { get; set; } = null;
 		public UIContainer Scene { get; set; }
 		public bool IsDirty { get => _isDirty; set { _isDirty = value; SceneName = _sceneName; OnPropertyChanged(); } }
-		public SceneDataContainer( float width, float height )
+		public double SceneZoom { get; set; }
+		public List<UIComponent> SceneSelection { get; set; }
+		public Size SceneSize { get; set; }
+
+		public SceneDataContainer()
 		{
-			Scene = new FreePlacement(0, 0, width, height) { Name = "SCENE" };
+			SceneZoom = 1.0f;
+			SceneSelection = new List<UIComponent>();
 		}
 
-		public SceneDataContainer( UIContainer scene )
+		public SceneDataContainer( float width, float height ) : this()
+		{
+			Scene = new FreePlacement(0, 0, width, height) { Name = "SCENE" };
+			SceneSize = new Size(width, height);
+		}
+
+		public SceneDataContainer( UIContainer scene ) : this()
 		{
 			Scene = scene;
+			SceneSize = new Size(Scene.Width, Scene.Height);
 		}
 
 		protected void OnPropertyChanged( [System.Runtime.CompilerServices.CallerMemberName] string changedProperty = "" )

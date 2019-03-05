@@ -83,6 +83,8 @@ namespace WpfEditorTest
 			{
 				if (_currentScene != null && RootFrame.Children.Contains(_currentScene.Scene))
 				{
+					_currentScene.SceneSelection = SelectionManager.Instance.SelectedFrames;
+					_currentScene.SceneZoom = ZoomerSlider.Value;
 					SelectionManager.Instance.SelectFrame(new List<UIComponent> { });
 					RootFrame.Remove(_currentScene.Scene);
 					foreach (var panel in SelectionLayer.FrameSelectionPanelList.Values)
@@ -95,6 +97,8 @@ namespace WpfEditorTest
 				_currentScene = value;
 				RootFrame.Add(_currentScene.Scene);
 				SceneFrame = _currentScene.Scene;
+				ZoomerSlider.Value = _currentScene.SceneZoom;
+
 			}
 		}
 
@@ -186,7 +190,7 @@ namespace WpfEditorTest
 			_treeView.SelectedFrameChangedInUI += ( _, frame ) =>
 			{
 				var command = new SelectFrameCommand(new List<UIComponent> { frame });
-				CommandManager.Instance.Execute(command);
+				CommandManager.Instance.ExecuteWithoutSettingDirty(command);
 			};
 			_treeView.ControllerSlotSelected += ( _, slot ) =>
 			{
@@ -327,14 +331,14 @@ namespace WpfEditorTest
 				var createdFrame = CreateFrameFromFile(openDialog.FileName);
 				if (createdFrame != null && createdFrame.GetType().BaseType == typeof(UIContainer))
 				{
-					SelectionManager.Instance.SelectFrame(new List<UIComponent> { });
-					RootFrame.Remove(SceneFrame);
-					foreach (var panel in SelectionLayer.FrameSelectionPanelList.Values)
-					{
-						var commands = SelectionLayer.ResetSelectedFrame(new Point(0, 0), panel);
-						var command = new CommandGroup(commands.ToArray());
-						CommandManager.Instance.ExecuteWithoutMemorising(command);
-					}
+					//SelectionManager.Instance.SelectFrame(new List<UIComponent> { });
+					//RootFrame.Remove(SceneFrame);
+					//foreach (var panel in SelectionLayer.FrameSelectionPanelList.Values)
+					//{
+					//	var commands = SelectionLayer.ResetSelectedFrame(new Point(0, 0), panel);
+					//	var command = new CommandGroup(commands.ToArray());
+					//	CommandManager.Instance.ExecuteWithoutMemorising(command);
+					//}
 
 					var loadedScene = new SceneDataContainer(createdFrame as UIContainer) { SceneFileFullPath = openDialog.FileName, SceneName = openDialog.FileName.Split('\\').Last().Split('.').First() };
 
@@ -365,14 +369,14 @@ namespace WpfEditorTest
 		{
 			//if (!this.CheckForChanges())
 			//	return;
-			SelectionManager.Instance.SelectFrame(new List<UIComponent> { });
-			RootFrame.Remove(SceneFrame);
-			foreach (var panel in SelectionLayer.FrameSelectionPanelList.Values)
-			{
-				var commands = SelectionLayer.ResetSelectedFrame(new Point(0, 0), panel);
-				var command = new CommandGroup(commands.ToArray());
-				CommandManager.Instance.ExecuteWithoutMemorising(command);
-			}
+			//SelectionManager.Instance.SelectFrame(new List<UIComponent> { });
+			//RootFrame.Remove(SceneFrame);
+			//foreach (var panel in SelectionLayer.FrameSelectionPanelList.Values)
+			//{
+			//	var commands = SelectionLayer.ResetSelectedFrame(new Point(0, 0), panel);
+			//	var command = new CommandGroup(commands.ToArray());
+			//	CommandManager.Instance.ExecuteWithoutMemorising(command);
+			//}
 			var newScene = new SceneDataContainer(RootFrame.Width, RootFrame.Height);
 
 			SceneFrame = newScene.Scene;
@@ -1053,6 +1057,7 @@ namespace WpfEditorTest
 					};
 					_treeView.ElementHierarchyView.SetBinding(TreeView.ItemsSourceProperty, _childrenBinding);
 					_treeView.AttachScene(SceneFrame);
+					SelectionManager.Instance.SelectFrame(CurrentScene.SceneSelection);
 				}
 				else
 				{
