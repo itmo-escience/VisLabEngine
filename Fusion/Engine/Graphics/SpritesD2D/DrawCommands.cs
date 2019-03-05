@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using Fusion.Drivers.Graphics;
 using SharpDX.Direct2D1;
 using Matrix3x2 = Fusion.Core.Mathematics.Matrix3x2;
 using RectangleF = Fusion.Core.Mathematics.RectangleF;
@@ -227,41 +228,35 @@ namespace Fusion.Engine.Graphics.SpritesD2D
         public float Width, Height;
         public float Opacity;
         private readonly RectangleF _sourceRect;
-        private Bitmap _dxBitmap;
-        private readonly System.Drawing.Image _sourceImage;
+        private BitmapD2D _bitmap;
+        private readonly Texture2D _texture;
+        private bool _bitmapIsLoaded = false;
 
-        public DrawBitmap(float x, float y, System.Drawing.Image image, float opacity = 1)
-        {
-            _x = x;
-            _y = y;
-            Width = image.Width;
-            Height = image.Height;
-            _sourceRect = new RectangleF(0, 0, image.Width, image.Height);
-            Opacity = opacity;
-            _sourceImage = image;
-        }
+        public DrawBitmap(float x, float y, Texture2D texture, float opacity = 1) : this(x, y, texture.Width, texture.Height, texture, opacity) {}
 
-        public DrawBitmap(float x, float y, float width, float height, System.Drawing.Image image, float opacity = 1)
+        public DrawBitmap(float x, float y, float width, float height, Texture2D texture, float opacity = 1)
         {
             _x = x;
             _y = y;
             Width = width;
             Height = height;
-            _sourceRect = new RectangleF(0, 0, image.Width, image.Height);
+            _sourceRect = new RectangleF(0, 0, texture.Width, texture.Height);
             Opacity = opacity;
-            _sourceImage = image;
+            _bitmap = null;
+            _texture = texture;
         }
 
         public void Apply(RenderTargetD2D target)
         {
-            if(_dxBitmap == null)
-                _dxBitmap = target.ToBitmap(_sourceImage);
-
-            target.DrawBitmap(new BitmapD2D(_dxBitmap),
-                new RectangleF(_x, _y, Width, Height),
-                Opacity,
-                _sourceRect
-            );
+            if (!_bitmapIsLoaded)
+            {
+                _bitmap = BitmapD2D.FromTexture2D(_texture, target);
+                _bitmapIsLoaded = true;
+            }
+            if (_bitmap != null)
+            {
+                target.DrawBitmap(_bitmap, new RectangleF(_x, _y, Width, Height), Opacity, _sourceRect);
+            }
         }
 
         public override string ToString()

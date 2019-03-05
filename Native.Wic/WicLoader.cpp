@@ -6,7 +6,7 @@
 
 using namespace DirectX;
 
-bool Native::Wic::WicLoader::CreateTextureFromMemory( IntPtr device, array<Byte>^ fileInMemory, bool forceSRgb, IntPtr %resource, IntPtr %srv )
+bool Native::Wic::WicLoader::CreateTextureFromMemory( IntPtr device, array<Byte>^ fileInMemory, bool forceSRgb, bool noMips, IntPtr %resource, IntPtr %srv )
 {
 	ID3D11Resource *d3dres;
 	ID3D11ShaderResourceView *d3dsrv;
@@ -16,7 +16,7 @@ bool Native::Wic::WicLoader::CreateTextureFromMemory( IntPtr device, array<Byte>
 
 	HRESULT	hr = CreateWICTextureFromMemoryEx( 
 						(ID3D11Device*)device.ToPointer(), 
-						(uint8_t*)dataPtr, dataSize, 0, D3D11_USAGE_DEFAULT, D3D11_BIND_SHADER_RESOURCE, 0, 0, forceSRgb,
+						(uint8_t*)dataPtr, dataSize, 0, D3D11_USAGE_DEFAULT, D3D11_BIND_SHADER_RESOURCE, 0, 0, forceSRgb, noMips,
 						&d3dres, &d3dsrv );
 
 	if (FAILED(hr)) {

@@ -1143,6 +1143,7 @@ static HRESULT CreateTextureFromDDS( _In_ ID3D11Device* d3dDevice,
                                      _In_ unsigned int cpuAccessFlags,
                                      _In_ unsigned int miscFlags,
                                      _In_ bool forceSRGB,
+	_In_ bool noMips,
                                      _Outptr_opt_ ID3D11Resource** texture,
                                      _Outptr_opt_ ID3D11ShaderResourceView** textureView )
 {
@@ -1430,7 +1431,10 @@ static HRESULT CreateTextureFromDDS( _In_ ID3D11Device* d3dDevice,
 
         if ( SUCCEEDED(hr) )
         {
-            hr = CreateD3DResources( d3dDevice, resDim, twidth, theight, tdepth, mipCount - skipMip, arraySize,
+			int mCountTemp = mipCount - skipMip;
+			if (noMips) mCountTemp = 1;
+
+            hr = CreateD3DResources( d3dDevice, resDim, twidth, theight, tdepth, mCountTemp, arraySize,
                                      format, usage, bindFlags, cpuAccessFlags, miscFlags, forceSRGB,
                                      isCubeMap, initData.get(), texture, textureView );
 
@@ -1522,7 +1526,7 @@ HRESULT DirectX::CreateDDSTextureFromMemory( ID3D11Device* d3dDevice,
                                              DDS_ALPHA_MODE* alphaMode )
 {
     return CreateDDSTextureFromMemoryEx( d3dDevice, nullptr, ddsData, ddsDataSize, maxsize,
-                                         D3D11_USAGE_DEFAULT, D3D11_BIND_SHADER_RESOURCE, 0, 0, false,
+                                         D3D11_USAGE_DEFAULT, D3D11_BIND_SHADER_RESOURCE, 0, 0, false, false,
                                          texture, textureView, alphaMode );
 }
 
@@ -1537,7 +1541,7 @@ HRESULT DirectX::CreateDDSTextureFromMemory( ID3D11Device* d3dDevice,
                                              DDS_ALPHA_MODE* alphaMode )
 {
     return CreateDDSTextureFromMemoryEx( d3dDevice, d3dContext, ddsData, ddsDataSize, maxsize,
-                                         D3D11_USAGE_DEFAULT, D3D11_BIND_SHADER_RESOURCE, 0, 0, false,
+                                         D3D11_USAGE_DEFAULT, D3D11_BIND_SHADER_RESOURCE, 0, 0, false, false,
                                          texture, textureView, alphaMode );
 }
 
@@ -1551,12 +1555,13 @@ HRESULT DirectX::CreateDDSTextureFromMemoryEx( ID3D11Device* d3dDevice,
                                                unsigned int cpuAccessFlags,
                                                unsigned int miscFlags,
                                                bool forceSRGB,
+	bool noMips,
                                                ID3D11Resource** texture,
                                                ID3D11ShaderResourceView** textureView,
                                                DDS_ALPHA_MODE* alphaMode )
 {
     return CreateDDSTextureFromMemoryEx( d3dDevice, nullptr, ddsData, ddsDataSize, maxsize,
-                                         usage, bindFlags, cpuAccessFlags, miscFlags, forceSRGB,
+                                         usage, bindFlags, cpuAccessFlags, miscFlags, forceSRGB, noMips,
                                          texture, textureView, alphaMode );
 }
 
@@ -1571,6 +1576,7 @@ HRESULT DirectX::CreateDDSTextureFromMemoryEx( ID3D11Device* d3dDevice,
                                                unsigned int cpuAccessFlags,
                                                unsigned int miscFlags,
                                                bool forceSRGB,
+	bool noMips,
                                                ID3D11Resource** texture,
                                                ID3D11ShaderResourceView** textureView,
                                                DDS_ALPHA_MODE* alphaMode )
@@ -1634,7 +1640,7 @@ HRESULT DirectX::CreateDDSTextureFromMemoryEx( ID3D11Device* d3dDevice,
 
     HRESULT hr = CreateTextureFromDDS( d3dDevice, d3dContext, header,
                                        ddsData + offset, ddsDataSize - offset, maxsize,
-                                       usage, bindFlags, cpuAccessFlags, miscFlags, forceSRGB,
+                                       usage, bindFlags, cpuAccessFlags, miscFlags, forceSRGB, noMips,
                                        texture, textureView );
     if ( SUCCEEDED(hr) )
     {
