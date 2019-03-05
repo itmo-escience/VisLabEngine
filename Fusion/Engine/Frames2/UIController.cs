@@ -58,7 +58,7 @@ namespace Fusion.Engine.Frames2
 
             CurrentState = newState;
 
-            Log.Verbose(CurrentState);
+            Log.Verbose(GetType().Name + " now " + CurrentState);
         }
 
         internal void Attach(Slot slot, UIComponent component)
