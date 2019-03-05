@@ -518,15 +518,18 @@ namespace WpfEditorTest
 
 		public UIComponent CreateFrameFromFile( string filePath )
 		{
-			UIComponent createdFrame;
+			UIComponent createdFrame = null;
 			try
 			{
 				Fusion.Core.Utils.UIComponentSerializer.Read(filePath, out createdFrame);
 			}
-			catch (Exception)
+			catch (Exception ex)
 			{
-
-				throw;
+				Fusion.Log.Error($"---------------ERROR---------------");
+				Fusion.Log.Error($"Could not deserialize file \"{filePath}\".\n");
+				Fusion.Log.Error($"Next exception is thrown:\n{ex.Message}\n");
+				Fusion.Log.Error($"Exception stack trace:\n{ex.StackTrace}");
+				Fusion.Log.Error($"---------------ERROR---------------\n");
 			}
 			return createdFrame;
 		}

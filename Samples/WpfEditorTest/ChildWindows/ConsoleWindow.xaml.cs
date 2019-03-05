@@ -81,14 +81,46 @@ namespace WpfEditorTest.ChildWindows
         private void UpdateOutputText()
         {
             string messages = "";
+			Paragraph paragraph = new Paragraph();
             foreach (LogMessage message in LogRecorder.GetLines())
             {
                 if (message.MessageType >= _lowestMessageLevelToPrint)
                 {
-                    messages += message.MessageText + Environment.NewLine;
-                }
+					//messages += message.MessageText + Environment.NewLine;
+					var text = new Run(message.MessageText + Environment.NewLine);
+					switch (message.MessageType)
+					{
+						case LogMessageType.Debug:
+							text.Foreground = Brushes.DarkGray;
+							text.Background = Brushes.Black;
+							break;
+						case LogMessageType.Verbose:
+							text.Foreground = Brushes.Gray;
+							text.Background = Brushes.Black;
+							break;
+						case LogMessageType.Information:
+							text.Foreground = Brushes.White;
+							text.Background = Brushes.Black;
+							break;
+						case LogMessageType.Warning:
+							text.Foreground = Brushes.Yellow;
+							text.Background = Brushes.Black;
+							break;
+						case LogMessageType.Error:
+							text.Foreground = Brushes.Red;
+							text.Background = Brushes.Black;
+							break;
+						case LogMessageType.Fatal:
+							text.Foreground = Brushes.Black;
+							text.Background = Brushes.Red;
+							break;
+					}
+					paragraph.Inlines.Add(text);
+				}
             }
-            OutputField.Text = messages;
+
+			OutputField.Document.Blocks.Clear();
+			OutputField.Document.Blocks.Add(paragraph);
             ScrollViewer.ScrollToEnd();
         }
 	}
