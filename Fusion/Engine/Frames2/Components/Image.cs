@@ -1,7 +1,9 @@
 ﻿using Fusion.Drivers.Graphics;
 using Fusion.Engine.Common;
 using Fusion.Engine.Frames2.Managing;
+using Fusion.Engine.Graphics;
 using Fusion.Engine.Graphics.SpritesD2D;
+using System.Xml.Serialization;
 
 namespace Fusion.Engine.Frames2.Components
 {
@@ -16,14 +18,45 @@ namespace Fusion.Engine.Frames2.Components
         }
 
         private Texture2D _texture;
-        public Texture2D Texture {
-            get => _texture;
-            set {
+		[XmlIgnore]
+		public Texture2D Texture {
+			get
+			{
+				if (_texture != null)
+				{
+					return _texture;
+				}
+				else if (!string.IsNullOrEmpty(TextureName))
+				{
+					_texture = Game.Instance.Content.Load<Texture2D>(_textureName);
+					return _texture;
+				}
+				else
+				{
+					return null;
+				}
+			}
+			set {
                 SetAndNotify(ref _texture, value);
-            }
+				SetAndNotify(ref _textureName, null);
+			}
         }
 
-        private DrawBitmap _drawCommand;
+
+		private string _textureName;
+
+		public string TextureName
+		{
+			get
+			{
+				return _textureName;
+			}
+			set
+			{
+				SetAndNotify(ref _textureName, value);
+			}
+		}
+		private DrawBitmap _drawCommand;
 
         public Image() : this(0, 0, 0, 0, null, 1)
         {
@@ -33,9 +66,38 @@ namespace Fusion.Engine.Frames2.Components
         {
         }
 
-        public Image(float x, float y, float width, float height, Texture2D texture, float opacity = 1) : base(x, y, width, height)
+		public Image( float x, float y, string textureName, float opacity = 1 ) : base(x, y)
+		{
+			Opacity = opacity;
+			_textureName = textureName;
+
+			if (Texture != null)
+			{
+				Width = Texture.Width;
+				Height = Texture.Height; 
+			}
+
+			UpdateDrawCommand();
+
+			PropertyChanged += ( s, e ) =>
+			{
+				if ((e.PropertyName == nameof(Width)) || (e.PropertyName == nameof(Height)) || (e.PropertyName == nameof(Opacity)))
+				{
+					UpdateDrawCommand();
+				}
+			};
+		}
+
+		public Image(float x, float y, float width, float height, Texture2D texture, float opacity = 1) : base(x, y, width, height)
         {
-            Texture = texture;
+			if (texture!=null)
+			{
+				Texture = texture;
+			}
+			else
+			{
+
+			}
             Opacity = opacity;
 
             UpdateDrawCommand();
@@ -51,14 +113,33 @@ namespace Fusion.Engine.Frames2.Components
 
         private void UpdateDrawCommand()
         {
-            _drawCommand = new DrawBitmap(0, 0, Width, Height, Texture, Opacity);
+			if (Texture!=null)
+			{
+				_drawCommand = new DrawBitmap(0, 0, Width, Height, Texture, Opacity);
+			}
+			else
+			{
+				_drawCommand = null;
+			}
         }
 
         public override void Update(GameTime gameTime) { }
 
         public override void Draw(SpriteLayerD2D layer)
         {
-            layer.Draw(_drawCommand);
-        }
+			if (_drawCommand!= null)
+			{
+				layer.Draw(_drawCommand);
+			}
+			else
+			{
+				layer.Draw(new FillRect(0, 0, Width, Height, new SolidBrushD2D(new Core.Mathematics.Color4(0, 0, 0, 1))));
+				layer.Draw(new Line(new Core.Mathematics.Vector2(0, 0), new Core.Mathematics.Vector2(Width, Height), new SolidBrushD2D(new Core.Mathematics.Color4(1, 0, 0, 1))));
+				layer.Draw(new Line(new Core.Mathematics.Vector2(0, Height), new Core.Mathematics.Vector2(Width, 0), new SolidBrushD2D(new Core.Mathematics.Color4(1, 0, 0, 1))));
+				layer.Draw(new Rect(0, 0, Width, Height, new SolidBrushD2D(new Core.Mathematics.Color4(1, 1, 1, 1))));
+			}
+
+
+		}
     }
 }

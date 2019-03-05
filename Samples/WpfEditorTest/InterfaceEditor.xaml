@@ -165,8 +165,31 @@
             <TabControl.ItemTemplate>
                 <!-- this is the header template-->
                 <DataTemplate>
-                    <TextBlock
-                    Text="{Binding SceneName}" Height="28"/>
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="28"/>
+                        </Grid.RowDefinitions>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="auto"/>
+                            <ColumnDefinition Width="5"/>
+                            <ColumnDefinition Width="auto"/>
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Text="{Binding SceneName}" Grid.Column="0" Height="18">
+                            <TextBlock.Style>
+                                <Style TargetType="TextBlock">
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding IsDirty}" Value="True">
+                                            <Setter Property="FontWeight" Value="Bold" />
+                                        </DataTrigger>
+                                        <DataTrigger Binding="{Binding IsDirty}" Value="False">
+                                            <Setter Property="FontWeight" Value="Normal" />
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </TextBlock.Style>
+                        </TextBlock>
+                        <Button Content="X" Click="CloseTabButton_Click" Width="18" Height="18" Grid.Column="2" Tag="{Binding}"></Button>
+                    </Grid>
                 </DataTemplate>
             </TabControl.ItemTemplate>
             <!--<TabItem Header="tab1"></TabItem>
