@@ -254,7 +254,26 @@ namespace GISTest
             UIManager.Root.Add(tb);
             #endregion
 
+            //
+            RadioButtonController rbtn = new RadioButtonController(500, 100);
+            float height = 25;
+            rbtn.Background.Attach(new Border(0, 0, 100, height));
+            rbtn.RadioButton.Attach(new Border(0, 0, height, height));
+            rbtn.Text.Attach(new Label("RadioButton", new TextFormatD2D("Calibry", 12), height, 0, 100 - height, height));
 
+            var radioButtoncolor = new UIController.PropertyValue("BackgroundColor", new Color4(1.0f, 0.0f, 0.0f, 1.0f));
+            radioButtoncolor[UIController.State.Hovered] = new Color4(0.5f, 0.0f, 0.0f, 1.0f);
+            radioButtoncolor[UIController.State.Disabled] = new Color4(1.0f, 0.5f, 0.5f, 1.0f);
+            radioButtoncolor[RadioButtonController.Pressed] = new Color4(0.5f, 0.5f, 0.0f, 1.0f);
+            radioButtoncolor[RadioButtonController.Checked] = new Color4(0.0f, 1.0f, 0.0f, 1.0f);
+            radioButtoncolor[RadioButtonController.CheckedHovered] = new Color4(0.0f, 0.5f, 0.0f, 1.0f);
+            radioButtoncolor[RadioButtonController.CheckedDisabled] = new Color4(0.5f, 1.0f, 0.5f, 1.0f);
+
+            rbtn.RadioButton.Properties.Add(radioButtoncolor);
+
+            UIManager.Root.Add(rbtn);
+
+            //
 
             userInterface.RootFrame = this.rootFrame = new MainFrame(FrameProcessor);
 			viewLayer.SpriteLayers.Add(userInterface.FramesSpriteLayer);
