@@ -96,6 +96,8 @@ namespace DirectX
                                           _In_ unsigned int cpuAccessFlags,
                                           _In_ unsigned int miscFlags,
                                           _In_ bool forceSRGB,
+		_In_ bool noMips,
+
                                           _Out_opt_ ID3D11Resource** texture,
                                           _Out_opt_ ID3D11ShaderResourceView** textureView
                                       );
@@ -123,6 +125,8 @@ namespace DirectX
                                           _In_ unsigned int cpuAccessFlags,
                                           _In_ unsigned int miscFlags,
                                           _In_ bool forceSRGB,
+		_In_ bool noMips,
+
                                           _Out_opt_ ID3D11Resource** texture,
                                           _Out_opt_ ID3D11ShaderResourceView** textureView
                                       );

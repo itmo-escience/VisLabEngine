@@ -179,11 +179,11 @@ namespace GISTest
 		    UIManager.DebugEnabled = false;
 
             txt = new Fusion.Engine.Frames2.Components.Label("z", new TextFormatD2D("Calibri", 20), 150, 450, 100, 100);
-            string fileName = @"C:\image.png";
-            img1 = new Image(0, 0, 200, 75, fileName, 1);
-            img2 = new Image(125, 0, 75, 200, fileName, 1);
-            img3 = new Image(0, 125, 200, 75, fileName, 1);
-            img4 = new Image(0, 0, 75, 200, fileName, 1);
+            var image = Game.Content.Load<Fusion.Drivers.Graphics.Texture2D>(@"UI-new\fv_palette_bg|nomips");
+            img1 = new Image(0, 0, 200, 75, image, 1);
+            img2 = new Image(125, 0, 75, 200, image, 1);
+            img3 = new Image(0, 125, 200, 75, image, 1);
+            img4 = new Image(0, 0, 75, 200, image, 1);
 
             FreePlacement freePlacement = new FreePlacement(300, 300, 200, 200, true);
             freePlacement.Name = "ImageFreePlacement";
@@ -194,7 +194,7 @@ namespace GISTest
 
             //
 
-            SerializableList<UIComponent> list = new SerializableList<UIComponent>();
+            /*SerializableList<UIComponent> list = new SerializableList<UIComponent>();
             list.Add(img3);
             list.Add(img4);
 
@@ -215,7 +215,7 @@ namespace GISTest
             }
 
             freePlacement.Add(list[0]);
-            freePlacement.Add(list[1]);
+            freePlacement.Add(list[1]);*/
 
             //
 

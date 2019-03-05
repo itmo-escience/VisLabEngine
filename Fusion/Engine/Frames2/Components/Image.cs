@@ -1,4 +1,5 @@
-﻿using Fusion.Engine.Common;
+﻿using Fusion.Drivers.Graphics;
+using Fusion.Engine.Common;
 using Fusion.Engine.Frames2.Managing;
 using Fusion.Engine.Graphics.SpritesD2D;
 
@@ -14,79 +15,50 @@ namespace Fusion.Engine.Frames2.Components
             }
         }
 
-        private DrawBitmap _image;
-
-        private string _sourseFile;
-        public string SourceFile {
-            get => _sourseFile;
+        private Texture2D _texture;
+        public Texture2D Texture {
+            get => _texture;
             set {
-                _sourseFile = value;
-                var source = System.Drawing.Image.FromFile(value);
-                _image = new DrawBitmap(0, 0, Width, Height, source, Opacity);
+                SetAndNotify(ref _texture, value);
             }
         }
 
-        public Image() : base() {
-            Opacity = 1;
-            _sourseFile = "";
+        private DrawBitmap _drawCommand;
 
-            PropertyChanged += (s, e) =>
-            {
-                if ((e.PropertyName == nameof(Width)) || (e.PropertyName == nameof(Height)) || (e.PropertyName == nameof(Opacity)))
-                {
-                    UpdateImage();
-                }
-            };
+        public Image() : this(0, 0, 0, 0, null, 1)
+        {
         }
 
-        public Image(float x, float y, string file, float opacity = 1) : base(x, y)
+        public Image(float x, float y, Texture2D texture, float opacity = 1) : this(x, y, texture.Width, texture.Height, texture, opacity)
         {
+        }
+
+        public Image(float x, float y, float width, float height, Texture2D texture, float opacity = 1) : base(x, y, width, height)
+        {
+            Texture = texture;
             Opacity = opacity;
 
-            var source = System.Drawing.Image.FromFile(file);
-            Width = source.Width;
-            Height = source.Height;
-
-            _image = new DrawBitmap(0, 0, source, Opacity);
+            UpdateDrawCommand();
 
             PropertyChanged += (s, e) =>
             {
                 if ((e.PropertyName == nameof(Width)) || (e.PropertyName == nameof(Height)) || (e.PropertyName == nameof(Opacity)))
                 {
-                    UpdateImage();
+                    UpdateDrawCommand();
                 }
             };
         }
 
-        public Image(float x, float y, float width, float height, string file, float opacity = 1) : base(x, y, width, height)
+        private void UpdateDrawCommand()
         {
-            Opacity = opacity;
-            SourceFile = file;
-
-            PropertyChanged += (s, e) =>
-            {
-                if ((e.PropertyName == nameof(Width)) || (e.PropertyName == nameof(Height)) || (e.PropertyName == nameof(Opacity)))
-                {
-                    UpdateImage();
-                }
-            };
-        }
-
-        private void UpdateImage()
-        {
-			if (_image!=null)
-			{
-				_image.Width = Width;
-				_image.Height = Height;
-				_image.Opacity = Opacity;
-			}
+            _drawCommand = new DrawBitmap(0, 0, Width, Height, Texture, Opacity);
         }
 
         public override void Update(GameTime gameTime) { }
 
         public override void Draw(SpriteLayerD2D layer)
         {
-            layer.Draw(_image);
+            layer.Draw(_drawCommand);
         }
     }
 }
