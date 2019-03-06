@@ -133,10 +133,13 @@ namespace Fusion.Engine.Frames2.Components
 			}
 			else
 			{
-				layer.Draw(new FillRect(0, 0, Width, Height, new SolidBrushD2D(new Core.Mathematics.Color4(0, 0, 0, 1))));
-				layer.Draw(new Line(new Core.Mathematics.Vector2(0, 0), new Core.Mathematics.Vector2(Width, Height), new SolidBrushD2D(new Core.Mathematics.Color4(1, 0, 0, 1))));
-				layer.Draw(new Line(new Core.Mathematics.Vector2(0, Height), new Core.Mathematics.Vector2(Width, 0), new SolidBrushD2D(new Core.Mathematics.Color4(1, 0, 0, 1))));
-				layer.Draw(new Rect(0, 0, Width, Height, new SolidBrushD2D(new Core.Mathematics.Color4(1, 1, 1, 1))));
+				var groupCommand = new DrawGroup(
+					new FillRect(0, 0, Width, Height, new SolidBrushD2D(new Core.Mathematics.Color4(0, 0, 0, 1))),
+					new Line(new Core.Mathematics.Vector2(0, 0), new Core.Mathematics.Vector2(Width, Height), new SolidBrushD2D(new Core.Mathematics.Color4(1, 0, 0, 1))),
+					new Line(new Core.Mathematics.Vector2(0, Height), new Core.Mathematics.Vector2(Width, 0), new SolidBrushD2D(new Core.Mathematics.Color4(1, 0, 0, 1))),
+					new Rect(0, 0, Width, Height, new SolidBrushD2D(new Core.Mathematics.Color4(1, 1, 1, 1)))
+					);
+				layer.Draw(groupCommand);
 			}
 
 
