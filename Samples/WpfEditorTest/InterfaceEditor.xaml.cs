@@ -264,8 +264,10 @@ namespace WpfEditorTest
 			{
 				Application.Current.Dispatcher.InvokeAsync(() =>
 				{
-					RootFrame = null; // (_engine.GameInterface as CustomGameInterface).GetUIRoot();
-					throw new Exception("This should be redone");
+					RootFrame = (_engine.GameInterface as ICustomizableUI)?.GetUIRoot();
+					if (RootFrame == null) {
+						throw new Exception("RootFrame is null, looks like GameInterface is not implementing ICustomizableUI");
+					}
 
 					var rootChildren = new List<UIComponent>(RootFrame.Children);
 					var startScene = new SceneDataContainer(RootFrame.Width, RootFrame.Height);
