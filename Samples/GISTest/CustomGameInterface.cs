@@ -178,6 +178,7 @@ namespace GISTest
             UIManager = new UIManager(Game.RenderSystem);
 		    UIManager.DebugEnabled = false;
 
+            /*
             txt = new Fusion.Engine.Frames2.Components.Label("z", new TextFormatD2D("Calibri", 20), 150, 450, 100, 100);
             var image = Game.Content.Load<Fusion.Drivers.Graphics.Texture2D>(@"UI-new\fv_palette_bg|nomips");
             img1 = new Image(0, 0, 200, 75, image, 1);
@@ -219,11 +220,11 @@ namespace GISTest
 
             //
 
-            UIManager.Root.Add(freePlacement);
-
+            //UIManager.Root.Add(freePlacement);
+            
             #endregion
 
-
+            /*
             #region button
             var btn = new ButtonController(100, 100);
 
@@ -253,27 +254,42 @@ namespace GISTest
 
             UIManager.Root.Add(tb);
             #endregion
+    */
+            #region radioButtons
 
-            //
-            RadioButtonController rbtn = new RadioButtonController(500, 100);
-            float height = 25;
-            rbtn.Background.Attach(new Border(0, 0, 100, height));
-            rbtn.RadioButton.Attach(new Border(0, 0, height, height));
-            rbtn.Text.Attach(new Label("RadioButton", new TextFormatD2D("Calibry", 12), height, 0, 100 - height, height));
+            RadioButtonController CreateSimpleRadioButton(float x, float y)
+            {
+                RadioButtonController rbtn = new RadioButtonController(x, y);
+                float height = 25;
+                rbtn.Background.Attach(new Border(0, 0, 100, height));
+                rbtn.RadioButton.Attach(new Border(0, 0, height, height));
+                rbtn.Text.Attach(new Label("RadioButton", new TextFormatD2D("Calibry", 12), height, 0, 100 - height, height));
 
-            var radioButtoncolor = new UIController.PropertyValue("BackgroundColor", new Color4(1.0f, 0.0f, 0.0f, 1.0f));
-            radioButtoncolor[UIController.State.Hovered] = new Color4(0.5f, 0.0f, 0.0f, 1.0f);
-            radioButtoncolor[UIController.State.Disabled] = new Color4(1.0f, 0.5f, 0.5f, 1.0f);
-            radioButtoncolor[RadioButtonController.Pressed] = new Color4(0.5f, 0.5f, 0.0f, 1.0f);
-            radioButtoncolor[RadioButtonController.Checked] = new Color4(0.0f, 1.0f, 0.0f, 1.0f);
-            radioButtoncolor[RadioButtonController.CheckedHovered] = new Color4(0.0f, 0.5f, 0.0f, 1.0f);
-            radioButtoncolor[RadioButtonController.CheckedDisabled] = new Color4(0.5f, 1.0f, 0.5f, 1.0f);
+                var radioButtoncolor = new UIController.PropertyValue("BackgroundColor", new Color4(1.0f, 0.0f, 0.0f, 1.0f));
+                radioButtoncolor[UIController.State.Hovered] = new Color4(0.5f, 0.0f, 0.0f, 1.0f);
+                radioButtoncolor[UIController.State.Disabled] = new Color4(1.0f, 0.5f, 0.5f, 1.0f);
+                radioButtoncolor[RadioButtonController.Pressed] = new Color4(0.5f, 0.5f, 0.0f, 1.0f);
+                radioButtoncolor[RadioButtonController.Checked] = new Color4(0.0f, 1.0f, 0.0f, 1.0f);
+                radioButtoncolor[RadioButtonController.CheckedHovered] = new Color4(0.0f, 0.5f, 0.0f, 1.0f);
+                radioButtoncolor[RadioButtonController.CheckedDisabled] = new Color4(0.5f, 1.0f, 0.5f, 1.0f);
 
-            rbtn.RadioButton.Properties.Add(radioButtoncolor);
+                rbtn.RadioButton.Properties.Add(radioButtoncolor);
+                return rbtn;
+            }
 
-            UIManager.Root.Add(rbtn);
+            RadioButtonGroupController rbg = new RadioButtonGroupController(500, 100, 100, 100);
+            rbg.Background.Attach(new Border(0, 0, 100, 100));
+            rbg.ButtonsContainer.Attach(new FreePlacement(0, 0, 100, 100));
 
-            //
+            UIContainer radioButtons = rbg.ButtonsContainer.Component as UIContainer;
+            for (int i = 0; i < 4; i++)
+            {
+                radioButtons.Add(CreateSimpleRadioButton(0, 25 * i));
+            }
+
+            UIManager.Root.Add(rbg);
+
+            #endregion
 
             userInterface.RootFrame = this.rootFrame = new MainFrame(FrameProcessor);
 			viewLayer.SpriteLayers.Add(userInterface.FramesSpriteLayer);
