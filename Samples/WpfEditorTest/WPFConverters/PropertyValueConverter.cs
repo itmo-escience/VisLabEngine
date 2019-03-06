@@ -26,10 +26,10 @@ namespace WpfEditorTest.WPFConverters
 			{
 				Fusion.Core.Mathematics.Color4 fuCol = (Fusion.Core.Mathematics.Color4)value;
 				System.Windows.Media.Color col = new System.Windows.Media.Color();
-				col.A = (byte)(fuCol.Alpha * 255);
-				col.R = (byte)(fuCol.Red * 255);
-				col.G = (byte)(fuCol.Green * 255);
-				col.B = (byte)(fuCol.Blue * 255);
+				col.A = (byte)(fuCol.Alpha * 255.0f);
+				col.R = (byte)(fuCol.Red * 255.0f);
+				col.G = (byte)(fuCol.Green * 255.0f);
+				col.B = (byte)(fuCol.Blue * 255.0f);
 
 				return col;
 			}
@@ -68,7 +68,7 @@ namespace WpfEditorTest.WPFConverters
 			if (value.GetType() == typeof(System.Windows.Media.Color))
 			{
 				System.Windows.Media.Color col = (System.Windows.Media.Color)value;
-				Fusion.Core.Mathematics.Color4 fuCol = new Fusion.Core.Mathematics.Color4(col.R / 255, col.G / 255, col.B / 255, col.A / 255);
+				Fusion.Core.Mathematics.Color4 fuCol = new Fusion.Core.Mathematics.Color4(col.R / 255.0f, col.G / 255.0f, col.B / 255.0f, col.A / 255.0f);
 				return fuCol;
 			}
 

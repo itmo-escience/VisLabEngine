@@ -439,7 +439,7 @@ namespace WpfEditorTest
 					}
 					if (command != null)
 					{
-						CommandManager.Instance.Execute(command);
+						CommandManager.Instance.ExecuteWithoutSettingDirty(command);
 					}
 				}
 				else
@@ -447,7 +447,7 @@ namespace WpfEditorTest
 					if (!Keyboard.IsKeyDown(Key.LeftShift) && !Keyboard.IsKeyDown(Key.RightShift))
 					{
 						var command = new SelectFrameCommand(new List<UIComponent> { });
-						CommandManager.Instance.Execute(command);
+						CommandManager.Instance.ExecuteWithoutSettingDirty(command);
 					}
 
 					AreaSelectionEnabled = true;
@@ -754,7 +754,7 @@ namespace WpfEditorTest
 				}
 				ClearSelectionRectangle();
 				var command = new SelectFrameCommand(selectedframes);
-				CommandManager.Instance.Execute(command);
+				CommandManager.Instance.ExecuteWithoutSettingDirty(command);
 			}
 		}
 

@@ -12,7 +12,25 @@ namespace Fusion.Engine.Graphics.SpritesD2D
         void Apply(RenderTargetD2D target);
     }
 
-    public sealed class TransformCommand : IDrawCommand
+	public class DrawGroup : IDrawCommand
+	{
+		private readonly IDrawCommand[] nestedCommands;
+
+		public DrawGroup( params IDrawCommand[] commands )
+		{
+			nestedCommands = commands;
+		}
+
+		public void Apply( RenderTargetD2D target )
+		{
+			foreach (var command in nestedCommands)
+			{
+				command.Apply(target);
+			}
+		}
+	}
+
+	public sealed class TransformCommand : IDrawCommand
     {
         private readonly Matrix3x2 _transform;
         public TransformCommand(Matrix3x2 transform)

@@ -94,6 +94,7 @@
     <Compile Include="Utility\CustomTreeViewAdorner.cs" />
     <Compile Include="Utility\IMVVMProperty.cs" />
     <Compile Include="Utility\MVVMControllerData.cs" />
+    <Compile Include="Utility\SceneDataContainer.cs" />
     <Compile Include="Utility\StickingCoordinates.cs" />
     <Compile Include="WPFConverters\BoolToIndexConverter.cs" />
     <Compile Include="ChildPanels\FrameDetails.xaml.cs">

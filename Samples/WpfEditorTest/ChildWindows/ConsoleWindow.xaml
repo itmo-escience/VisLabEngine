@@ -33,7 +33,8 @@
             </ToolBar>
         </ToolBarTray>
         <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto" Name="ScrollViewer" Grid.Row="1">
-            <TextBox Name="OutputField" Background="#FFA0A0A0" IsReadOnly="True"/>
+            <RichTextBox Width="{Binding ActualWidth, ElementName=ScrollViewer, Mode=OneWay}" Name="OutputField" 
+                         Background="#FF000000" Foreground="White" IsReadOnly="True" FlowDirection="LeftToRight"/>
         </ScrollViewer>
         <TextBox Name="InputField" Grid.Row="2" Height="25" VerticalAlignment="Bottom" KeyDown="TextBox_KeyDown"/>
     </Grid>

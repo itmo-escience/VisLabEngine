@@ -30,7 +30,18 @@ namespace Fusion.Core.Utils
 			// получаем поток, куда будем записывать сериализованный объект
 			using (FileStream fs = new FileStream(filename, FileMode.Create, FileAccess.Write))
 			{
-				formatter.Serialize(fs, holder);
+				try
+				{
+					formatter.Serialize(fs, holder);
+				}
+				catch (Exception ex)
+				{
+					Log.Error($"---------------ERROR---------------");
+					Log.Error($"Could not serialize \"{holder.SerializableFrame.Name}\".\n");
+					Log.Error($"Next exception is thrown:\n{ex.Message}\n");
+					Log.Error($"Exception stack trace:\n{ex.StackTrace}");
+					Log.Error($"---------------ERROR---------------\n");
+				}
 				Console.WriteLine("Объект сериализован");
 			}
 		}

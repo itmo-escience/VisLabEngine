@@ -90,6 +90,7 @@
     <Grid Name="GlobalGrid" MaxWidth="10000" MaxHeight="10000" AllowDrop="True">
         <Grid.RowDefinitions>
             <RowDefinition Height="32"/>
+            <RowDefinition Height="32"/>
             <RowDefinition />
         </Grid.RowDefinitions>
         <ToolBarTray Name="MenuToolBar" Grid.Row="0" IsLocked="True" >
@@ -160,7 +161,44 @@
                 <Separator></Separator>
             </ToolBar>
         </ToolBarTray>
-        <ScrollViewer Name="ZoomerScroll" Grid.Row="1" HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto" Background="#FFA0A0A0" PreviewKeyDown="ZoomerScroll_PreviewKeyDown">
+        <TabControl Name="LoadedScenesTabs" Grid.Row="1" ItemsSource="{Binding}"  SelectionChanged="LoadedScenesTabs_SelectionChanged">
+            <TabControl.ItemTemplate>
+                <!-- this is the header template-->
+                <DataTemplate>
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="28"/>
+                        </Grid.RowDefinitions>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="auto"/>
+                            <ColumnDefinition Width="5"/>
+                            <ColumnDefinition Width="auto"/>
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Text="{Binding SceneName}" Grid.Column="0" Height="18">
+                            <TextBlock.Style>
+                                <Style TargetType="TextBlock">
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding IsDirty}" Value="True">
+                                            <Setter Property="FontWeight" Value="Bold" />
+                                        </DataTrigger>
+                                        <DataTrigger Binding="{Binding IsDirty}" Value="False">
+                                            <Setter Property="FontWeight" Value="Normal" />
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </TextBlock.Style>
+                        </TextBlock>
+                        <Button Content="X" Click="CloseTabButton_Click" Width="18" Height="18" Grid.Column="2" Tag="{Binding}"></Button>
+                    </Grid>
+                </DataTemplate>
+            </TabControl.ItemTemplate>
+            <!--<TabItem Header="tab1"></TabItem>
+            <TabItem Header="tab2" Height="28"></TabItem>
+            <TabItem Header="tab3"></TabItem>
+            <TabItem Header="tab4"></TabItem>
+            <TabItem Header="tab5"></TabItem>-->
+        </TabControl>
+        <ScrollViewer Name="ZoomerScroll" Grid.Row="2" HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto" Background="#FFA0A0A0" PreviewKeyDown="ZoomerScroll_PreviewKeyDown">
             <Viewbox Name="Zoomer" HorizontalAlignment="Center" VerticalAlignment="Center">
                 <local:WPFSelectionUILayer x:Name="SelectionLayer">
                 </local:WPFSelectionUILayer>
