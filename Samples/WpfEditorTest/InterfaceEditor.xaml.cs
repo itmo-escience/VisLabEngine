@@ -1,6 +1,5 @@
 ﻿using Fusion.Engine.Common;
 using FusionUI;
-using GISTest;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -9,7 +8,6 @@ using System.Linq;
 using System.Reflection;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
 using System.Windows.Input;
 using System.Windows.Media;
 using Fusion.Engine.Frames;
@@ -33,7 +31,20 @@ using Fusion.Engine.Frames2.Containers;
 using Fusion.Engine.Frames2.Managing;
 using WpfEditorTest.ChildWindows;
 using System.Collections.ObjectModel;
+using System.Windows.Forms;
+using Fusion.Engine.Client;
+using Fusion.Engine.Server;
 using WpfEditorTest.Utility;
+using Application = System.Windows.Application;
+using Binding = System.Windows.Data.Binding;
+using Button = System.Windows.Controls.Button;
+using CheckBox = System.Windows.Controls.CheckBox;
+using MenuItem = System.Windows.Controls.MenuItem;
+using MessageBox = System.Windows.MessageBox;
+using MouseEventArgs = System.Windows.Input.MouseEventArgs;
+using RadioButton = System.Windows.Controls.RadioButton;
+using TabControl = System.Windows.Controls.TabControl;
+using TreeView = System.Windows.Controls.TreeView;
 
 namespace WpfEditorTest
 {
@@ -133,9 +144,49 @@ namespace WpfEditorTest
 			_engine.Keyboard = new DummyKeyboard(_engine);
 			_engine.Touch = new DummyTouch(_engine);
 
-			_engine.GameServer = new CustomGameServer(_engine);
-			_engine.GameClient = new CustomGameClient(_engine);
-			_engine.GameInterface = new CustomGameInterface(_engine);
+
+			OpenFileDialog openFileDialog1 = new OpenFileDialog();
+
+			openFileDialog1.InitialDirectory = "c:\\";
+			openFileDialog1.Filter = "Assembly files (*.exe, *.dll)|*.exe;*.dll";
+			openFileDialog1.FilterIndex = 0;
+			openFileDialog1.RestoreDirectory = true;
+
+			var filePath = @"D:\GitHub\VisLabEngine\Samples\GISTest\bin\x64\Debug\GISTest.exe";
+
+			if (openFileDialog1.ShowDialog() == System.Windows.Forms.DialogResult.OK) {
+				filePath = openFileDialog1.FileName;
+			}
+
+			if(File.Exists(filePath)) { 
+				var assem = Assembly.LoadFrom(filePath);
+				
+				foreach (var type in assem.GetTypes()) {
+					if (type.IsSubclassOf(typeof(GameServer)) && _engine.GameServer == null) {
+						_engine.GameServer = (GameServer)Activator.CreateInstance(type, _engine);
+						continue;
+					}
+					if (type.IsSubclassOf(typeof(GameClient)) && _engine.GameClient == null) {
+						_engine.GameClient = (GameClient)Activator.CreateInstance(type, _engine);
+						continue;
+					}
+					if (type.IsSubclassOf(typeof(UserInterface)) && _engine.GameInterface == null) {
+						_engine.GameInterface = (UserInterface)Activator.CreateInstance(type, _engine);
+						continue;
+					}
+				}
+			}
+
+			if (_engine.GameServer == null || _engine.GameClient == null || _engine.GameInterface == null) {
+				Console.WriteLine("Error:");
+				throw new Exception("No classes fount in Assembly: " + filePath);
+			}
+
+			Directory.SetCurrentDirectory(Path.GetDirectoryName(filePath));
+
+			//_engine.GameServer = new CustomGameServer(_engine);
+			//_engine.GameClient = new CustomGameClient(_engine);
+			//_engine.GameInterface = new CustomGameInterface(_engine);
 			_engine.LoadConfiguration("Config.ini");
 
 			DefaultSceneWidth = int.Parse(ConfigurationManager.AppSettings.Get("SceneSizeWidth"));
@@ -145,8 +196,6 @@ namespace WpfEditorTest
 			_engine.RenderSystem.Width = (int)DefaultSceneWidth;
 			_engine.RenderSystem.Height = (int)DefaultSceneHeight;
 			_engine.RenderSystem.VSyncInterval = 1;
-
-			Directory.SetCurrentDirectory(@"..\..\..\..\GISTest\bin\x64\Debug");
 
 			var tokenSource = new CancellationTokenSource();
 
@@ -213,7 +262,9 @@ namespace WpfEditorTest
 			{
 				Application.Current.Dispatcher.InvokeAsync(() =>
 				{
-					RootFrame = (_engine.GameInterface as CustomGameInterface).GetUIRoot();
+					RootFrame = null; // (_engine.GameInterface as CustomGameInterface).GetUIRoot();
+					throw new Exception("This should be redone");
+
 					var rootChildren = new List<UIComponent>(RootFrame.Children);
 					var startScene = new SceneDataContainer(RootFrame.Width, RootFrame.Height);
 					SceneFrame = startScene.Scene;//RootFrame.Children.FirstOrDefault() as UIContainer;
