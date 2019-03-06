@@ -85,6 +85,8 @@ namespace WpfEditorTest
 				{
 					_currentScene.SceneSelection = SelectionManager.Instance.SelectedFrames;
 					_currentScene.SceneZoom = ZoomerSlider.Value;
+					_currentScene.SceneSize = new Size(SelectionLayer.Width, SelectionLayer.Height);
+
 					SelectionManager.Instance.SelectFrame(new List<UIComponent> { });
 					RootFrame.Remove(_currentScene.Scene);
 					foreach (var panel in SelectionLayer.FrameSelectionPanelList.Values)
@@ -98,6 +100,8 @@ namespace WpfEditorTest
 				RootFrame.Add(_currentScene.Scene);
 				SceneFrame = _currentScene.Scene;
 				ZoomerSlider.Value = _currentScene.SceneZoom;
+				//SelectionLayer.Width = SceneFrame.Width;
+				//SelectionLayer.Height = SceneFrame.Height;
 
 			}
 		}
