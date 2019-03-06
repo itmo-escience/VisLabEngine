@@ -291,6 +291,35 @@ namespace GISTest
 
             #endregion
 
+            #region dialogBox
+
+            DialogBoxController dlg = new DialogBoxController(300, 300, 200, 150);
+
+            var background = new Border(0, 25, 200, 125);
+            background.BackgroundColor = new Color4(0.5f, 0.5f, 0.5f, 1.0f);
+            dlg.Background.Attach(background);
+
+            var titleBackground = new Border(0, 0, 200, 25);
+            titleBackground.BackgroundColor = new Color4(0.25f, 0.25f, 0.25f, 1.0f);
+            dlg.TitleBackground.Attach(titleBackground);
+
+            dlg.Title.Attach(new Label("Dialog", new TextFormatD2D("Calibry", 12), 0, 0, 100, 25));
+            dlg.Content.Attach(new Label("Content", new TextFormatD2D("Calibry", 20), 0, 25, 200, 125));
+
+            var btn = new ButtonController(175, 0, 25, 25);
+
+            var buttonBackground = new Border(0, 0, 25, 25);
+            buttonBackground.BackgroundColor = new Color4(1.0f, 0.0f, 0.0f, 1.0f);
+            btn.Background.Attach(buttonBackground);
+
+            btn.Foreground.Attach(new Label("  X", new TextFormatD2D("Calibry", 15), 0, 0, 25, 25));
+
+            dlg.ExitButton.Attach(btn);
+
+            UIManager.Root.Add(dlg);
+
+            #endregion
+
             userInterface.RootFrame = this.rootFrame = new MainFrame(FrameProcessor);
 			viewLayer.SpriteLayers.Add(userInterface.FramesSpriteLayer);
 
