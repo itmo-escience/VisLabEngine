@@ -100,8 +100,8 @@ namespace WpfEditorTest
 				RootFrame.Add(_currentScene.Scene);
 				SceneFrame = _currentScene.Scene;
 				ZoomerSlider.Value = _currentScene.SceneZoom;
-				//SelectionLayer.Width = SceneFrame.Width;
-				//SelectionLayer.Height = SceneFrame.Height;
+				SelectionLayer.Width = SceneFrame.Width;
+				SelectionLayer.Height = SceneFrame.Height;
 
 			}
 		}
@@ -363,8 +363,8 @@ namespace WpfEditorTest
 					CommandManager.Instance.SetNotDirty();
 					CommandManager.Instance.Reset();
 
-					SelectionLayer.Width = SceneFrame.Width;
-					SelectionLayer.Height = SceneFrame.Height;
+					//SelectionLayer.Width = SceneFrame.Width;
+					//SelectionLayer.Height = SceneFrame.Height;
 				}
 			}
 		}
