@@ -152,37 +152,39 @@ namespace WpfEditorTest
 			openFileDialog1.FilterIndex = 0;
 			openFileDialog1.RestoreDirectory = true;
 
-			var filePath = @"D:\GitHub\VisLabEngine\Samples\GISTest\bin\x64\Debug\GISTest.exe";
+			var fileName = @"";
 
 			if (openFileDialog1.ShowDialog() == System.Windows.Forms.DialogResult.OK) {
-				filePath = openFileDialog1.FileName;
+				fileName = openFileDialog1.FileName;
 			}
 
-			if(File.Exists(filePath)) { 
-				var assem = Assembly.LoadFrom(filePath);
+			if (String.IsNullOrEmpty(fileName) || !File.Exists(fileName)) {
+				throw new FileNotFoundException("File not found", fileName);
+			}
+
+			var assem = Assembly.LoadFrom(fileName);
 				
-				foreach (var type in assem.GetTypes()) {
-					if (type.IsSubclassOf(typeof(GameServer)) && _engine.GameServer == null) {
-						_engine.GameServer = (GameServer)Activator.CreateInstance(type, _engine);
-						continue;
-					}
-					if (type.IsSubclassOf(typeof(GameClient)) && _engine.GameClient == null) {
-						_engine.GameClient = (GameClient)Activator.CreateInstance(type, _engine);
-						continue;
-					}
-					if (type.IsSubclassOf(typeof(UserInterface)) && _engine.GameInterface == null) {
-						_engine.GameInterface = (UserInterface)Activator.CreateInstance(type, _engine);
-						continue;
-					}
+			foreach (var type in assem.GetTypes()) {
+				if (type.IsSubclassOf(typeof(GameServer)) && _engine.GameServer == null) {
+					_engine.GameServer = (GameServer)Activator.CreateInstance(type, _engine);
+					continue;
+				}
+				if (type.IsSubclassOf(typeof(GameClient)) && _engine.GameClient == null) {
+					_engine.GameClient = (GameClient)Activator.CreateInstance(type, _engine);
+					continue;
+				}
+				if (type.IsSubclassOf(typeof(UserInterface)) && _engine.GameInterface == null) {
+					_engine.GameInterface = (UserInterface)Activator.CreateInstance(type, _engine);
+					continue;
 				}
 			}
 
 			if (_engine.GameServer == null || _engine.GameClient == null || _engine.GameInterface == null) {
-				Console.WriteLine("Error:");
-				throw new Exception("No classes fount in Assembly: " + filePath);
+				throw new Exception("No classes found in Assembly: " + fileName);
 			}
 
-			Directory.SetCurrentDirectory(Path.GetDirectoryName(filePath));
+			Directory.SetCurrentDirectory(Path.GetDirectoryName(fileName));
+			
 
 			//_engine.GameServer = new CustomGameServer(_engine);
 			//_engine.GameClient = new CustomGameClient(_engine);
