@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.Specialized;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -21,49 +22,55 @@ namespace Fusion.Engine.Frames2.Controllers
             SlotsInternal.Add(Background);
             SlotsInternal.Add(ButtonsContainer);
 
-            ButtonsContainer.ComponentAttached += (s0, e0) =>
+            ButtonsContainer.ComponentAttached += (s, e) =>
             {
-                if (!(ButtonsContainer.Component is UIContainer))
+                if (e.New is UIContainer newContainer)
+                {
+                    newContainer.Children.CollectionChanged += OnRadioButtonCollectionChange;
+                }
+                else
                 {
                     Log.Warning("ButtonsContainer isn't UIContainer!");
-                    return;
                 }
 
-                UIContainer container = ButtonsContainer.Component as UIContainer;
-                container.Children.CollectionChanged += (s1, e1) =>
+                if (e.Old is UIContainer oldContainer)
                 {
-                    if (e1.NewItems != null)
-                    {
-                        foreach (UIComponent component in e1.NewItems)
-                        {
-                            if (!(component is RadioButtonController))
-                            {
-                                Log.Warning("ButtonsContainer's element isn't RadioButtonController!");
-                            }
-                            else
-                            {
-                                RadioButtonController radioButton = component as RadioButtonController;
-                                radioButton.RadioButtonClick += (s2, e2) => ChangeCheckedRadioButtonTo(e2.RadioButton);
-                            }
-                        }
-                    }
-                    if (e1.OldItems != null)
-                    {
-                        foreach (UIComponent component in e1.OldItems)
-                        {
-                            if (component is RadioButtonController)
-                            {
-                                RadioButtonController radioButton = component as RadioButtonController;
-                                radioButton.RadioButtonClick -= (s2, e2) => ChangeCheckedRadioButtonTo(e2.RadioButton);
-                            }
-                        }
-                    }
-                };
+                    oldContainer.Children.CollectionChanged -= OnRadioButtonCollectionChange;
+                }
             };
         }
 
-        private void ChangeCheckedRadioButtonTo(RadioButtonController newButton)
+        private void OnRadioButtonCollectionChange(object sender, NotifyCollectionChangedEventArgs args)
         {
+            if (args.NewItems != null)
+            {
+                foreach (UIComponent component in args.NewItems)
+                {
+                    if (component is RadioButtonController radioButton)
+                    {
+                        radioButton.RadioButtonClick += ChangeCheckedRadioButtonTo;
+                    }
+                    else
+                    {
+                        Log.Warning("ButtonsContainer's element isn't RadioButtonController!");
+                    }
+                }
+            }
+            if (args.OldItems != null)
+            {
+                foreach (UIComponent component in args.OldItems)
+                {
+                    if (component is RadioButtonController radioButton)
+                    {
+                        radioButton.RadioButtonClick -= ChangeCheckedRadioButtonTo;
+                    }
+                }
+            }
+        }
+
+        private void ChangeCheckedRadioButtonTo(object sender,  RadioButtonController.RadioButtonClickEventArgs args)
+        {
+            var newButton = args.RadioButton;
             if (newButton == CheckedRadioButton) return;
 
             CheckedRadioButton?.ChangeState(State.Default);
