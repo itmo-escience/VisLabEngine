@@ -108,6 +108,12 @@ namespace Fusion.Engine.Frames2.Managing
 
                     c.InvokeMouseMove(mouseArgs);
                 }
+
+                foreach (var c in UIHelper.DFSTraverse(_root))
+                {
+                    if (!c.IsInside(mousePosition))
+                        c.InvokeMouseMoveOutside(mouseArgs);
+                }
             };
 
             /*//MouseMove (touch)

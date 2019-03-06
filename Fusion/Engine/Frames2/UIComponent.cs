@@ -299,6 +299,7 @@ namespace Fusion.Engine.Frames2
         public event KeyUpEvent         KeyUp;
         public event KeyPressEvent      KeyPress;
         public event MouseMoveEvent     MouseMove;
+        public event MouseMoveEvent     MouseMoveOutside;
         public event MouseDragEvent     MouseDrag;
         public event MouseDownEvent     MouseDown;
         public event MouseDownEvent     MouseDownOutside;
@@ -316,6 +317,7 @@ namespace Fusion.Engine.Frames2
         internal virtual void InvokeKeyUp           (KeyEventArgs e)       => KeyUp?.Invoke(this, e);
         internal virtual void InvokeKeyPress        (KeyPressEventArgs e)  => KeyPress?.Invoke(this, e);
         internal virtual void InvokeMouseMove       (MoveEventArgs e)      => MouseMove?.Invoke(this, e);
+        internal virtual void InvokeMouseMoveOutside(MoveEventArgs e)      => MouseMoveOutside?.Invoke(this, e);
         internal virtual void InvokeMouseDrag       (DragEventArgs e)      => MouseDrag?.Invoke(this, e);
         internal virtual void InvokeMouseDown       (ClickEventArgs e)     => MouseDown?.Invoke(this, e);
         internal virtual void InvokeMouseDownOutside(ClickEventArgs e)     => MouseDownOutside?.Invoke(this, e);
