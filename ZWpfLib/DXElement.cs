@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.Windows;
 using System.Windows.Interop;
 using System.Windows.Media;
+using Fusion;
 using Fusion.Drivers.Graphics;
 using Fusion.Drivers.Graphics.Display;
 using Fusion.Engine.Common;
@@ -166,7 +167,7 @@ namespace ZWpfLib
 				return;
 			Renderer.GraphicsDevice.Resize((int)DesiredSize.Width, (int)DesiredSize.Height);
 
-			Console.WriteLine(DesiredSize);
+		    Log.Message($"DxElement resize to {DesiredSize}");
 		}
 
         private bool SameDimensions(RenderTarget2D t1, RenderTarget2D t2)
