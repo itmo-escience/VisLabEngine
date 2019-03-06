@@ -11,8 +11,7 @@
         ShowInTaskbar="False"
         ResizeMode="CanResize"
         SizeToContent="Manual"
-        MinWidth="350" MinHeight="150"
-        MaxWidth="950">
+        MinWidth="350" MinHeight="150">
     <Grid Width="auto" Height="auto">
         <Grid.RowDefinitions>
             <RowDefinition Height="25"/>
@@ -33,7 +32,7 @@
             </ToolBar>
         </ToolBarTray>
         <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto" Name="ScrollViewer" Grid.Row="1">
-            <RichTextBox Width="{Binding ActualWidth, ElementName=ScrollViewer, Mode=OneWay}" Name="OutputField" 
+            <RichTextBox Width="{Binding ViewportWidth, ElementName=ScrollViewer, Mode=OneWay}" Name="OutputField" 
                          Background="#FF000000" Foreground="White" IsReadOnly="True" FlowDirection="LeftToRight"/>
         </ScrollViewer>
         <TextBox Name="InputField" Grid.Row="2" Height="25" VerticalAlignment="Bottom" KeyDown="TextBox_KeyDown"/>

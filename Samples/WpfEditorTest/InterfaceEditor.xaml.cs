@@ -147,7 +147,7 @@ namespace WpfEditorTest
 
 			OpenFileDialog openFileDialog1 = new OpenFileDialog();
 
-			openFileDialog1.InitialDirectory = "c:\\";
+			openFileDialog1.InitialDirectory = ConfigurationManager.AppSettings.Get("InitialAssemblySearchDirectory");
 			openFileDialog1.Filter = "Assembly files (*.exe, *.dll)|*.exe;*.dll";
 			openFileDialog1.FilterIndex = 0;
 			openFileDialog1.RestoreDirectory = true;
@@ -156,6 +156,10 @@ namespace WpfEditorTest
 
 			if (openFileDialog1.ShowDialog() == System.Windows.Forms.DialogResult.OK) {
 				fileName = openFileDialog1.FileName;
+				var configFile = ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.None);
+				configFile.AppSettings.Settings["InitialAssemblySearchDirectory"].Value = Path.GetDirectoryName(fileName);
+				configFile.Save(ConfigurationSaveMode.Modified);
+				ConfigurationManager.RefreshSection(configFile.AppSettings.SectionInformation.Name);
 			}
 
 			if (String.IsNullOrEmpty(fileName) || !File.Exists(fileName)) {
