@@ -357,15 +357,15 @@ namespace Fusion.Drivers.Input {
 						Forms.Cursor.Clip		=	Game.GraphicsDevice.Display.Window.RectangleToScreen( rect );
 					} else
 					{
-					    Forms.Cursor.Clip =
-					        new Drawing.Rectangle(); // int.MinValue, int.MinValue, int.MaxValue, int.MaxValue );
+					    Forms.Cursor.Clip = new Drawing.Rectangle();
 					}
 
 					SetCursorVisibility( !IsMouseHidden );
 
-			    } else {
+			    } else
+			    {
 
-			        Forms.Cursor.Clip		=	new Drawing.Rectangle( int.MinValue, int.MinValue, int.MaxValue, int.MaxValue );
+			        Forms.Cursor.Clip = new Drawing.Rectangle();
 					RelativeMouseOffset		=	Vector2.Zero;
 					SetCursorVisibility( true );
 
