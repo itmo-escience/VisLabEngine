@@ -29,26 +29,11 @@ namespace Fusion.Engine.Frames2.Controllers
             SlotsInternal.Add(Text);
             SlotsInternal.Add(Background);
 
-            RadioButton.ComponentAttached += (s, e) =>
-            {
-                UIComponent oldComponent = e.Old;
-                UIComponent newComponent = e.New;
-
-                if (oldComponent != null)
-                {
-                    oldComponent.MouseDown -= OnMouseDown;
-                    oldComponent.MouseUp -= OnMouseUp;
-                    oldComponent.MouseUpOutside -= OnMouseUp;
-                    oldComponent.Enter -= OnEnter;
-                    oldComponent.Leave -= OnLeave;
-                }
-
-                newComponent.MouseDown += OnMouseDown;
-                newComponent.MouseUp += OnMouseUp;
-                newComponent.MouseUpOutside += OnMouseUp;
-                newComponent.Enter += OnEnter;
-                newComponent.Leave += OnLeave;
-            };
+            MouseDown += OnMouseDown;
+            MouseUp += OnMouseUp;
+            MouseUpOutside += OnMouseUp;
+            Enter += OnEnter;
+            Leave += OnLeave;
 
             RadioButtonClick += (sender, args) => { };
         }
