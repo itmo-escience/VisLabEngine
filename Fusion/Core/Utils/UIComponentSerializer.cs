@@ -58,7 +58,18 @@ namespace Fusion.Core.Utils
 			// получаем поток, куда будем записывать сериализованный объект
 			using (StringWriter sw = new StringWriter())
 			{
-				formatter.Serialize(sw, holder);
+				try
+				{
+					formatter.Serialize(sw, holder);
+				}
+				catch (Exception ex)
+				{
+					Log.Error($"---------------ERROR---------------");
+					Log.Error($"Could not serialize \"{holder.SerializableFrame.Name}\".\n");
+					Log.Error($"Next exception is thrown:\n{ex.Message}\n");
+					Log.Error($"Exception stack trace:\n{ex.StackTrace}");
+					Log.Error($"---------------ERROR---------------\n");
+				}
 				Console.WriteLine("Объект сериализован в строку");
 				return sw.ToString();
 			}

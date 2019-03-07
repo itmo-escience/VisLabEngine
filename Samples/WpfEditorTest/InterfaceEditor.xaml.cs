@@ -262,6 +262,20 @@ namespace WpfEditorTest
 
 			LoadPalettes();
 
+			//var templates = new List<UIComponent>();
+			//foreach (var type in this.customUIComponentTypes)
+			//{
+			//	templates.Add(Activator.CreateInstance(type) as UIComponent);
+			//}
+			//templates.Add(Activator.CreateInstance(typeof(Fusion.Engine.Frames2.Components.Image)) as UIComponent);
+
+
+			_palette.AvailableComponents.ItemsSource = customUIComponentTypes;
+
+			
+
+			_palette.BaseComponents.ItemsSource = Assembly.GetAssembly(typeof(UIComponent)).GetTypes().Where(t => t.IsSubclassOf(typeof(UIComponent)));
+
 			//var templates = Directory.GetFiles(ApplicationConfig.TemplatesPath, "*.xml").ToList();
 			//_palette.AvailablePrefabs.ItemsSource = templates.Select(t => t.Split('\\').Last().Split('.').First());
 
@@ -792,14 +806,29 @@ namespace WpfEditorTest
 
 				if (!string.IsNullOrEmpty(componentXml))
 				{
-					UIComponent component = Fusion.Core.Utils.UIComponentSerializer.ReadFromString(componentXml);
-					pastedComponents.Add(component);
+					UIComponent component = null;
+					try
+					{
+						component = Fusion.Core.Utils.UIComponentSerializer.ReadFromString(componentXml);
+					}
+					catch (Exception ex)
+					{
+						Fusion.Log.Error($"---------------ERROR---------------");
+						Fusion.Log.Error($"Could not deserialize string.\n");
+						Fusion.Log.Error($"Next exception is thrown:\n{ex.Message}\n");
+						Fusion.Log.Error($"Exception stack trace:\n{ex.StackTrace}");
+						Fusion.Log.Error($"---------------ERROR---------------\n");
+					}
+					if (component != null)
+					{
+						pastedComponents.Add(component);
 
-					List<IEditorCommand> commands = AddFrameToScene(component,
-						System.Windows.Input.Mouse.GetPosition(SelectionLayer) + componentOffset);
+						List<IEditorCommand> commands = AddFrameToScene(component,
+							System.Windows.Input.Mouse.GetPosition(SelectionLayer) + componentOffset);
 
-					var command = new CommandGroup(commands.ToArray());
-					CommandManager.Instance.Execute(command);
+						var command = new CommandGroup(commands.ToArray());
+						CommandManager.Instance.Execute(command); 
+					}
 				}
 			}
 

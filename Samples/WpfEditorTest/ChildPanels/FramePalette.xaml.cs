@@ -87,6 +87,24 @@ namespace WpfEditorTest.ChildPanels
 			}
 		}
 
+		private void Border_MouseDown_2( object sender, MouseButtonEventArgs e )
+		{
+			if (this.templateHolder != null)
+				this.templateHolder.Background = templateHolderInitColor;
+
+			this.templateHolder = sender as Border;
+			this.templateHolderInitColor = templateHolder.Background;
+
+			if (this.templateHolder.Tag != null)
+			{
+				DataObject dataObject = new DataObject();
+				dataObject.SetData(DataFormats.FileDrop, (Type)this.templateHolder.Tag);
+				DragDrop.DoDragDrop(templateHolder,
+									 dataObject,
+									 DragDropEffects.Move);
+			}
+		}
+
 		private void Window_Drop( object sender, DragEventArgs e )
 		{
 			if (e.Data.GetDataPresent(DataFormats.StringFormat))

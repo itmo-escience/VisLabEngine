@@ -818,6 +818,28 @@ namespace WpfEditorTest
 					ParentHighlightPanel.SelectedFrame = null;
                 }
 			}
+			else if (e.Data.GetDataPresent(DataFormats.FileDrop))
+			{
+				Type dataType = (Type)e.Data.GetData(DataFormats.FileDrop);
+				if (dataType!=null)
+				{
+					var createdFrame = Activator.CreateInstance(dataType) as UIComponent;
+
+					if (createdFrame != null)
+					{
+						List<IEditorCommand> commands = Window.AddFrameToScene(createdFrame, e.GetPosition(this));
+						commands.Add(new SelectFrameCommand(new List<UIComponent> { createdFrame }));
+						CommandManager.Instance.Execute(new CommandGroup(commands.ToArray()));
+
+						foreach (UIComponent component in UIHelper.BFSTraverse(createdFrame))
+						{
+							UIManager.MakeComponentNameValid(component, SceneFrame, component);
+						}
+					}
+					PaletteWindow.SelectedFrameTemplate = null;
+					ParentHighlightPanel.SelectedFrame = null;
+				}
+			}
 		}
     }
 }
