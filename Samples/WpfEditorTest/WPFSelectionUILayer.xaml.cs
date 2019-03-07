@@ -338,6 +338,11 @@ namespace WpfEditorTest
 						hoveredFrame = hoveredFrame.Parent;
 					}
 
+                    if (hoveredFrame is UIController)
+                    {
+                        hoveredFrame = SceneFrame;
+                    }
+
 					UIContainer container = hoveredFrame as UIContainer;
 
 					panel.SelectedFrame.Parent?.Remove(panel.SelectedFrame);

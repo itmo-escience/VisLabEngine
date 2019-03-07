@@ -293,7 +293,7 @@ namespace GISTest
 
             #region dialogBox
 
-            DialogBoxController dlg = new DialogBoxController(300, 300, 40, 150);
+            DialogBoxController dlg = new DialogBoxController(300, 300, 200, 150);
 
             var background = new Border();
             background.BackgroundColor = new Color4(0.5f, 0.5f, 0.5f, 1.0f);
@@ -304,7 +304,9 @@ namespace GISTest
             dlg.TitleBackground.Attach(titleBackground);
 
             dlg.Title.Attach(new Label("Dialog", new TextFormatD2D("Calibry", 12), 0, 0, 0, 0));
-            dlg.Content.Attach(new Label("Content", new TextFormatD2D("Calibry", 20), 0, 0, 0, 0));
+            var content = new FreePlacement();
+            content.Add(new Label("Content", new TextFormatD2D("Calibry", 20), 0, 0, 100, 100));
+            dlg.Content.Attach(content);
 
             var btn = new ButtonController(0, 0, 0, 0);
 
