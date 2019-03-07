@@ -67,11 +67,10 @@ namespace Fusion.Engine.Frames2.Controllers
                 }
             };
 
-            MouseMove += TryMove;
-            MouseMoveOutside += TryMove;
+            MouseDrag += TryMove;
         }
 
-        private void TryMove(UIComponent sender, Managing.MoveEventArgs args) => TryMove(args.Position);
+        private void TryMove(UIComponent sender, DragEventArgs args) => TryMove(args.Position);
 
         private void TryMove(Vector2 mousePosition)
         {

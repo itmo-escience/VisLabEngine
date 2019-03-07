@@ -4,6 +4,7 @@ using System.Linq;
 using Fusion.Core.Mathematics;
 using Fusion.Engine.Common;
 using Fusion.Engine.Input;
+using SharpDX.DirectSound;
 
 namespace Fusion.Engine.Frames2.Managing
 {
@@ -16,7 +17,7 @@ namespace Fusion.Engine.Frames2.Managing
         private Keys _lastKey;
         private UIComponent _lastMouseDownComponent;
         private UIComponent _lastClickComponent;
-        private Stopwatch _clickStopwatch;
+        private Stopwatch _clickStopwatch = new Stopwatch();
         private const long _clickDelay = 500;
 
         private const int KeyPressRepetitionFrequency = 50;
@@ -30,15 +31,16 @@ namespace Fusion.Engine.Frames2.Managing
 
         private double _lastKeyRepetitionMs = 0;
 
-        private List<UIComponent> _componentsWithMouse;
+        private List<UIComponent> _componentsWithMouse = new List<UIComponent>();
+
+        private bool _isDrag;
+        private List<UIComponent> _draggedComponents = new List<UIComponent>();
 
         internal UIEventProcessor(UIContainer root)
         {
             _root = root;
             _game = Game.Instance;
             _focusComponent = root;
-            _clickStopwatch = new Stopwatch();
-            _componentsWithMouse = new List<UIComponent>();
 
             SubscribeToInputEvents();
         }
@@ -99,6 +101,8 @@ namespace Fusion.Engine.Frames2.Managing
             //MouseMove (mouse)
             _game.Mouse.Move += (sender, args) =>
             {
+                if (_isDrag) return;
+
                 Vector2 mousePosition = _game.Mouse.Position;
                 var mouseArgs = (MoveEventArgs) args;
                 foreach (var c in UIHelper.BFSTraverseForPoint(_root, mousePosition).Reverse())
@@ -128,12 +132,11 @@ namespace Fusion.Engine.Frames2.Managing
             //MouseDrag (mouse)
             _game.Mouse.Move += (sender, args) =>
             {
-                if (!_game.Keyboard.IsKeyDown(_lastMouseKey)) return;
+                if (!_isDrag) return;
 
-                var mousePosition = _game.Mouse.Position;
                 var dragArgs = new DragEventArgs(_lastMouseKey, args);
 
-                foreach (var c in UIHelper.BFSTraverseForPoint(_root, mousePosition).Reverse())
+                foreach (var c in _draggedComponents)
                 {
                     if (!dragArgs.ShouldPropagate)
                         return;
@@ -153,6 +156,8 @@ namespace Fusion.Engine.Frames2.Managing
             //MouseDown (mouse)
             _game.Keyboard.KeyDown += (sender, args) =>
             {
+                if (_isDrag) return;
+
                 if (!args.Key.IsMouseKey()) return;
 
                 var mousePosition = _game.Mouse.Position;
@@ -164,6 +169,7 @@ namespace Fusion.Engine.Frames2.Managing
                         break;
 
                     c.InvokeMouseDown(clickArgs);
+                    _draggedComponents.Add(c);
                 }
 
                 foreach (var c in UIHelper.DFSTraverse(_root))
@@ -175,6 +181,7 @@ namespace Fusion.Engine.Frames2.Managing
                 _lastMouseKey = args.Key;
                 _lastMouseDownComponent = UIHelper.GetLowestComponentInHierarchy(_root, mousePosition);
                 _focusComponent = _lastMouseDownComponent;
+                _isDrag = true;
             };
 
             //MouseDown (touch)
@@ -189,6 +196,19 @@ namespace Fusion.Engine.Frames2.Managing
             //MouseUp
             _game.Keyboard.KeyUp += (sender, args) =>
             {
+                if (_isDrag)
+                {
+                    if (args.Key == _lastMouseKey)
+                    {
+                        _isDrag = false;
+                        _draggedComponents.Clear();
+                    }
+                    else
+                    {
+                        return;
+                    }
+                }
+
                 if (!args.Key.IsMouseKey()) return;
 
                 var mousePosition = _game.Mouse.Position;
@@ -287,6 +307,8 @@ namespace Fusion.Engine.Frames2.Managing
 
         private void InvokeEnterAndLeaveComponentsEvents()
         {
+            if (_isDrag) return;
+
             var newComponentsWithMouse = UIHelper.BFSTraverseForPoint(_root, _game.Mouse.Position).ToList();
             foreach (var c in newComponentsWithMouse.Except(_componentsWithMouse))
             {
