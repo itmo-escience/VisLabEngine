@@ -31,7 +31,7 @@
                 </ComboBox>
             </ToolBar>
         </ToolBarTray>
-        <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto" Name="ScrollViewer" Grid.Row="1">
+        <ScrollViewer VerticalScrollBarVisibility="Visible" HorizontalScrollBarVisibility="Hidden" Name="ScrollViewer" Grid.Row="1">
             <RichTextBox Width="{Binding ViewportWidth, ElementName=ScrollViewer, Mode=OneWay}" Name="OutputField" 
                          Background="#FF000000" Foreground="White" IsReadOnly="True" FlowDirection="LeftToRight"/>
         </ScrollViewer>
