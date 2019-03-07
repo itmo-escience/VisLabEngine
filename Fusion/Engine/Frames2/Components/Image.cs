@@ -22,19 +22,11 @@ namespace Fusion.Engine.Frames2.Components
 		public Texture2D Texture {
 			get
 			{
-				if (_texture != null)
-				{
-					return _texture;
-				}
-				else if (!string.IsNullOrEmpty(TextureName))
+				if ((_texture == null) && (!string.IsNullOrEmpty(TextureName)))
 				{
 					_texture = Game.Instance.Content.Load<Texture2D>(_textureName);
-					return _texture;
 				}
-				else
-				{
-					return null;
-				}
+                return _texture;
 			}
 			set {
                 SetAndNotify(ref _texture, value);
@@ -58,7 +50,7 @@ namespace Fusion.Engine.Frames2.Components
 		}
 		private DrawBitmap _drawCommand;
 
-        public Image() : this(0, 0, 0, 0, null, 1)
+        public Image() : this(0, 0, 0, 0, (Texture2D) null, 1)
         {
         }
 
@@ -68,7 +60,6 @@ namespace Fusion.Engine.Frames2.Components
 
 		public Image( float x, float y, string textureName, float opacity = 1 ) : base(x, y)
 		{
-			Opacity = opacity;
 			_textureName = textureName;
 
 			if (Texture != null)
@@ -76,6 +67,8 @@ namespace Fusion.Engine.Frames2.Components
 				Width = Texture.Width;
 				Height = Texture.Height; 
 			}
+
+            Opacity = opacity;
 
 			UpdateDrawCommand();
 
@@ -88,16 +81,27 @@ namespace Fusion.Engine.Frames2.Components
 			};
 		}
 
+        public Image( float x, float y, float width, float height, string textureName, float opacity = 1 ) : base(x, y, width, height)
+        {
+            _textureName = textureName;
+
+            Opacity = opacity;
+
+            UpdateDrawCommand();
+
+            PropertyChanged += ( s, e ) =>
+            {
+                if ((e.PropertyName == nameof(Width)) || (e.PropertyName == nameof(Height)) || (e.PropertyName == nameof(Opacity)))
+                {
+                    UpdateDrawCommand();
+                }
+            };
+        }
+
 		public Image(float x, float y, float width, float height, Texture2D texture, float opacity = 1) : base(x, y, width, height)
         {
-			if (texture!=null)
-			{
-				Texture = texture;
-			}
-			else
-			{
+			Texture = texture;
 
-			}
             Opacity = opacity;
 
             UpdateDrawCommand();
@@ -113,14 +117,7 @@ namespace Fusion.Engine.Frames2.Components
 
         private void UpdateDrawCommand()
         {
-			if (Texture!=null)
-			{
-				_drawCommand = new DrawBitmap(0, 0, Width, Height, Texture, Opacity);
-			}
-			else
-			{
-				_drawCommand = null;
-			}
+            _drawCommand = (Texture != null) ? new DrawBitmap(0, 0, Width, Height, Texture, Opacity) : null;
         }
 
         public override void Update(GameTime gameTime) { }
