@@ -324,24 +324,27 @@ namespace GISTest
 
             DialogBoxController dlg = new DialogBoxController(300, 300, 200, 150);
 
-            var background = new Border(0, 25, 200, 125);
+            var background = new Border();
             background.BackgroundColor = new Color4(0.5f, 0.5f, 0.5f, 1.0f);
-            dlg.Background.Attach(background);
+            dlg.ContentBackground.Attach(background);
 
-            var titleBackground = new Border(0, 0, 200, 25);
+            var titleBackground = new Border();
             titleBackground.BackgroundColor = new Color4(0.25f, 0.25f, 0.25f, 1.0f);
             dlg.TitleBackground.Attach(titleBackground);
 
-            dlg.Title.Attach(new Label("Dialog", new TextFormatD2D("Calibry", 12), 0, 0, 100, 25));
-            dlg.Content.Attach(new Label("Content", new TextFormatD2D("Calibry", 20), 0, 25, 200, 125));
+            dlg.Title.Attach(new Label("Dialog", new TextFormatD2D("Calibry", 12), 0, 0, 0, 0));
+            var content = new FreePlacement();
+            content.Add(new Label("Content", new TextFormatD2D("Calibry", 20), 0, 0, 100, 100));
+            dlg.Content.Attach(content);
 
-            var btn = new ButtonController(175, 0, 25, 25);
+            var btn = new ButtonController(0, 0, 0, 0);
 
             var buttonBackground = new Border(0, 0, 25, 25);
             buttonBackground.BackgroundColor = new Color4(1.0f, 0.0f, 0.0f, 1.0f);
             btn.Background.Attach(buttonBackground);
 
-            btn.Foreground.Attach(new Label("  X", new TextFormatD2D("Calibry", 15), 0, 0, 25, 25));
+            //btn.Foreground.Attach(new Label("  X", new TextFormatD2D("Calibry", 15), 0, 0, 25, 25));
+            btn.Foreground.Attach(new Image(0, 0,@"UI-new\fv-icons_clear-text-box|nomips", 1));
 
             dlg.ExitButton.Attach(btn);
 
@@ -350,7 +353,7 @@ namespace GISTest
             #endregion
 
             userInterface.RootFrame = this.rootFrame = new MainFrame(FrameProcessor);
-			viewLayer.SpriteLayers.Add(userInterface.FramesSpriteLayer);
+            viewLayer.SpriteLayers.Add(userInterface.FramesSpriteLayer);
 
 			Scene = new ScalableFrame(0, 0, this.rootFrame.UnitWidth, this.rootFrame.UnitHeight, "Scene", Color.Zero) { Anchor= FrameAnchor.All };
 			Scene.Visible = true;

@@ -60,6 +60,14 @@ namespace Fusion.Engine.Frames2
             }
         }
 
+        public void SetPositionAndSize(float x, float y, float width, float height)
+        {
+            X = x;
+            Y = y;
+            Width = width;
+            Height = height;
+        }
+
         #endregion
 
         #region Transforms
