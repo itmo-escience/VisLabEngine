@@ -68,6 +68,11 @@ namespace Fusion.Engine.Frames2.Components
         public Label() : base()
         {
             _isDirtyText = true;
+
+            PropertyChanged += (s, e) =>
+            {
+                if (e.PropertyName == "Width" || e.PropertyName == "Height") _isDirtyText = true;
+            };
         }
 
         public Label(string text, string fontName, float fontSize, float x, float y, float width, float height)
@@ -81,6 +86,11 @@ namespace Fusion.Engine.Frames2.Components
             Text = text;
 
             _isDirtyText = true;
+
+            PropertyChanged += (s, e) =>
+            {
+                if (e.PropertyName == "Width" || e.PropertyName == "Height") _isDirtyText = true;
+            };
         }
 
         public Label(string text, TextLayoutD2D textLayout, float x, float y, float width, float height) : base(x, y, width, height)
@@ -91,6 +101,11 @@ namespace Fusion.Engine.Frames2.Components
             Text = text;
 
             _isDirtyText = true;
+
+            PropertyChanged += (s, e) =>
+            {
+                if (e.PropertyName == "Width" || e.PropertyName == "Height") _isDirtyText = true;
+            };
         }
 
         public override void Update(GameTime gameTime)
