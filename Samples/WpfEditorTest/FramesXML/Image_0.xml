@@ -7,15 +7,15 @@
         <string>Fusion.Engine.Frames2.Components.Image</string>
       </key>
       <value>
-        <string>Fusion, Version=0.2.6981.23514, Culture=neutral, PublicKeyToken=null</string>
+        <string>Fusion, Version=0.2.7003.22656, Culture=neutral, PublicKeyToken=null</string>
       </value>
     </item>
   </dictionary>
   <UIComponent xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:type="Image">
-    <X>1000</X>
-    <Y>100</Y>
-    <Width>100</Width>
-    <Height>100</Height>
+    <X>0</X>
+    <Y>0</Y>
+    <Width>200</Width>
+    <Height>75</Height>
     <Angle>0</Angle>
     <Transform>
       <M11>1</M11>
@@ -28,6 +28,5 @@
     <Visible>true</Visible>
     <Name>Image_0</Name>
     <Opacity>1</Opacity>
-    <SourceFile>C:\image.png</SourceFile>
   </UIComponent>
 </SeralizableObjectHolder>

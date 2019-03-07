@@ -17,7 +17,7 @@
         Drop="Window_Drop">
     <ScrollViewer Height="auto" Width="auto" Background="LightGray" Grid.Row="1">
         <StackPanel Height="auto" Width="auto">
-            <ItemsControl Name="AvailableFrames">
+            <ItemsControl Name="AvailablePrefabs">
                 <ItemsControl.ItemTemplate>
                     <DataTemplate>
                         <Border BorderThickness="1" Tag="{Binding}" BorderBrush="Gray" MinHeight="32" Width="auto"

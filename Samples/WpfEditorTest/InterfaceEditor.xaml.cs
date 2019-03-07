@@ -81,6 +81,7 @@ namespace WpfEditorTest
 		public UIContainer DragFieldFrame;
 		public UIContainer SceneFrame;
 		public UIContainer RootFrame;
+		private List<Type> customUIComponentTypes;
 		private string _currentSceneFile;
 		private string _sceneChangedIndicator;
 		private string _titleWithFileName = ApplicationConfig.BaseTitle + " - " + ApplicationConfig.BaseSceneName;
@@ -210,6 +211,8 @@ namespace WpfEditorTest
 
 			Closing += ( sender, args ) => { if (args.Cancel == false) tokenSource.Cancel(); };
 
+			this.customUIComponentTypes = (_engine.GameInterface as ICustomizableUI)?.CustomUIComponentTypes;
+
 			_slotDetails = new SlotDetailsWindow();
 			_details = new FrameDetails();
 			_treeView = new FrameTreeView();
@@ -257,8 +260,10 @@ namespace WpfEditorTest
 			};
 			_treeView.RequestFrameDeletionInUI += ( _, __ ) => TryDeleteSelectedFrame();
 
-			var templates = Directory.GetFiles(ApplicationConfig.TemplatesPath, "*.xml").ToList();
-			_palette.AvailableFrames.ItemsSource = templates.Select(t => t.Split('\\').Last().Split('.').First());
+			LoadPalettes();
+
+			//var templates = Directory.GetFiles(ApplicationConfig.TemplatesPath, "*.xml").ToList();
+			//_palette.AvailablePrefabs.ItemsSource = templates.Select(t => t.Split('\\').Last().Split('.').First());
 
 			SelectionLayer.Window = this;
 			SelectionLayer.PaletteWindow = _palette;
@@ -579,7 +584,7 @@ namespace WpfEditorTest
 			if (Directory.Exists(ApplicationConfig.TemplatesPath))
 			{
 				var templates = Directory.GetFiles(ApplicationConfig.TemplatesPath, "*.xml").ToList();
-				_palette.AvailableFrames.ItemsSource = templates.Select(t => t.Split('\\').Last().Split('.').First());
+				_palette.AvailablePrefabs.ItemsSource = templates.Select(t => t.Split('\\').Last().Split('.').First());
 			}
 		}
 

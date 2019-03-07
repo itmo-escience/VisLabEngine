@@ -79,6 +79,35 @@ namespace GISTest
 
 		ScalableFrame Scene;
 		ScalableFrame DragFieldFrame;
+
+		public System.Reflection.Assembly ProjectAssembly
+		{
+			get
+			{
+				return this.GetType().Assembly;
+			}
+		}
+
+		public List<Type> CustomUIComponentTypes
+		{
+			get
+			{
+				var componentTypes = new List<Type>();
+				foreach (var item in ProjectAssembly.GetTypes())
+				{
+					if (item.IsSubclassOf(typeof(UIComponent)))
+					{
+						componentTypes.Add(item);
+					}
+				}
+				//var components = new List<UIComponent>();
+				//foreach (var item in componentTypes)
+				//{
+				//	components.Add(Activator.CreateInstance(item) as UIComponent);
+				//}
+				return componentTypes;
+			}
+		}
 		/// <summary>
 		/// Ctor
 		/// </summary>
@@ -386,7 +415,7 @@ namespace GISTest
 	    private SolidBrushD2D _brush;
         public UIManager UIManager { get; private set; }
 
-        private Fusion.Engine.Frames2.Components.Label txt;
+		private Fusion.Engine.Frames2.Components.Label txt;
 	    private float angle = 0;
 	    private Image img1;
         private Image img2;
