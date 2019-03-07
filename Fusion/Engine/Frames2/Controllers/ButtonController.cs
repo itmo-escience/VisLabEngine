@@ -12,7 +12,7 @@ namespace Fusion.Engine.Frames2.Controllers
         public Slot Foreground { get; }
         public Slot Background { get; }
 
-        public ButtonController(float x, float y) : base(x, y, 100, 100)
+        public ButtonController(float x, float y, float width, float height) : base(x, y, width, height)
         {
             Foreground = new Slot("Foreground");
             Background = new Slot("Background");
@@ -25,8 +25,6 @@ namespace Fusion.Engine.Frames2.Controllers
             MouseUpOutside += OnMouseUp;
             Enter += OnEnter;
             Leave += OnLeave;
-
-            ButtonClick += (sender, args) => { };
         }
 
         private void OnEnter(UIComponent sender)
