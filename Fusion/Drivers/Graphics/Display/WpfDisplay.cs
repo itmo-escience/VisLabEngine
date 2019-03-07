@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Concurrent;
+using System.Diagnostics;
 using System.Threading;
 using SharpDX.Direct3D;
 using SharpDX.Direct3D11;
@@ -13,12 +14,10 @@ namespace Fusion.Drivers.Graphics.Display
 {
 	public class WpfDisplay : BaseDisplay
 	{
-        private ConcurrentQueue<RenderTarget2D> _oldBuffers = new ConcurrentQueue<RenderTarget2D>();
+        private readonly ConcurrentQueue<RenderTarget2D> _oldBuffers = new ConcurrentQueue<RenderTarget2D>();
 	    private RenderTarget2D _currentBuffer;
 	    private volatile RenderTarget2D _readyBuffer;
 	    private DepthStencil2D _backbufferDepth;
-
-        private readonly object _lockHolder = new object();
 
 	    private int _clientWidth;
 	    private int _clientHeight;
@@ -57,7 +56,10 @@ namespace Fusion.Drivers.Graphics.Display
             RecreateBuffers();
 	    }
 
-	    private void RecreateBuffers() {
+	    private readonly Stopwatch _sw = new Stopwatch();
+        private void RecreateBuffers()
+	    {
+            _sw.Start();
 
             _readyBuffer?.Dispose();
 		    _currentBuffer?.Dispose();
@@ -77,6 +79,10 @@ namespace Fusion.Drivers.Graphics.Display
 	        _readyBuffer = CreateBuffer();
 
             _backbufferDepth = new DepthStencil2D(device, DepthFormat.D24S8, _currentBuffer.Width, _currentBuffer.Height, _currentBuffer.SampleCount);
+
+            _sw.Stop();
+            Log.Debug($"WpfDisplay: Buffers recreated in {_sw.Elapsed.TotalMilliseconds:0.00}");
+            _sw.Reset();
         }
 
 	    private RenderTarget2D CreateBuffer()
@@ -159,13 +165,8 @@ namespace Fusion.Drivers.Graphics.Display
 	        _oldBuffers.Enqueue(buffer);
 	    }
 
-	    private volatile bool _renderRequested;
-	    public volatile bool RenderRequestComplete = true;
-	    public void RequestRender()
-	    {
-	        RenderRequestComplete = false;
-            _renderRequested = true;
-	    }
+	    public readonly object RenderLock = new object();
+	    private bool _renderRequestPending = true;
 
 		public override void Update()
 		{
@@ -181,19 +182,33 @@ namespace Fusion.Drivers.Graphics.Display
 		        _isResizeRequested = false;
 		    }
 
-            if (_renderRequested)
+		    lock (RenderLock)
 		    {
-		        var lst = DeferredContext.FinishCommandList(false);
-		        if (lst != null)
+		        if (_renderRequestPending)
 		        {
-		            device.Device.ImmediateContext.ExecuteCommandList(lst, false);
-                    lst.Dispose();
-		        } else
-		            Log.Warning("Empty command list");
+		            Monitor.Enter(_renderRequestPending);
+		            var lst = DeferredContext.FinishCommandList(false);
+		            if (lst != null)
+		            {
+		                device.Device.ImmediateContext.ExecuteCommandList(lst, false);
+		                lst.Dispose();
+		            }
+		            else
+		                Log.Debug("WpfDisplay: Empty command list");
 
-		        _renderRequested = false;
-		        RenderRequestComplete = true;
+		            _renderRequestPending = false;
+		            Monitor.PulseAll(RenderLock);
+		        }
 		    }
+		}
+
+	    public void WaitRender()
+	    {
+	        lock (RenderLock)
+	        {
+	            _renderRequestPending = true;
+	            Monitor.Wait(RenderLock);
+	        }
         }
 
 
