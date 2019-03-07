@@ -18,22 +18,24 @@ namespace Fusion.Engine.Frames2.Controllers
         protected override IEnumerable<State> NonDefaultStates => new List<State> { Dragged };
 
         public Slot TitleBackground { get; }
-        public Slot Background { get; }
+        public Slot ContentBackground { get; }
         public Slot Title { get; }
         public Slot ExitButton { get; }
         public Slot Content { get; }
 
         private Vector2 _dragLastPosition;
 
+        private const float _titleHeight = 25;
+
         public DialogBoxController(float x, float y, float width, float height) : base(x, y, width, height)
         {
-            Background = new Slot("Background");
+            ContentBackground = new Slot("ContentBackground");
             TitleBackground = new Slot("TitleBackground");
             Title = new Slot("Title");
             ExitButton = new Slot("ExitButton");
             Content = new Slot("Content");
 
-            SlotsInternal.Add(Background);
+            SlotsInternal.Add(ContentBackground);
             SlotsInternal.Add(TitleBackground);
             SlotsInternal.Add(Title);
             SlotsInternal.Add(ExitButton);
@@ -68,6 +70,13 @@ namespace Fusion.Engine.Frames2.Controllers
             };
 
             MouseDrag += TryMove;
+
+            PropertyChanged += (s, e) =>
+            {
+                if (e.PropertyName == "Width" || e.PropertyName == "Height") UpdateSlotsComponentsSizes();
+            };
+
+            SetAttachEvents();
         }
 
         private void TryMove(UIComponent sender, DragEventArgs args) => TryMove(args.Position);
@@ -105,6 +114,39 @@ namespace Fusion.Engine.Frames2.Controllers
         {
             Parent.Remove(this);
             OnClose?.Invoke(this, EventArgs.Empty);
+        }
+
+        private void SetAttachEvents()
+        {
+            TitleBackground.ComponentAttached += (s, e) =>
+            {
+                e.New.SetPositionAndSize(0, 0, Width, _titleHeight);
+            };
+            Title.ComponentAttached += (s, e) =>
+            {
+                e.New.SetPositionAndSize(0, 0, Width - _titleHeight, _titleHeight);
+            };
+            ExitButton.ComponentAttached += (s, e) =>
+            {
+                e.New.SetPositionAndSize(Width - _titleHeight, 0, _titleHeight, _titleHeight);
+            };
+            ContentBackground.ComponentAttached += (s, e) =>
+            {
+                e.New.SetPositionAndSize(0, _titleHeight, Width, Height - _titleHeight);
+            };
+            Content.ComponentAttached += (s, e) =>
+            {
+                e.New.SetPositionAndSize(0, _titleHeight, Width, Height - _titleHeight);
+            };       
+        }
+
+        private void UpdateSlotsComponentsSizes()
+        {
+            TitleBackground.Component?.SetPositionAndSize(0, 0, Width, _titleHeight);
+            Title.Component?.SetPositionAndSize(0, 0, Width - _titleHeight, _titleHeight);
+            ExitButton.Component?.SetPositionAndSize(Width - _titleHeight, 0, _titleHeight, _titleHeight);
+            ContentBackground.Component?.SetPositionAndSize(0, _titleHeight, Width, Height - _titleHeight);
+            Content.Component?.SetPositionAndSize(0, _titleHeight, Width, Height - _titleHeight);
         }
     }
 }
