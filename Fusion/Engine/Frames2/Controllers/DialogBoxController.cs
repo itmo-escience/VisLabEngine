@@ -97,8 +97,14 @@ namespace Fusion.Engine.Frames2.Controllers
             if (args.Key == Keys.LeftButton) ChangeState(State.Default);
         }
 
+        public event EventHandler OnClose;
+
         public void Close(object sender, ButtonController.ButtonClickEventArgs args) => Close();
 
-        public void Close() => Parent.Remove(this);
+        public void Close()
+        {
+            Parent.Remove(this);
+            OnClose?.Invoke(this, EventArgs.Empty);
+        }
     }
 }
