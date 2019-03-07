@@ -40,9 +40,10 @@ namespace ZWpfLib
 					//Render();
 			};
 
-            IsVisibleChanged += delegate { UpdateReallyLoopRendering(); };
-
-
+            IsVisibleChanged += delegate
+            {
+                UpdateReallyLoopRendering();
+            };
 		}
 
 		private IntPtr WndProc(IntPtr hwnd, int msg, IntPtr wParam, IntPtr lParam, ref bool handled)
@@ -144,7 +145,6 @@ namespace ZWpfLib
 			}
 		}
 
-
         private TimeSpan _lastRenderTime;
         private void OnLoopRendering(object sender, EventArgs e)
 		{
@@ -160,14 +160,13 @@ namespace ZWpfLib
             Render();
 		}
 
-
         private void UpdateSize()
 		{
 			if (Renderer == null || !Renderer.IsInitialized)
 				return;
 			Renderer.GraphicsDevice.Resize((int)DesiredSize.Width, (int)DesiredSize.Height);
 
-		    Log.Message($"DxElement resize to {DesiredSize}");
+		    Log.Verbose($"DxElement: Resized to {DesiredSize}");
 		}
 
         private bool SameDimensions(RenderTarget2D t1, RenderTarget2D t2)
@@ -177,7 +176,6 @@ namespace ZWpfLib
             return t1.Width == t2.Width && t1.Height == t2.Height && t1.Format == t2.Format;
         }
 
-        private int frameCounter = 1;
         private RenderTarget2D _buf = null;
         /// <summary>
 		/// Will redraw the underlying surface once.
@@ -201,15 +199,12 @@ namespace ZWpfLib
 		    {
 		        display.ReturnBuffer(_buf);
 		        _buf = null;
-		        frameCounter = 0;
 		    }
 
 		    if (_buf == null)
 		    {
 		        _buf = Surface.CopyBackBuffer( display);
             }
-
-		    frameCounter++;
 		}
 
 
