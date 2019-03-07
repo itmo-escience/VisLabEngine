@@ -2,6 +2,7 @@
 using System.Threading;
 using System.Windows;
 using System.Windows.Interop;
+using Fusion;
 using Fusion.Drivers.Graphics;
 using Fusion.Drivers.Graphics.Display;
 using SharpDX.Direct3D11;
@@ -47,6 +48,7 @@ namespace ZWpfLib
             Unlock();
         }
 
+        private Duration _lockWaitDuration = new Duration(TimeSpan.FromMilliseconds(2));
 	    private DeviceContext _deferredContext;
 	    internal RenderTarget2D Buffer { get; private set; }
 	    internal void SetBufferWithContext(RenderTarget2D target, DeviceContext deferredContext)
@@ -57,28 +59,45 @@ namespace ZWpfLib
             var shared = _D3D9.Device.GetSharedD3D9(_texture);
             using (var surface = shared.GetSurfaceLevel(0))
             {
-                if (TryLock(new Duration(default(TimeSpan))))
+                var bufferUpdated = false;
+                var attempts = 0;
+                while (!bufferUpdated)
                 {
-                    SetBackBuffer(D3DResourceType.IDirect3DSurface9, surface.NativePointer);
-                    AddDirtyRect(new Int32Rect(0, 0, base.PixelWidth, base.PixelHeight));
+                    if (TryLock(_lockWaitDuration))
+                    {
+                        SetBackBuffer(D3DResourceType.IDirect3DSurface9, surface.NativePointer);
+                        AddDirtyRect(new Int32Rect(0, 0, base.PixelWidth, base.PixelHeight));
+
+                        bufferUpdated = true;
+                    }
+                    attempts++;
+
+                    Unlock();
                 }
 
-                Unlock();
+                Log.Debug($"DXImageSource: Set back buffer in {attempts} attempts");
             }
         }
 
 	    private Texture2D _texture;
 		public RenderTarget2D CopyBackBuffer(WpfDisplay display)
 		{
-		    Lock();
 		    var newBuffer = display.ExtractBuffer();
 		    var newTexture = newBuffer.Surface.Resource.QueryInterface<Texture2D>();
 
-            _deferredContext.CopyResource(newTexture, _texture);
-            display.RequestRender();
-            while(!display.RenderRequestComplete) Thread.Sleep(5);
+            if (TryLock(_lockWaitDuration))
+		    {
+		        _deferredContext.CopyResource(newTexture, _texture);
 
-		    AddDirtyRect(new Int32Rect(0, 0, base.PixelWidth, base.PixelHeight));
+                display.WaitRender();
+
+		        AddDirtyRect(new Int32Rect(0, 0, base.PixelWidth, base.PixelHeight));
+		    }
+            else
+            {
+                Log.Debug("DXImageSource: Couldn't lock to copy back buffer");
+            }
+
 		    Unlock();
 
             return newBuffer;
