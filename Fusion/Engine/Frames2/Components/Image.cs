@@ -46,6 +46,19 @@ namespace Fusion.Engine.Frames2.Components
 			set
 			{
 				SetAndNotify(ref _textureName, value);
+				try
+				{
+					if ((_texture == null) && (!string.IsNullOrEmpty(_textureName)))
+					{
+						_texture = Game.Instance.Content.Load<Texture2D>(_textureName);
+						UpdateDrawCommand();
+					}
+				}
+				catch (System.Exception)
+				{
+
+					//throw;
+				}
 			}
 		}
 		private DrawBitmap _drawCommand;

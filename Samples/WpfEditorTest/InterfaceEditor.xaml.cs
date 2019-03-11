@@ -162,32 +162,52 @@ namespace WpfEditorTest
 				configFile.Save(ConfigurationSaveMode.Modified);
 				ConfigurationManager.RefreshSection(configFile.AppSettings.SectionInformation.Name);
 			}
+			else 
+			{
+				System.Windows.Application.Current.Shutdown();
+				return;
+			}
 
 			if (String.IsNullOrEmpty(fileName) || !File.Exists(fileName)) {
 				throw new FileNotFoundException("File not found", fileName);
 			}
 
 			var assem = Assembly.LoadFrom(fileName);
-				
-			foreach (var type in assem.GetTypes()) {
-				if (type.IsSubclassOf(typeof(GameServer)) && _engine.GameServer == null) {
-					_engine.GameServer = (GameServer)Activator.CreateInstance(type, _engine);
-					continue;
-				}
-				if (type.IsSubclassOf(typeof(GameClient)) && _engine.GameClient == null) {
-					_engine.GameClient = (GameClient)Activator.CreateInstance(type, _engine);
-					continue;
-				}
-				if (type.IsSubclassOf(typeof(UserInterface)) && _engine.GameInterface == null) {
-					_engine.GameInterface = (UserInterface)Activator.CreateInstance(type, _engine);
-					continue;
-				}
-			}
 
-			if (_engine.GameServer == null || _engine.GameClient == null || _engine.GameInterface == null) {
-				throw new Exception("No classes found in Assembly: " + fileName);
-			}
+			try
+			{
+				foreach (var type in assem.GetTypes())
+				{
+					if (type.IsSubclassOf(typeof(GameServer)) && _engine.GameServer == null)
+					{
+						_engine.GameServer = (GameServer)Activator.CreateInstance(type, _engine);
+						continue;
+					}
+					if (type.IsSubclassOf(typeof(GameClient)) && _engine.GameClient == null)
+					{
+						_engine.GameClient = (GameClient)Activator.CreateInstance(type, _engine);
+						continue;
+					}
+					if (type.IsSubclassOf(typeof(UserInterface)) && _engine.GameInterface == null)
+					{
+						_engine.GameInterface = (UserInterface)Activator.CreateInstance(type, _engine);
+						continue;
+					}
+				}
 
+				if (_engine.GameServer == null || _engine.GameClient == null || _engine.GameInterface == null)
+				{
+					throw new Exception("No classes found in Assembly: " + fileName);
+				}
+
+			}
+			catch (Exception ex)
+			{
+				MessageBox.Show(ex.Message, "Error!", MessageBoxButton.OK);
+				System.Windows.Application.Current.Shutdown();
+				return;
+				//throw;
+			}
 			Directory.SetCurrentDirectory(Path.GetDirectoryName(fileName));
 			
 
@@ -897,13 +917,20 @@ namespace WpfEditorTest
 		private void Window_Closing( object sender, CancelEventArgs e )
 		{
 			e.Cancel = false;
-			foreach (var scene in LoadedScenes.ToList())
+			if (LoadedScenes.Count>0)
 			{
-				e.Cancel |= TryUnloadScene(scene);
-				if (e.Cancel)
+				foreach (var scene in LoadedScenes.ToList())
 				{
-					return; 
-				}
+					e.Cancel |= TryUnloadScene(scene);
+					if (e.Cancel)
+					{
+						return;
+					}
+				} 
+			}
+			else
+			{
+				return;
 			}
 
 			var configFile = ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.None);

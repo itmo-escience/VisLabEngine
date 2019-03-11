@@ -7,7 +7,7 @@
         <string>Fusion.Engine.Frames2.Containers.FreePlacement</string>
       </key>
       <value>
-        <string>Fusion, Version=0.2.6998.28159, Culture=neutral, PublicKeyToken=null</string>
+        <string>Fusion, Version=0.2.7009.22295, Culture=neutral, PublicKeyToken=null</string>
       </value>
     </item>
     <item>
@@ -15,14 +15,14 @@
         <string>Fusion.Engine.Frames2.Components.Image</string>
       </key>
       <value>
-        <string>Fusion, Version=0.2.6998.28159, Culture=neutral, PublicKeyToken=null</string>
+        <string>Fusion, Version=0.2.7009.22295, Culture=neutral, PublicKeyToken=null</string>
       </value>
     </item>
   </dictionary>
   <UIComponent xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:type="FreePlacement">
-    <X>300</X>
-    <Y>300</Y>
-    <Width>617</Width>
+    <X>202</X>
+    <Y>372</Y>
+    <Width>200</Width>
     <Height>200</Height>
     <Angle>0</Angle>
     <Transform>
@@ -37,10 +37,10 @@
     <Name>ImageFreePlacement</Name>
     <Children>
       <UIComponent xsi:type="Image">
-        <X>0</X>
+        <X>125</X>
         <Y>0</Y>
-        <Width>200</Width>
-        <Height>75</Height>
+        <Width>75</Width>
+        <Height>200</Height>
         <Angle>0</Angle>
         <Transform>
           <M11>1</M11>
@@ -51,28 +51,9 @@
           <M32>0</M32>
         </Transform>
         <Visible>true</Visible>
-        <Name>Image_0</Name>
+        <Name>Image_1</Name>
         <Opacity>1</Opacity>
-        <SourceFile>C:\image.png</SourceFile>
-      </UIComponent>
-      <UIComponent xsi:type="Image">
-        <X>0</X>
-        <Y>125</Y>
-        <Width>200</Width>
-        <Height>75</Height>
-        <Angle>0</Angle>
-        <Transform>
-          <M11>1</M11>
-          <M12>0</M12>
-          <M21>0</M21>
-          <M22>1</M22>
-          <M31>0</M31>
-          <M32>0</M32>
-        </Transform>
-        <Visible>true</Visible>
-        <Name>Image_2</Name>
-        <Opacity>1</Opacity>
-        <SourceFile>C:\image.png</SourceFile>
+        <TextureName>UI-new\fv_palette_bg|nomips</TextureName>
       </UIComponent>
       <UIComponent xsi:type="Image">
         <X>0</X>
@@ -91,13 +72,13 @@
         <Visible>true</Visible>
         <Name>Image_3</Name>
         <Opacity>1</Opacity>
-        <SourceFile>C:\image.png</SourceFile>
+        <TextureName>UI-new\fv_palette_bg|nomips</TextureName>
       </UIComponent>
       <UIComponent xsi:type="Image">
-        <X>345</X>
-        <Y>0</Y>
-        <Width>75</Width>
-        <Height>200</Height>
+        <X>0</X>
+        <Y>125</Y>
+        <Width>200</Width>
+        <Height>75</Height>
         <Angle>0</Angle>
         <Transform>
           <M11>1</M11>
@@ -108,9 +89,28 @@
           <M32>0</M32>
         </Transform>
         <Visible>true</Visible>
-        <Name>Image_1</Name>
+        <Name>Image_2</Name>
         <Opacity>1</Opacity>
-        <SourceFile>C:\image.png</SourceFile>
+        <TextureName>UI-new\fv_palette_bg|nomips</TextureName>
+      </UIComponent>
+      <UIComponent xsi:type="Image">
+        <X>0</X>
+        <Y>0</Y>
+        <Width>200</Width>
+        <Height>75</Height>
+        <Angle>0</Angle>
+        <Transform>
+          <M11>1</M11>
+          <M12>0</M12>
+          <M21>0</M21>
+          <M22>1</M22>
+          <M31>0</M31>
+          <M32>0</M32>
+        </Transform>
+        <Visible>true</Visible>
+        <Name>Image_0</Name>
+        <Opacity>1</Opacity>
+        <TextureName>UI-new\fv_palette_bg|nomips</TextureName>
       </UIComponent>
     </Children>
     <NeedClipping>true</NeedClipping>
