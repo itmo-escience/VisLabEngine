@@ -732,7 +732,7 @@ namespace WpfEditorTest
 
 		private bool NeedSnapping()
 		{
-			return VisualGrid.Visibility == Visibility.Visible && !(Keyboard.IsKeyDown(Key.LeftAlt) || Keyboard.IsKeyDown(Key.RightAlt));
+			return/* VisualGrid.Visibility == Visibility.Visible && */!(Keyboard.IsKeyDown(Key.LeftAlt) || Keyboard.IsKeyDown(Key.RightAlt));
 		}
 
 		private void AreaSelectionEnd( List<UIComponent> selectedFrames )

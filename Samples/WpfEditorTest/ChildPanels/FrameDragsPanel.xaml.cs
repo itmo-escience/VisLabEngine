@@ -258,14 +258,14 @@ namespace WpfEditorTest.ChildPanels
 
 			var dX = deltaX;
 			var dY = deltaY;
-			if (needSnapping)
+			if (gridEnabled && needSnapping)
 			{
 				newX = mouseInitPosition.X + deltaX;
 				newY = mouseInitPosition.Y + deltaY;
 				dX -= -step / 2 + (newX + step / 2) % step;
 				dY -= -step / 2 + (newY + step / 2) % step;
 			}
-			else if (!gridEnabled)
+			else if (needSnapping)
 			{
 				newX = TransformedCurrentDragInitPosition.X + deltaX;
 				newY = TransformedCurrentDragInitPosition.Y + deltaY;
@@ -366,12 +366,12 @@ namespace WpfEditorTest.ChildPanels
 			var newY =  SelectedGroupInitPosition.Y + deltaY;
 			dX = deltaX;
 			dY = deltaY;
-			if (needSnapping)
+			if (gridEnabled && needSnapping)
 			{
 				dX -= -step / 2 + (newX + step / 2) % step;
 				dY -= -step / 2 + (newY + step / 2) % step;
 			}
-			else if(!gridEnabled)
+			else if(needSnapping)
 			{
 				var stickingDelta = 0;
 
