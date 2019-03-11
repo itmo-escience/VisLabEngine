@@ -23,7 +23,7 @@ namespace Fusion.Engine.Frames2.Components
         public override void Draw(SpriteLayerD2D layer)
         {
             layer.Draw(new FillRect(0, 0, Width, Height, new SolidBrushD2D(BackgroundColor)));
-            layer.Draw(new Rect(0, 0, Width - 1, Height - 1, new SolidBrushD2D(Color)));
+            layer.Draw(new Rect(0, 0, Width, Height, new SolidBrushD2D(Color)));
         }
     }
 }
