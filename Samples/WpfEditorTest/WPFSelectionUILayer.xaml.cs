@@ -672,7 +672,7 @@ namespace WpfEditorTest
 
 			foreach (var line in StickLines)
 			{
-				VisualGrid.Children.Remove(line);
+				StickLinesGrid.Children.Remove(line);
 			}
 			StickLines.Clear();
 		}
