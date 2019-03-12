@@ -1130,8 +1130,9 @@ namespace WpfEditorTest
 			}
 		}
 
-		private void Window_MouseMove( object sender, MouseEventArgs e )
+		private void Window_PreviewMouseMove( object sender, MouseEventArgs e )
 		{
+			e.Handled = true;
 			SelectionLayer.FullMouseMove(sender, e);
 		}
 
