@@ -336,6 +336,8 @@ namespace WpfEditorTest
 
 					SelectionLayer.DxElem.Renderer = _engine;
 
+					var uiManager = (_engine.GameInterface as ICustomizableUI)?.GetUIManager();
+					uiManager.Mode = UIManager.DisplayMode.Edit;
 					//var binding = new Binding("Children")
 					//{
 					//	Source = SceneFrame,

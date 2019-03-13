@@ -205,7 +205,7 @@ namespace GISTest
             #region UITesting
 
             UIManager = new UIManager(Game.RenderSystem);
-		    UIManager.DebugEnabled = false;
+		    UIManager.Mode = UIManager.DisplayMode.Actual;
 
             /*
             txt = new Fusion.Engine.Frames2.Components.Label("z", new TextFormatD2D("Calibri", 20), 150, 450, 100, 100);
