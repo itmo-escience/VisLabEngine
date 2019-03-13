@@ -12,6 +12,12 @@ namespace Fusion.Engine.Frames2.Containers
 
         public FreePlacement(float x, float y, float width, float height, bool needClipping = false) : base(x, y, width, height, needClipping) { }
 
+        public override void DefaultInit()
+        {
+            Width = 100;
+            Height = 100;
+        }
+
         public override void DebugDraw(SpriteLayerD2D layer)
         {
             base.DebugDraw(layer);

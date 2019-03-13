@@ -4,6 +4,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Fusion.Core.Mathematics;
+using Fusion.Engine.Graphics.SpritesD2D;
+using Fusion.Engine.Frames2.Components;
 
 namespace Fusion.Engine.Frames2.Controllers
 {
@@ -19,7 +22,9 @@ namespace Fusion.Engine.Frames2.Controllers
         public Slot Text { get; }
         public Slot Background { get; }
 
-        public RadioButtonController(float x, float y) : base(x, y, 100, 25)
+        public RadioButtonController() : this(0, 0, 0, 0) {}
+
+        public RadioButtonController(float x, float y, float width, float height) : base(x, y, width, height)
         {
             RadioButton = new Slot("RadioButton");
             Text = new Slot("Text");
@@ -34,8 +39,26 @@ namespace Fusion.Engine.Frames2.Controllers
             MouseUpOutside += OnMouseUp;
             Enter += OnEnter;
             Leave += OnLeave;
+        }
 
-            RadioButtonClick += (sender, args) => { };
+        public override void DefaultInit()
+        {
+            Width = 100;
+            Height = 25;
+                
+            Background.Attach(new Border(0, 0, Width, Height));
+            RadioButton.Attach(new Border(0, 0, Height, Height));
+            Text.Attach(new Label("RadioButton", new TextFormatD2D("Calibry", 12), Height, 0, Width - Height, Height));
+
+            var radioButtoncolor = new UIController.PropertyValue("BackgroundColor", new Color4(1.0f, 0.0f, 0.0f, 1.0f));
+            radioButtoncolor[UIController.State.Hovered] = new Color4(0.5f, 0.0f, 0.0f, 1.0f);
+            radioButtoncolor[UIController.State.Disabled] = new Color4(1.0f, 0.5f, 0.5f, 1.0f);
+            radioButtoncolor[RadioButtonController.Pressed] = new Color4(0.5f, 0.5f, 0.0f, 1.0f);
+            radioButtoncolor[RadioButtonController.Checked] = new Color4(0.0f, 1.0f, 0.0f, 1.0f);
+            radioButtoncolor[RadioButtonController.CheckedHovered] = new Color4(0.0f, 0.5f, 0.0f, 1.0f);
+            radioButtoncolor[RadioButtonController.CheckedDisabled] = new Color4(0.5f, 1.0f, 0.5f, 1.0f);
+
+            RadioButton.Properties.Add(radioButtoncolor);
         }
 
         private void OnEnter(UIComponent sender)

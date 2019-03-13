@@ -128,6 +128,12 @@ namespace Fusion.Engine.Frames2.Components
             };
         }
 
+        public override void DefaultInit()
+        {
+            Width = 100;
+            Height = 100;
+        }
+
         private void UpdateDrawCommand()
         {
             _drawCommand = (Texture != null) ? new DrawBitmap(0, 0, Width, Height, Texture, Opacity) : null;

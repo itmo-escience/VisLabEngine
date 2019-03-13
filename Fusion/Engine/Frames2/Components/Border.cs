@@ -15,6 +15,12 @@ namespace Fusion.Engine.Frames2.Components
         {
         }
 
+        public override void DefaultInit()
+        {
+            Width = 100;
+            Height = 100;
+        }
+
         public override void Update(GameTime gameTime)
         {
 

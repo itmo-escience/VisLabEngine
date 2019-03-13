@@ -288,11 +288,13 @@ namespace GISTest
 
             RadioButtonController CreateSimpleRadioButton(float x, float y)
             {
-                RadioButtonController rbtn = new RadioButtonController(x, y);
+                float width = 100;
                 float height = 25;
-                rbtn.Background.Attach(new Border(0, 0, 100, height));
+                RadioButtonController rbtn = new RadioButtonController(x, y, width, height);
+                
+                rbtn.Background.Attach(new Border(0, 0, width, height));
                 rbtn.RadioButton.Attach(new Border(0, 0, height, height));
-                rbtn.Text.Attach(new Label("RadioButton", new TextFormatD2D("Calibry", 12), height, 0, 100 - height, height));
+                rbtn.Text.Attach(new Label("RadioButton", new TextFormatD2D("Calibry", 12), height, 0, width - height, height));
 
                 var radioButtoncolor = new UIController.PropertyValue("BackgroundColor", new Color4(1.0f, 0.0f, 0.0f, 1.0f));
                 radioButtoncolor[UIController.State.Hovered] = new Color4(0.5f, 0.0f, 0.0f, 1.0f);

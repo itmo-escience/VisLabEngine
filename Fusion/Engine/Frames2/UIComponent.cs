@@ -229,6 +229,8 @@ namespace Fusion.Engine.Frames2
             _isTransformDirty = true;
         }
 
+        public abstract void DefaultInit();
+
         internal void InternalUpdate(GameTime gameTime)
         {
             UpdateTransforms();

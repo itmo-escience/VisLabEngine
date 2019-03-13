@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using Fusion.Engine.Frames2.Components;
 using Fusion.Engine.Frames2.Managing;
 using Fusion.Engine.Graphics.SpritesD2D;
 using Label = Fusion.Engine.Frames2.Components.Label;
@@ -16,9 +17,14 @@ namespace Fusion.Engine.Frames2.Controllers
 
         private Label _label;
 
-        public TextBoxController(float x, float y) : base(x, y, 100, 100)
+        public TextBoxController() : this(0, 0, 0, 0)
         {
-            _label = new Label("z", new TextFormatD2D("Calibri", 12), 0, 0, 100, 100);
+            _label.Text = "";
+        }
+
+        public TextBoxController(float x, float y, float width, float height) : base(x, y, width, height)
+        {
+            _label = new Label("Label", new TextFormatD2D("Calibri", 12), 0, 0, width, height);
 
             Background = new Slot("Background");
             Text = new Slot("Text");
@@ -33,8 +39,20 @@ namespace Fusion.Engine.Frames2.Controllers
             MouseDownOutside += OnMouseDownOutside;
             MouseDown += OnMouseDown;
             KeyPress += OnKeyPress;
+        }
 
-            Input += (sender, args) => { };
+        public override void DefaultInit()
+        {
+            Width = 100;
+            Height = 100;
+
+            _label.MaxWidth = Width;
+            _label.MaxHeight = Height;
+            _label.Width = Width;
+            _label.Height = Height;
+            _label.Text = "TextBox";
+
+            Background.Attach(new Border(0, 0, Width, Height));
         }
 
         public event EventHandler<InputEventArgs> Input;
