@@ -31,8 +31,8 @@ namespace WpfEditorTest
 
 		private List<Line> StickLines = new List<Line>();
 
-		private int _deltaX = 0;
-		private int _deltaY = 0;
+		private float _deltaX = 0;
+		private float _deltaY = 0;
 		private Point _initMousePosition;
 
 		private Rectangle _selectionRectangle;
@@ -238,8 +238,8 @@ namespace WpfEditorTest
 		private void RecalcMouseDelta( MouseEventArgs e )
 		{
 			var currentMousePosition = GetBoundedMousePosition(e);
-			_deltaX = (int)(currentMousePosition.X - _initMousePosition.X);
-			_deltaY = (int)(currentMousePosition.Y - _initMousePosition.Y);
+			_deltaX = (float)(currentMousePosition.X - _initMousePosition.X);
+			_deltaY = (float)(currentMousePosition.Y - _initMousePosition.Y);
 		}
 
         private Point GetBoundedMousePosition(MouseEventArgs e)
@@ -532,7 +532,7 @@ namespace WpfEditorTest
 			else if (FrameSelectionPanelList.Any(fsp => fsp.Value.MousePressed))
 			{
 				var movedPanel = FrameSelectionPanelList.FirstOrDefault(fsp => fsp.Value.MousePressed).Value;
-				if (!movedPanel.IsInDragField && (_deltaX != 0 || _deltaY != 0))
+				if (!movedPanel.IsInDragField && (Math.Abs(_deltaX) > float.Epsilon || Math.Abs(_deltaY) > float.Epsilon))
 				{
 					foreach (var panel in FrameSelectionPanelList.Values)
 					{
@@ -543,7 +543,7 @@ namespace WpfEditorTest
 					_frameDragsPanel.SelectedGroupInitSize = new Size(_frameDragsPanel.Width, _frameDragsPanel.Height);
 					_frameDragsPanel.SelectedGroupInitPosition = new Point(_frameDragsPanel.RenderTransform.Value.OffsetX, _frameDragsPanel.RenderTransform.Value.OffsetY);
 				}
-				else if (_deltaX != 0 || _deltaY != 0)
+				else if (Math.Abs(_deltaX) > float.Epsilon || Math.Abs(_deltaY) > float.Epsilon)
 				{
 					RecalculateSelectionPosition(e.MouseDevice.GetPosition(this));
 				}
@@ -570,27 +570,27 @@ namespace WpfEditorTest
 		{
 			if (!FrameSelectionPanelList.ContainsKey(frame))
 			{
-				StickingCoordsX.Add(new StickCoordinateX((int)frame.BoundingBox.X, (int)frame.BoundingBox.Y, (int)(frame.BoundingBox.Y + frame.BoundingBox.Height))
+				StickingCoordsX.Add(new StickCoordinateX(frame.BoundingBox.X, frame.BoundingBox.Y, (frame.BoundingBox.Y + frame.BoundingBox.Height))
 				{
 					ActiveChanged = DrawStickLine,
 				});
-				StickingCoordsX.Add(new StickCoordinateX((int)(frame.BoundingBox.X + frame.BoundingBox.Width), (int)frame.BoundingBox.Y, (int)(frame.BoundingBox.Y + frame.BoundingBox.Height))
+				StickingCoordsX.Add(new StickCoordinateX((frame.BoundingBox.X + frame.BoundingBox.Width), frame.BoundingBox.Y, (frame.BoundingBox.Y + frame.BoundingBox.Height))
 				{
 					ActiveChanged = DrawStickLine,
 				});
-				StickingCoordsX.Add(new StickCoordinateX((int)(frame.BoundingBox.X + frame.BoundingBox.Width/2), (int)frame.BoundingBox.Y, (int)(frame.BoundingBox.Y + frame.BoundingBox.Height))
+				StickingCoordsX.Add(new StickCoordinateX((frame.BoundingBox.X + frame.BoundingBox.Width/2), frame.BoundingBox.Y, (frame.BoundingBox.Y + frame.BoundingBox.Height))
 				{
 					ActiveChanged = DrawStickLine,
 				});
-				StickingCoordsY.Add(new StickCoordinateY((int)frame.BoundingBox.Y, (int)frame.BoundingBox.X, (int)(frame.BoundingBox.X + frame.BoundingBox.Width))
+				StickingCoordsY.Add(new StickCoordinateY(frame.BoundingBox.Y, frame.BoundingBox.X, (frame.BoundingBox.X + frame.BoundingBox.Width))
 				{
 					ActiveChanged = DrawStickLine,
 				});
-				StickingCoordsY.Add(new StickCoordinateY((int)(frame.BoundingBox.Y + frame.BoundingBox.Height), (int)frame.BoundingBox.X, (int)(frame.BoundingBox.X + frame.BoundingBox.Width))
+				StickingCoordsY.Add(new StickCoordinateY((frame.BoundingBox.Y + frame.BoundingBox.Height), frame.BoundingBox.X, (frame.BoundingBox.X + frame.BoundingBox.Width))
 				{
 					ActiveChanged = DrawStickLine,
 				});
-				StickingCoordsY.Add(new StickCoordinateY((int)(frame.BoundingBox.Y + frame.BoundingBox.Height/2), (int)frame.BoundingBox.X, (int)(frame.BoundingBox.X + frame.BoundingBox.Width))
+				StickingCoordsY.Add(new StickCoordinateY((frame.BoundingBox.Y + frame.BoundingBox.Height/2), frame.BoundingBox.X, (frame.BoundingBox.X + frame.BoundingBox.Width))
 				{
 					ActiveChanged = DrawStickLine,
 				});
@@ -610,8 +610,8 @@ namespace WpfEditorTest
 				{
 					var line =	PrepareLine(
 						coordX.X, coordX.X,
-						Math.Min(coordX.TopY, _frameDragsPanel.RenderTransform.Value.OffsetY),
-						Math.Max(coordX.BottomY, _frameDragsPanel.RenderTransform.Value.OffsetY + _frameDragsPanel.ActualHeight),
+						Math.Min(coordX.TopY, _frameDragsPanel.RenderTransform.Value.OffsetY + _frameDragsPanel.ActualHeight * _frameDragsPanel.RenderTransform.Value.M22),
+						Math.Max(coordX.BottomY, _frameDragsPanel.RenderTransform.Value.OffsetY + _frameDragsPanel.ActualHeight * _frameDragsPanel.RenderTransform.Value.M22),
 						2, Brushes.MediumBlue
 						);
 					StickLinesGrid.Children.Add(line);
@@ -634,8 +634,8 @@ namespace WpfEditorTest
 				if (coordY.IsActive)
 				{
 					var line = PrepareLine(
-						Math.Min(coordY.LeftX, _frameDragsPanel.RenderTransform.Value.OffsetX),
-						Math.Max(coordY.RightX, _frameDragsPanel.RenderTransform.Value.OffsetX + _frameDragsPanel.ActualWidth),
+						Math.Min(coordY.LeftX, _frameDragsPanel.RenderTransform.Value.OffsetX + _frameDragsPanel.ActualWidth * _frameDragsPanel.RenderTransform.Value.M11),
+						Math.Max(coordY.RightX, _frameDragsPanel.RenderTransform.Value.OffsetX + _frameDragsPanel.ActualWidth * _frameDragsPanel.RenderTransform.Value.M11),
 						coordY.Y, coordY.Y,
 						2, Brushes.MediumBlue
 						);
@@ -709,6 +709,18 @@ namespace WpfEditorTest
 															panel.SelectedFrame.GlobalTransform.M21, panel.SelectedFrame.GlobalTransform.M22,
 															multedTransform.X, multedTransform.Y);// transform;
 			}
+
+			foreach (var x in StickingCoordsX)
+			{
+				x.IsActive = false;
+			}
+			foreach (var y in StickingCoordsY)
+			{
+				y.IsActive = false;
+			}
+
+			ActivateStickingLines(StickingCoordsX, _frameDragsPanel.RenderTransform.Value.OffsetX, _frameDragsPanel.Width);
+			ActivateStickingLines(StickingCoordsY, _frameDragsPanel.RenderTransform.Value.OffsetY, _frameDragsPanel.Height);
 		}
 
 		public void RecalculateSelectionPosition( Point currentLocation )
@@ -727,12 +739,68 @@ namespace WpfEditorTest
 				transform.Children.Add(new ScaleTransform(Math.Sign(panel.WidthBuffer), Math.Sign(panel.HeightBuffer)));
 				transform.Children.Add(transformDelta);
                 panel.RenderTransform = transform;
+				panel.UpdateLayout();
+			}
+			_frameDragsPanel.UpdateLayout();
+
+			foreach (var x in StickingCoordsX)
+			{
+				x.IsActive = false;
+			}
+			foreach (var y in StickingCoordsY)
+			{
+				y.IsActive = false;
+			}
+
+			ActivateStickingLines(StickingCoordsX, _frameDragsPanel.RenderTransform.Value.OffsetX, _frameDragsPanel.Width);
+			ActivateStickingLines(StickingCoordsY, _frameDragsPanel.RenderTransform.Value.OffsetY, _frameDragsPanel.Height);
+
+
+		}
+
+		private void ActivateStickingLines(List<StickCoordinateY> stickingCoordsY, double minValue, double additionalValue )
+		{
+			var closestStickY1 = stickingCoordsY.Where(scY => Math.Abs(minValue - scY.Y) <= float.Epsilon + 1.0f).FirstOrDefault();
+			var closestStickY2 = stickingCoordsY.Where(scY => Math.Abs((minValue + additionalValue) - scY.Y) <= float.Epsilon + 1.0f).FirstOrDefault();
+			var closestStickY3 = stickingCoordsY.Where(scY => Math.Abs((minValue + additionalValue / 2) - scY.Y) <= float.Epsilon + 1.0f).FirstOrDefault();
+
+			if (closestStickY1 != null)
+			{
+				closestStickY1.IsActive = true;
+			}
+			if (closestStickY2 != null)
+			{
+				closestStickY2.IsActive = true;
+			}
+			if (closestStickY3 != null)
+			{
+				closestStickY3.IsActive = true;
+			}
+		}
+
+		private void ActivateStickingLines( List<StickCoordinateX> stickingCoordsX, double minValue, double additionalValue )
+		{
+			var closestStickX1 = stickingCoordsX.Where(scX => Math.Abs(minValue - scX.X) <= float.Epsilon + 1.0f).FirstOrDefault();
+			var closestStickX2 = stickingCoordsX.Where(scX => Math.Abs((minValue + additionalValue) - scX.X) <= float.Epsilon + 1.0f).FirstOrDefault();
+			var closestStickX3 = stickingCoordsX.Where(scX => Math.Abs((minValue + additionalValue / 2) - scX.X) <= float.Epsilon + 1.0f).FirstOrDefault();
+
+			if (closestStickX1 != null)
+			{
+				closestStickX1.IsActive = true;
+			}
+			if (closestStickX2 != null)
+			{
+				closestStickX2.IsActive = true;
+			}
+			if (closestStickX3 != null)
+			{
+				closestStickX3.IsActive = true;
 			}
 		}
 
 		private bool NeedSnapping()
 		{
-			return VisualGrid.Visibility == Visibility.Visible && !(Keyboard.IsKeyDown(Key.LeftAlt) || Keyboard.IsKeyDown(Key.RightAlt));
+			return/* VisualGrid.Visibility == Visibility.Visible && */!(Keyboard.IsKeyDown(Key.LeftAlt) || Keyboard.IsKeyDown(Key.RightAlt));
 		}
 
 		private void AreaSelectionEnd( List<UIComponent> selectedFrames )

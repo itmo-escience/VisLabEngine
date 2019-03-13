@@ -45,6 +45,7 @@ using MouseEventArgs = System.Windows.Input.MouseEventArgs;
 using RadioButton = System.Windows.Controls.RadioButton;
 using TabControl = System.Windows.Controls.TabControl;
 using TreeView = System.Windows.Controls.TreeView;
+using Fusion.Engine.Frames2.Components;
 
 namespace WpfEditorTest
 {
@@ -294,7 +295,8 @@ namespace WpfEditorTest
 
 			
 
-			_palette.BaseComponents.ItemsSource = Assembly.GetAssembly(typeof(UIComponent)).GetTypes().Where(t => t.IsSubclassOf(typeof(UIComponent)));
+			_palette.BaseComponents.ItemsSource = Assembly.GetAssembly(typeof(UIComponent)).GetTypes()
+				.Where(t => t.IsSubclassOf(typeof(UIComponent)) && !t.IsAbstract && t != typeof(StartClippingFlag) && t != typeof(EndClippingFlag));
 
 			//var templates = Directory.GetFiles(ApplicationConfig.TemplatesPath, "*.xml").ToList();
 			//_palette.AvailablePrefabs.ItemsSource = templates.Select(t => t.Split('\\').Last().Split('.').First());
@@ -1128,8 +1130,9 @@ namespace WpfEditorTest
 			}
 		}
 
-		private void Window_MouseMove( object sender, MouseEventArgs e )
+		private void Window_PreviewMouseMove( object sender, MouseEventArgs e )
 		{
+			e.Handled = true;
 			SelectionLayer.FullMouseMove(sender, e);
 		}
 

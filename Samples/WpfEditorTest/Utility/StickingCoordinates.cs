@@ -8,9 +8,9 @@ namespace WpfEditorTest.Utility
 {
 	public class StickCoordinateX
 	{
-		public int X;
-		public int TopY;
-		public int BottomY;
+		public float X;
+		public float TopY;
+		public float BottomY;
 
 		private bool isActive;
 
@@ -26,7 +26,7 @@ namespace WpfEditorTest.Utility
 			}
 		}
 
-		public StickCoordinateX( int x, int topY, int bottomY )
+		public StickCoordinateX( float x, float topY, float bottomY )
 		{
 			X = x;
 			TopY = topY;
@@ -36,9 +36,9 @@ namespace WpfEditorTest.Utility
 
 	public class StickCoordinateY
 	{
-		public int Y;
-		public int LeftX;
-		public int RightX;
+		public float Y;
+		public float LeftX;
+		public float RightX;
 
 		private bool isActive;
 
@@ -54,7 +54,7 @@ namespace WpfEditorTest.Utility
 			}
 		}
 
-		public StickCoordinateY( int y, int leftX, int rightX )
+		public StickCoordinateY( float y, float leftX, float rightX )
 		{
 			Y = y;
 			LeftX = leftX;
