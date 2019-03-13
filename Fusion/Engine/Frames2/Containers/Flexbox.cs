@@ -60,6 +60,13 @@ namespace Fusion.Engine.Frames2.Containers
             _mainSize = width;  //TODO make better
         }
 
+        public override void DefaultInit()
+        {
+            Width = 100;
+            Height = 100;
+            _mainSize = Width;
+        }
+
         public override void DebugDraw(SpriteLayerD2D layer)
         {
             base.DebugDraw(layer);

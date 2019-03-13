@@ -827,6 +827,8 @@ namespace WpfEditorTest
 
 					if (createdFrame != null)
 					{
+                        createdFrame.DefaultInit();
+
 						List<IEditorCommand> commands = Window.AddFrameToScene(createdFrame, e.GetPosition(this));
 						commands.Add(new SelectFrameCommand(new List<UIComponent> { createdFrame }));
 						CommandManager.Instance.Execute(new CommandGroup(commands.ToArray()));

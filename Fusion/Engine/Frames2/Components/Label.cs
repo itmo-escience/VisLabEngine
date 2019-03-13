@@ -108,6 +108,18 @@ namespace Fusion.Engine.Frames2.Components
             };
         }
 
+        public override void DefaultInit()
+        {
+            Width = 100;
+            Height = 100;
+            _textFormat = new TextFormatD2D("Calibri", 12);
+            _maxWidth = Width;
+            _maxHeight = Height;
+            Text = "Label";
+
+            _isDirtyText = true;
+        }
+
         public override void Update(GameTime gameTime)
         {
             if (_isDirtyText)

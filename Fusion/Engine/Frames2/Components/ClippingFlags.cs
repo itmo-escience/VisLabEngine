@@ -17,6 +17,10 @@ namespace Fusion.Engine.Frames2.Components
             layer.Draw(new StartClippingAlongGeometry(_pathGeometry, AntialiasModeD2D.Aliased));
         }
 
+        public override void DefaultInit()
+        {
+        }
+
         public override void Update(GameTime gameTime) { }
     }
 
@@ -27,6 +31,10 @@ namespace Fusion.Engine.Frames2.Components
         public override void Draw(SpriteLayerD2D layer)
         {
             layer.Draw(new EndClippingAlongGeometry());
+        }
+
+        public override void DefaultInit()
+        { 
         }
 
         public override void Update(GameTime gameTime) { }

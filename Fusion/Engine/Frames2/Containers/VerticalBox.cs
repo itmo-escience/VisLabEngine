@@ -67,6 +67,13 @@ namespace Fusion.Engine.Frames2.Containers
             Alignment = alignment;
         }
 
+        public override void DefaultInit()
+        {
+            Width = 100;
+            Height = 100;
+            Alignment = VerticalAlignment.Left;
+        }
+
         public override void DebugDraw(SpriteLayerD2D layer)
         {
             base.DebugDraw(layer);

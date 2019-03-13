@@ -1,4 +1,6 @@
-﻿using System;
+﻿using Fusion.Engine.Frames2.Components;
+using Fusion.Engine.Frames2.Containers;
+using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Linq;
@@ -13,6 +15,8 @@ namespace Fusion.Engine.Frames2.Controllers
         public Slot Background { get; }
 
         public RadioButtonController CheckedRadioButton { get; private set; }
+
+        public RadioButtonGroupController() : this(0, 0, 0, 0) {}
 
         public RadioButtonGroupController(float x, float y, float width, float height) : base(x, y, width, height)
         {
@@ -38,6 +42,14 @@ namespace Fusion.Engine.Frames2.Controllers
                     oldContainer.Children.CollectionChanged -= OnRadioButtonCollectionChange;
                 }
             };
+        }
+
+        public override void DefaultInit()
+        {
+            Width = 100;
+            Height = 100;
+            Background.Attach(new Border(0, 0, 100, 100));
+            ButtonsContainer.Attach(new FreePlacement(0, 0, 100, 100));
         }
 
         private void OnRadioButtonCollectionChange(object sender, NotifyCollectionChangedEventArgs args)

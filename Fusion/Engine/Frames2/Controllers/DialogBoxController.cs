@@ -6,7 +6,10 @@ using System.Threading.Tasks;
 using System.Windows.Forms.VisualStyles;
 using Fusion.Core.Mathematics;
 using Fusion.Engine.Frames.Abstract;
+using Fusion.Engine.Frames2.Components;
+using Fusion.Engine.Frames2.Containers;
 using Fusion.Engine.Frames2.Managing;
+using Fusion.Engine.Graphics.SpritesD2D;
 using Fusion.Engine.Input;
 using MoveEventArgs = Fusion.Engine.Frames.Abstract.MoveEventArgs;
 
@@ -26,6 +29,8 @@ namespace Fusion.Engine.Frames2.Controllers
         private Vector2 _dragLastPosition;
 
         private const float _titleHeight = 25;
+
+        public DialogBoxController() : this(0, 0, 0, 0) {}
 
         public DialogBoxController(float x, float y, float width, float height) : base(x, y, width, height)
         {
@@ -77,6 +82,36 @@ namespace Fusion.Engine.Frames2.Controllers
             };
 
             SetAttachEvents();
+        }
+
+        public override void DefaultInit()
+        {
+            Width = 200;
+            Height = 150;
+
+            var background = new Border();
+            background.BackgroundColor = new Color4(0.5f, 0.5f, 0.5f, 1.0f);
+            ContentBackground.Attach(background);
+
+            var titleBackground = new Border();
+            titleBackground.BackgroundColor = new Color4(0.25f, 0.25f, 0.25f, 1.0f);
+            TitleBackground.Attach(titleBackground);
+
+            Title.Attach(new Label("Dialog", new TextFormatD2D("Calibry", 12), 0, 0, 0, 0));
+            var content = new FreePlacement();
+            content.Add(new Label("Content", new TextFormatD2D("Calibry", 20), 0, 0, 100, 100));
+            Content.Attach(content);
+
+            var btn = new ButtonController(0, 0, 0, 0);
+
+            var buttonBackground = new Border(0, 0, 25, 25);
+            buttonBackground.BackgroundColor = new Color4(1.0f, 0.0f, 0.0f, 1.0f);
+            btn.Background.Attach(buttonBackground);
+
+            btn.Foreground.Attach(new Label("  X", new TextFormatD2D("Calibry", 15), 0, 0, 25, 25));
+            //btn.Foreground.Attach(new Image(0, 0,@"UI-new\fv-icons_clear-text-box|nomips", 1));
+
+            ExitButton.Attach(btn);
         }
 
         private void TryMove(UIComponent sender, DragEventArgs args) => TryMove(args.Position);

@@ -1,6 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using Fusion.Core.Mathematics;
+using Fusion.Engine.Frames2.Components;
 using Fusion.Engine.Frames2.Managing;
+using Fusion.Engine.Graphics.SpritesD2D;
 
 namespace Fusion.Engine.Frames2.Controllers
 {
@@ -11,6 +14,10 @@ namespace Fusion.Engine.Frames2.Controllers
 
         public Slot Foreground { get; }
         public Slot Background { get; }
+
+        public ButtonController() : this(0,  0,  0,  0)
+        {
+        }
 
         public ButtonController(float x, float y, float width, float height) : base(x, y, width, height)
         {
@@ -25,6 +32,27 @@ namespace Fusion.Engine.Frames2.Controllers
             MouseUpOutside += OnMouseUp;
             Enter += OnEnter;
             Leave += OnLeave;
+        }
+
+        public override void DefaultInit()
+        {
+            Width = 100;
+            Height = 100;
+
+            Background.Attach(new Border(0, 0, 100, 100));
+            Foreground.Attach(new Label("Button", new TextFormatD2D("Calibry", 12), 0, 0, 100, 100));
+
+
+            var bgColor = new UIController.PropertyValue("BackgroundColor", Color4.White);
+            bgColor[UIController.State.Hovered] = new Color4(1.0f, 0.0f, 0.0f, 1.0f);
+            bgColor[ButtonController.Pressed] = new Color4(0.0f, 1.0f, 1.0f, 1.0f);
+
+            var color = new UIController.PropertyValue("BackgroundColor", new Color4(1.0f, 1.0f, 0.0f, 1.0f));
+            color[UIController.State.Hovered] = new Color4(1.0f, 0.0f, 1.0f, 1.0f);
+            color[ButtonController.Pressed] = new Color4(1.0f, 1.0f, 1.0f, 1.0f);
+
+            Background.Properties.Add(bgColor);
+            Background.Properties.Add(color);
         }
 
         private void OnEnter(UIComponent sender)
