@@ -73,7 +73,7 @@ namespace WpfEditorTest.ChildPanels
 		{
 			this.initTreeViewItemHolder = sender as TextBlock;
 			var objectChecking = (sender as TextBlock).Tag;
-			if (objectChecking is UIController.Slot)
+			if (objectChecking is UIController.Placement)
 			{
 				//ControllerSlotSelected?.Invoke(this, objectChecking as UIController.Slot);
 				return;

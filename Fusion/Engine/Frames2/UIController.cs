@@ -1,9 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Linq;
-using Fusion.Core.Mathematics;
-using Fusion.Engine.Common;
 
 namespace Fusion.Engine.Frames2
 {
@@ -28,15 +25,14 @@ namespace Fusion.Engine.Frames2
             }
         }
 
-        protected UIController(float x, float y, float width, float height) : base(x, y, width, height, true) { }
-
         protected virtual IEnumerable<State<T>> NonDefaultStates => new List<State<T>>();
 
-        protected readonly List<Slot> SlotsInternal = new List<ControllerSlot<T>>();
+        protected readonly List<IS> SlotsInternal = new List<PlacementSlot>();
         //public IReadOnlyList<Slot<T>> Slots => SlotsInternal;
 
         public void ChangeState(State<T> newState)
         {
+            /*
             if (!States.Contains(newState)) return;
 
             foreach (var fragment in Slots)
@@ -58,15 +54,16 @@ namespace Fusion.Engine.Frames2
                 }
             }
 
+            */
             CurrentState = newState;
 
             Log.Verbose(CurrentState);
         }
-
-        internal void Attach(Slot<T> slot, UIComponent component)
+        /*
+        internal void Attach(ISlot<T> slot, UIComponent component)
         {
             var idx = SlotsInternal.IndexOf(slot);
-            base.AddAt(component, idx);
+            base.InsertAt(slot.Component, idx);
 
             ResizeAccordingly();
         }
@@ -135,11 +132,11 @@ namespace Fusion.Engine.Frames2
         }
 
         #endregion
+
+        */
     }
 
-    
-
-    public interface IControllerSlot<T> : ISlot where T : IControllerType
+    public interface IControllerSlot<T> : PlacementSlot where T : IControllerType
     {
         ObservableCollection<PropertyValueStates<T>> Properties { get; }
     }

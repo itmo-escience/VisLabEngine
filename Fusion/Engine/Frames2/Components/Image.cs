@@ -1,4 +1,5 @@
-﻿using Fusion.Drivers.Graphics;
+﻿using System.ComponentModel;
+using Fusion.Drivers.Graphics;
 using Fusion.Engine.Common;
 using Fusion.Engine.Frames2.Managing;
 using Fusion.Engine.Graphics.SpritesD2D;
@@ -10,16 +11,20 @@ namespace Fusion.Engine.Frames2.Components
         private float _opacity;
         public float Opacity {
             get => _opacity;
-            set {
-                SetAndNotify(ref _opacity, value);
+            set
+            {
+                _opacity = value;
+                //SetAndNotify(ref _opacity, value);
             }
         }
 
         private Texture2D _texture;
         public Texture2D Texture {
             get => _texture;
-            set {
-                SetAndNotify(ref _texture, value);
+            set
+            {
+                _texture = value;
+                //SetAndNotify(ref _texture, value);
             }
         }
 
@@ -54,11 +59,16 @@ namespace Fusion.Engine.Frames2.Components
             _drawCommand = new DrawBitmap(0, 0, Width, Height, Texture, Opacity);
         }
 
+        public ISlot Placement { get; set; }
+        public object Tag { get; set; }
+        public string Name { get; set; }
         public override void Update(GameTime gameTime) { }
 
         public override void Draw(SpriteLayerD2D layer)
         {
             layer.Draw(_drawCommand);
         }
+
+        public event PropertyChangedEventHandler PropertyChanged;
     }
 }

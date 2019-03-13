@@ -1,4 +1,5 @@
-﻿using Fusion.Core.Mathematics;
+﻿using System.ComponentModel;
+using Fusion.Core.Mathematics;
 using Fusion.Engine.Common;
 using Fusion.Engine.Graphics.SpritesD2D;
 
@@ -9,21 +10,18 @@ namespace Fusion.Engine.Frames2.Components
         public Color4 BackgroundColor { get; set; } = Color4.Zero;
         public Color4 Color { get; set; } = Color4.White;
 
-        public Border() : base() { }
+        public ISlot Placement { get; set; }
+        public object Tag { get; set; }
+        public string Name { get; set; }
 
-        public Border(float x, float y, float width, float height) : base(x, y, width, height)
+        public void Update(GameTime gameTime) { }
+
+        public void Draw(SpriteLayerD2D layer)
         {
+            layer.Draw(new FillRect(0, 0, Placement.Width, Placement.Height, new SolidBrushD2D(BackgroundColor)));
+            layer.Draw(new Rect(0, 0, Placement.Width, Placement.Height, new SolidBrushD2D(Color)));
         }
 
-        public override void Update(GameTime gameTime)
-        {
-
-        }
-
-        public override void Draw(SpriteLayerD2D layer)
-        {
-            layer.Draw(new FillRect(0, 0, Width, Height, new SolidBrushD2D(BackgroundColor)));
-            layer.Draw(new Rect(0, 0, Width, Height, new SolidBrushD2D(Color)));
-        }
+        public event PropertyChangedEventHandler PropertyChanged;
     }
 }

@@ -21,7 +21,7 @@ namespace WpfEditorTest.WPFConverters
 		{
 			if (item.GetType().IsSubclassOf(typeof(UIController)))
 				return tv2Template;
-			else if (item is UIController.Slot)
+			else if (item is UIController.Placement)
 				return tv3Template;
 			else return tv1Template;
 		}

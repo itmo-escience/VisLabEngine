@@ -39,7 +39,7 @@ namespace WpfEditorTest.UndoRedo
             Game.ResourceWorker.Post(r => {
                 r.ProcessQueue.Post(t => {
                     _oldParent?.Remove(_frame);
-                    _newParent?.AddAt(_frame, _index);
+                    _newParent?.InsertAt(_frame, _index);
                 }, null, int.MaxValue);
             }, null, int.MaxValue);
 		}
@@ -49,7 +49,7 @@ namespace WpfEditorTest.UndoRedo
             Game.ResourceWorker.Post(r => {
                 r.ProcessQueue.Post(t => {
                     _newParent?.Remove(_frame);
-                    _oldParent?.AddAt(_frame, _index);
+                    _oldParent?.InsertAt(_frame, _index);
                 }, null, int.MaxValue);
             }, null, int.MaxValue);
         }

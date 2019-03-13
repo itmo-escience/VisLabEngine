@@ -1,156 +1,57 @@
 ﻿using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using Fusion.Core.Mathematics;
-using Fusion.Core.Utils;
-using Fusion.Engine.Common;
-using Fusion.Engine.Graphics.SpritesD2D;
-using SharpDX.Direct2D1;
-using SharpDX.Mathematics.Interop;
+using System.Linq;
 
 namespace Fusion.Engine.Frames2
 {
-    public abstract class UIContainer : UIComponent
+    public interface UIReadonlyContainer<out T> : UIComponent where T : ISlot
     {
-        private readonly AsyncObservableCollection<UIComponent> _children;
-        public AsyncObservableCollection<UIComponent> Children {
-            get { return _children; }
-            set {
-                foreach (UIComponent child in value)
-                {
-                    Add(child);
-                }
-                NotifyPropertyChanged();
-            }
-        }
+        IEnumerable<T> Slots { get; }
 
-        private bool _needClipping;
-        public bool NeedClipping {
-            get => _needClipping;
-            set {
-                SetAndNotify(ref _needClipping, value);
-            }
-        }
+        int IndexOf(UIComponent child);
 
-        public override void InvalidateTransform()
-        {
-            base.InvalidateTransform();
-            foreach (var child in Children)
-            {
-                child.InvalidateTransform();
-            }
-        }
+        bool Contains(UIComponent component);
+    }
 
-        /*public override RectangleF BoundingBox
-        {
-            get
-            {
-                var b = base.BoundingBox;
+    public interface UIContainer<out T> : UIReadonlyContainer<T> where T : ISlot
+    {
+        T Insert(UIComponent child, int index);
 
-                foreach (var child in Children)
-                {
-                    b = RectangleF.Union(b, child.BoundingBox);
-                }
+        bool Remove(UIComponent child);
 
-                return b;
-            }
-        }*/
-
-        protected UIContainer() : base()
-        {
-            _children = new AsyncObservableCollection<UIComponent>();
-            Children = new AsyncObservableCollection<UIComponent>(_children);
-            _children.CollectionChanged += (s, e) =>
-            {
-                NotifyPropertyChanged(nameof(Children));
-            };
-            _needClipping = false;
-        }
-
-        protected UIContainer(float x, float y, float width, float height, bool needClipping = false) : base(x, y, width, height)
-        {
-            _children = new AsyncObservableCollection<UIComponent>();
-            Children = new AsyncObservableCollection<UIComponent>(_children);
-            _children.CollectionChanged += (s, e) =>
-            {
-                //NotifyPropertyChanged(nameof(Children));
-
-                string text;
-                text = $"{Name}.Children.{e.Action.ToString()}";
-                if (e.Action == System.Collections.Specialized.NotifyCollectionChangedAction.Add) text += $"({((UIComponent)(e.NewItems?[0])).Name})";
-                if (e.Action == System.Collections.Specialized.NotifyCollectionChangedAction.Remove) text += $"({((UIComponent)(e.OldItems?[0])).Name})";
-                Log.Debug(text);
-            };
-            _needClipping = needClipping;
-        }
-
-        public virtual void Add(UIComponent child)
-        {
-			AddAt(child, int.MaxValue);
-		}
-
-		public virtual void AddAt( UIComponent child, int index )
-		{
-			if (_children.Contains(child))
-				return;
-
-			child.Parent = this;
-			if (index >= Children.Count)
-			{
-				Children.Add(child);
-			} else
-			{
-				Children.Insert(index, child);
-			}
-
-            UpdateChildrenLayout();
-        }
-
-        protected virtual void UpdateChildrenLayout() { }
-
-        public virtual bool Remove(UIComponent child)
-        {
-            if(!Children.Contains(child))
-                return false;
-
-            child.Parent = null;
-            _children.Remove(child);
-            return true;
-        }
-
+        /*
         #region ZOrder
-
-        public void AddAtFront(UIComponent child)
+        public void InsertAtFront(UIComponent child)
         {
-            Add(child);
+            Insert(child, Slots.Count);
         }
 
-        public void AddAtBack(UIComponent child)
+        public void InsertAtBack(UIComponent child)
         {
-            AddAt(child, 0);
+            Insert(child, 0);
         }
 
-        public void AddInFrontOf(UIComponent child, UIComponent otherChild)
+        public void InsertInFrontOf(UIComponent child, UIComponent otherChild)
         {
-            if (!Children.Contains(otherChild))
+            if (!Contains(otherChild))
                 return;
 
-            AddAt(child, Children.IndexOf(otherChild) + 1);
+            Insert(child, IndexOf(otherChild) + 1);
         }
 
         public void MoveTo(UIComponent child, int index)
         {
-            if (!Children.Contains(child))
+            if (!Contains(child))
                 return;
 
             if (index < 0) index = 0;
 
             Remove(child);
-            AddAt(child, index);
+            Insert(child, index);
         }
 
         public void BringToFront(UIComponent child)
         {
-            MoveTo(child, Children.Count);
+            MoveTo(child, Count);
         }
 
         public void SendToBack(UIComponent child)
@@ -160,53 +61,42 @@ namespace Fusion.Engine.Frames2
 
         public void BringForward(UIComponent child)
         {
-            MoveTo(child, Children.IndexOf(child) + 1);
+            MoveTo(child, IndexOf(child) + 1);
         }
 
         public void SendBackward(UIComponent child)
         {
-            MoveTo(child, Children.IndexOf(child) - 1);
+            MoveTo(child, IndexOf(child) - 1);
         }
-
         #endregion
+        */
+    }
 
-        public override void Update(GameTime gameTime)
+    public static class UIContainerExtensions
+    {
+        public static int IndexOf<T>(this UIReadonlyContainer<T> c, UIComponent child) where T : ISlot
         {
-            UpdateChildrenLayout();
-        }
-
-        public PathGeometryD2D GetClippingGeometry(SpriteLayerD2D layer)
-        {
-            PathGeometry geometry = new PathGeometry(layer.Factory);
-            GeometrySink sink = geometry.Open();
-            sink.SetFillMode(FillMode.Winding);
-
-            RawVector2 p0 = Matrix3x2.TransformPoint(GlobalTransform, new Vector2(0, 0)).ToRawVector2();
-            RawVector2 p1 = Matrix3x2.TransformPoint(GlobalTransform, new Vector2(0, Height)).ToRawVector2();
-            RawVector2 p2 = Matrix3x2.TransformPoint(GlobalTransform, new Vector2(Width, Height)).ToRawVector2();
-            RawVector2 p3 = Matrix3x2.TransformPoint(GlobalTransform, new Vector2(Width, 0)).ToRawVector2();
-
-            sink.BeginFigure(p0, FigureBegin.Filled);
-            sink.AddLine(p1);
-            sink.AddLine(p2);
-            sink.AddLine(p3);
-            sink.EndFigure(FigureEnd.Closed);
-            sink.Close();
-            sink.Dispose();
-
-            return new PathGeometryD2D(geometry);
-        }
-
-        internal void RestoreParents()
-        {
-            foreach (var child in Children)
+            var i = 0;
+            foreach (var slot in c.Slots)
             {
-                child.Parent = this;
-                child.NotifyPropertyChanged("Parent");
-                if (child is UIContainer container) {
-                    container.RestoreParents();
-                }
+                if (slot.Component == child)
+                    return i;
+                i++;
             }
+
+            return -1;
+        }
+
+        public static bool Contains<T>(this UIReadonlyContainer<T> c, UIComponent component) where T : ISlot
+        {
+            var holder = c.Slots.FirstOrDefault(slot => slot.Component == component);
+
+            return holder != null;
+        }
+
+        public static IEnumerable<UIComponent> GetChildren<T>(this UIReadonlyContainer<T> container) where T : ISlot
+        {
+            return container.Slots.Select(slot => slot.Component);
         }
     }
 }
