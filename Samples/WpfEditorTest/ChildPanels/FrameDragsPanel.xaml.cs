@@ -270,14 +270,14 @@ namespace WpfEditorTest.ChildPanels
 				var newXHelper = (int)(newX + 0.5 * Math.Sign(newX));
 				var newYHelper = (int)(newY + 0.5 * Math.Sign(newY));
 
-				foreach (var x in stickingCoordsX)
-				{
-					x.IsActive = false;
-				}
-				foreach (var y in stickingCoordsY)
-				{
-					y.IsActive = false;
-				}
+				//foreach (var x in stickingCoordsX)
+				//{
+				//	x.IsActive = false;
+				//}
+				//foreach (var y in stickingCoordsY)
+				//{
+				//	y.IsActive = false;
+				//}
 
 				var closestStickX1 =
 					stickingCoordsX.Where(scX => Math.Abs(newXHelper - scX.X) == stickingCoordsX.Select(x => Math.Abs(newXHelper - x.X)).Min()).FirstOrDefault();
@@ -289,17 +289,19 @@ namespace WpfEditorTest.ChildPanels
 					if (Math.Abs(closestStickX1.X - newXHelper) <= StickingCoordsSensitivity)
 					{
 						stickingDelta = closestStickX1.X - newXHelper;
-						closestStickX1.IsActive = true;
+						dX += stickingDelta;
+						//closestStickX1.IsActive = true;
 					}
-					dX += stickingDelta;
+					
 
 					stickingDelta = 0;
 					if (Math.Abs(closestStickY1.Y - newYHelper) <= StickingCoordsSensitivity)
 					{
 						stickingDelta = closestStickY1.Y - newYHelper;
-						closestStickY1.IsActive = true;
+						dY += stickingDelta;
+						//closestStickY1.IsActive = true;
 					}
-					dY += stickingDelta;
+					
 				}
 			}
 			/*---*/
@@ -423,11 +425,11 @@ namespace WpfEditorTest.ChildPanels
 				{
 					stickingDeltaHelper1 = closestStickY1.Y - newYHelper;
 				}
-				if (Math.Abs(closestStickY1.Y - newYHelper - heightHelper) <= StickingCoordsSensitivity)
+				if (Math.Abs(closestStickY2.Y - newYHelper - heightHelper) <= StickingCoordsSensitivity)
 				{
 					stickingDeltaHelper2 = closestStickY2.Y - (newYHelper + heightHelper);
 				}
-				if (Math.Abs(closestStickY1.Y - newYHelper - heightHelper/2) <= StickingCoordsSensitivity)
+				if (Math.Abs(closestStickY3.Y - newYHelper - heightHelper/2) <= StickingCoordsSensitivity)
 				{
 					stickingDeltaHelper3 = closestStickY3.Y - (newYHelper + heightHelper / 2);
 				}

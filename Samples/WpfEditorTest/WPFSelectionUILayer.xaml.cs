@@ -610,7 +610,7 @@ namespace WpfEditorTest
 				{
 					var line =	PrepareLine(
 						coordX.X, coordX.X,
-						Math.Min(coordX.TopY, _frameDragsPanel.RenderTransform.Value.OffsetY),
+						Math.Min(coordX.TopY, _frameDragsPanel.RenderTransform.Value.OffsetY + _frameDragsPanel.ActualHeight * _frameDragsPanel.RenderTransform.Value.M22),
 						Math.Max(coordX.BottomY, _frameDragsPanel.RenderTransform.Value.OffsetY + _frameDragsPanel.ActualHeight * _frameDragsPanel.RenderTransform.Value.M22),
 						2, Brushes.MediumBlue
 						);
@@ -634,7 +634,7 @@ namespace WpfEditorTest
 				if (coordY.IsActive)
 				{
 					var line = PrepareLine(
-						Math.Min(coordY.LeftX, _frameDragsPanel.RenderTransform.Value.OffsetX),
+						Math.Min(coordY.LeftX, _frameDragsPanel.RenderTransform.Value.OffsetX + _frameDragsPanel.ActualWidth * _frameDragsPanel.RenderTransform.Value.M11),
 						Math.Max(coordY.RightX, _frameDragsPanel.RenderTransform.Value.OffsetX + _frameDragsPanel.ActualWidth * _frameDragsPanel.RenderTransform.Value.M11),
 						coordY.Y, coordY.Y,
 						2, Brushes.MediumBlue
@@ -760,9 +760,9 @@ namespace WpfEditorTest
 
 		private void ActivateStickingLines(List<StickCoordinateY> stickingCoordsY, double minValue, double additionalValue )
 		{
-			var closestStickY1 = stickingCoordsY.Where(scY => Math.Abs(minValue - scY.Y) <= float.Epsilon + 0.5f).FirstOrDefault();
-			var closestStickY2 = stickingCoordsY.Where(scY => Math.Abs((minValue + additionalValue) - scY.Y) <= float.Epsilon + 0.5f).FirstOrDefault();
-			var closestStickY3 = stickingCoordsY.Where(scY => Math.Abs((minValue + additionalValue / 2) - scY.Y) <= float.Epsilon + 0.5f).FirstOrDefault();
+			var closestStickY1 = stickingCoordsY.Where(scY => Math.Abs(minValue - scY.Y) <= float.Epsilon + 1.0f).FirstOrDefault();
+			var closestStickY2 = stickingCoordsY.Where(scY => Math.Abs((minValue + additionalValue) - scY.Y) <= float.Epsilon + 1.0f).FirstOrDefault();
+			var closestStickY3 = stickingCoordsY.Where(scY => Math.Abs((minValue + additionalValue / 2) - scY.Y) <= float.Epsilon + 1.0f).FirstOrDefault();
 
 			if (closestStickY1 != null)
 			{
@@ -780,9 +780,9 @@ namespace WpfEditorTest
 
 		private void ActivateStickingLines( List<StickCoordinateX> stickingCoordsX, double minValue, double additionalValue )
 		{
-			var closestStickX1 = stickingCoordsX.Where(scX => Math.Abs(minValue - scX.X) <= float.Epsilon + 0.5f).FirstOrDefault();
-			var closestStickX2 = stickingCoordsX.Where(scX => Math.Abs((minValue + additionalValue) - scX.X) <= float.Epsilon + 0.5f).FirstOrDefault();
-			var closestStickX3 = stickingCoordsX.Where(scX => Math.Abs((minValue + additionalValue / 2) - scX.X) <= float.Epsilon + 0.5f).FirstOrDefault();
+			var closestStickX1 = stickingCoordsX.Where(scX => Math.Abs(minValue - scX.X) <= float.Epsilon + 1.0f).FirstOrDefault();
+			var closestStickX2 = stickingCoordsX.Where(scX => Math.Abs((minValue + additionalValue) - scX.X) <= float.Epsilon + 1.0f).FirstOrDefault();
+			var closestStickX3 = stickingCoordsX.Where(scX => Math.Abs((minValue + additionalValue / 2) - scX.X) <= float.Epsilon + 1.0f).FirstOrDefault();
 
 			if (closestStickX1 != null)
 			{
