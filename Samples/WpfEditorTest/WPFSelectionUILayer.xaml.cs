@@ -726,8 +726,11 @@ namespace WpfEditorTest
 				y.IsActive = false;
 			}
 
-			ActivateStickingLines(StickingCoordsX, _frameDragsPanel.RenderTransform.Value.OffsetX, _frameDragsPanel.Width);
-			ActivateStickingLines(StickingCoordsY, _frameDragsPanel.RenderTransform.Value.OffsetY, _frameDragsPanel.Height);
+            if (NeedSnapping())
+            {
+                ActivateStickingLines(StickingCoordsX, _frameDragsPanel.RenderTransform.Value.OffsetX, _frameDragsPanel.Width);
+                ActivateStickingLines(StickingCoordsY, _frameDragsPanel.RenderTransform.Value.OffsetY, _frameDragsPanel.Height);
+            }
 		}
 
 		public void RecalculateSelectionPosition( Point currentLocation )
@@ -759,10 +762,11 @@ namespace WpfEditorTest
 				y.IsActive = false;
 			}
 
-			ActivateStickingLines(StickingCoordsX, _frameDragsPanel.RenderTransform.Value.OffsetX, _frameDragsPanel.Width);
-			ActivateStickingLines(StickingCoordsY, _frameDragsPanel.RenderTransform.Value.OffsetY, _frameDragsPanel.Height);
-
-
+            if (NeedSnapping())
+            {
+                ActivateStickingLines(StickingCoordsX, _frameDragsPanel.RenderTransform.Value.OffsetX, _frameDragsPanel.Width);
+                ActivateStickingLines(StickingCoordsY, _frameDragsPanel.RenderTransform.Value.OffsetY, _frameDragsPanel.Height);
+            }
 		}
 
 		private void ActivateStickingLines(List<StickCoordinateY> stickingCoordsY, double minValue, double additionalValue )
