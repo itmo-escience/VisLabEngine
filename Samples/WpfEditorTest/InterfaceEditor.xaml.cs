@@ -1132,7 +1132,26 @@ namespace WpfEditorTest
 
 		private void Window_PreviewMouseMove( object sender, MouseEventArgs e )
 		{
-			SelectionLayer.FullMouseMove(sender, e);
+            if (SelectionLayer.IsScrollExpected)
+            {
+                Point mousePosition = e.GetPosition(ZoomerScroll);
+                if (mousePosition.X < 0)
+                {
+                    ZoomerScroll.ScrollToHorizontalOffset(ZoomerScroll.ContentHorizontalOffset - 1);
+                }
+                if (mousePosition.Y < 0)
+                {
+                    ZoomerScroll.ScrollToVerticalOffset(ZoomerScroll.ContentVerticalOffset - 1);
+                }
+                if (mousePosition.X > ZoomerScroll.ViewportWidth)
+                {
+                    ZoomerScroll.ScrollToHorizontalOffset(ZoomerScroll.ContentHorizontalOffset + 1);
+                }
+                if (mousePosition.Y > ZoomerScroll.ViewportHeight)
+                {
+                    ZoomerScroll.ScrollToVerticalOffset(ZoomerScroll.ContentVerticalOffset + 1);
+                }
+            }
 		}
 
 		private void Slider_ValueChanged( object sender, RoutedPropertyChangedEventArgs<double> e )
