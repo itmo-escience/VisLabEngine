@@ -56,9 +56,6 @@
         <CommandBinding Command="{x:Static local:InterfaceEditor.DeleteFrameCmd}"
                         Executed="ExecutedDeleteFrameCommand"
                         CanExecute="AlwaysCanExecute" />
-        <CommandBinding Command="{x:Static local:InterfaceEditor.MoveFrameCmd}"
-                        Executed="ExecutedMoveFrameCommand"
-                        CanExecute="AlwaysCanExecute" />
         <CommandBinding Command="{x:Static local:InterfaceEditor.AlignFrameCmd}"
                         Executed="ExecutedAlignFrameCommand"
                         CanExecute="AlwaysCanExecute" />
@@ -82,10 +79,7 @@
         <KeyBinding Command="{x:Static local:InterfaceEditor.DeleteFrameCmd}" Key="Delete"/>
         <KeyBinding Command="{x:Static local:InterfaceEditor.RemoveSelectionCmd}" Key="Esc"/>
 
-        <KeyBinding Command="{x:Static local:InterfaceEditor.MoveFrameCmd}" CommandParameter="up" Key="Up"/>
-        <KeyBinding Command="{x:Static local:InterfaceEditor.MoveFrameCmd}" CommandParameter="down" Key="Down"/>
-        <KeyBinding Command="{x:Static local:InterfaceEditor.MoveFrameCmd}" CommandParameter="left" Key="Left"/>
-        <KeyBinding Command="{x:Static local:InterfaceEditor.MoveFrameCmd}" CommandParameter="right" Key="Right"/>
+
     </Window.InputBindings>
     <Grid Name="GlobalGrid" MaxWidth="10000" MaxHeight="10000" AllowDrop="True">
         <Grid.RowDefinitions>
@@ -205,6 +199,17 @@
             <TabItem Header="tab5"></TabItem>-->
         </TabControl>
         <ScrollViewer Name="ZoomerScroll" Grid.Row="2" HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto" Background="#FFA0A0A0" PreviewKeyDown="ZoomerScroll_PreviewKeyDown">
+            <ScrollViewer.CommandBindings>
+                <CommandBinding Command="{x:Static local:InterfaceEditor.MoveFrameCmd}"
+                        Executed="ExecutedMoveFrameCommand"
+                        CanExecute="AlwaysCanExecute" />
+            </ScrollViewer.CommandBindings>
+            <ScrollViewer.InputBindings>
+                <KeyBinding Command="{x:Static local:InterfaceEditor.MoveFrameCmd}" CommandParameter="up" Key="Up"/>
+                <KeyBinding Command="{x:Static local:InterfaceEditor.MoveFrameCmd}" CommandParameter="down" Key="Down"/>
+                <KeyBinding Command="{x:Static local:InterfaceEditor.MoveFrameCmd}" CommandParameter="left" Key="Left"/>
+                <KeyBinding Command="{x:Static local:InterfaceEditor.MoveFrameCmd}" CommandParameter="right" Key="Right"/>
+            </ScrollViewer.InputBindings>
             <Viewbox Name="Zoomer" HorizontalAlignment="Center" VerticalAlignment="Center">
                 <local:WPFSelectionUILayer x:Name="SelectionLayer">
                 </local:WPFSelectionUILayer>

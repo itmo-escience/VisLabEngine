@@ -12,12 +12,18 @@ namespace Fusion.Engine.Frames2.Managing
 {
     public class UIManager
     {
-        public UIEventProcessor UIEventProcessor { get; }
+		public enum DisplayMode
+		{
+			Actual, Debug, Edit
+		}
+
+		public UIEventProcessor UIEventProcessor { get; }
         public UIContainer Root { get; }
 
-        public bool DebugEnabled { get; set; }
+		public DisplayMode Mode { get; set; } = DisplayMode.Actual;
 
-        public UIManager(RenderSystem rs)
+
+		public UIManager(RenderSystem rs)
         {
             Root = new FreePlacement(0, 0, rs.Width, rs.Height);
             Root.Name = "Root";
@@ -81,7 +87,7 @@ namespace Fusion.Engine.Frames2.Managing
                 c.Draw(layer);
             }
 
-            if (DebugEnabled)
+            if (Mode == DisplayMode.Debug)
             {
                 queue.Enqueue(root);
 
@@ -102,7 +108,28 @@ namespace Fusion.Engine.Frames2.Managing
                 }
             }
 
-            layer.Draw(TransformCommand.Identity);
+			if (Mode == DisplayMode.Edit)
+			{
+				queue.Enqueue(root);
+
+				while (queue.Any())
+				{
+					var c = queue.Dequeue();
+
+					if (c is UIContainer container)
+					{
+						foreach (var child in container.Children)
+						{
+							queue.Enqueue(child);
+						}
+					}
+
+					layer.Draw(new TransformCommand(c.GlobalTransform));
+					c.EditDraw(layer);
+				}
+			}
+
+			layer.Draw(TransformCommand.Identity);
         }
 
         public static bool IsComponentNameValid(string name, UIComponent root, UIComponent ignoredComponent = null)

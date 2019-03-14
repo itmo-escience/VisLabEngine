@@ -244,7 +244,8 @@ namespace Fusion.Engine.Frames2
         public virtual void Draw(SpriteLayerD2D layer) { }
 
         protected virtual SolidBrushD2D DebugBrush { get; } = new SolidBrushD2D(new Color4(0, 1, 0, 1));
-        protected virtual TextFormatD2D DebugTextFormat { get; } = new TextFormatD2D("Consolas", 12);
+		protected virtual SolidBrushD2D EditBrush { get; } = new SolidBrushD2D(new Color4(1, 1, 1, 1));
+		protected virtual TextFormatD2D DebugTextFormat { get; } = new TextFormatD2D("Consolas", 12);
         public virtual void DebugDraw(SpriteLayerD2D layer)
         {
             var b = BoundingBox;
@@ -256,9 +257,14 @@ namespace Fusion.Engine.Frames2
             layer.Draw(new Text(debugText, new RectangleF(b.X, b.Y - dtl.Height, dtl.Width + 1, dtl.Height), DebugTextFormat, DebugBrush));
         }
 
-        #region Naming
+		public virtual void EditDraw( SpriteLayerD2D layer )
+		{
+			layer.Draw(new Rect(0, 0, Width, Height, EditBrush, true));
+		}
 
-        private static readonly Dictionary<Type, int> GeneratedCountOfType = new Dictionary<Type, int>();
+		#region Naming
+
+		private static readonly Dictionary<Type, int> GeneratedCountOfType = new Dictionary<Type, int>();
         private static string GenerateName(Type type)
         {
             if (GeneratedCountOfType.TryGetValue(type, out var value))

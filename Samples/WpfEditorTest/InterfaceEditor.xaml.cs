@@ -336,6 +336,9 @@ namespace WpfEditorTest
 
 					SelectionLayer.DxElem.Renderer = _engine;
 
+					var uiManager = (_engine.GameInterface as ICustomizableUI)?.GetUIManager();
+					uiManager.Mode = UIManager.DisplayMode.Edit;
+
 					//var binding = new Binding("Children")
 					//{
 					//	Source = SceneFrame,
@@ -373,6 +376,9 @@ namespace WpfEditorTest
 				{
 					SceneFrame.Width = (float)e.NewSize.Width;
 					SceneFrame.Height = (float)e.NewSize.Height;
+
+					DragFieldFrame.Width = (float)e.NewSize.Width;
+					DragFieldFrame.Height = (float)e.NewSize.Height;
 				}
 				ZoomScene();
 			};
@@ -684,18 +690,42 @@ namespace WpfEditorTest
 
 		private void ExecutedMoveFrameCommand( object sender, ExecutedRoutedEventArgs e )
 		{
-			var step = GridToggle.IsChecked != null && (bool)GridToggle.IsChecked ?
-				(int)(FusionUI.UI.ScalableFrame.ScaleMultiplier * SelectionLayer.GridSizeMultiplier) : 1;
-			List<IEditorCommand> commands = new List<IEditorCommand>();
 			var delta = KeyboardArrowsSteps[e.Parameter.ToString()];
-			foreach (UIComponent frame in SelectionLayer.FrameSelectionPanelList.Keys)
+			if (SelectionManager.Instance.SelectedFrames.Count>0)
 			{
-				commands.Add(new CommandGroup(
-					new FramePropertyChangeCommand(frame, "X", frame.X + (int)delta.X * step),
-					new FramePropertyChangeCommand(frame, "Y", frame.Y + (int)delta.Y * step)));
+				var step = GridToggle.IsChecked != null && (bool)GridToggle.IsChecked ?
+			(int)(FusionUI.UI.ScalableFrame.ScaleMultiplier * SelectionLayer.GridSizeMultiplier) : 1;
+				List<IEditorCommand> commands = new List<IEditorCommand>();
+				foreach (UIComponent frame in SelectionLayer.FrameSelectionPanelList.Keys)
+				{
+					commands.Add(new CommandGroup(
+						new FramePropertyChangeCommand(frame, "X", frame.X + (int)delta.X * step),
+						new FramePropertyChangeCommand(frame, "Y", frame.Y + (int)delta.Y * step)));
+				}
+				var command = new CommandGroup(commands.ToArray());
+				CommandManager.Instance.Execute(command);
 			}
-			var command = new CommandGroup(commands.ToArray());
-			CommandManager.Instance.Execute(command);
+			else
+			{
+				var scroll = sender as ScrollViewer;
+
+				if (delta.X>0)
+				{
+					scroll.LineRight();
+				}
+				if (delta.X < 0)
+				{
+					scroll.LineLeft();
+				}
+				if (delta.Y > 0)
+				{
+					scroll.LineDown();
+				}
+				if (delta.Y < 0)
+				{
+					scroll.LineUp();
+				}
+			}
 		}
 
 		private void ExecutedAlignFrameCommand( object sender, ExecutedRoutedEventArgs e )

@@ -728,9 +728,17 @@ namespace WpfEditorTest
 
             if (NeedSnapping())
             {
-                ActivateStickingLines(StickingCoordsX, _frameDragsPanel.RenderTransform.Value.OffsetX, _frameDragsPanel.Width);
-                ActivateStickingLines(StickingCoordsY, _frameDragsPanel.RenderTransform.Value.OffsetY, _frameDragsPanel.Height);
-            }
+				if (SelectionManager.Instance.SelectedFrames.Count == 1)
+				{
+					ActivateStickingLines(StickingCoordsX, SelectionManager.Instance.SelectedFrames.First().BoundingBox.X, SelectionManager.Instance.SelectedFrames.First().BoundingBox.Width);
+					ActivateStickingLines(StickingCoordsY, SelectionManager.Instance.SelectedFrames.First().BoundingBox.Y, SelectionManager.Instance.SelectedFrames.First().BoundingBox.Height);
+				}
+				else
+				{
+					ActivateStickingLines(StickingCoordsX, _frameDragsPanel.RenderTransform.Value.OffsetX, _frameDragsPanel.Width);
+					ActivateStickingLines(StickingCoordsY, _frameDragsPanel.RenderTransform.Value.OffsetY, _frameDragsPanel.Height);
+				}
+			}
 		}
 
 		public void RecalculateSelectionPosition( Point currentLocation )
@@ -764,8 +772,16 @@ namespace WpfEditorTest
 
             if (NeedSnapping())
             {
-                ActivateStickingLines(StickingCoordsX, _frameDragsPanel.RenderTransform.Value.OffsetX, _frameDragsPanel.Width);
-                ActivateStickingLines(StickingCoordsY, _frameDragsPanel.RenderTransform.Value.OffsetY, _frameDragsPanel.Height);
+				if (SelectionManager.Instance.SelectedFrames.Count==1)
+				{
+					ActivateStickingLines(StickingCoordsX, SelectionManager.Instance.SelectedFrames.First().BoundingBox.X, SelectionManager.Instance.SelectedFrames.First().BoundingBox.Width);
+					ActivateStickingLines(StickingCoordsY, SelectionManager.Instance.SelectedFrames.First().BoundingBox.Y, SelectionManager.Instance.SelectedFrames.First().BoundingBox.Height);
+				}
+				else
+				{
+					ActivateStickingLines(StickingCoordsX, _frameDragsPanel.RenderTransform.Value.OffsetX, _frameDragsPanel.Width);
+					ActivateStickingLines(StickingCoordsY, _frameDragsPanel.RenderTransform.Value.OffsetY, _frameDragsPanel.Height);
+				}
             }
 		}
 
