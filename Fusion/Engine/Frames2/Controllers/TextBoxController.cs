@@ -1,4 +1,4 @@
-﻿using System;
+﻿/*using System;
 using System.Collections.Generic;
 using Fusion.Engine.Frames2.Managing;
 using Fusion.Engine.Graphics.SpritesD2D;
@@ -6,6 +6,7 @@ using Label = Fusion.Engine.Frames2.Components.Label;
 
 namespace Fusion.Engine.Frames2.Controllers
 {
+
     public class TextBoxController : UIController
     {
         public static State Editing = new State("Editing");
@@ -101,3 +102,4 @@ namespace Fusion.Engine.Frames2.Controllers
         }
     }
 }
+*/

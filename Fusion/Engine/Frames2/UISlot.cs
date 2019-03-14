@@ -9,17 +9,91 @@ namespace Fusion.Engine.Frames2
     {
         float X { get; }
         float Y { get; }
+        float Angle { get; }
+
+        /* Current width and height */
         float Width { get; }
         float Height { get; }
+
+        /* Container specifies available dimensions for component */
+        float AvailableWidth { get; }
+        float AvailableHeight { get; }
+
         Matrix3x2 Transform { get; }
         bool Clip { get; }
         bool Visible { get; }
 
-        UIContainer<ISlot> GetParent();
+        UIContainer<ISlot> Parent { get; }
         UIComponent Component { get; }
 
         SolidBrushD2D DebugBrush { get; }
         TextFormatD2D DebugTextFormat { get; }
+
+        /*#region Transforms
+        private bool _isTransformDirty = true;
+
+        public virtual void InvalidateTransform()
+        {
+            _isTransformDirty = true;
+        }
+
+        private Matrix3x2 _localTransform = Matrix3x2.Identity;
+        internal Matrix3x2 LocalTransform
+        {
+            get
+            {
+                if (_isTransformDirty)
+                    UpdateTransforms();
+
+                return _localTransform;
+            }
+        }
+
+        private Matrix3x2 _globalTransform = Matrix3x2.Identity;
+        public Matrix3x2 GlobalTransform
+        {
+            get
+            {
+                if(_isTransformDirty)
+                    UpdateTransforms();
+
+                return _globalTransform;
+            }
+        }
+
+        private Matrix3x2 _transform = Matrix3x2.Identity;
+        public Matrix3x2 Transform
+        {
+            get => _transform;
+            set
+            {
+                if (SetAndNotify(ref _transform, value))
+                    InvalidateTransform();
+            }
+        }
+
+        private void UpdateTransforms()
+        {
+            if(!_isTransformDirty) return;
+
+            _localTransform = Matrix3x2.Transformation(1, 1, 0, Placement.Position.X, Y);
+
+            var pTransform = Placement.Parent?.GlobalTransform ?? Matrix.Identity;
+            _globalTransform = _transform * _localTransform * pTransform;
+
+            _isTransformDirty = false;
+        }
+
+        #endregion
+
+        public virtual RectangleF LocalBoundingBox
+        {
+            get
+            {
+                return (Visible ? new RectangleF(0, 0, Width, Height) : new RectangleF(0, 0, 0, 0)).GetBound(_transform * _localTransform);
+            }
+        }
+        */
     }
 
     public interface ISlotAttachable : ISlot
@@ -43,6 +117,12 @@ namespace Fusion.Engine.Frames2
 
     public static class SlotExtensions
     {
+        internal static Matrix3x2 LocalTransform(this ISlot slot)
+        {
+            var m = Matrix3x2.Transformation(1.0f, 1.0f, slot.Angle, 0, 0);
+            return m * Matrix3x2.Translation(slot.X, slot.Y);
+        }
+
         public static RectangleF BoundingBox(this ISlot slot)
         {
             var rectangle = slot.Visible
@@ -53,9 +133,9 @@ namespace Fusion.Engine.Frames2
 
         public static bool IsInside(this ISlot slot, Vector2 point)
         {
-            Matrix3x2 invertTransform = slot.Transform;
+            var invertTransform = slot.Transform;
             invertTransform.Invert();
-            Vector2 localPoint = Matrix3x2.TransformPoint(invertTransform, point);
+            var localPoint = Matrix3x2.TransformPoint(invertTransform, point);
             return ((localPoint.X >= 0) && (localPoint.Y >= 0) && (localPoint.X < slot.Width) && (localPoint.Y < slot.Height));
         }
 

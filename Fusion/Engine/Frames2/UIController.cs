@@ -4,6 +4,7 @@ using System.Collections.ObjectModel;
 
 namespace Fusion.Engine.Frames2
 {
+    /*
     public interface IControllerType { }
 
     public abstract class UIController<T> : UIContainer where T : IControllerType
@@ -54,7 +55,7 @@ namespace Fusion.Engine.Frames2
                 }
             }
 
-            */
+
             CurrentState = newState;
 
             Log.Verbose(CurrentState);
@@ -133,7 +134,7 @@ namespace Fusion.Engine.Frames2
 
         #endregion
 
-        */
+
     }
 
     public interface IControllerSlot<T> : PlacementSlot where T : IControllerType
@@ -216,4 +217,5 @@ namespace Fusion.Engine.Frames2
 
         public override string ToString() => Name;
     }
+    */
 }

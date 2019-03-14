@@ -14,7 +14,7 @@ namespace Fusion.Engine.Frames2.Containers
     {
         internal FreePlacementSlot(FreePlacement parent, float x, float y, float width, float height)
         {
-            Parent = parent;
+            InternalParent = parent;
             _x = x;
             _y = y;
             _width = width;
@@ -36,19 +36,29 @@ namespace Fusion.Engine.Frames2.Containers
             set => SetAndNotify(ref _y, value);
         }
 
+        private float _angle;
+        public float Angle
+        {
+            get => _angle;
+            set => SetAndNotify(ref _angle, value);
+        }
+
         private float _width;
         public float Width
         {
             get => _width;
-            set => SetAndNotify(ref _width, value);
+            internal set => SetAndNotify(ref _width, value);
         }
 
         private float _height;
         public float Height
         {
             get => _height;
-            set => SetAndNotify(ref _height, value);
+            internal set => SetAndNotify(ref _height, value);
         }
+
+        public float AvailableWidth => Parent.Placement.Width - X;
+        public float AvailableHeight => Parent.Placement.Height - Y;
 
         private Matrix3x2 _transform = Matrix3x2.Identity;
         public Matrix3x2 Transform
@@ -71,14 +81,14 @@ namespace Fusion.Engine.Frames2.Containers
             set => SetAndNotify(ref _visible, value);
         }
 
-        internal UIContainer<FreePlacementSlot> Parent { get; }
-        public UIContainer<ISlot> GetParent() => Parent;
+        internal UIContainer<FreePlacementSlot> InternalParent { get; }
+        public UIContainer<ISlot> Parent => InternalParent;
 
         private UIComponent _component;
         public UIComponent Component
         {
             get => _component;
-            set => SetAndNotify(ref _component, value);
+            private set => SetAndNotify(ref _component, value);
         }
 
         public SolidBrushD2D DebugBrush => new SolidBrushD2D(new Color4(0, 1.0f, 0, 1.0f));
@@ -91,6 +101,7 @@ namespace Fusion.Engine.Frames2.Containers
             var old = Component;
 
             Component = component;
+            component.Placement = this;
 
             ComponentAttached?.Invoke(this,
                 new SlotAttachmentChangedEventArgs(old, component)
@@ -138,10 +149,25 @@ namespace Fusion.Engine.Frames2.Containers
 
         public event PropertyChangedEventHandler PropertyChanged;
         public ISlot Placement { get; set; }
+
+        public float DesiredWidth { get; set; } = -1;
+        public float DesiredHeight { get; set; } = -1;
+
         public object Tag { get; set; }
         public string Name { get; set; }
 
-        public void Update(GameTime gameTime) { }
+        public void Update(GameTime gameTime)
+        {
+            foreach (var slot in Slots)
+            {
+                if (slot.Component.DesiredWidth >= 0)
+                    slot.Width = slot.Component.DesiredWidth;
+
+                if (slot.Component.DesiredHeight >= 0)
+                    slot.Height = slot.Component.DesiredHeight;
+            }
+        }
+
         public void Draw(SpriteLayerD2D layer) { }
 
         public int IndexOf(UIComponent child)
@@ -162,6 +188,7 @@ namespace Fusion.Engine.Frames2.Containers
         public FreePlacementSlot Insert(UIComponent child, int index)
         {
             var slot = new FreePlacementSlot(this, 0, 0, 100, 100);
+            slot.Attach(child);
 
             _slots.Insert(index, slot);
 

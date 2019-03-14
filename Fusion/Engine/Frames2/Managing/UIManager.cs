@@ -1,5 +1,5 @@
-﻿using System.Collections.Concurrent;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using Fusion.Core.Mathematics;
 using Fusion.Engine.Common;
@@ -10,34 +10,66 @@ using System.Text.RegularExpressions;
 
 namespace Fusion.Engine.Frames2.Managing
 {
+    internal class RootSlot : ISlot
+    {
+        public event PropertyChangedEventHandler PropertyChanged;
+        public float X => 0;
+        public float Y => 0;
+        public float Angle => 0;
+        public float Width { get; internal set; }
+        public float Height { get; internal set; }
+        public float AvailableWidth => Width;
+        public float AvailableHeight => Height;
+        public float DesiredWidth { get; set; }
+        public float DesiredHeight { get; set; }
+        public Matrix3x2 Transform => Matrix3x2.Identity;
+        public bool Clip => false;
+        public bool Visible => true;
+        public UIContainer<ISlot> Parent => null;
+        public UIComponent Component { get; }
+        public SolidBrushD2D DebugBrush => new SolidBrushD2D(Color4.White);
+        public TextFormatD2D DebugTextFormat => new TextFormatD2D("Calibri", 10);
+
+        internal RootSlot(float width, float height, UIContainer<ISlot> rootContainer)
+        {
+            Width = width;
+            Height = height;
+            Component = rootContainer;
+            rootContainer.Placement = this;
+        }
+    }
+
     public class UIManager
     {
-        public UIEventProcessor UIEventProcessor { get; }
-        public UIContainer Root { get; }
+        //public UIEventProcessor UIEventProcessor { get; }
+        private RootSlot _rootSlot;
+        public UIContainer<ISlot> Root { get; }
 
         public bool DebugEnabled { get; set; }
 
         public UIManager(RenderSystem rs)
         {
-            Root = new FreePlacement(0, 0, rs.Width, rs.Height);
+            Root = new FreePlacement();
             Root.Name = "Root";
 
-            UIEventProcessor = new UIEventProcessor(Root);
+            _rootSlot = new RootSlot(rs.DisplayBounds.Width, rs.DisplayBounds.Height, Root);
+
+          //  UIEventProcessor = new UIEventProcessor(Root);
 
             rs.DisplayBoundsChanged += (s, e) =>
             {
-                Root.Width = rs.DisplayBounds.Width;
-                Root.Height = rs.DisplayBounds.Height;
+                _rootSlot.Width = rs.DisplayBounds.Width;
+                _rootSlot.Height = rs.DisplayBounds.Height;
             };
         }
 
         public void Update(GameTime gameTime)
         {
-            UIEventProcessor.Update(gameTime);
+            //UIEventProcessor.Update(gameTime);
 
-            foreach (var c in UIHelper.DFSTraverse(Root).Where(c => typeof(UIContainer) != c.GetType()))
+            foreach (var c in UIHelper.DFSTraverse(Root))
             {
-                c.InternalUpdate(gameTime);
+                c.Update(gameTime);
             }
         }
 
@@ -45,69 +77,45 @@ namespace Fusion.Engine.Frames2.Managing
         {
             layer.Clear();
 
-            DrawBFS(layer, Root);
+            layer.Draw(TransformCommand.Identity);
+            DrawRecursive(layer, Root, Matrix3x2.Identity);
+            layer.Draw(TransformCommand.Identity);
         }
 
-        private void DrawBFS(SpriteLayerD2D layer, UIContainer root)
+        private void DrawRecursive(SpriteLayerD2D layer, UIComponent component, Matrix3x2 Transform)
         {
-            var queue = new Queue<UIComponent>();
-            queue.Enqueue(root);
+            if (!component.Placement.Visible) return;
 
-            while (queue.Any())
+            var globalTransform = Transform * component.Placement.LocalTransform() * component.Placement.Transform;
+
+            layer.Draw(new TransformCommand(globalTransform));
+
+            if (component.Placement.Clip)
             {
-                var c = queue.Dequeue();
-
-                if(!c.Visible) continue;
-
-                if (c is UIContainer container)
-                {
-                    if (container.NeedClipping)
-                    {
-                        queue.Enqueue(new Components.StartClippingFlag(container.GetClippingGeometry(layer)));
-                    }
-
-                    foreach (var child in container.Children)
-                    {
-                        queue.Enqueue(child);
-                    }
-
-                    if (container.NeedClipping)
-                    {
-                        queue.Enqueue(new Components.EndClippingFlag());
-                    }
-                }
-
-                layer.Draw(new TransformCommand(c.GlobalTransform));
-                c.Draw(layer);
+                var geom = component.Placement.GetClippingGeometry(layer);
+                layer.Draw(new StartClippingAlongGeometry(geom, AntialiasModeD2D.Aliased));
             }
 
-            if (DebugEnabled)
+            component.Draw(layer);
+
+            if (component is UIContainer<ISlot> container)
             {
-                queue.Enqueue(root);
 
-                while (queue.Any())
+                foreach (var child in container.Slots)
                 {
-                    var c = queue.Dequeue();
-
-                    if (c is UIContainer container)
-                    {
-                        foreach (var child in container.Children)
-                        {
-                            queue.Enqueue(child);
-                        }
-                    }
-
-                    layer.Draw(new TransformCommand(c.GlobalTransform));
-                    c.DebugDraw(layer);
+                    DrawRecursive(layer, child.Component, globalTransform);
                 }
             }
 
-            layer.Draw(TransformCommand.Identity);
+            if (component.Placement.Clip)
+            {
+                layer.Draw(new EndClippingAlongGeometry());
+            }
         }
 
         public static bool IsComponentNameValid(string name, UIComponent root, UIComponent ignoredComponent = null)
         {
-            foreach (UIComponent component in UIHelper.BFSTraverse(root))
+            foreach (var component in UIHelper.BFSTraverse(root))
             {
                 if (component == root) continue;
                 if ((component.Name == name) && (component != ignoredComponent)) return false;

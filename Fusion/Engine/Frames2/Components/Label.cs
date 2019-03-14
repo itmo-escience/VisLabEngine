@@ -1,19 +1,25 @@
-﻿using Fusion.Core.Mathematics;
+﻿using System.ComponentModel;
+using Fusion.Core.Mathematics;
 using Fusion.Engine.Common;
 using Fusion.Engine.Graphics.SpritesD2D;
 
 namespace Fusion.Engine.Frames2.Components
 {
+    /*
     public sealed class Label : UIComponent
     {
         private bool _isDirtyText;
+
+        public ISlot Placement { get; set; }
+        public object Tag { get; set; }
+        public string Name { get; set; }
 
         private TextFormatD2D _textFormat;
         public TextFormatD2D TextFormat {
             get => _textFormat;
             set {
                 _textFormat = value;
-                NotifyPropertyChanged();
+                //NotifyPropertyChanged();
             }
         }
 
@@ -24,25 +30,31 @@ namespace Fusion.Engine.Frames2.Components
             set
             {
                 _textLayout = value;
-                NotifyPropertyChanged();
+                //NotifyPropertyChanged();
             }
         }
 
         private float _maxWidth;
         public float MaxWidth {
             get => _maxWidth;
-            set {
-                if (SetAndNotify(ref _maxWidth, value))
-                    InvalidateTransform();
+            set
+            {
+                _maxWidth = value;
+
+                //if (SetAndNotify(ref _maxWidth, value))
+                //    InvalidateTransform();
             }
         }
 
         private float _maxHeight;
         public float MaxHeight {
             get => _maxHeight;
-            set {
-                if (SetAndNotify(ref _maxHeight, value))
-                    InvalidateTransform();
+            set
+            {
+                _maxHeight = value;
+
+                //if (SetAndNotify(ref _maxHeight, value))
+                //    InvalidateTransform();
             }
         }
 
@@ -57,9 +69,9 @@ namespace Fusion.Engine.Frames2.Components
 
                 var layout = new TextLayoutD2D(_text, _textFormat, _maxWidth, _maxHeight);
 
-                Width = layout.Width < _maxWidth ? layout.Width : _maxWidth;
-                Height = layout.Height < _maxHeight ? layout.Height : _maxHeight;
-                NotifyPropertyChanged();
+                //Width = layout.Width < _maxWidth ? layout.Width : _maxWidth;
+                //Height = layout.Height < _maxHeight ? layout.Height : _maxHeight;
+                //NotifyPropertyChanged();
             }
         }
 
@@ -93,12 +105,12 @@ namespace Fusion.Engine.Frames2.Components
             _isDirtyText = true;
         }
 
-        public override void Update(GameTime gameTime)
+        public void Update(GameTime gameTime)
         {
             if (_isDirtyText)
                 _textCommand = new Text(
                     Text,
-                    new RectangleF(0, 0, Width, Height),
+                    new RectangleF(0, 0, Placement.Width, Placement.Height),
                     _textFormat,
                     new SolidBrushD2D(Color4.White)
                 );
@@ -106,10 +118,12 @@ namespace Fusion.Engine.Frames2.Components
             _isDirtyText = false;
         }
 
-        public override void Draw(SpriteLayerD2D layer)
+        public void Draw(SpriteLayerD2D layer)
         {
             if(_textCommand != null)
                 layer.Draw(_textCommand);
         }
-    }
+
+        public event PropertyChangedEventHandler PropertyChanged;
+    }*/
 }

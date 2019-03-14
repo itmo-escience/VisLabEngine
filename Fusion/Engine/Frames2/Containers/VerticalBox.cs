@@ -3,6 +3,7 @@ using Fusion.Engine.Graphics.SpritesD2D;
 
 namespace Fusion.Engine.Frames2.Containers
 {
+    /*
     public enum VerticalAlignment
     {
         Left, Center, Right
@@ -82,4 +83,5 @@ namespace Fusion.Engine.Frames2.Containers
             }
         }
     }
+    */
 }

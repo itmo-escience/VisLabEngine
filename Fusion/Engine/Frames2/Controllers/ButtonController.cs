@@ -4,6 +4,7 @@ using Fusion.Engine.Frames2.Managing;
 
 namespace Fusion.Engine.Frames2.Controllers
 {
+    /*
     public class ButtonType : IControllerType { }
 
     public class ButtonController : UIController<ButtonType>
@@ -75,4 +76,5 @@ namespace Fusion.Engine.Frames2.Controllers
             }
         }
     }
+    */
 }

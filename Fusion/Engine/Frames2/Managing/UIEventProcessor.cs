@@ -5,6 +5,7 @@ using Fusion.Core.Mathematics;
 using Fusion.Engine.Common;
 using Fusion.Engine.Input;
 
+/*
 namespace Fusion.Engine.Frames2.Managing
 {
     public class UIEventProcessor
@@ -18,17 +19,6 @@ namespace Fusion.Engine.Frames2.Managing
         private UIComponent _lastClickComponent;
         private Stopwatch _clickStopwatch;
         private const long _clickDelay = 500;
-
-        private const int KeyPressRepetitionFrequency = 50;
-        private const int KeyPressRepetitionDelay = 200;
-
-        private enum KeyPressState
-        {
-            Idle, JustPressed, Pressing
-        }
-        private KeyPressState _keyPressState = KeyPressState.Idle;
-
-        private double _lastKeyRepetitionMs = 0;
 
         private List<UIComponent> _componentsWithMouse;
 
@@ -58,20 +48,12 @@ namespace Fusion.Engine.Frames2.Managing
                     c.InvokeKeyDown(keyArgs);
                 }
 
-                _lastKeyRepetitionMs = Game.Instance.Time.Total.TotalMilliseconds;
                 _lastKey = args.Key;
-                _keyPressState = KeyPressState.JustPressed;
             };
 
             //KeyUp
             _game.Keyboard.FormKeyUp += (sender, args) =>
             {
-                if (args.Key == _lastKey)
-                {
-                    _keyPressState = KeyPressState.Idle;
-                }
-
-
                 var keyArgs = (KeyEventArgs) args;
                 _focusComponent?.InvokeKeyUp(keyArgs);
 
@@ -109,7 +91,7 @@ namespace Fusion.Engine.Frames2.Managing
                     c.InvokeMouseMove(mouseArgs);
                 }
             };
-
+            */
             /*//MouseMove (touch)
             _game.Touch.Manipulate += (args) => {
                 Vector2 touchPosition = args.Position;
@@ -120,6 +102,7 @@ namespace Fusion.Engine.Frames2.Managing
             };*/
 
             //MouseDrag (mouse)
+            /*
             _game.Mouse.Move += (sender, args) =>
             {
                 if (!_game.Keyboard.IsKeyDown(_lastMouseKey)) return;
@@ -134,7 +117,7 @@ namespace Fusion.Engine.Frames2.Managing
 
                     c.InvokeMouseDrag(dragArgs);
                 }
-            };
+            };*/
 
             /*//MouseDrag (touch)
             _game.Touch.Hold += (args) => {
@@ -145,6 +128,7 @@ namespace Fusion.Engine.Frames2.Managing
             };*/
 
             //MouseDown (mouse)
+            /*
             _game.Keyboard.KeyDown += (sender, args) =>
             {
                 if (!args.Key.IsMouseKey()) return;
@@ -294,3 +278,4 @@ namespace Fusion.Engine.Frames2.Managing
         }
     }
 }
+*/

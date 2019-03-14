@@ -256,7 +256,7 @@
     <Compile Include="Engine\Common\Commands\CrashServer.cs" />
     <Compile Include="Engine\Common\AtomAttribute.cs" />
     <Compile Include="Engine\Common\UserInterface.Internal.cs" />
-    <Compile Include="Engine\Frames2\Components\ClippingFlags.cs" />
+    <Compile Include="Engine\Frames2\Managing\ClippingFlags.cs" />
     <Compile Include="Engine\Frames2\Components\Image.cs" />
     <Compile Include="Engine\Frames2\Components\Border.cs" />
     <Compile Include="Engine\Frames2\Containers\Flexbox.cs" />
@@ -266,6 +266,7 @@
     <Compile Include="Engine\Frames2\Managing\EditionSceneManager.cs" />
     <Compile Include="Engine\Frames2\Managing\Events.cs" />
     <Compile Include="Engine\Frames2\Managing\UIHelper.cs" />
+    <Compile Include="Engine\Frames2\IUIDrawable.cs" />
     <Compile Include="Engine\Frames2\UISlot.cs" />
     <Compile Include="Engine\Frames2\UIComponent.cs" />
     <Compile Include="Engine\Frames2\UIController.cs" />

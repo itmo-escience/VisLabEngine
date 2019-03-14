@@ -11,6 +11,10 @@ namespace Fusion.Engine.Frames2.Components
         public Color4 Color { get; set; } = Color4.White;
 
         public ISlot Placement { get; set; }
+
+        public float DesiredWidth { get; set; } = -1;
+        public float DesiredHeight { get; set; } = -1;
+
         public object Tag { get; set; }
         public string Name { get; set; }
 

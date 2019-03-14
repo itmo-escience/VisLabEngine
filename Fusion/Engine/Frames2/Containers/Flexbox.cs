@@ -4,6 +4,7 @@ using System;
 
 namespace Fusion.Engine.Frames2.Containers
 {
+    /*
     public class Flexbox : UIContainer
     {
         private float _mainSize;
@@ -70,4 +71,5 @@ namespace Fusion.Engine.Frames2.Containers
             layer.Draw(new Rect(0, 0, _mainSize, Height, DebugBrush, true));
         }
     }
+    */
 }

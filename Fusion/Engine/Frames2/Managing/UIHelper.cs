@@ -16,11 +16,11 @@ namespace Fusion.Engine.Frames2.Managing
                 var c = queue.Dequeue();
                 yield return c;
 
-                if (c is UIContainer container)
+                if (c is UIContainer<ISlot> container)
                 {
-                    foreach (var child in container.Children)
+                    foreach (var child in container.Slots)
                     {
-                        queue.Enqueue(child);
+                        queue.Enqueue(child.Component);
                     }
                 }
             }
@@ -29,18 +29,18 @@ namespace Fusion.Engine.Frames2.Managing
         public static IEnumerable<UIComponent> BFSTraverseForPoint(UIComponent root, Vector2 innerPoint)
         {
             var queue = new Queue<UIComponent>();
-            if (root.IsInside(innerPoint)) queue.Enqueue(root);
+            if (root.Placement.IsInside(innerPoint)) queue.Enqueue(root);
 
             while (queue.Any())
             {
                 var c = queue.Dequeue();
                 yield return c;
 
-                if (c is UIContainer container)
+                if (c is UIContainer<ISlot> container)
                 {
-                    foreach (var child in container.Children)
+                    foreach (var child in container.Slots)
                     {
-                        if (child.IsInside(innerPoint)) queue.Enqueue(child);
+                        if (child.IsInside(innerPoint)) queue.Enqueue(child.Component);
                     }
                 }
             }
@@ -57,11 +57,11 @@ namespace Fusion.Engine.Frames2.Managing
                 var c = stack.Pop();
                 stack2.Push(c);
 
-                if (c is UIContainer container)
+                if (c is UIContainer<ISlot> container)
                 {
-                    foreach (var child in container.Children)
+                    foreach (var child in container.Slots)
                     {
-                        stack.Push(child);
+                        stack.Push(child.Component);
                     }
                 }
             }
@@ -73,16 +73,16 @@ namespace Fusion.Engine.Frames2.Managing
             }
         }
 
-        public static UIComponent GetLowestComponentInHierarchy(UIContainer root, Vector2 innerPoint)
+        public static UIComponent GetLowestComponentInHierarchy(UIContainer<ISlot> root, Vector2 innerPoint)
         {
-            if (!root.IsInside(innerPoint)) return null;
+            if (!root.Placement.IsInside(innerPoint)) return null;
 
-            UIContainer lowestContainer = root;
+            UIContainer<ISlot> lowestContainer = root;
             while (true)
             {
-                UIComponent newLowest = lowestContainer.Children.LastOrDefault(c => c.IsInside(innerPoint));
+                var newLowest = lowestContainer.Slots.LastOrDefault(c => c.IsInside(innerPoint))?.Component;
                 if (newLowest == null) return lowestContainer;
-                if (newLowest is UIContainer newContainer)
+                if (newLowest is UIContainer<ISlot> newContainer)
                 {
                     lowestContainer = newContainer;
                 }
@@ -93,16 +93,16 @@ namespace Fusion.Engine.Frames2.Managing
             }
         }
 
-        public static IEnumerable<UIContainer> Ancestors(UIComponent component)
+        public static IEnumerable<UIContainer<ISlot>> Ancestors(UIComponent component)
         {
             if(component == null)
                 yield break;
 
-            var current = component.Parent;
+            var current = component.Placement.Parent;
             while (current != null)
             {
                 yield return current;
-                current = current.Parent;
+                current = current.Placement.Parent;
             }
         }
     }

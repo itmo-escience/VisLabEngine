@@ -14,12 +14,12 @@ using FusionUI;
 using FusionUI.UI;
 using Fusion.Engine.Frames2.Components;
 using Fusion.Engine.Frames2.Containers;
-using Fusion.Engine.Frames2.Controllers;
+//using Fusion.Engine.Frames2.Controllers;
 using Fusion.Engine.Frames2.Managing;
 using Fusion.Engine.Graphics.SpritesD2D;
 using KeyEventArgs = Fusion.Engine.Input.KeyEventArgs;
 using Fusion.Engine.Frames2;
-using Label = Fusion.Engine.Frames2.Components.Label;
+//using Label = Fusion.Engine.Frames2.Components.Label;
 using Fusion.Core.Utils;
 using System.Xml.Serialization;
 using System.IO;
@@ -178,17 +178,33 @@ namespace GISTest
             UIManager = new UIManager(Game.RenderSystem);
 		    UIManager.DebugEnabled = false;
 
-            txt = new Fusion.Engine.Frames2.Components.Label("z", new TextFormatD2D("Calibri", 20), 150, 450, 100, 100);
+            //txt = new Fusion.Engine.Frames2.Components.Label("z", new TextFormatD2D("Calibri", 20), 150, 450, 100, 100);
             var image = Game.Content.Load<Fusion.Drivers.Graphics.Texture2D>(@"UI-new\fv_palette_bg|nomips");
-            img1 = new Image(0, 0, 200, 75, image, 1);
-            img2 = new Image(125, 0, 75, 200, image, 1);
-            img3 = new Image(0, 125, 200, 75, image, 1);
-            img4 = new Image(0, 0, 75, 200, image, 1);
+            img1 = new Image(image, 1);
+            img2 = new Image(image, 1);
+            img3 = new Image(image, 1);
+            img4 = new Image(image, 1);
 
-            FreePlacement freePlacement = new FreePlacement(300, 300, 200, 200, true);
+            var freePlacement = new FreePlacement();
             freePlacement.Name = "ImageFreePlacement";
-            freePlacement.Add(img1);
-            freePlacement.Add(img2);
+		    freePlacement.DesiredWidth  = 1000;
+		    freePlacement.DesiredHeight = 1000;
+
+            var slot = freePlacement.Insert(img1, 0);
+		    slot.X = 100;
+		    slot.Y = 100;
+		    img1.DesiredWidth = 150;
+		    img1.DesiredHeight = 150;
+		    //slot.Clip = false;
+
+
+            var slot2 = freePlacement.Insert(img2, 0);
+		    slot2.X = 500;
+		    slot2.Y = 500;
+
+		    img2.DesiredWidth = 300;
+		    img2.DesiredHeight = 150;
+		    //slot2.Clip = false;
             //freePlacement.Add(img3);
             //freePlacement.Add(img4);
 
@@ -219,11 +235,11 @@ namespace GISTest
 
             //
 
-            UIManager.Root.Add(freePlacement);
+            UIManager.Root.Insert(freePlacement, 0);
 
             #endregion
 
-
+            /*
             #region button
             var btn = new ButtonController(100, 100);
 
@@ -245,7 +261,9 @@ namespace GISTest
             UIManager.Root.Add(btn);
 
             #endregion
+            */
 
+            /*
             #region textbox
 
 		    var tb = new TextBoxController(300, 100);
@@ -253,7 +271,7 @@ namespace GISTest
 
             UIManager.Root.Add(tb);
             #endregion
-
+            */
 
 
             userInterface.RootFrame = this.rootFrame = new MainFrame(FrameProcessor);
@@ -351,16 +369,18 @@ namespace GISTest
 	    private SolidBrushD2D _brush;
         public UIManager UIManager { get; private set; }
 
-        private Fusion.Engine.Frames2.Components.Label txt;
+        //private Fusion.Engine.Frames2.Components.Label txt;
 	    private float angle = 0;
 	    private Image img1;
         private Image img2;
         private Image img3;
         private Image img4;
-        private VerticalBox verticalBox1;
+
+	    /*private VerticalBox verticalBox1;
         private VerticalBox verticalBox2;
         private VerticalBox verticalBox3;
         private Flexbox flexbox1;
+        */
 
         public void PrintMessage(string message)
 		{
@@ -372,7 +392,7 @@ namespace GISTest
 	        messages.Add(string.Format(messageFormat, args));
 	    }
 
-        public UIContainer GetUIRoot()
+        public UIContainer<ISlot> GetUIRoot()
         {
             return UIManager.Root;
         }

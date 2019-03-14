@@ -20,7 +20,7 @@ using Fusion.Engine.Input;
 
 namespace Fusion.Drivers.Input {
 
-	
+
 	internal class InputDevice : DisposableBase {
 
 		public	Vector2		RelativeMouseOffset		{ get; protected set; }
@@ -32,7 +32,7 @@ namespace Fusion.Drivers.Input {
 		public	bool		IsMouseHidden			{ get; set; }
 		public	int			MouseWheelScrollLines	{ get { return System.Windows.Forms.SystemInformation.MouseWheelScrollLines; } }
 		public	int			MouseWheelScrollDelta	{ get { return System.Windows.Forms.SystemInformation.MouseWheelScrollDelta; } }
-		
+
 		HashSet<Keys>		pressed = new HashSet<Keys>();
 
 		public delegate void MouseMoveHandlerDelegate	( object sender, MouseMoveEventArgs e );
@@ -83,25 +83,25 @@ namespace Fusion.Drivers.Input {
 
 
 		static class NativeMethods {
-			public static Forms.Cursor LoadCustomCursor(string path) 
+			public static Forms.Cursor LoadCustomCursor(string path)
 			{
 				IntPtr hCurs =	LoadCursorFromFile(path);
 
 				if (hCurs == IntPtr.Zero) {
 					throw new Win32Exception();
 				}
-				
+
 				var curs	=	new Forms.Cursor(hCurs);
 				// Note: force the cursor to own the handle so it gets released properly
 				var fi		=	typeof(Forms.Cursor).GetField("ownHandle", BindingFlags.NonPublic | BindingFlags.Instance);
-				
+
 				fi.SetValue(curs, true);
 				return curs;
 			}
 
 			[DllImport("user32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
 			private static extern IntPtr LoadCursorFromFile(string path);
-		}		
+		}
 
 
 
@@ -195,7 +195,7 @@ namespace Fusion.Drivers.Input {
 
 
 		/// <summary>
-		/// 
+		///
 		/// </summary>
 		internal void RemoveAllPressedKeys()
 		{
@@ -261,10 +261,10 @@ namespace Fusion.Drivers.Input {
 		}
 
 
-		
+
 		/// <summary>
 		/// Keyboard handler
-		/// In general: http://molecularmusings.wordpress.com/2011/09/05/properly-handling-keyboard-input/ 
+		/// In general: http://molecularmusings.wordpress.com/2011/09/05/properly-handling-keyboard-input/
 		/// L/R shift:  http://stackoverflow.com/questions/5920301/distinguish-between-left-and-right-shift-keys-using-rawinput
 		/// </summary>
 		/// <param name="sender"></param>
@@ -355,15 +355,17 @@ namespace Fusion.Drivers.Input {
 
 					if (IsMouseClipped) {
 						Forms.Cursor.Clip		=	Game.GraphicsDevice.Display.Window.RectangleToScreen( rect );
-					} else {
-				        Forms.Cursor.Clip		=	new Drawing.Rectangle( int.MinValue, int.MinValue, int.MaxValue, int.MaxValue );
+					} else
+					{
+					    Forms.Cursor.Clip = new Drawing.Rectangle();
 					}
 
 					SetCursorVisibility( !IsMouseHidden );
 
-			    } else {
+			    } else
+			    {
 
-			        Forms.Cursor.Clip		=	new Drawing.Rectangle( int.MinValue, int.MinValue, int.MaxValue, int.MaxValue );
+			        Forms.Cursor.Clip = new Drawing.Rectangle();
 					RelativeMouseOffset		=	Vector2.Zero;
 					SetCursorVisibility( true );
 
@@ -388,9 +390,9 @@ namespace Fusion.Drivers.Input {
 
 
 		/*-----------------------------------------------------------------------------------------
-		 * 
+		 *
 		 *	Form handling :
-		 * 
+		 *
 		-----------------------------------------------------------------------------------------*/
 
 		internal void NotifyKeyDown ( Keys key, bool alt, bool shift, bool control )

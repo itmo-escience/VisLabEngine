@@ -1,13 +1,16 @@
 ﻿using System.ComponentModel;
+using Fusion.Core.Mathematics;
 using Fusion.Drivers.Graphics;
 using Fusion.Engine.Common;
-using Fusion.Engine.Frames2.Managing;
 using Fusion.Engine.Graphics.SpritesD2D;
 
 namespace Fusion.Engine.Frames2.Components
 {
     public sealed class Image : UIComponent
     {
+        public float DesiredWidth { get; set; } = -1;
+        public float DesiredHeight { get; set; } = -1;
+
         private float _opacity;
         public float Opacity {
             get => _opacity;
@@ -30,43 +33,41 @@ namespace Fusion.Engine.Frames2.Components
 
         private DrawBitmap _drawCommand;
 
-        public Image() : this(0, 0, 0, 0, null, 1)
-        {
-        }
+        public Image() : this(null) { }
 
-        public Image(float x, float y, Texture2D texture, float opacity = 1) : this(x, y, texture.Width, texture.Height, texture, opacity)
-        {
-        }
-
-        public Image(float x, float y, float width, float height, Texture2D texture, float opacity = 1) : base(x, y, width, height)
+        public Image(Texture2D texture, float opacity = 1)
         {
             Texture = texture;
             Opacity = opacity;
-
-            UpdateDrawCommand();
-
-            PropertyChanged += (s, e) =>
-            {
-                if ((e.PropertyName == nameof(Width)) || (e.PropertyName == nameof(Height)) || (e.PropertyName == nameof(Opacity)))
-                {
-                    UpdateDrawCommand();
-                }
-            };
         }
 
-        private void UpdateDrawCommand()
+        public Image(float width, float height, Texture2D texture, float opacity = 1)
         {
-            _drawCommand = new DrawBitmap(0, 0, Width, Height, Texture, Opacity);
+            Texture = texture;
+            Opacity = opacity;
+            DesiredWidth = width;
+            DesiredHeight = height;
         }
 
         public ISlot Placement { get; set; }
         public object Tag { get; set; }
         public string Name { get; set; }
-        public override void Update(GameTime gameTime) { }
 
-        public override void Draw(SpriteLayerD2D layer)
+        public void Update(GameTime gameTime)
         {
-            layer.Draw(_drawCommand);
+            if (Texture != null &&
+                (_drawCommand == null ||
+                !MathUtil.NearEqual(_drawCommand.Width, Placement.Width) ||
+                !MathUtil.NearEqual(_drawCommand.Height, Placement.Height)))
+            {
+                _drawCommand = new DrawBitmap(0, 0, Placement.Width, Placement.Height, Texture, Opacity);
+            }
+        }
+
+        public void Draw(SpriteLayerD2D layer)
+        {
+            if(_drawCommand != null)
+                layer.Draw(_drawCommand);
         }
 
         public event PropertyChangedEventHandler PropertyChanged;

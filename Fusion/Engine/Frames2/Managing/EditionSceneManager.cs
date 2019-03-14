@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 
 namespace Fusion.Engine.Frames2.Managing
 {
+    /*
 	public static class EditionSceneManager
 	{
 		public static bool ReadSceneFromFile(string filePath, out UIContainer scene)
@@ -46,4 +47,5 @@ namespace Fusion.Engine.Frames2.Managing
 			}
 		}
 	}
+    */
 }
