@@ -68,6 +68,8 @@ namespace WpfEditorTest
 
 		private Stack<FrameSelectionPanel> _selectionPanelPool = new Stack<FrameSelectionPanel>();
 
+        public bool IsScrollExpected { get; set; }
+
 		public WPFSelectionUILayer()
 		{
 			InitializeComponent();
@@ -485,11 +487,13 @@ namespace WpfEditorTest
 			}
 
 			CaptureMouse();
-		}
+            IsScrollExpected = true;
+        }
 
 		private void LocalGrid_MouseLeftButtonUp( object sender, MouseButtonEventArgs e )
 		{
             ReleaseMouseCapture();
+            IsScrollExpected = false;
             EndMouseDrag(e.GetPosition(this));
         }
 
@@ -553,6 +557,9 @@ namespace WpfEditorTest
 					ParentHighlightPanel.SelectedFrame = hovered;
 				}
 			}
+
+            if (AreaSelectionEnabled)
+                DrawSelectionRectangle(_initMousePosition, GetBoundedMousePosition(e));
 		}
 
 		public void PrepareStickingCoords()
@@ -719,8 +726,11 @@ namespace WpfEditorTest
 				y.IsActive = false;
 			}
 
-			ActivateStickingLines(StickingCoordsX, _frameDragsPanel.RenderTransform.Value.OffsetX, _frameDragsPanel.Width);
-			ActivateStickingLines(StickingCoordsY, _frameDragsPanel.RenderTransform.Value.OffsetY, _frameDragsPanel.Height);
+            if (NeedSnapping())
+            {
+                ActivateStickingLines(StickingCoordsX, _frameDragsPanel.RenderTransform.Value.OffsetX, _frameDragsPanel.Width);
+                ActivateStickingLines(StickingCoordsY, _frameDragsPanel.RenderTransform.Value.OffsetY, _frameDragsPanel.Height);
+            }
 		}
 
 		public void RecalculateSelectionPosition( Point currentLocation )
@@ -752,10 +762,11 @@ namespace WpfEditorTest
 				y.IsActive = false;
 			}
 
-			ActivateStickingLines(StickingCoordsX, _frameDragsPanel.RenderTransform.Value.OffsetX, _frameDragsPanel.Width);
-			ActivateStickingLines(StickingCoordsY, _frameDragsPanel.RenderTransform.Value.OffsetY, _frameDragsPanel.Height);
-
-
+            if (NeedSnapping())
+            {
+                ActivateStickingLines(StickingCoordsX, _frameDragsPanel.RenderTransform.Value.OffsetX, _frameDragsPanel.Width);
+                ActivateStickingLines(StickingCoordsY, _frameDragsPanel.RenderTransform.Value.OffsetY, _frameDragsPanel.Height);
+            }
 		}
 
 		private void ActivateStickingLines(List<StickCoordinateY> stickingCoordsY, double minValue, double additionalValue )
@@ -830,19 +841,6 @@ namespace WpfEditorTest
 				CommandManager.Instance.ExecuteWithoutSettingDirty(command);
 			}
 		}
-
-		private void VisualSelection_MouseMove( object sender, MouseEventArgs e )
-		{
-			if (AreaSelectionEnabled)
-				DrawSelectionRectangle(_initMousePosition, GetBoundedMousePosition(e));
-		}
-
-        internal void FullMouseMove(object sender, MouseEventArgs e)
-        {
-            LocalGrid_MouseMove(sender, e);
-            VisualSelection_MouseMove(sender, e);
-        }
-
 
         private void Grid_PreviewDragOver( object sender, System.Windows.DragEventArgs e )
 		{

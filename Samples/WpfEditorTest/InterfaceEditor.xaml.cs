@@ -1132,9 +1132,47 @@ namespace WpfEditorTest
 			}
 		}
 
+        public static readonly DependencyProperty MouseXProperty =
+            DependencyProperty.Register("MouseX", typeof(double), typeof(InterfaceEditor), new UIPropertyMetadata((double)0));
+
+        public double MouseX {
+            get => (double)GetValue(MouseXProperty);
+            set => SetValue(MouseXProperty, value);
+        }
+
+        public static readonly DependencyProperty MouseYProperty =
+            DependencyProperty.Register("MouseY", typeof(double), typeof(InterfaceEditor), new UIPropertyMetadata((double)0));
+
+        public double MouseY {
+            get => (double)GetValue(MouseYProperty);
+            set => SetValue(MouseYProperty, value);
+        }
+
 		private void Window_PreviewMouseMove( object sender, MouseEventArgs e )
-		{
-			SelectionLayer.FullMouseMove(sender, e);
+        {
+            MouseX = Math.Round(e.GetPosition(SelectionLayer).X);
+            MouseY = Math.Round(e.GetPosition(SelectionLayer).Y);
+
+            if (SelectionLayer.IsScrollExpected)
+            {
+                Point mousePosition = e.GetPosition(ZoomerScroll);
+                if (mousePosition.X < 0)
+                {
+                    ZoomerScroll.ScrollToHorizontalOffset(ZoomerScroll.ContentHorizontalOffset - 1);
+                }
+                if (mousePosition.Y < 0)
+                {
+                    ZoomerScroll.ScrollToVerticalOffset(ZoomerScroll.ContentVerticalOffset - 1);
+                }
+                if (mousePosition.X > ZoomerScroll.ViewportWidth)
+                {
+                    ZoomerScroll.ScrollToHorizontalOffset(ZoomerScroll.ContentHorizontalOffset + 1);
+                }
+                if (mousePosition.Y > ZoomerScroll.ViewportHeight)
+                {
+                    ZoomerScroll.ScrollToVerticalOffset(ZoomerScroll.ContentVerticalOffset + 1);
+                }
+            }
 		}
 
 		private void Slider_ValueChanged( object sender, RoutedPropertyChangedEventArgs<double> e )

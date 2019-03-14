@@ -159,6 +159,12 @@
                 <TextBlock Text="  Scene Height:  " VerticalAlignment="Center"/>
                 <TextBlock Text="{Binding Height, ElementName=SelectionLayer}" VerticalAlignment="Center"/>
                 <Separator></Separator>
+                <TextBlock Text="Mouse position:  (" VerticalAlignment="Center"/>
+                <TextBlock Text="{Binding MouseX, RelativeSource={RelativeSource Mode=FindAncestor,AncestorType={x:Type local:InterfaceEditor}}}" VerticalAlignment="Center"/>
+                <TextBlock Text=", " VerticalAlignment="Center"/>
+                <TextBlock Text="{Binding MouseY, RelativeSource={RelativeSource Mode=FindAncestor,AncestorType={x:Type local:InterfaceEditor}}}" VerticalAlignment="Center"/>
+                <TextBlock Text=")" VerticalAlignment="Center"/>
+                <Separator></Separator>
             </ToolBar>
         </ToolBarTray>
         <TabControl Name="LoadedScenesTabs" Grid.Row="1" ItemsSource="{Binding}"  SelectionChanged="LoadedScenesTabs_SelectionChanged">

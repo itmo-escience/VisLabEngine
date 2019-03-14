@@ -18,7 +18,7 @@
     <Canvas Name="VisualGrid" Visibility="Collapsed"/>
     <Canvas Name="StickLinesGrid" SnapsToDevicePixels="True"/>
     <panels:ParentHighlightPanel x:Name="ParentHighlightPanel"></panels:ParentHighlightPanel>
-    <Canvas Name="AreaSelection" Background="Transparent" MouseMove="VisualSelection_MouseMove"/>
+    <Canvas Name="AreaSelection" Background="Transparent"/>
     <Grid Name="HighlightPanelsContainer"></Grid>
     <panels:FrameDragsPanel x:Name="_frameDragsPanel"></panels:FrameDragsPanel>
 </Grid>
