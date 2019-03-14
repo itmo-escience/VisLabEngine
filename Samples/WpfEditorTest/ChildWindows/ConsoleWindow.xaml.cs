@@ -75,7 +75,13 @@ namespace WpfEditorTest.ChildWindows
 		{
 			var comboBox = sender as ComboBox;
 			_lowestMessageLevelToPrint = (LogMessageType)(comboBox.SelectedItem as FrameworkElement).Tag;
-            UpdateOutputText();
+			var configFile = ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.None);
+			configFile.AppSettings.Settings["ConsoleFilterItemIndex"].Value = LogTypeComboBox.SelectedIndex.ToString();
+			configFile.Save(ConfigurationSaveMode.Modified);
+			ConfigurationManager.RefreshSection(configFile.AppSettings.SectionInformation.Name);
+
+
+			UpdateOutputText();
         }
 
         private void UpdateOutputText()
