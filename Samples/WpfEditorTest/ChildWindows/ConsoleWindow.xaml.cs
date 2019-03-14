@@ -24,8 +24,9 @@ namespace WpfEditorTest.ChildWindows
 	/// </summary>
 	public partial class ConsoleWindow : Window
 	{
-        Invoker _invoker;
-        LogMessageType _lowestMessageLevelToPrint;
+        private Invoker _invoker;
+        private LogMessageType _lowestMessageLevelToPrint;
+        private LogMessage _lastPrintedMessage;
 
         public ConsoleWindow(Invoker invoker)
 		{
@@ -46,11 +47,10 @@ namespace WpfEditorTest.ChildWindows
             Log.AddListener(new LogRecorder());
             LogRecorder.TraceRecorded += (s, e) =>
             {
-                Application.Current.Dispatcher.InvokeAsync(() =>
-                {
-                    UpdateOutputText();
-                });
+                Application.Current.Dispatcher.InvokeAsync(AddLastLogLines);
             };
+
+            UpdateOutputText();
         }
 
 		private void TextBox_KeyDown( object sender, KeyEventArgs e )
@@ -78,15 +78,67 @@ namespace WpfEditorTest.ChildWindows
             UpdateOutputText();
         }
 
+        private void AddLastLogLines()
+        {
+            if (!LogRecorder.GetLines().Contains(_lastPrintedMessage))
+            {
+                UpdateOutputText();
+                return;
+            }
+
+            var notPrintedMessages = LogRecorder.GetLines().SkipWhile(mes => mes != _lastPrintedMessage).ToList();
+            Paragraph paragraph = new Paragraph();
+            foreach (LogMessage message in notPrintedMessages)
+            {
+                if (message.MessageType >= _lowestMessageLevelToPrint)
+                {
+                    var text = new Run(message.MessageText + Environment.NewLine);
+                    switch (message.MessageType)
+                    {
+                        case LogMessageType.Debug:
+                            text.Foreground = Brushes.DarkGray;
+                            text.Background = Brushes.Black;
+                            break;
+                        case LogMessageType.Verbose:
+                            text.Foreground = Brushes.Gray;
+                            text.Background = Brushes.Black;
+                            break;
+                        case LogMessageType.Information:
+                            text.Foreground = Brushes.White;
+                            text.Background = Brushes.Black;
+                            break;
+                        case LogMessageType.Warning:
+                            text.Foreground = Brushes.Yellow;
+                            text.Background = Brushes.Black;
+                            break;
+                        case LogMessageType.Error:
+                            text.Foreground = Brushes.Red;
+                            text.Background = Brushes.Black;
+                            break;
+                        case LogMessageType.Fatal:
+                            text.Foreground = Brushes.Black;
+                            text.Background = Brushes.Red;
+                            break;
+                    }
+                    paragraph.Inlines.Add(text);
+                }
+            }
+
+            _lastPrintedMessage = notPrintedMessages.LastOrDefault();
+            if (paragraph.Inlines.Count > 0)
+            {
+                OutputField.Document.Blocks.Add(paragraph);
+                ScrollViewer.ScrollToEnd(); 
+            }     
+        }
+
         private void UpdateOutputText()
         {
-            string messages = "";
 			Paragraph paragraph = new Paragraph();
             foreach (LogMessage message in LogRecorder.GetLines())
             {
                 if (message.MessageType >= _lowestMessageLevelToPrint)
                 {
-					//messages += message.MessageText + Environment.NewLine;
 					var text = new Run(message.MessageText + Environment.NewLine);
 					switch (message.MessageType)
 					{
@@ -121,6 +173,7 @@ namespace WpfEditorTest.ChildWindows
 
 			OutputField.Document.Blocks.Clear();
 			OutputField.Document.Blocks.Add(paragraph);
+            _lastPrintedMessage = LogRecorder.GetLines().LastOrDefault();
             ScrollViewer.ScrollToEnd();
         }
 	}
