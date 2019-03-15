@@ -115,11 +115,11 @@ namespace WpfEditorTest.ChildPanels
 			else if (frames.Count == 1)
 			{
 				Visibility = Visibility.Visible;
-
-				SelectedGroupMinX = frames.Select(f => f.BoundingBox.X).Min();
-				SelectedGroupMinY = frames.Select(f => f.BoundingBox.Y).Min();
-				SelectedGroupMaxX = frames.Select(f => f.BoundingBox.X + f.BoundingBox.Width).Max();
-				SelectedGroupMaxY = frames.Select(f => f.BoundingBox.Y + f.BoundingBox.Height).Max();
+				var component = SelectionManager.Instance.SelectedFrames.First();
+				SelectedGroupMinX = component.BoundingBox.X;
+				SelectedGroupMinY = component.BoundingBox.Y;
+				SelectedGroupMaxX = component.BoundingBox.X + component.BoundingBox.Width;
+				SelectedGroupMaxY = component.BoundingBox.Y + component.BoundingBox.Height;
 
 				UIComponent frame = frames.First();
 				Width = frame.Width;
@@ -152,8 +152,8 @@ namespace WpfEditorTest.ChildPanels
 				InitialFramesRectangles.Add(
 					frame,
 					new RectangleF(
-						frame.GlobalTransform.M31 - (int)RenderTransform.Value.OffsetX,
-						frame.GlobalTransform.M32 - (int)RenderTransform.Value.OffsetY,
+						frame.GlobalTransform.M31 - (float)RenderTransform.Value.OffsetX,
+						frame.GlobalTransform.M32 - (float)RenderTransform.Value.OffsetY,
 						frame.Width,
 						frame.Height
 					)
@@ -220,7 +220,7 @@ namespace WpfEditorTest.ChildPanels
 
 		private Point RelativeToPivot( Point pivotPoint, Point point )
 		{
-			return new Point(Math.Round(point.X - pivotPoint.X, 3), Math.Round(point.Y - pivotPoint.Y, 3));
+			return new Point(/*Math.Round(*/point.X - pivotPoint.X,/* 3), Math.Round(*/point.Y - pivotPoint.Y/*, 3)*/);
 		}
 
 		private Point AbsolutePosition( Point pivotPoint, Point point )
@@ -372,13 +372,13 @@ namespace WpfEditorTest.ChildPanels
 			heightMultiplier = newHeight / SelectedGroupInitSize.Height;
 		}
 
-		internal void Reposition( double deltaX, double deltaY, bool isShiftPressed, bool isControlPressed, int gridSizeMultiplier, bool needSnapping,
-			Visibility gridVisibility, List<StickCoordinateX> stickingCoordsX, List<StickCoordinateY> stickingCoordsY, out double dX, out double dY )
+		internal void Reposition( float deltaX, float deltaY, bool isShiftPressed, bool isControlPressed, int gridSizeMultiplier, bool needSnapping,
+			Visibility gridVisibility, List<StickCoordinateX> stickingCoordsX, List<StickCoordinateY> stickingCoordsY, out float dX, out float dY )
 		{
 			bool gridEnabled = gridVisibility == Visibility.Visible;
 			var step = (int)(FusionUI.UI.ScalableFrame.ScaleMultiplier * gridSizeMultiplier);
-			var newX = SelectedGroupInitPosition.X + deltaX;
-			var newY = SelectedGroupInitPosition.Y + deltaY;
+			float newX = (float)SelectedGroupInitPosition.X + deltaX;
+			float newY = (float)SelectedGroupInitPosition.Y + deltaY;
 			dX = deltaX;
 			dY = deltaY;
 			if (gridEnabled && needSnapping)
@@ -433,7 +433,7 @@ namespace WpfEditorTest.ChildPanels
 				stickingDelta = ClosestToZero(ClosestToZero(stickingDeltaHelper1, stickingDeltaHelper2), stickingDeltaHelper3);
 				if (stickingDelta != null)
 				{
-					dX += (double)stickingDelta;
+					dX += stickingDelta.GetValueOrDefault(0);
 				}
 
 
@@ -455,10 +455,7 @@ namespace WpfEditorTest.ChildPanels
 				}
 				stickingDelta = ClosestToZero(ClosestToZero(stickingDeltaHelper1, stickingDeltaHelper2), stickingDeltaHelper3);
 
-				if (stickingDelta != null)
-				{
-					dY += (double)stickingDelta;
-				}
+				dY += stickingDelta.GetValueOrDefault(0);
 			}
 		}
 

@@ -389,7 +389,7 @@ namespace WpfEditorTest
 
 			foreach (RadioButton item in GridSizeMenuItem.Items)
 			{
-				if ((string)item.Content == loadedGridSize)
+				if (item.Tag.ToString() == loadedGridSize)
 				{
 					item.IsChecked = true;
 					break;
@@ -693,8 +693,8 @@ namespace WpfEditorTest
 			var delta = KeyboardArrowsSteps[e.Parameter.ToString()];
 			if (SelectionManager.Instance.SelectedFrames.Count>0)
 			{
-				var step = GridToggle.IsChecked != null && (bool)GridToggle.IsChecked ?
-			(int)(FusionUI.UI.ScalableFrame.ScaleMultiplier * SelectionLayer.GridSizeMultiplier) : 1;
+				var step = SelectionLayer.VisualGrid.Visibility == Visibility.Visible ?
+					(int)(FusionUI.UI.ScalableFrame.ScaleMultiplier * SelectionLayer.GridSizeMultiplier) : 1;
 				List<IEditorCommand> commands = new List<IEditorCommand>();
 				foreach (UIComponent frame in SelectionLayer.FrameSelectionPanelList.Keys)
 				{
@@ -991,7 +991,7 @@ namespace WpfEditorTest
 			settings["ConsoleWindowVisibility"].Value = _consoleWindow.Visibility == Visibility.Visible ? true.ToString() : false.ToString();
 			settings["SlotDetailsWindowVisibility"].Value = _slotDetails.Visibility == Visibility.Visible ? true.ToString() : false.ToString();
 
-			settings["GridSize"].Value = SelectionLayer.GridSizeMultiplier.ToString() + "x";
+
 			settings["MainWindowX"].Value = this.Left.ToString();
 			settings["MainWindowY"].Value = this.Top.ToString();
 			settings["MainWindowWidth"].Value = this.Width.ToString();
@@ -1001,8 +1001,6 @@ namespace WpfEditorTest
 			settings["SceneZoom"].Value = this.ZoomerSlider.Value.ToString();
 			settings["SceneSizeWidth"].Value = this.DefaultSceneWidth.ToString();
 			settings["SceneSizeHeight"].Value = this.DefaultSceneHeight.ToString();
-
-			settings["ConsoleFilterItemIndex"].Value = _consoleWindow.LogTypeComboBox.SelectedIndex.ToString();
 
 			configFile.Save(ConfigurationSaveMode.Modified);
 			ConfigurationManager.RefreshSection(configFile.AppSettings.SectionInformation.Name);
@@ -1118,7 +1116,12 @@ namespace WpfEditorTest
 		private void rb_Checked( object sender, RoutedEventArgs e )
 		{
 			var rBtn = sender as RadioButton;
-			SelectionLayer.GridSizeMultiplier = SelectionLayer.GridScaleNumbers[rBtn.Content.ToString()];
+			SelectionLayer.GridSizeMultiplier = int.Parse(rBtn.Tag.ToString());
+
+			var configFile = ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.None);
+			configFile.AppSettings.Settings["GridSize"].Value = rBtn.Tag.ToString();
+			configFile.Save(ConfigurationSaveMode.Modified);
+			ConfigurationManager.RefreshSection(configFile.AppSettings.SectionInformation.Name);
 		}
 
 		private void Window_KeyUp( object sender, KeyEventArgs e )

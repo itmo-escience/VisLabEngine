@@ -5,7 +5,7 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:local="clr-namespace:WpfEditorTest.ChildPanels"
              mc:Ignorable="d"
-             d:DesignHeight="100" d:DesignWidth="100" HorizontalAlignment="Left" VerticalAlignment="Top" Visibility="Collapsed">
+             d:DesignHeight="100.55" d:DesignWidth="100" HorizontalAlignment="Left" VerticalAlignment="Top" Visibility="Visible">
     <Grid.RowDefinitions>
         <RowDefinition Height="9"/>
         <RowDefinition Height="1*"/>
@@ -20,30 +20,30 @@
     <Border Name="TopBorder" Grid.Column="0" Grid.Row="0" Grid.ColumnSpan="3" Grid.RowSpan="3" BorderThickness="0,2,0,0" BorderBrush="White"/>
     <Border Name="RightBorder" Grid.Column="0" Grid.Row="0" Grid.ColumnSpan="3" Grid.RowSpan="3" BorderThickness="0,0,2,0" BorderBrush="White"/>
     <Border Name="BottomBorder" Grid.Column="0" Grid.Row="0" Grid.ColumnSpan="3" Grid.RowSpan="3" BorderThickness="0,0,0,2" BorderBrush="White"/>
-    <Border Name="PositionInfo" BorderThickness="0,0,0,1" BorderBrush="White" Grid.Column="0" Height="28" Grid.Row="0" Width="40" Margin="-40,-27,9,8">
+    <Border Name="PositionInfo" BorderThickness="0,0,0,1" BorderBrush="White" Grid.Column="0" Height="28" Grid.Row="0" Width="53" Margin="-53,-27,9,8">
         <StackPanel>
-            <StackPanel Orientation="Horizontal">
-                <TextBlock Foreground="White" FontFamily="Consolas" TextAlignment ="Left" FontSize="12" Text="X:"></TextBlock>
-                <TextBlock x:Name="textBlock1" Foreground="White" FontFamily="Consolas" TextAlignment ="Right" FontSize="12" Text="{Binding RenderTransform.Value.OffsetX, ElementName=userControl}" Width="27"></TextBlock>
+            <DockPanel>
+                <TextBlock Foreground="White" FontFamily="Consolas" FontSize="12" Text="X:" HorizontalAlignment="Left"></TextBlock>
+                <TextBlock Foreground="White" FontFamily="Consolas" FontSize="12" Text="{Binding RenderTransform.Value.OffsetX, ElementName=userControl, StringFormat=###0.00}" Width="40" HorizontalAlignment="Left"></TextBlock>
 
-            </StackPanel>
-            <StackPanel  Orientation="Horizontal">
-                <TextBlock Foreground="White" FontFamily="Consolas" TextAlignment ="Left" FontSize="12" Text="Y:"></TextBlock>
-                <TextBlock Foreground="White" FontFamily="Consolas" TextAlignment ="Right" FontSize="12" Text="{Binding RenderTransform.Value.OffsetY, ElementName=userControl}" Width="27"></TextBlock>
-            </StackPanel>
+            </DockPanel>
+            <DockPanel>
+                <TextBlock Foreground="White" FontFamily="Consolas" FontSize="12" Text="Y:" HorizontalAlignment="Left"></TextBlock>
+                <TextBlock Foreground="White" FontFamily="Consolas" FontSize="12" Text="{Binding RenderTransform.Value.OffsetY, ElementName=userControl, StringFormat=###0.00}" Width="40" HorizontalAlignment="Left"></TextBlock>
+            </DockPanel>
         </StackPanel>
     </Border>
     <Border Name="SizeInfo" BorderThickness="0,1,0,0" BorderBrush="White" Grid.Column="2" Height="28" Grid.Row="2"
-                Width="40" Margin="9,8,-40,-27">
+                Width="53" Margin="9,8,-53,-27">
         <StackPanel>
-            <StackPanel Orientation="Horizontal">
-                <TextBlock Foreground="White" FontFamily="Consolas" TextAlignment ="Left" FontSize="12" Text="W:"></TextBlock>
-                <TextBlock Foreground="White" FontFamily="Consolas" TextAlignment ="Right" FontSize="12" Text="{Binding Width, ElementName=userControl}" Width="27"></TextBlock>
-            </StackPanel>
-            <StackPanel Orientation="Horizontal">
-                <TextBlock Foreground="White" FontFamily="Consolas" TextAlignment ="Left" FontSize="12" Text="H:"></TextBlock>
-                <TextBlock x:Name="textBlock" Foreground="White" FontFamily="Consolas" TextAlignment ="Right" FontSize="12" Text="{Binding Height, ElementName=userControl}" Width="27"></TextBlock>
-            </StackPanel>
+            <DockPanel>
+                <TextBlock Foreground="White" FontFamily="Consolas" FontSize="12" Text="W:" HorizontalAlignment="Left"></TextBlock>
+                <TextBlock Foreground="White" FontFamily="Consolas" FontSize="12" Text="{Binding Width, ElementName=userControl, StringFormat=###0.00}" Width="40" HorizontalAlignment="Left"></TextBlock>
+            </DockPanel>
+            <DockPanel>
+                <TextBlock Foreground="White" FontFamily="Consolas" FontSize="12" Text="H:" HorizontalAlignment="Left"></TextBlock>
+                <TextBlock Foreground="White" FontFamily="Consolas" FontSize="12" Text="{Binding Height, ElementName=userControl, StringFormat=###0.00}" Width="40" HorizontalAlignment="Left"></TextBlock>
+            </DockPanel>
         </StackPanel>
     </Border>
 

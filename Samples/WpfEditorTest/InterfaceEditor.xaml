@@ -15,7 +15,7 @@
         Width="800" Height="600"
         MinWidth="400" MinHeight="300"
         WindowStartupLocation="CenterScreen"
-        FocusManager.FocusedElement="{Binding ElementName=window}"
+        FocusManager.FocusedElement="{Binding}"
         Closing="Window_Closing"
         KeyUp="Window_KeyUp"
         Loaded="Window_Loaded" PreviewMouseWheel="Window_PreviewMouseWheel" PreviewMouseMove="Window_PreviewMouseMove">
@@ -107,24 +107,22 @@
                 </Menu>
                 <Menu>
                     <MenuItem Header="Windows" Background="#FFEEF5FD">
-                    <MenuItem Name="miFrameProperties" Header="Frame Properties" Click="MenuItem_Click"/>
-                    <MenuItem Name="miSceneTreeView" Header="Scene TreeView" Click="MenuItem_Click"/>
-                    <MenuItem Name="miFrameTemplates" Header="Frame Templates" Click="MenuItem_Click"/>
-                    <MenuItem Name="miConsole" Header="Console" Click="MenuItem_Click"/>
-                    <MenuItem Name="miSlotDetails" Header="SlotDetails" Click="MenuItem_Click"/>
+                        <MenuItem Name="miFrameProperties" Header="Frame Properties" Click="MenuItem_Click"/>
+                        <MenuItem Name="miSceneTreeView" Header="Scene TreeView" Click="MenuItem_Click"/>
+                        <MenuItem Name="miFrameTemplates" Header="Frame Templates" Click="MenuItem_Click"/>
+                        <MenuItem Name="miConsole" Header="Console" Click="MenuItem_Click"/>
+                        <MenuItem Name="miSlotDetails" Header="SlotDetails" Click="MenuItem_Click"/>
                     </MenuItem>
                 </Menu>
-                <CheckBox Name="GridToggle" IsChecked="False" Background="#FFEEF5FD" Checked="CheckBox_Checked" Unchecked="CheckBox_Checked" VerticalAlignment="Stretch">
-                    <TextBlock Text="ShowGrid" Background="#FFEEF5FD" VerticalAlignment="Center"/>
-                </CheckBox>
                 <Menu>
                     <MenuItem Name="GridSizeMenuItem" Header="GridSize" Background="#FFEEF5FD">
-                        <RadioButton Name="rb1" GroupName="GridScale" Content="1x" Checked="rb_Checked"/>
-                        <RadioButton Name="rb2" GroupName="GridScale" Content="2x" Checked="rb_Checked"/>
-                        <RadioButton Name="rb3" GroupName="GridScale" Content="3x" Checked="rb_Checked"/>
-                        <RadioButton Name="rb4" GroupName="GridScale" Content="4x" Checked="rb_Checked"/>
-                        <RadioButton Name="rb5" GroupName="GridScale" Content="5x" Checked="rb_Checked"/>
-                        <RadioButton Name="rb10" GroupName="GridScale" Content="10x" Checked="rb_Checked"/>
+                        <RadioButton Name="rb0" GroupName="GridScale" Content="None" Tag="0" Checked="rb_Checked"/>
+                        <RadioButton Name="rb1" GroupName="GridScale" Content="1x" Tag="1" Checked="rb_Checked"/>
+                        <RadioButton Name="rb2" GroupName="GridScale" Content="2x" Tag="2" Checked="rb_Checked"/>
+                        <RadioButton Name="rb3" GroupName="GridScale" Content="3x" Tag="3" Checked="rb_Checked"/>
+                        <RadioButton Name="rb4" GroupName="GridScale" Content="4x" Tag="4" Checked="rb_Checked"/>
+                        <RadioButton Name="rb5" GroupName="GridScale" Content="5x" Tag="5" Checked="rb_Checked"/>
+                        <RadioButton Name="rb10" GroupName="GridScale" Content="10x" Tag="10" Checked="rb_Checked"/>
                     </MenuItem>
                 </Menu>
                 <Menu>
