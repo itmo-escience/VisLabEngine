@@ -3,11 +3,10 @@ using System.Linq;
 using Fusion.Core.Mathematics;
 using Fusion.Engine.Graphics.SpritesD2D;
 using SharpDX.Direct2D1;
-using SharpDX.Mathematics.Interop;
 
 namespace Fusion.Engine.Frames2
 {
-    public interface UIReadonlyContainer<out T> : UIComponent where T : ISlot
+    public interface IUIContainer<out T> : UIComponent where T : ISlot
     {
         IEnumerable<T> Slots { get; }
 
@@ -16,7 +15,7 @@ namespace Fusion.Engine.Frames2
         bool Contains(UIComponent component);
     }
 
-    public interface UIContainer<out T> : UIReadonlyContainer<T> where T : ISlot
+    public interface IUIModifiableContainer<out T> : IUIContainer<T> where T : ISlot
     {
         T Insert(UIComponent child, int index);
 
@@ -76,9 +75,9 @@ namespace Fusion.Engine.Frames2
         */
     }
 
-    public static class UIContainerExtensions
+    public static class ContainerExtensions
     {
-        public static int IndexOf<T>(this UIReadonlyContainer<T> c, UIComponent child) where T : ISlot
+        public static int IndexOf<T>(this IUIContainer<T> c, UIComponent child) where T : ISlot
         {
             var i = 0;
             foreach (var slot in c.Slots)
@@ -91,14 +90,14 @@ namespace Fusion.Engine.Frames2
             return -1;
         }
 
-        public static bool Contains<T>(this UIReadonlyContainer<T> c, UIComponent component) where T : ISlot
+        public static bool Contains<T>(this IUIContainer<T> c, UIComponent component) where T : ISlot
         {
             var holder = c.Slots.FirstOrDefault(slot => slot.Component == component);
 
             return holder != null;
         }
 
-        public static IEnumerable<UIComponent> GetChildren<T>(this UIReadonlyContainer<T> container) where T : ISlot
+        public static IEnumerable<UIComponent> GetChildren<T>(this IUIContainer<T> container) where T : ISlot
         {
             return container.Slots.Select(slot => slot.Component);
         }

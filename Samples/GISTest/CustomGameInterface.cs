@@ -24,6 +24,7 @@ using Fusion.Core.Utils;
 using System.Xml.Serialization;
 using System.IO;
 using System.Collections.ObjectModel;
+using Label = Fusion.Engine.Frames2.Components.Label;
 
 namespace GISTest
 {
@@ -176,7 +177,7 @@ namespace GISTest
             #region UITesting
 
             UIManager = new UIManager(Game.RenderSystem);
-		    UIManager.DebugEnabled = false;
+		    UIManager.DebugEnabled = true;
 
             //txt = new Fusion.Engine.Frames2.Components.Label("z", new TextFormatD2D("Calibri", 20), 150, 450, 100, 100);
             var image = Game.Content.Load<Fusion.Drivers.Graphics.Texture2D>(@"UI-new\fv_palette_bg|nomips");
@@ -195,7 +196,6 @@ namespace GISTest
 		    slot.Y = 100;
 		    img1.DesiredWidth = 150;
 		    img1.DesiredHeight = 150;
-		    //slot.Clip = false;
 
 
             var slot2 = freePlacement.Insert(img2, 0);
@@ -204,6 +204,13 @@ namespace GISTest
 
 		    img2.DesiredWidth = 300;
 		    img2.DesiredHeight = 150;
+
+            var text = new Label("Hello, world!", "Calibri", 50);
+		    var textSlot = freePlacement.Insert(text, 0);
+		    textSlot.X = 500;
+		    textSlot.Y = 300;
+
+
 		    //slot2.Clip = false;
             //freePlacement.Add(img3);
             //freePlacement.Add(img4);
@@ -392,7 +399,7 @@ namespace GISTest
 	        messages.Add(string.Format(messageFormat, args));
 	    }
 
-        public UIContainer<ISlot> GetUIRoot()
+        public IUIModifiableContainer<ISlot> GetUIRoot()
         {
             return UIManager.Root;
         }

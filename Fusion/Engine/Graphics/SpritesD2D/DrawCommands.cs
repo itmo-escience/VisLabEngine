@@ -160,6 +160,25 @@ namespace Fusion.Engine.Graphics.SpritesD2D
         }
     }
 
+    public sealed class LayoutedText : IDrawCommand
+    {
+        public readonly TextLayoutD2D Layout;
+        public readonly IBrushD2D Brush;
+        public readonly Vector2 Location;
+
+        public LayoutedText(Vector2 location, TextLayoutD2D layout, IBrushD2D brush)
+        {
+            Layout = layout;
+            Brush = brush;
+            Location = location;
+        }
+
+        public void Apply(RenderTargetD2D target)
+        {
+            target.DrawTextLayout(Location, Layout, Brush);
+        }
+    }
+
     public class FillEllipse : IDrawCommand
     {
         protected readonly float X, Y, R1, R2;

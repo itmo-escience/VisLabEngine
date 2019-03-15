@@ -20,7 +20,7 @@ namespace Fusion.Engine.Frames2
 
     public static class UIComponentExtensions
     {
-        public static UIContainer<ISlot> Parent(this UIComponent component) => component.Placement.Parent;
+        public static IUIContainer<ISlot> Parent(this UIComponent component) => component.Placement.Holder;
     }
 
     public static class UINameManager

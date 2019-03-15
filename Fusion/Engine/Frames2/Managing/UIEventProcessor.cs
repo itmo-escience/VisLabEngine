@@ -5,14 +5,15 @@ using Fusion.Core.Mathematics;
 using Fusion.Engine.Common;
 using Fusion.Engine.Input;
 
-/*
 namespace Fusion.Engine.Frames2.Managing
 {
     public class UIEventProcessor
     {
         private readonly Game _game;
-        private readonly UIContainer _root;
+        private readonly IUIContainer<ISlot> _root;
+
         private UIComponent _focusComponent;
+
         private Keys _lastMouseKey;
         private Keys _lastKey;
         private UIComponent _lastMouseDownComponent;
@@ -22,7 +23,7 @@ namespace Fusion.Engine.Frames2.Managing
 
         private List<UIComponent> _componentsWithMouse;
 
-        internal UIEventProcessor(UIContainer root)
+        internal UIEventProcessor(IUIContainer<ISlot> root)
         {
             _root = root;
             _game = Game.Instance;
@@ -278,4 +279,3 @@ namespace Fusion.Engine.Frames2.Managing
         }
     }
 }
-*/

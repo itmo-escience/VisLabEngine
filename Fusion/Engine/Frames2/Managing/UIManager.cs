@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-using System.ComponentModel;
-using System.Linq;
+﻿using System.ComponentModel;
 using Fusion.Core.Mathematics;
 using Fusion.Engine.Common;
 using Fusion.Engine.Frames2.Containers;
@@ -12,7 +10,6 @@ namespace Fusion.Engine.Frames2.Managing
 {
     internal class RootSlot : ISlot
     {
-        public event PropertyChangedEventHandler PropertyChanged;
         public float X => 0;
         public float Y => 0;
         public float Angle => 0;
@@ -20,30 +17,34 @@ namespace Fusion.Engine.Frames2.Managing
         public float Height { get; internal set; }
         public float AvailableWidth => Width;
         public float AvailableHeight => Height;
-        public float DesiredWidth { get; set; }
-        public float DesiredHeight { get; set; }
+
         public Matrix3x2 Transform => Matrix3x2.Identity;
         public bool Clip => false;
         public bool Visible => true;
-        public UIContainer<ISlot> Parent => null;
+        public IUIContainer<ISlot> Holder => null;
         public UIComponent Component { get; }
+
         public SolidBrushD2D DebugBrush => new SolidBrushD2D(Color4.White);
         public TextFormatD2D DebugTextFormat => new TextFormatD2D("Calibri", 10);
+        public void DebugDraw(SpriteLayerD2D layer) {}
 
-        internal RootSlot(float width, float height, UIContainer<ISlot> rootContainer)
+        internal RootSlot(float width, float height, IUIContainer<ISlot> rootContainer)
         {
             Width = width;
             Height = height;
             Component = rootContainer;
             rootContainer.Placement = this;
         }
+
+        // This object is immutable
+        public event PropertyChangedEventHandler PropertyChanged;
     }
 
     public class UIManager
     {
         //public UIEventProcessor UIEventProcessor { get; }
-        private RootSlot _rootSlot;
-        public UIContainer<ISlot> Root { get; }
+        private readonly RootSlot _rootSlot;
+        public IUIModifiableContainer<ISlot> Root { get; }
 
         public bool DebugEnabled { get; set; }
 
@@ -79,14 +80,15 @@ namespace Fusion.Engine.Frames2.Managing
 
             layer.Draw(TransformCommand.Identity);
             DrawRecursive(layer, Root, Matrix3x2.Identity);
+
             layer.Draw(TransformCommand.Identity);
         }
 
-        private void DrawRecursive(SpriteLayerD2D layer, UIComponent component, Matrix3x2 Transform)
+        private void DrawRecursive(SpriteLayerD2D layer, UIComponent component, Matrix3x2 transform)
         {
             if (!component.Placement.Visible) return;
 
-            var globalTransform = Transform * component.Placement.LocalTransform() * component.Placement.Transform;
+            var globalTransform = transform * component.Placement.LocalTransform() * component.Placement.Transform;
 
             layer.Draw(new TransformCommand(globalTransform));
 
@@ -98,9 +100,8 @@ namespace Fusion.Engine.Frames2.Managing
 
             component.Draw(layer);
 
-            if (component is UIContainer<ISlot> container)
+            if (component is IUIContainer<ISlot> container)
             {
-
                 foreach (var child in container.Slots)
                 {
                     DrawRecursive(layer, child.Component, globalTransform);
@@ -111,6 +112,25 @@ namespace Fusion.Engine.Frames2.Managing
             {
                 layer.Draw(new EndClippingAlongGeometry());
             }
+
+            if (DebugEnabled)
+            {
+                DebugDraw(layer, component.Placement, globalTransform);
+            }
+        }
+
+        private void DebugDraw(SpriteLayerD2D layer, ISlot slot, Matrix3x2 transform)
+        {
+            layer.Draw(new TransformCommand(transform));
+
+            slot.DebugDraw(layer);
+
+            var b = slot.BoundingBox();
+            layer.Draw(new Rect(b.X, b.Y, b.Width, b.Height, slot.DebugBrush));
+
+            var debugText = $"{slot.Component.Name} X:{b.X:0.00} Y:{b.Y:0.00} W:{b.Width:0.00} H:{b.Height:0.00}";
+            var dtl = new TextLayoutD2D(debugText, slot.DebugTextFormat, float.MaxValue, float.MaxValue);
+            layer.Draw(new Text(debugText, new RectangleF(b.X, b.Y - dtl.Height, dtl.Width + 1, dtl.Height), slot.DebugTextFormat, slot.DebugBrush));
         }
 
         public static bool IsComponentNameValid(string name, UIComponent root, UIComponent ignoredComponent = null)

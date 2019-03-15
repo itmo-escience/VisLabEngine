@@ -2,19 +2,19 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
-using System.Runtime.CompilerServices;
 using Fusion.Core.Mathematics;
 using Fusion.Core.Utils;
 using Fusion.Engine.Common;
+using Fusion.Engine.Frames2.Managing;
 using Fusion.Engine.Graphics.SpritesD2D;
 
 namespace Fusion.Engine.Frames2.Containers
 {
-    public class FreePlacementSlot : ISlotAttachable
+    public class FreePlacementSlot : PropertyChangedHelper, ISlotAttachable
     {
-        internal FreePlacementSlot(FreePlacement parent, float x, float y, float width, float height)
+        internal FreePlacementSlot(FreePlacement holder, float x, float y, float width, float height)
         {
-            InternalParent = parent;
+            InternalHolder = holder;
             _x = x;
             _y = y;
             _width = width;
@@ -57,8 +57,8 @@ namespace Fusion.Engine.Frames2.Containers
             internal set => SetAndNotify(ref _height, value);
         }
 
-        public float AvailableWidth => Parent.Placement.Width - X;
-        public float AvailableHeight => Parent.Placement.Height - Y;
+        public float AvailableWidth => MathUtil.Clamp(Holder.Placement.Width - X, 0, float.MaxValue);
+        public float AvailableHeight => MathUtil.Clamp(Holder.Placement.Height - Y, 0, float.MaxValue);
 
         private Matrix3x2 _transform = Matrix3x2.Identity;
         public Matrix3x2 Transform
@@ -81,8 +81,8 @@ namespace Fusion.Engine.Frames2.Containers
             set => SetAndNotify(ref _visible, value);
         }
 
-        internal UIContainer<FreePlacementSlot> InternalParent { get; }
-        public UIContainer<ISlot> Parent => InternalParent;
+        internal IUIModifiableContainer<FreePlacementSlot> InternalHolder { get; }
+        public IUIContainer<ISlot> Holder => InternalHolder;
 
         private UIComponent _component;
         public UIComponent Component
@@ -93,56 +93,29 @@ namespace Fusion.Engine.Frames2.Containers
 
         public SolidBrushD2D DebugBrush => new SolidBrushD2D(new Color4(0, 1.0f, 0, 1.0f));
         public TextFormatD2D DebugTextFormat => new TextFormatD2D("Calibri", 10);
+        public void DebugDraw(SpriteLayerD2D layer) { }
         #endregion
 
         #region ISlotAttachable
-        public void Attach(UIComponent component)
+
+        public virtual void Attach(UIComponent newComponent)
         {
             var old = Component;
 
-            Component = component;
-            component.Placement = this;
+            Component = newComponent;
+            newComponent.Placement = this;
 
             ComponentAttached?.Invoke(this,
-                new SlotAttachmentChangedEventArgs(old, component)
+                new SlotAttachmentChangedEventArgs(old, newComponent)
             );
         }
 
         public event EventHandler<SlotAttachmentChangedEventArgs> ComponentAttached;
+
         #endregion
-
-        #region PropertyChanges
-
-        public event PropertyChangedEventHandler PropertyChanged;
-
-        /// <summary>
-        /// Sets field with new value and fires <seealso cref="PropertyChanged"/> event if provided value is different from the old one.
-        /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="field">Private field to set.</param>
-        /// <param name="value">New value.</param>
-        /// <param name="propertyName">Name that will be passed in a PropertyChanged event.</param>
-        /// <returns>True if new value is different and PropertyChanged event was fired, false otherwise.</returns>
-        protected bool SetAndNotify<T>(ref T field, T value, [CallerMemberName] string propertyName = null)
-        {
-            if (EqualityComparer<T>.Default.Equals(field, value))
-                return false;
-
-            field = value;
-            NotifyPropertyChanged(propertyName);
-
-            return true;
-        }
-
-        internal void NotifyPropertyChanged([CallerMemberName] string propertyName = null)
-        {
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
-        }
-
-        #endregion PropertyChanges
     }
 
-    public class FreePlacement : UIContainer<FreePlacementSlot>
+    public class FreePlacement : IUIModifiableContainer<FreePlacementSlot>
     {
         private readonly AsyncObservableCollection<FreePlacementSlot> _slots = new AsyncObservableCollection<FreePlacementSlot>();
         public IEnumerable<FreePlacementSlot> Slots => _slots;
