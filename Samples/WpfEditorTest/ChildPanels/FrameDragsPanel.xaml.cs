@@ -23,6 +23,8 @@ namespace WpfEditorTest.ChildPanels
 	/// </summary>
 	public partial class FrameDragsPanel : Grid
 	{
+		public EventHandler BoundingBoxUpdated;
+
 		public Border CurrentDrag { get; set; }
 		public Point CurrentPivot { get; private set; }
 		public Point CurrentDragInitPosition { get; private set; }
@@ -52,6 +54,11 @@ namespace WpfEditorTest.ChildPanels
 		public Dictionary<Border, Border> DragPivots { get; private set; }
 		public Point NewDeziredPosition { get; private set; }
 		public Point TransformedCurrentDragInitPosition { get; private set; }
+		public float SelectedGroupMinX { get; private set; }
+		public float SelectedGroupMinY { get; private set; }
+		public float SelectedGroupMaxX { get; private set; }
+		public float SelectedGroupMaxY { get; private set; }
+
 		public Matrix3x2 GlobalFrameMatrix;
 
 		public FrameDragsPanel()
@@ -94,20 +101,26 @@ namespace WpfEditorTest.ChildPanels
 			if (frames.Count > 1)
 			{
 				Visibility = Visibility.Visible;
-				int minX = (int)(frames.Select(f => f.BoundingBox.X).Min() + 0.5f);
-				int minY = (int)(frames.Select(f => f.BoundingBox.Y).Min() + 0.5f);
-				int maxX = (int)(frames.Select(f => f.BoundingBox.X + f.BoundingBox.Width).Max() + 0.5f);
-				int maxY = (int)(frames.Select(f => f.BoundingBox.Y + f.BoundingBox.Height).Max() + 0.5f);
-				Width = Math.Max(maxX - minX, double.Epsilon);
-				Height = Math.Max(maxY - minY, double.Epsilon);
+				SelectedGroupMinX = frames.Select(f => f.BoundingBox.X).Min();
+				SelectedGroupMinY = frames.Select(f => f.BoundingBox.Y).Min();
+				SelectedGroupMaxX = frames.Select(f => f.BoundingBox.X + f.BoundingBox.Width).Max();
+				SelectedGroupMaxY = frames.Select(f => f.BoundingBox.Y + f.BoundingBox.Height).Max();
+				Width = Math.Max(SelectedGroupMaxX - SelectedGroupMinX, double.Epsilon);
+				Height = Math.Max(SelectedGroupMaxY - SelectedGroupMinY, double.Epsilon);
 				var delta = new TranslateTransform();
 				RenderTransform = delta;
-				delta.X = minX;
-				delta.Y = minY;
+				delta.X = SelectedGroupMinX;
+				delta.Y = SelectedGroupMinY;
 			}
 			else if (frames.Count == 1)
 			{
 				Visibility = Visibility.Visible;
+
+				SelectedGroupMinX = frames.Select(f => f.BoundingBox.X).Min();
+				SelectedGroupMinY = frames.Select(f => f.BoundingBox.Y).Min();
+				SelectedGroupMaxX = frames.Select(f => f.BoundingBox.X + f.BoundingBox.Width).Max();
+				SelectedGroupMaxY = frames.Select(f => f.BoundingBox.Y + f.BoundingBox.Height).Max();
+
 				UIComponent frame = frames.First();
 				Width = frame.Width;
 				Height = frame.Height;
@@ -118,8 +131,15 @@ namespace WpfEditorTest.ChildPanels
 			}
 			else
 			{
+				SelectedGroupMinX = 0;
+				SelectedGroupMinY = 0;
+				SelectedGroupMaxX = 0;
+				SelectedGroupMaxY = 0;
+
 				this.Visibility = Visibility.Collapsed;
 			}
+
+			BoundingBoxUpdated?.Invoke(this, null);
 		}
 
 		private void RememberSizeAndPosition( List<UIComponent> selectedFrames )
@@ -267,8 +287,8 @@ namespace WpfEditorTest.ChildPanels
 
 				float stickingDelta = 0;
 
-				var newXHelper = (int)(newX + 0.5 * Math.Sign(newX));
-				var newYHelper = (int)(newY + 0.5 * Math.Sign(newY));
+				var newXHelper = (float)newX;
+				var newYHelper = (float)newY;
 
 				//foreach (var x in stickingCoordsX)
 				//{

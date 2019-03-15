@@ -74,7 +74,8 @@ namespace WpfEditorTest
 		{
 			InitializeComponent();
 
-			this.SizeChanged += ( s, e ) => {
+			this.SizeChanged += ( s, e ) =>
+			{
 				DrawGridLines();
 			};
 
@@ -111,6 +112,25 @@ namespace WpfEditorTest
 					}
 
 					SelectFrame(selectedFrames[selectedFrames.Count - 1]);
+				}
+			};
+
+			_frameDragsPanel.BoundingBoxUpdated += ( s, e ) =>
+			{
+				foreach (var x in StickingCoordsX)
+				{
+					x.IsActive = false;
+				}
+				foreach (var y in StickingCoordsY)
+				{
+					y.IsActive = false;
+				}
+
+				if (NeedSnapping())
+				{
+
+					ActivateStickingLines(StickingCoordsX, _frameDragsPanel.SelectedGroupMinX, Math.Abs(_frameDragsPanel.SelectedGroupMaxX - _frameDragsPanel.SelectedGroupMinX));
+					ActivateStickingLines(StickingCoordsY, _frameDragsPanel.SelectedGroupMinY, Math.Abs(_frameDragsPanel.SelectedGroupMaxY - _frameDragsPanel.SelectedGroupMinY));
 				}
 			};
 		}
@@ -617,7 +637,7 @@ namespace WpfEditorTest
 				{
 					var line =	PrepareLine(
 						coordX.X, coordX.X,
-						Math.Min(coordX.TopY, _frameDragsPanel.RenderTransform.Value.OffsetY + _frameDragsPanel.ActualHeight * _frameDragsPanel.RenderTransform.Value.M22),
+						Math.Min(coordX.TopY, _frameDragsPanel.RenderTransform.Value.OffsetY + _frameDragsPanel.ActualHeight * Math.Min(_frameDragsPanel.RenderTransform.Value.M22,0)),
 						Math.Max(coordX.BottomY, _frameDragsPanel.RenderTransform.Value.OffsetY + _frameDragsPanel.ActualHeight * _frameDragsPanel.RenderTransform.Value.M22),
 						2, Brushes.MediumBlue
 						);
@@ -641,7 +661,7 @@ namespace WpfEditorTest
 				if (coordY.IsActive)
 				{
 					var line = PrepareLine(
-						Math.Min(coordY.LeftX, _frameDragsPanel.RenderTransform.Value.OffsetX + _frameDragsPanel.ActualWidth * _frameDragsPanel.RenderTransform.Value.M11),
+						Math.Min(coordY.LeftX, _frameDragsPanel.RenderTransform.Value.OffsetX + _frameDragsPanel.ActualWidth * Math.Min(_frameDragsPanel.RenderTransform.Value.M11,0)),
 						Math.Max(coordY.RightX, _frameDragsPanel.RenderTransform.Value.OffsetX + _frameDragsPanel.ActualWidth * _frameDragsPanel.RenderTransform.Value.M11),
 						coordY.Y, coordY.Y,
 						2, Brushes.MediumBlue
@@ -715,29 +735,7 @@ namespace WpfEditorTest
 				panel.RenderTransform = new MatrixTransform(panel.SelectedFrame.GlobalTransform.M11, panel.SelectedFrame.GlobalTransform.M12,
 															panel.SelectedFrame.GlobalTransform.M21, panel.SelectedFrame.GlobalTransform.M22,
 															multedTransform.X, multedTransform.Y);// transform;
-			}
-
-			foreach (var x in StickingCoordsX)
-			{
-				x.IsActive = false;
-			}
-			foreach (var y in StickingCoordsY)
-			{
-				y.IsActive = false;
-			}
-
-            if (NeedSnapping())
-            {
-				if (SelectionManager.Instance.SelectedFrames.Count == 1)
-				{
-					ActivateStickingLines(StickingCoordsX, SelectionManager.Instance.SelectedFrames.First().BoundingBox.X, SelectionManager.Instance.SelectedFrames.First().BoundingBox.Width);
-					ActivateStickingLines(StickingCoordsY, SelectionManager.Instance.SelectedFrames.First().BoundingBox.Y, SelectionManager.Instance.SelectedFrames.First().BoundingBox.Height);
-				}
-				else
-				{
-					ActivateStickingLines(StickingCoordsX, _frameDragsPanel.RenderTransform.Value.OffsetX, _frameDragsPanel.Width);
-					ActivateStickingLines(StickingCoordsY, _frameDragsPanel.RenderTransform.Value.OffsetY, _frameDragsPanel.Height);
-				}
+				panel.UpdateLayout();
 			}
 		}
 
@@ -760,29 +758,6 @@ namespace WpfEditorTest
 				panel.UpdateLayout();
 			}
 			_frameDragsPanel.UpdateLayout();
-
-			foreach (var x in StickingCoordsX)
-			{
-				x.IsActive = false;
-			}
-			foreach (var y in StickingCoordsY)
-			{
-				y.IsActive = false;
-			}
-
-            if (NeedSnapping())
-            {
-				if (SelectionManager.Instance.SelectedFrames.Count==1)
-				{
-					ActivateStickingLines(StickingCoordsX, SelectionManager.Instance.SelectedFrames.First().BoundingBox.X, SelectionManager.Instance.SelectedFrames.First().BoundingBox.Width);
-					ActivateStickingLines(StickingCoordsY, SelectionManager.Instance.SelectedFrames.First().BoundingBox.Y, SelectionManager.Instance.SelectedFrames.First().BoundingBox.Height);
-				}
-				else
-				{
-					ActivateStickingLines(StickingCoordsX, _frameDragsPanel.RenderTransform.Value.OffsetX, _frameDragsPanel.Width);
-					ActivateStickingLines(StickingCoordsY, _frameDragsPanel.RenderTransform.Value.OffsetY, _frameDragsPanel.Height);
-				}
-            }
 		}
 
 		private void ActivateStickingLines(List<StickCoordinateY> stickingCoordsY, double minValue, double additionalValue )

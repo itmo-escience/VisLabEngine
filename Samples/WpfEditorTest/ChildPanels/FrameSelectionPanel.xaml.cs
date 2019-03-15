@@ -237,10 +237,10 @@ namespace WpfEditorTest.ChildPanels
 
 			var parent = _selectedFrame.Parent;
 			var parentMatrixInvert = Matrix3x2.Invert(parent.GlobalTransform);
-			var vectorHelper = Matrix3x2.TransformPoint(parentMatrixInvert, new Fusion.Core.Mathematics.Vector2((int)RenderTransform.Value.OffsetX + 0.5f, (int)RenderTransform.Value.OffsetY + 0.5f));
+			var vectorHelper = Matrix3x2.TransformPoint(parentMatrixInvert, new Fusion.Core.Mathematics.Vector2((float)RenderTransform.Value.OffsetX, (float)RenderTransform.Value.OffsetY));
 
-			_selectedFrame.X = (int)vectorHelper.X;
-			_selectedFrame.Y = (int)vectorHelper.Y;
+			_selectedFrame.X = vectorHelper.X;
+			_selectedFrame.Y = vectorHelper.Y;
 
 			_oldX = RenderTransform.Value.OffsetX;
 			_oldY = RenderTransform.Value.OffsetY;
@@ -282,7 +282,7 @@ namespace WpfEditorTest.ChildPanels
 
 		private bool PositionChanged()
 		{
-			return (int)_oldX != (int)RenderTransform.Value.OffsetX || (int)_oldY != (int)RenderTransform.Value.OffsetY;
+			return Math.Abs(_oldX - RenderTransform.Value.OffsetX) > double.Epsilon || Math.Abs(_oldY - RenderTransform.Value.OffsetY) > double.Epsilon;
 		}
 
 		private void UserControl_MouseLeftButtonDown( object sender, MouseButtonEventArgs e )
