@@ -27,6 +27,7 @@ namespace WpfEditorTest.ChildWindows
         private Invoker _invoker;
         private LogMessageType _lowestMessageLevelToPrint;
         private LogMessage _lastPrintedMessage;
+        private Paragraph _paragraph;
 
         public ConsoleWindow(Invoker invoker)
 		{
@@ -37,6 +38,9 @@ namespace WpfEditorTest.ChildWindows
 
 			Left = double.Parse(ConfigurationManager.AppSettings.Get("ConsoleWindowX"));
 			Top = double.Parse(ConfigurationManager.AppSettings.Get("ConsoleWindowY"));
+
+            _paragraph = new Paragraph();
+            OutputField.Document.Blocks.Add(_paragraph);
 
 			LogTypeComboBox.SelectedIndex = int.Parse(ConfigurationManager.AppSettings.Get("ConsoleFilterItemIndex"));
 
@@ -84,103 +88,115 @@ namespace WpfEditorTest.ChildWindows
 			UpdateOutputText();
         }
 
+        private object _lockObject = new object();
         private void AddLastLogLines()
         {
-            if (!LogRecorder.GetLines().Contains(_lastPrintedMessage))
+            lock (_lockObject)
             {
-                UpdateOutputText();
-                return;
-            }
+                var lines = LogRecorder.GetLines().ToList();
 
-            var notPrintedMessages = LogRecorder.GetLines().SkipWhile(mes => mes != _lastPrintedMessage).ToList();
-            Paragraph paragraph = new Paragraph();
-            foreach (LogMessage message in notPrintedMessages)
-            {
-                if (message.MessageType >= _lowestMessageLevelToPrint)
+                if (!lines.Contains(_lastPrintedMessage))
                 {
-                    var text = new Run(message.MessageText + Environment.NewLine);
-                    switch (message.MessageType)
-                    {
-                        case LogMessageType.Debug:
-                            text.Foreground = Brushes.DarkGray;
-                            text.Background = Brushes.Black;
-                            break;
-                        case LogMessageType.Verbose:
-                            text.Foreground = Brushes.Gray;
-                            text.Background = Brushes.Black;
-                            break;
-                        case LogMessageType.Information:
-                            text.Foreground = Brushes.White;
-                            text.Background = Brushes.Black;
-                            break;
-                        case LogMessageType.Warning:
-                            text.Foreground = Brushes.Yellow;
-                            text.Background = Brushes.Black;
-                            break;
-                        case LogMessageType.Error:
-                            text.Foreground = Brushes.Red;
-                            text.Background = Brushes.Black;
-                            break;
-                        case LogMessageType.Fatal:
-                            text.Foreground = Brushes.Black;
-                            text.Background = Brushes.Red;
-                            break;
-                    }
-                    paragraph.Inlines.Add(text);
+                    UpdateOutputText();
+                    return;
                 }
-            }
 
-            _lastPrintedMessage = notPrintedMessages.LastOrDefault();
-            if (paragraph.Inlines.Count > 0)
-            {
-                OutputField.Document.Blocks.Add(paragraph);
-                ScrollViewer.ScrollToEnd(); 
-            }     
+                var notPrintedMessages = lines
+                    .SkipWhile(mes => mes != _lastPrintedMessage)
+                    .Skip(1) // skip last printed
+                    .Where(msg => msg.MessageType >= _lowestMessageLevelToPrint)
+                    .ToList();
+
+                if (notPrintedMessages.Count > 0)
+                {
+                    foreach (var message in notPrintedMessages)
+                    {
+                        var text = new Run(message.MessageText + Environment.NewLine);
+                        switch (message.MessageType)
+                        {
+                            case LogMessageType.Debug:
+                                text.Foreground = Brushes.DarkGray;
+                                text.Background = Brushes.Black;
+                                break;
+                            case LogMessageType.Verbose:
+                                text.Foreground = Brushes.Gray;
+                                text.Background = Brushes.Black;
+                                break;
+                            case LogMessageType.Information:
+                                text.Foreground = Brushes.White;
+                                text.Background = Brushes.Black;
+                                break;
+                            case LogMessageType.Warning:
+                                text.Foreground = Brushes.Yellow;
+                                text.Background = Brushes.Black;
+                                break;
+                            case LogMessageType.Error:
+                                text.Foreground = Brushes.Red;
+                                text.Background = Brushes.Black;
+                                break;
+                            case LogMessageType.Fatal:
+                                text.Foreground = Brushes.Black;
+                                text.Background = Brushes.Red;
+                                break;
+                        }
+
+                        _paragraph.Inlines.Add(text);                   
+                    }
+
+                    ScrollViewer.ScrollToEnd();
+                }
+
+                _lastPrintedMessage = lines.LastOrDefault();
+            }
         }
 
         private void UpdateOutputText()
         {
-			Paragraph paragraph = new Paragraph();
-            foreach (LogMessage message in LogRecorder.GetLines())
+            lock (_lockObject)
             {
-                if (message.MessageType >= _lowestMessageLevelToPrint)
-                {
-					var text = new Run(message.MessageText + Environment.NewLine);
-					switch (message.MessageType)
-					{
-						case LogMessageType.Debug:
-							text.Foreground = Brushes.DarkGray;
-							text.Background = Brushes.Black;
-							break;
-						case LogMessageType.Verbose:
-							text.Foreground = Brushes.Gray;
-							text.Background = Brushes.Black;
-							break;
-						case LogMessageType.Information:
-							text.Foreground = Brushes.White;
-							text.Background = Brushes.Black;
-							break;
-						case LogMessageType.Warning:
-							text.Foreground = Brushes.Yellow;
-							text.Background = Brushes.Black;
-							break;
-						case LogMessageType.Error:
-							text.Foreground = Brushes.Red;
-							text.Background = Brushes.Black;
-							break;
-						case LogMessageType.Fatal:
-							text.Foreground = Brushes.Black;
-							text.Background = Brushes.Red;
-							break;
-					}
-					paragraph.Inlines.Add(text);
-				}
-            }
+                var lines = LogRecorder.GetLines().ToList();
 
-			OutputField.Document.Blocks.Clear();
-			OutputField.Document.Blocks.Add(paragraph);
-            _lastPrintedMessage = LogRecorder.GetLines().LastOrDefault();
-            ScrollViewer.ScrollToEnd();
+                _paragraph.Inlines.Clear();
+                foreach (var message in lines)
+                {
+                    if (message.MessageType >= _lowestMessageLevelToPrint)
+                    {
+                        var text = new Run(message.MessageText + Environment.NewLine);
+                        switch (message.MessageType)
+                        {
+                            case LogMessageType.Debug:
+                                text.Foreground = Brushes.DarkGray;
+                                text.Background = Brushes.Black;
+                                break;
+                            case LogMessageType.Verbose:
+                                text.Foreground = Brushes.Gray;
+                                text.Background = Brushes.Black;
+                                break;
+                            case LogMessageType.Information:
+                                text.Foreground = Brushes.White;
+                                text.Background = Brushes.Black;
+                                break;
+                            case LogMessageType.Warning:
+                                text.Foreground = Brushes.Yellow;
+                                text.Background = Brushes.Black;
+                                break;
+                            case LogMessageType.Error:
+                                text.Foreground = Brushes.Red;
+                                text.Background = Brushes.Black;
+                                break;
+                            case LogMessageType.Fatal:
+                                text.Foreground = Brushes.Black;
+                                text.Background = Brushes.Red;
+                                break;
+                        }
+
+                        _paragraph.Inlines.Add(text);
+                    }
+                }
+
+                _lastPrintedMessage = lines.LastOrDefault();
+                ScrollViewer.ScrollToEnd();
+            }
         }
-	}
+    }
 }
