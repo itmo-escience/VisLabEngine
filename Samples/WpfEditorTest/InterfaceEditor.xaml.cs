@@ -1151,7 +1151,9 @@ namespace WpfEditorTest
 			Zoomer.Height = SelectionLayer.Height;
 			Zoomer.Stretch = Stretch.Uniform;
 			ZoomerSlider.Value = double.Parse(ConfigurationManager.AppSettings.Get("SceneZoom"));
-		}
+
+            Activate();
+        }
 
 		private void Window_PreviewMouseWheel( object sender, MouseWheelEventArgs e )
 		{

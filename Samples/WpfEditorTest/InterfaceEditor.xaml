@@ -15,10 +15,11 @@
         Width="800" Height="600"
         MinWidth="400" MinHeight="300"
         WindowStartupLocation="CenterScreen"
-        FocusManager.FocusedElement="{Binding}"
         Closing="Window_Closing"
         KeyUp="Window_KeyUp"
-        Loaded="Window_Loaded" PreviewMouseWheel="Window_PreviewMouseWheel" PreviewMouseMove="Window_PreviewMouseMove">
+        Loaded="Window_Loaded" 
+        PreviewMouseWheel="Window_PreviewMouseWheel"
+        PreviewMouseMove="Window_PreviewMouseMove">
     <Window.Resources>
         <conv:ButtonEnableConverter x:Key="btnEnableConverter"/>
     </Window.Resources>
