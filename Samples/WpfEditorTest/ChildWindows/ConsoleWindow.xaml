@@ -35,6 +35,6 @@
             <RichTextBox Width="{Binding ViewportWidth, ElementName=ScrollViewer, Mode=OneWay}" Name="OutputField" 
                          Background="#FF000000" Foreground="White" IsReadOnly="True" FlowDirection="LeftToRight"/>
         </ScrollViewer>
-        <TextBox Name="InputField" Grid.Row="2" Height="25" VerticalAlignment="Bottom" KeyDown="TextBox_KeyDown"/>
+        <TextBox Name="InputField" Grid.Row="2" Height="25" VerticalAlignment="Bottom" PreviewKeyDown="TextBox_KeyDown"/>
     </Grid>
 </Window>

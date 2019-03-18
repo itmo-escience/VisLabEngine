@@ -27,7 +27,10 @@ namespace WpfEditorTest.ChildWindows
         private Invoker _invoker;
         private LogMessageType _lowestMessageLevelToPrint;
         private LogMessage _lastPrintedMessage;
-        private Paragraph _paragraph;
+        private Paragraph _paragraph  = new Paragraph();
+
+        private List<string> _enteredCommands = new List<string>();
+        private int _messageQuickSelectionIndex = 0;
 
         public ConsoleWindow(Invoker invoker)
 		{
@@ -39,7 +42,6 @@ namespace WpfEditorTest.ChildWindows
 			Left = double.Parse(ConfigurationManager.AppSettings.Get("ConsoleWindowX"));
 			Top = double.Parse(ConfigurationManager.AppSettings.Get("ConsoleWindowY"));
 
-            _paragraph = new Paragraph();
             OutputField.Document.Blocks.Add(_paragraph);
 
 			LogTypeComboBox.SelectedIndex = int.Parse(ConfigurationManager.AppSettings.Get("ConsoleFilterItemIndex"));
@@ -59,19 +61,45 @@ namespace WpfEditorTest.ChildWindows
 
 		private void TextBox_KeyDown( object sender, KeyEventArgs e )
 		{
-			if (e.Key == Key.Enter)
-			{
-                string cmd = InputField.Text;
-                InputField.Text = string.Empty;
-                try
-                {
-                    Log.Message(">{0}", cmd);
-                    _invoker.Push(cmd);
-                }
-                catch (Exception exp)
-                {
-                    Log.Error(exp.Message);
-                }
+            switch (e.Key)
+            {
+                case Key.Enter:
+                    string cmd = InputField.Text;
+                    InputField.Text = string.Empty;
+                    try
+                    {
+                        Log.Message(">{0}", cmd);
+                        _enteredCommands.Add(cmd);
+                        if (cmd != _enteredCommands[_messageQuickSelectionIndex])
+                            _messageQuickSelectionIndex = _enteredCommands.Count;
+
+                        _invoker.Push(cmd);
+                    }
+                    catch (Exception exp)
+                    {
+                        Log.Error(exp.Message);
+                    }
+                    break;
+
+                case Key.Up:
+                    if (_enteredCommands.Count == 0) return;
+
+                    _messageQuickSelectionIndex--;
+                    if (_messageQuickSelectionIndex < 0) _messageQuickSelectionIndex = 0;
+
+                    InputField.Text = _enteredCommands[_messageQuickSelectionIndex];
+                    InputField.CaretIndex = InputField.Text.Length;
+                    break;
+
+                case Key.Down:
+                    if (_enteredCommands.Count == 0) return;
+
+                    _messageQuickSelectionIndex++;
+                    if (_messageQuickSelectionIndex > _enteredCommands.Count - 1) _messageQuickSelectionIndex = _enteredCommands.Count - 1;
+
+                    InputField.Text = _enteredCommands[_messageQuickSelectionIndex];
+                    InputField.CaretIndex = InputField.Text.Length;
+                    break;
             }
 		}
 
