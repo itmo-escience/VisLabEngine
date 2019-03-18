@@ -109,6 +109,7 @@ namespace WpfEditorTest.ChildWindows
 
                 if (notPrintedMessages.Count > 0)
                 {
+                    bool needToScroll = ScrollViewer.VerticalOffset == ScrollViewer.ScrollableHeight;
                     foreach (var message in notPrintedMessages)
                     {
                         var text = new Run(message.MessageText + Environment.NewLine);
@@ -143,7 +144,7 @@ namespace WpfEditorTest.ChildWindows
                         _paragraph.Inlines.Add(text);                   
                     }
 
-                    ScrollViewer.ScrollToEnd();
+                    if (needToScroll) ScrollViewer.ScrollToEnd();
                 }
 
                 _lastPrintedMessage = lines.LastOrDefault();
