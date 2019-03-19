@@ -1,10 +1,14 @@
-﻿using System.ComponentModel;
+﻿using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Diagnostics;
 using Fusion.Core.Mathematics;
 using Fusion.Engine.Common;
 using Fusion.Engine.Frames2.Containers;
 using Fusion.Engine.Graphics;
 using Fusion.Engine.Graphics.SpritesD2D;
 using System.Text.RegularExpressions;
+using Fusion.Engine.Frames2.Events;
 
 namespace Fusion.Engine.Frames2.Managing
 {
@@ -21,7 +25,7 @@ namespace Fusion.Engine.Frames2.Managing
         public Matrix3x2 Transform => Matrix3x2.Identity;
         public bool Clip => false;
         public bool Visible => true;
-        public IUIContainer<ISlot> Holder => null;
+        public IUIContainer<ISlot> Parent => null;
         public UIComponent Component { get; }
 
         public SolidBrushD2D DebugBrush => new SolidBrushD2D(Color4.White);
@@ -42,11 +46,16 @@ namespace Fusion.Engine.Frames2.Managing
 
     public class UIManager
     {
-        //public UIEventProcessor UIEventProcessor { get; }
+        public UIEventProcessor UIEventProcessor { get; }
+
         private readonly RootSlot _rootSlot;
-        public IUIModifiableContainer<ISlot> Root { get; }
+        public FreePlacement Root { get; }
 
         public bool DebugEnabled { get; set; }
+
+        private readonly Dictionary<ISlot, Matrix3x2> _localTransforms = new Dictionary<ISlot, Matrix3x2>();
+        private readonly Dictionary<ISlot, Matrix3x2> _globalTransforms = new Dictionary<ISlot, Matrix3x2>();
+        private readonly Dictionary<ISlot, bool> _dirtyTransforms = new Dictionary<ISlot, bool>();
 
         public UIManager(RenderSystem rs)
         {
@@ -54,8 +63,12 @@ namespace Fusion.Engine.Frames2.Managing
             Root.Name = "Root";
 
             _rootSlot = new RootSlot(rs.DisplayBounds.Width, rs.DisplayBounds.Height, Root);
+            var t = _rootSlot.Transform();
+            _localTransforms[_rootSlot] = t;
+            _globalTransforms[_rootSlot] = Matrix3x2.Identity;
+            _dirtyTransforms[_rootSlot] = false;
 
-          //  UIEventProcessor = new UIEventProcessor(Root);
+            UIEventProcessor = new UIEventProcessor(this, Root);
 
             rs.DisplayBoundsChanged += (s, e) =>
             {
@@ -66,12 +79,123 @@ namespace Fusion.Engine.Frames2.Managing
 
         public void Update(GameTime gameTime)
         {
-            //UIEventProcessor.Update(gameTime);
+            UIEventProcessor.Update(gameTime);
+            //RecalculateAllTransforms();
 
             foreach (var c in UIHelper.DFSTraverse(Root))
             {
                 c.Update(gameTime);
+                var slot = c.Placement;
+
+                if (SlotTransformChanged(slot))
+                {
+                    InvalidateTransformsDown(slot);
+                }
             }
+
+            RecalculateAllTransforms();
+        }
+
+        private bool SlotTransformChanged(ISlot slot)
+        {
+            return !_localTransforms.TryGetValue(slot, out var storedTransform) || storedTransform != slot.Transform();
+        }
+
+        public Matrix3x2 GlobalTransform(ISlot slot)
+        {
+            if (!_dirtyTransforms.TryGetValue(slot, out var isDirty))
+            {
+                isDirty = true;
+            }
+
+            if (isDirty)
+            {
+                RecalculateTransformsUp(slot);
+            }
+
+            return _globalTransforms[slot];
+        }
+
+        private void InvalidateTransformsDown(ISlot slot)
+        {
+            foreach (var component in UIHelper.DFSTraverse(slot.Component))
+            {
+                _dirtyTransforms[component.Placement] = true;
+            }
+        }
+
+        private void RecalculateTransformsUp(ISlot slot)
+        {
+            if (slot == null) return;
+
+            if(!_dirtyTransforms.GetOrDefault(slot, true)) return;
+
+            if (slot == _rootSlot)
+            {
+                _localTransforms[slot] = slot.Transform();
+                _globalTransforms[slot] = _localTransforms[slot];
+                _dirtyTransforms[slot] = false;
+
+                return;
+            }
+
+            RecalculateTransformsUp(slot.Parent.Placement);
+
+            var local = slot.Transform();
+            _localTransforms[slot] = local;
+            _globalTransforms[slot] = _globalTransforms[slot.Parent.Placement] * local;
+            _dirtyTransforms[slot] = false;
+        }
+
+        private void RecalculateAllTransforms()
+        {
+            foreach (var component in UIHelper.BFSTraverse(Root))
+            {
+                var slot = component.Placement;
+                if (slot == _rootSlot)
+                {
+                    _localTransforms[_rootSlot] = _rootSlot.Transform();
+                    _globalTransforms[_rootSlot] = _localTransforms[_rootSlot];
+                    _dirtyTransforms[_rootSlot] = false;
+                    continue;
+                }
+
+                var parent = slot.Parent.Placement;
+#if DEBUG
+                // at this point transforms for holder must be already calculated
+                Debug.Assert(!_dirtyTransforms.GetOrDefault(parent, true));
+                Debug.Assert(_globalTransforms.ContainsKey(parent));
+#endif
+
+                _localTransforms[slot] = slot.Transform();
+                _globalTransforms[slot] = _globalTransforms[parent] * _localTransforms[slot];
+                _dirtyTransforms[slot] = false;
+            }
+        }
+
+        /// <summary>
+        /// Considers only slot as input, doesn't consider parent clipping
+        /// </summary>
+        /// <param name="slot"></param>
+        /// <param name="globalPoint"></param>
+        /// <returns></returns>
+        internal bool IsInsideSlotInternal(ISlot slot, Vector2 globalPoint)
+        {
+            var invertTransform = GlobalTransform(slot);
+            invertTransform.Invert();
+            var localPoint = Matrix3x2.TransformPoint(invertTransform, globalPoint);
+            return ((localPoint.X >= 0) && (localPoint.Y >= 0) && (localPoint.X < slot.Width) && (localPoint.Y < slot.Height));
+        }
+
+        /// <summary>
+        /// Takes into account ancestors clipping
+        /// </summary>
+        /// <param name="slot"></param>
+        /// <param name="point"></param>
+        /// <returns></returns>
+        public bool IsPointInsideSlot(ISlot slot, Vector2 point)
+        {
+            throw new NotImplementedException();
         }
 
         public void Draw(SpriteLayerD2D layer)
@@ -79,16 +203,16 @@ namespace Fusion.Engine.Frames2.Managing
             layer.Clear();
 
             layer.Draw(TransformCommand.Identity);
-            DrawRecursive(layer, Root, Matrix3x2.Identity);
+            DrawRecursive(layer, Root);
 
             layer.Draw(TransformCommand.Identity);
         }
 
-        private void DrawRecursive(SpriteLayerD2D layer, UIComponent component, Matrix3x2 transform)
+        private void DrawRecursive(SpriteLayerD2D layer, UIComponent component)
         {
             if (!component.Placement.Visible) return;
 
-            var globalTransform = transform * component.Placement.LocalTransform() * component.Placement.Transform;
+            var globalTransform = _globalTransforms[component.Placement];
 
             layer.Draw(new TransformCommand(globalTransform));
 
@@ -104,7 +228,7 @@ namespace Fusion.Engine.Frames2.Managing
             {
                 foreach (var child in container.Slots)
                 {
-                    DrawRecursive(layer, child.Component, globalTransform);
+                    DrawRecursive(layer, child.Component);
                 }
             }
 

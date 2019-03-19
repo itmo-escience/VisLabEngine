@@ -1,7 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.ComponentModel;
-using System.Runtime.CompilerServices;
 using Fusion.Core.Mathematics;
 using Fusion.Engine.Graphics.SpritesD2D;
 
@@ -21,11 +19,10 @@ namespace Fusion.Engine.Frames2
         float AvailableWidth { get; }
         float AvailableHeight { get; }
 
-        Matrix3x2 Transform { get; }
         bool Clip { get; }
         bool Visible { get; }
 
-        IUIContainer<ISlot> Holder { get; }
+        IUIContainer<ISlot> Parent { get; }
         UIComponent Component { get; }
 
         SolidBrushD2D DebugBrush { get; }
@@ -54,26 +51,14 @@ namespace Fusion.Engine.Frames2
 
     public static class SlotExtensions
     {
-        internal static Matrix3x2 LocalTransform(this ISlot slot)
-        {
-            var m = Matrix3x2.Transformation(1.0f, 1.0f, slot.Angle, 0, 0);
-            return m * Matrix3x2.Translation(slot.X, slot.Y);
-        }
+        internal static Matrix3x2 Transform(this ISlot slot) => Matrix3x2.Transformation(1.0f, 1.0f, slot.Angle, slot.X, slot.Y);
 
         public static RectangleF BoundingBox(this ISlot slot)
         {
             var rectangle = slot.Visible
                 ? new RectangleF(0, 0, slot.Width, slot.Height)
                 : new RectangleF(0, 0, 0, 0);
-            return rectangle.GetBound(slot.Transform);
-        }
-
-        public static bool IsInside(this ISlot slot, Vector2 point)
-        {
-            var invertTransform = slot.Transform;
-            invertTransform.Invert();
-            var localPoint = Matrix3x2.TransformPoint(invertTransform, point);
-            return ((localPoint.X >= 0) && (localPoint.Y >= 0) && (localPoint.X < slot.Width) && (localPoint.Y < slot.Height));
+            return rectangle;
         }
     }
 }

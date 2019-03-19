@@ -2,12 +2,20 @@
 using Fusion.Core.Mathematics;
 using Fusion.Drivers.Graphics;
 using Fusion.Engine.Common;
+using Fusion.Engine.Frames2.Events;
 using Fusion.Engine.Graphics.SpritesD2D;
 
 namespace Fusion.Engine.Frames2.Components
 {
     public sealed class Image : UIComponent
     {
+        public ISlot Placement { get; set; }
+
+        public UIEventsHolder Events { get; } = new UIEventsHolder();
+
+        public object Tag { get; set; }
+        public string Name { get; set; }
+
         public float DesiredWidth { get; set; } = -1;
         public float DesiredHeight { get; set; } = -1;
 
@@ -49,10 +57,6 @@ namespace Fusion.Engine.Frames2.Components
             DesiredHeight = height;
         }
 
-        public ISlot Placement { get; set; }
-        public object Tag { get; set; }
-        public string Name { get; set; }
-
         public void Update(GameTime gameTime)
         {
             if (Texture != null &&
@@ -71,5 +75,7 @@ namespace Fusion.Engine.Frames2.Components
         }
 
         public event PropertyChangedEventHandler PropertyChanged;
+
+        public override string ToString() => "Image";
     }
 }

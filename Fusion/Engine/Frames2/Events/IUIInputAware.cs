@@ -1,8 +1,8 @@
-﻿using Fusion.Core.Mathematics;
+﻿using System;
+using Fusion.Core.Mathematics;
 using Fusion.Engine.Input;
-using System;
 
-namespace Fusion.Engine.Frames2.Managing
+namespace Fusion.Engine.Frames2.Events
 {
     public interface IUIInputAware
     {
@@ -10,27 +10,30 @@ namespace Fusion.Engine.Frames2.Managing
         event KeyUpEvent KeyUp;
         event KeyPressEvent KeyPress;
 
+        event FocusEvent Focus;
+        event BlurEvent Blur;
+
         event MouseMoveEvent MouseMove;
         event MouseDragEvent MouseDrag;
-
         event MouseDownEvent MouseDown;
         event MouseUpEvent MouseUp;
 
+        event MouseDownEvent MouseDownOutside;
+        event MouseUpEvent MouseUpOutside;
+
         event ClickEvent Click;
         event DoubleClickEvent DoubleClick;
-
         event EnterEvent Enter;
         event LeaveEvent Leave;
-
         event ScrollEvent Scroll;
-
-        event FocusEvent Focus;
-        event BlurEvent Blur;
     }
-
     public delegate void KeyDownEvent(UIComponent sender, KeyEventArgs e);
     public delegate void KeyUpEvent(UIComponent sender, KeyEventArgs e);
     public delegate void KeyPressEvent(UIComponent sender, KeyPressEventArgs e);
+
+    public delegate void FocusEvent(UIComponent sender);
+    public delegate void BlurEvent(UIComponent sender);
+
 
     public delegate void MouseMoveEvent(UIComponent sender, MoveEventArgs e);
 
@@ -49,46 +52,12 @@ namespace Fusion.Engine.Frames2.Managing
 
     public delegate void ScrollEvent(UIComponent sender, ScrollEventArgs e);
 
-    //public delegate void HoldEvent(UIComponent sender, ClickEventArgs e);
-    //public delegate void CanselEvent(UIComponent sender, MoveEventArgs e);
-
-    public delegate void FocusEvent(UIComponent sender);
-    public delegate void BlurEvent(UIComponent sender);
 
     public class BubblingEventArgs : EventArgs
     {
         public bool ShouldPropagate { get; set; } = true;
     }
 
-    public class KeyEventArgs : BubblingEventArgs
-    {
-        public Keys Key { get; }
-
-        public KeyEventArgs(Keys key)
-        {
-            Key = key;
-        }
-
-        public static explicit operator KeyEventArgs(Input.KeyEventArgs args)
-        {
-            return new KeyEventArgs(args.Key);
-        }
-    }
-
-    public class KeyPressEventArgs : BubblingEventArgs
-    {
-        public char KeyChar { get; }
-
-        public KeyPressEventArgs(char keyChar)
-        {
-            KeyChar = keyChar;
-        }
-
-        public static explicit operator KeyPressEventArgs(Input.KeyPressArgs args)
-        {
-            return new KeyPressEventArgs(args.KeyChar);
-        }
-    }
     public class MoveEventArgs : BubblingEventArgs
     {
         public Vector2 Position { get; }
@@ -143,4 +112,35 @@ namespace Fusion.Engine.Frames2.Managing
             WheelDelta = args.WheelDelta;
         }
     }
+
+    public class KeyEventArgs : BubblingEventArgs
+    {
+        public Keys Key { get; }
+
+        public KeyEventArgs(Keys key)
+        {
+            Key = key;
+        }
+
+        public static explicit operator KeyEventArgs(Input.KeyEventArgs args)
+        {
+            return new KeyEventArgs(args.Key);
+        }
+    }
+
+    public class KeyPressEventArgs : BubblingEventArgs
+    {
+        public char KeyChar { get; }
+
+        public KeyPressEventArgs(char keyChar)
+        {
+            KeyChar = keyChar;
+        }
+
+        public static explicit operator KeyPressEventArgs(Input.KeyPressArgs args)
+        {
+            return new KeyPressEventArgs(args.KeyChar);
+        }
+    }
+
 }

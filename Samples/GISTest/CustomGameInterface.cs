@@ -161,88 +161,73 @@ namespace GISTest
 
             viewLayer.SpriteLayersD2D.Add(_spriteLayer);
 
-		    Game.Keyboard.KeyUp += (sender, args) =>
-		    {
-		        if (args.Key == Keys.LeftButton)
-		        {
-		            _spriteLayer.DrawEllipse(50 + _random.Next(400), 450 + _random.Next(400), 5 + _random.Next(50), 5 + _random.Next(50), Color4.White);
-                }
-
-		        if (args.Key == Keys.RightButton)
-		        {
-                    _spriteLayer.Clear();
-		        }
-            };
-
             #region UITesting
 
             UIManager = new UIManager(Game.RenderSystem);
 		    UIManager.DebugEnabled = true;
 
-            //txt = new Fusion.Engine.Frames2.Components.Label("z", new TextFormatD2D("Calibri", 20), 150, 450, 100, 100);
             var image = Game.Content.Load<Fusion.Drivers.Graphics.Texture2D>(@"UI-new\fv_palette_bg|nomips");
-            img1 = new Image(image, 1);
-            img2 = new Image(image, 1);
-            img3 = new Image(image, 1);
-            img4 = new Image(image, 1);
+            img1 = new Image(image);
+            img2 = new Image(image);
 
-            var freePlacement = new FreePlacement();
-            freePlacement.Name = "ImageFreePlacement";
-		    freePlacement.DesiredWidth  = 1000;
-		    freePlacement.DesiredHeight = 1000;
+		    var imgFreePlacement = new FreePlacement
+		    {
+		        Name = "ImageFreePlacement",
+		        DesiredWidth = 500,
+		        DesiredHeight = 800
+		    };
 
-            var slot = freePlacement.Insert(img1, 0);
-		    slot.X = 100;
-		    slot.Y = 100;
-		    img1.DesiredWidth = 150;
-		    img1.DesiredHeight = 150;
+		    var imgFpSlot = UIManager.Root.Insert(imgFreePlacement, 0);
+		    imgFpSlot.X = 50;
+		    imgFpSlot.Y = 50;
+
+            var slot = imgFreePlacement.Insert(img1, 0);
+		    slot.X = 10;
+		    slot.Y = 10;
+		    img1.DesiredWidth = 250;
+		    img1.DesiredHeight = 50;
 
 
-            var slot2 = freePlacement.Insert(img2, 0);
-		    slot2.X = 500;
-		    slot2.Y = 500;
+            var slot2 = imgFreePlacement.Insert(img2, 0);
+		    slot2.X = 20;
+		    slot2.Y = 80;
+		    img2.DesiredWidth = 450;
+		    img2.DesiredHeight = 250;
 
-		    img2.DesiredWidth = 300;
-		    img2.DesiredHeight = 150;
+		    var labelFreePlacement = new FreePlacement();
+		    labelFreePlacement.Name = "LabelFreePlacement";
+		    labelFreePlacement.DesiredWidth  = 400;
+		    labelFreePlacement.DesiredHeight = 600;
+
+		    var labelFpSlot = UIManager.Root.Insert(labelFreePlacement, 0);
+		    labelFpSlot.X = 600;
+		    labelFpSlot.Y = 50;
+		    labelFpSlot.Angle = 0.3f;
 
             var text = new Label("Hello, world!", "Calibri", 50);
-		    var textSlot = freePlacement.Insert(text, 0);
-		    textSlot.X = 500;
-		    textSlot.Y = 300;
+		    var textSlot = labelFreePlacement.Insert(text, 0);
+		    textSlot.X = 10;
+		    textSlot.Y = 200;
+		    textSlot.Angle = -0.3f;
+
+            var border = new Border();
+		    border.DesiredWidth = 300;
+		    border.DesiredHeight = 400;
+            border.BackgroundColor = new Color4(1, 1, 1, 1);
+
+            var borderSlot = UIManager.Root.Insert(border, 0);
+		    borderSlot.X = 1100;
+		    borderSlot.Y = 300;
+
+		    text.Events.Click += (sender, args) => Log.Message("Label click");
+		    img2.Events.Click += (sender, args) => Log.Message("Image 2 click");
+		    img1.Events.Click += (sender, args) => Log.Message("Image 1 click");
+		    border.Events.Click += (sender, args) => Log.Message("Border click");
+		    imgFreePlacement.Events.Click += (sender, args) => Log.Message("Image Container click");
+		    labelFreePlacement.Events.Click += (sender, args) => Log.Message("Label Container click");
 
 
-		    //slot2.Clip = false;
-            //freePlacement.Add(img3);
-            //freePlacement.Add(img4);
 
-            //
-
-            /*SerializableList<UIComponent> list = new SerializableList<UIComponent>();
-            list.Add(img3);
-            list.Add(img4);
-
-            XmlSerializer formatter = new XmlSerializer(typeof(SerializableList<UIComponent>));
-            string xml;
-            using (StringWriter sw = new StringWriter())
-            {
-                formatter.Serialize(sw, list);
-                xml = sw.ToString();
-            }
-
-            System.Console.WriteLine(xml);
-
-            list = new SerializableList<UIComponent>();
-            using (StringReader sr = new StringReader(xml))
-            {
-                list = (SerializableList<UIComponent>)formatter.Deserialize(sr);
-            }
-
-            freePlacement.Add(list[0]);
-            freePlacement.Add(list[1]);*/
-
-            //
-
-            UIManager.Root.Insert(freePlacement, 0);
 
             #endregion
 

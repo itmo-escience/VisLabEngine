@@ -1,6 +1,7 @@
 ﻿using System.ComponentModel;
 using Fusion.Core.Mathematics;
 using Fusion.Engine.Common;
+using Fusion.Engine.Frames2.Events;
 using Fusion.Engine.Graphics.SpritesD2D;
 
 namespace Fusion.Engine.Frames2.Components
@@ -24,6 +25,8 @@ namespace Fusion.Engine.Frames2.Components
             }
         }
 
+        public UIEventsHolder Events { get; } = new UIEventsHolder();
+
         private void SlotChanged(object sender, PropertyChangedEventArgs e)
         {
             if(e.PropertyName == nameof(ISlot.Width) || e.PropertyName == nameof(ISlot.Height))
@@ -38,6 +41,7 @@ namespace Fusion.Engine.Frames2.Components
         }
 
         private float _desiredWidth = -1;
+
         public float DesiredWidth
         {
             get => _desiredWidth;
@@ -126,5 +130,7 @@ namespace Fusion.Engine.Frames2.Components
         }
 
         public event PropertyChangedEventHandler PropertyChanged;
+
+        public override string ToString() => $"Label: {Text}";
     }
 }

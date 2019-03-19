@@ -2,12 +2,15 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using Fusion.Engine.Common;
+using Fusion.Engine.Frames2.Events;
 
 namespace Fusion.Engine.Frames2
 {
     public interface UIComponent : IUIDrawable, INotifyPropertyChanged //, IUIInputAware
     {
         ISlot Placement { get; set; }
+
+        UIEventsHolder Events { get; }
 
         float DesiredWidth { get; set; }
         float DesiredHeight { get; set; }
@@ -20,7 +23,7 @@ namespace Fusion.Engine.Frames2
 
     public static class UIComponentExtensions
     {
-        public static IUIContainer<ISlot> Parent(this UIComponent component) => component.Placement.Holder;
+        public static IUIContainer<ISlot> Parent(this UIComponent component) => component.Placement.Parent;
     }
 
     public static class UINameManager

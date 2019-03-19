@@ -5,6 +5,7 @@ using System.Linq;
 using Fusion.Core.Mathematics;
 using Fusion.Core.Utils;
 using Fusion.Engine.Common;
+using Fusion.Engine.Frames2.Events;
 using Fusion.Engine.Frames2.Managing;
 using Fusion.Engine.Graphics.SpritesD2D;
 
@@ -57,8 +58,8 @@ namespace Fusion.Engine.Frames2.Containers
             internal set => SetAndNotify(ref _height, value);
         }
 
-        public float AvailableWidth => MathUtil.Clamp(Holder.Placement.Width - X, 0, float.MaxValue);
-        public float AvailableHeight => MathUtil.Clamp(Holder.Placement.Height - Y, 0, float.MaxValue);
+        public float AvailableWidth => MathUtil.Clamp(Parent.Placement.Width - X, 0, float.MaxValue);
+        public float AvailableHeight => MathUtil.Clamp(Parent.Placement.Height - Y, 0, float.MaxValue);
 
         private Matrix3x2 _transform = Matrix3x2.Identity;
         public Matrix3x2 Transform
@@ -82,7 +83,7 @@ namespace Fusion.Engine.Frames2.Containers
         }
 
         internal IUIModifiableContainer<FreePlacementSlot> InternalHolder { get; }
-        public IUIContainer<ISlot> Holder => InternalHolder;
+        public IUIContainer<ISlot> Parent => InternalHolder;
 
         private UIComponent _component;
         public UIComponent Component
@@ -113,6 +114,8 @@ namespace Fusion.Engine.Frames2.Containers
         public event EventHandler<SlotAttachmentChangedEventArgs> ComponentAttached;
 
         #endregion
+
+        public override string ToString() => $"FreePlacementSlot with {Component}";
     }
 
     public class FreePlacement : IUIModifiableContainer<FreePlacementSlot>
@@ -122,6 +125,7 @@ namespace Fusion.Engine.Frames2.Containers
 
         public event PropertyChangedEventHandler PropertyChanged;
         public ISlot Placement { get; set; }
+        public UIEventsHolder Events { get; } = new UIEventsHolder();
 
         public float DesiredWidth { get; set; } = -1;
         public float DesiredHeight { get; set; } = -1;

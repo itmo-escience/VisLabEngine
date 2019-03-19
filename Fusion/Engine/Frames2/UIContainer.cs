@@ -108,10 +108,11 @@ namespace Fusion.Engine.Frames2
             var sink = geometry.Open();
             sink.SetFillMode(FillMode.Winding);
 
-            var p0 = Matrix3x2.TransformPoint(slot.Transform, new Vector2(0, 0)).ToRawVector2();
-            var p1 = Matrix3x2.TransformPoint(slot.Transform, new Vector2(0, slot.Width)).ToRawVector2();
-            var p2 = Matrix3x2.TransformPoint(slot.Transform, new Vector2(slot.Width, slot.Height)).ToRawVector2();
-            var p3 = Matrix3x2.TransformPoint(slot.Transform, new Vector2(slot.Width, 0)).ToRawVector2();
+            //var slotTransform = slot.Transform();
+            var p0 = new Vector2(0, 0).ToRawVector2(); // Matrix3x2.TransformPoint(slotTransform, new Vector2(0, 0)).ToRawVector2();
+            var p1 = new Vector2(0, slot.Width).ToRawVector2(); //Matrix3x2.TransformPoint(slotTransform, new Vector2(0, slot.Width)).ToRawVector2();
+            var p2 = new Vector2(slot.Width, slot.Height).ToRawVector2(); //Matrix3x2.TransformPoint(slotTransform, new Vector2(slot.Width, slot.Height)).ToRawVector2();
+            var p3 = new Vector2(slot.Width, 0).ToRawVector2(); //Matrix3x2.TransformPoint(slotTransform, new Vector2(slot.Width, 0)).ToRawVector2();
 
             sink.BeginFigure(p0, FigureBegin.Filled);
             sink.AddLine(p1);

@@ -37,7 +37,7 @@ namespace Fusion.Engine.Frames2.Managing
         #endregion
     }
 
-    public class UIHelper
+    public static class UIHelper
     {
         public static IEnumerable<UIComponent> BFSTraverse(UIComponent root)
         {
@@ -59,10 +59,11 @@ namespace Fusion.Engine.Frames2.Managing
             }
         }
 
-        public static IEnumerable<UIComponent> BFSTraverseForPoint(UIComponent root, Vector2 innerPoint)
+        public static IEnumerable<UIComponent> BFSTraverseForPoint(UIManager manager, UIComponent root, Vector2 point)
         {
             var queue = new Queue<UIComponent>();
-            if (root.Placement.IsInside(innerPoint)) queue.Enqueue(root);
+
+            if (InsideComponent(manager, root, point)) queue.Enqueue(root);
 
             while (queue.Any())
             {
@@ -71,12 +72,22 @@ namespace Fusion.Engine.Frames2.Managing
 
                 if (c is IUIContainer<ISlot> container)
                 {
-                    foreach (var child in container.Slots)
+                    foreach (var child in container.Slots.Select(s => s.Component))
                     {
-                        if (child.IsInside(innerPoint)) queue.Enqueue(child.Component);
+                        if (InsideComponent(manager, child, point))
+                            queue.Enqueue(child);
                     }
                 }
             }
+        }
+
+        private static bool InsideComponent(UIManager manager, UIComponent component, Vector2 point)
+        {
+            if (component is IUIContainer<ISlot> container && !container.Placement.Clip)
+            {
+                return true;
+            }
+            return manager.IsInsideSlotInternal(component.Placement, point);
         }
 
         public static IEnumerable<UIComponent> DFSTraverse(UIComponent root)
@@ -106,14 +117,17 @@ namespace Fusion.Engine.Frames2.Managing
             }
         }
 
-        public static UIComponent GetLowestComponentInHierarchy(IUIContainer<ISlot> root, Vector2 innerPoint)
+        public static UIComponent GetLowestComponentInHierarchy(UIManager manager, IUIContainer<ISlot> root, Vector2 innerPoint)
         {
-            if (!root.Placement.IsInside(innerPoint)) return null;
+            if (!InsideComponent(manager, root, innerPoint)) return null;
 
             var lowestContainer = root;
             while (true)
             {
-                var newLowest = lowestContainer.Slots.LastOrDefault(c => c.IsInside(innerPoint))?.Component;
+                var newLowest = lowestContainer.Slots
+                    .LastOrDefault(c => InsideComponent(manager, c.Component, innerPoint))?
+                    .Component;
+
                 if (newLowest == null) return lowestContainer;
                 if (newLowest is IUIContainer<ISlot> newContainer)
                 {
@@ -131,12 +145,17 @@ namespace Fusion.Engine.Frames2.Managing
             if(component == null)
                 yield break;
 
-            var current = component.Placement.Holder;
+            var current = component.Placement.Parent;
             while (current != null)
             {
                 yield return current;
-                current = current.Placement.Holder;
+                current = current.Placement.Parent;
             }
+        }
+
+        public static TValue GetOrDefault<TKey, TValue>(this Dictionary<TKey, TValue> dict, TKey key, TValue defaultValue)
+        {
+            return dict.TryGetValue(key, out var result) ? result : defaultValue;
         }
     }
 }
