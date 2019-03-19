@@ -26,6 +26,8 @@ namespace Fusion.Engine.Graphics.SpritesD2D
         {
             target.Transform = _transform;
         }
+
+        public override string ToString() => $"Transform: {_transform}";
     }
 
     public class Line : IDrawCommand
@@ -158,6 +160,8 @@ namespace Fusion.Engine.Graphics.SpritesD2D
         {
             target.DrawText(Value, Format, Location, Brush);
         }
+
+        public override string ToString() => $"Text: ({Location.X}, {Location.Y}, {Location.Width}, {Location.Height}, {Value})";
     }
 
     public sealed class LayoutedText : IDrawCommand
@@ -177,6 +181,8 @@ namespace Fusion.Engine.Graphics.SpritesD2D
         {
             target.DrawTextLayout(Location, Layout, Brush);
         }
+
+        public override string ToString() => $"LayoutedText: ({Location.X}, {Location.Y}, {Layout.Width}, {Layout.Height}, {Layout.Text})";
     }
 
     public class FillEllipse : IDrawCommand

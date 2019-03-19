@@ -101,28 +101,5 @@ namespace Fusion.Engine.Frames2
         {
             return container.Slots.Select(slot => slot.Component);
         }
-
-        internal static PathGeometryD2D GetClippingGeometry(this ISlot slot, SpriteLayerD2D layer)
-        {
-            var geometry = new PathGeometry(layer.Factory);
-            var sink = geometry.Open();
-            sink.SetFillMode(FillMode.Winding);
-
-            //var slotTransform = slot.Transform();
-            var p0 = new Vector2(0, 0).ToRawVector2(); // Matrix3x2.TransformPoint(slotTransform, new Vector2(0, 0)).ToRawVector2();
-            var p1 = new Vector2(0, slot.Width).ToRawVector2(); //Matrix3x2.TransformPoint(slotTransform, new Vector2(0, slot.Width)).ToRawVector2();
-            var p2 = new Vector2(slot.Width, slot.Height).ToRawVector2(); //Matrix3x2.TransformPoint(slotTransform, new Vector2(slot.Width, slot.Height)).ToRawVector2();
-            var p3 = new Vector2(slot.Width, 0).ToRawVector2(); //Matrix3x2.TransformPoint(slotTransform, new Vector2(slot.Width, 0)).ToRawVector2();
-
-            sink.BeginFigure(p0, FigureBegin.Filled);
-            sink.AddLine(p1);
-            sink.AddLine(p2);
-            sink.AddLine(p3);
-            sink.EndFigure(FigureEnd.Closed);
-            sink.Close();
-            sink.Dispose();
-
-            return new PathGeometryD2D(geometry);
-        }
     }
 }

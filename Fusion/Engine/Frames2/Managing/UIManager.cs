@@ -80,7 +80,7 @@ namespace Fusion.Engine.Frames2.Managing
         public void Update(GameTime gameTime)
         {
             UIEventProcessor.Update(gameTime);
-            //RecalculateAllTransforms();
+            RecalculateAllTransforms();
 
             foreach (var c in UIHelper.DFSTraverse(Root))
             {
@@ -218,8 +218,7 @@ namespace Fusion.Engine.Frames2.Managing
 
             if (component.Placement.Clip)
             {
-                var geom = component.Placement.GetClippingGeometry(layer);
-                layer.Draw(new StartClippingAlongGeometry(geom, AntialiasModeD2D.Aliased));
+                layer.Draw(new StartClippingAlongRectangle(component.Placement.BoundingBox(), AntialiasModeD2D.Aliased));
             }
 
             component.Draw(layer);
@@ -234,7 +233,7 @@ namespace Fusion.Engine.Frames2.Managing
 
             if (component.Placement.Clip)
             {
-                layer.Draw(new EndClippingAlongGeometry());
+                layer.Draw(new EndClippingAlongRectangle());
             }
 
             if (DebugEnabled)
