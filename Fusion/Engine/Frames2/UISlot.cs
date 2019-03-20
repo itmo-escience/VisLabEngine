@@ -60,5 +60,10 @@ namespace Fusion.Engine.Frames2
                 : new RectangleF(0, 0, 0, 0);
             return rectangle;
         }
+
+        public static void Detach(this ISlotAttachable slot)
+        {
+            slot.Attach(null);
+        }
     }
 }

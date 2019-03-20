@@ -24,6 +24,7 @@ using Fusion.Core.Utils;
 using System.Xml.Serialization;
 using System.IO;
 using System.Collections.ObjectModel;
+using Fusion.Engine.Frames2.Controllers;
 using Label = Fusion.Engine.Frames2.Components.Label;
 
 namespace GISTest
@@ -226,34 +227,33 @@ namespace GISTest
 		    imgFreePlacement.Events.Click += (sender, args) => Log.Message("Image Container click");
 		    labelFreePlacement.Events.Click += (sender, args) => Log.Message("Label Container click");
 
-
-
-
             #endregion
 
-            /*
+
             #region button
-            var btn = new ButtonController(100, 100);
+            var btn = new ButtonController();
+		    btn.DesiredWidth = 100;
+		    btn.DesiredHeight = 100;
+			btn.Background.Attach(new Border());
+            btn.Foreground.Attach(new Label("Button", new TextFormatD2D("Calibry", 15)));
 
-			btn.Background.Attach(new Border(0, 0, 100, 100));
-            btn.Foreground.Attach(new Label("Button", new TextFormatD2D("Calibry", 15), 0, 0, 100, 100));
-
-
-		    var bgColor = new UIController.PropertyValueStates<>("BackgroundColor", Color4.White);
-		    bgColor[UIController.State.Hovered] = new Color4(1.0f, 0.0f, 0.0f, 1.0f);
+		    var bgColor = new PropertyValueStates("BackgroundColor", Color4.White);
+		    bgColor[State.Hovered] = new Color4(1.0f, 0.0f, 0.0f, 1.0f);
 		    bgColor[ButtonController.Pressed] = new Color4(0.0f, 1.0f, 1.0f, 1.0f);
 
-		    var color = new UIController.PropertyValueStates<>("BackgroundColor", new Color4(1.0f, 1.0f, 0.0f, 1.0f));
-		    color[UIController.State.Hovered] = new Color4(1.0f, 0.0f, 1.0f, 1.0f);
+		    var color = new PropertyValueStates("BackgroundColor", new Color4(1.0f, 1.0f, 0.0f, 1.0f));
+		    color[State.Hovered] = new Color4(1.0f, 0.0f, 1.0f, 1.0f);
 		    color[ButtonController.Pressed] = new Color4(1.0f, 1.0f, 1.0f, 1.0f);
 
             btn.Background.Properties.Add(bgColor);
             btn.Background.Properties.Add(color);
 
-            UIManager.Root.Add(btn);
+            var btnSlot = UIManager.Root.Insert(btn, 0);
+		    btnSlot.X = 1100;
+		    btnSlot.Y = 100;
 
             #endregion
-            */
+
 
             /*
             #region textbox

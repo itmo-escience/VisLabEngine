@@ -20,6 +20,14 @@ namespace Fusion.Engine.Frames2.Components
         public object Tag { get; set; }
         public string Name { get; set; }
 
+        public Border() { }
+
+        public Border(Color background, Color border)
+        {
+            BackgroundColor = background.ToColor4();
+            BorderColor = border.ToColor4();
+        }
+
         public void Update(GameTime gameTime) { }
 
         public void Draw(SpriteLayerD2D layer)

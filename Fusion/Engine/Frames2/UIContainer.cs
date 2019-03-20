@@ -1,8 +1,5 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using Fusion.Core.Mathematics;
-using Fusion.Engine.Graphics.SpritesD2D;
-using SharpDX.Direct2D1;
 
 namespace Fusion.Engine.Frames2
 {
@@ -92,9 +89,7 @@ namespace Fusion.Engine.Frames2
 
         public static bool Contains<T>(this IUIContainer<T> c, UIComponent component) where T : ISlot
         {
-            var holder = c.Slots.FirstOrDefault(slot => slot.Component == component);
-
-            return holder != null;
+            return c.Slots.Any(slot => slot.Component == component);
         }
 
         public static IEnumerable<UIComponent> GetChildren<T>(this IUIContainer<T> container) where T : ISlot

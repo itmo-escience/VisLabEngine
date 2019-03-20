@@ -1,23 +1,30 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.ComponentModel;
+using System.Linq;
+using Fusion.Engine.Common;
+using Fusion.Engine.Frames2.Events;
+using Fusion.Engine.Graphics.SpritesD2D;
 
-namespace Fusion.Engine.Frames2
+namespace Fusion.Engine.Frames2.Controllers
 {
-    /*
-    public interface IControllerType { }
-
-    public abstract class UIController<T> : UIContainer where T : IControllerType
+    public interface IControllerSlot : ISlot
     {
-        public State<T> CurrentState { get; protected set; } = State<T>.Default;
+        ObservableCollection<PropertyValueStates> Properties { get; }
+    }
 
-        public IEnumerable<State<T>> States
+    public abstract class UIController<T> : IUIContainer<T> where T : IControllerSlot
+    {
+        public State CurrentState { get; protected set; } = State.Default;
+
+        public IEnumerable<State> States
         {
             get
             {
-                yield return State<T>.Default;
-                yield return State<T>.Hovered;
-                yield return State<T>.Disabled;
+                yield return State.Default;
+                yield return State.Hovered;
+                yield return State.Disabled;
 
                 foreach (var state in NonDefaultStates)
                 {
@@ -26,21 +33,19 @@ namespace Fusion.Engine.Frames2
             }
         }
 
-        protected virtual IEnumerable<State<T>> NonDefaultStates => new List<State<T>>();
+        protected virtual IEnumerable<State> NonDefaultStates => new List<State>();
 
-        protected readonly List<IS> SlotsInternal = new List<PlacementSlot>();
-        //public IReadOnlyList<Slot<T>> Slots => SlotsInternal;
+        public abstract IEnumerable<T> Slots { get; }
 
-        public void ChangeState(State<T> newState)
+        public void ChangeState(State newState)
         {
-            /*
             if (!States.Contains(newState)) return;
 
-            foreach (var fragment in Slots)
+            foreach (var slot in Slots)
             {
-                var component = fragment.Component;
+                var component = slot.Component;
                 var type = component.GetType();
-                foreach (var propertyValue in fragment.Properties)
+                foreach (var propertyValue in slot.Properties)
                 {
                     var info = type.GetProperty(propertyValue.Name);
                     if (info == null) continue;
@@ -60,89 +65,40 @@ namespace Fusion.Engine.Frames2
 
             Log.Verbose(CurrentState);
         }
-        /*
-        internal void Attach(ISlot<T> slot, UIComponent component)
-        {
-            var idx = SlotsInternal.IndexOf(slot);
-            base.InsertAt(slot.Component, idx);
-
-            ResizeAccordingly();
-        }
-
-        private void ResizeAccordingly()
-        {
-            var b = base.BoundingBox;
-            foreach (var child in Children)
-            {
-                b = RectangleF.Union(b, child.BoundingBox);
-            }
-
-            // Do not take into account to the left and top
-            Width = b.Width - MathUtil.Clamp(BoundingBox.X - b.X, float.NegativeInfinity, 0);
-            Height = b.Height - MathUtil.Clamp(BoundingBox.Y - b.Y, float.NegativeInfinity, 0);
-        }
 
         private bool _initialized = false;
-
         private void Initialize()
         {
-            foreach (var slot in Slots)
-            {
-                if (slot.Component != null)
-                {
-                    Attach(slot, slot.Component);
-                }
-                slot.ComponentAttached += ComponentAttachedToSlot;
-            }
-
-            ChangeState(State<T>.Default);
+            ChangeState(State.Default);
             _initialized = true;
         }
 
-        private void ComponentAttachedToSlot(object sender, SlotAttachmentChangedEventArgs e)
-        {
-            var slot = (Slot<T>)sender;
+        public ISlot Placement { get; set; }
+        public UIEventsHolder Events { get; } = new UIEventsHolder();
+        public float DesiredWidth { get; set; }
+        public float DesiredHeight { get; set; }
+        public object Tag { get; set; }
+        public string Name { get; set; }
 
-            Attach(slot, e.New);
-        }
-
-        public override void Update(GameTime gameTime)
+        public void Update(GameTime gameTime)
         {
             if (!_initialized)
                 Initialize();
-
-            base.Update(gameTime);
         }
 
-        #region Disable default children operations
+        public void Draw(SpriteLayerD2D layer) { }
 
-        public override void Add(UIComponent child)
+        public int IndexOf(UIComponent child)
         {
-            Log.Error("Direct addition is not supported");
+            throw new NotImplementedException();
         }
 
-        public override void AddAt(UIComponent child, int index)
-        {
-            Log.Error("Direct addition is not supported");
-        }
+        public bool Contains(UIComponent component) => Slots.Any(slot => slot.Component == component);
 
-        public override bool Remove(UIComponent child)
-        {
-            Log.Error("Direct removal is not supported");
-            return false;
-        }
-
-        #endregion
-
-
+        public event PropertyChangedEventHandler PropertyChanged;
     }
 
-    public interface IControllerSlot<T> : PlacementSlot where T : IControllerType
-    {
-        ObservableCollection<PropertyValueStates<T>> Properties { get; }
-    }
-
-    public struct State<T> : IEquatable<State<T>> where T : IControllerType
+    public struct State : IEquatable<State>
     {
         public readonly string Name;
         public State(string name)
@@ -150,21 +106,21 @@ namespace Fusion.Engine.Frames2
             Name = name;
         }
 
-        public static State<T> Default = new State<T>("Default");
-        public static State<T> Hovered = new State<T>("Hovered");
-        public static State<T> Disabled = new State<T>("Disabled");
+        public static State Default = new State("Default");
+        public static State Hovered = new State("Hovered");
+        public static State Disabled = new State("Disabled");
 
-        public static bool operator ==(State<T> self, State<T> other)
+        public static bool operator ==(State self, State other)
         {
             return self.Equals(other);
         }
 
-        public static bool operator !=(State<T> self, State<T> other)
+        public static bool operator !=(State self, State other)
         {
             return !self.Equals(other);
         }
 
-        public bool Equals(State<T> other)
+        public bool Equals(State other)
         {
             return string.Equals(Name, other.Name);
         }
@@ -172,7 +128,7 @@ namespace Fusion.Engine.Frames2
         public override bool Equals(object obj)
         {
             if (ReferenceEquals(null, obj)) return false;
-            return obj is State<T> other && Equals(other);
+            return obj is State other && Equals(other);
         }
 
         public override int GetHashCode()
@@ -185,26 +141,26 @@ namespace Fusion.Engine.Frames2
             return $"State: {Name}";
         }
 
-        public static implicit operator string(State<T> s) => s.ToString();
+        public static implicit operator string(State s) => s.ToString();
     }
 
-    public class PropertyValueStates<T> where T : IControllerType
+    public class PropertyValueStates
     {
         public string Name { get; }
         public object Default { get; }
 
 
-        private readonly Dictionary<State<T>, object> _storedValues = new Dictionary<State<T>, object>();
+        private readonly Dictionary<State, object> _storedValues = new Dictionary<State, object>();
 
         public PropertyValueStates(string name, object defaultValue)
         {
             Name = name;
             Default = defaultValue;
 
-            _storedValues[State<T>.Default] = Default;
+            _storedValues[State.Default] = Default;
         }
 
-        public object this[State<T> s]
+        public object this[State s]
         {
             get
             {
@@ -217,5 +173,4 @@ namespace Fusion.Engine.Frames2
 
         public override string ToString() => Name;
     }
-    */
 }
