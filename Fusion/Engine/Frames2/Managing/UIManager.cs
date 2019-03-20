@@ -210,9 +210,17 @@ namespace Fusion.Engine.Frames2.Managing
 
         private void DrawRecursive(SpriteLayerD2D layer, UIComponent component)
         {
-            if (!component.Placement.Visible) return;
-
             var globalTransform = _globalTransforms[component.Placement];
+
+            if (!component.Placement.Visible)
+            {
+                if (DebugEnabled)
+                {
+                    DebugDraw(layer, component.Placement, globalTransform);
+                }
+
+                return;
+            }
 
             layer.Draw(new TransformCommand(globalTransform));
 

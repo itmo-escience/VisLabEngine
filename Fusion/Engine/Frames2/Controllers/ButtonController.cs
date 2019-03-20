@@ -19,7 +19,7 @@ namespace Fusion.Engine.Frames2.Controllers
         public float AvailableWidth => Width;
         public float AvailableHeight => Height;
         public bool Clip => true;
-        public bool Visible { get; set; }
+        public bool Visible { get; set; } = false;
 
         public IUIContainer<ISlot> Parent { get; }
         public UIComponent Component { get; private set; }
@@ -66,7 +66,7 @@ namespace Fusion.Engine.Frames2.Controllers
         }
 
         public event EventHandler<SlotAttachmentChangedEventArgs> ComponentAttached;
-        public ObservableCollection<PropertyValueStates> Properties => new ObservableCollection<PropertyValueStates>();
+        public ObservableCollection<PropertyValueStates> Properties { get; } = new ObservableCollection<PropertyValueStates>();
     }
 
     public class ButtonController : UIController<ButtonSlot>
