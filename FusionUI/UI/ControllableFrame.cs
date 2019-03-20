@@ -613,13 +613,14 @@ namespace FusionUI.UI
             }
         }
 
-        private bool firstUpdate = true;
+        protected bool firstUpdate = true;
         protected override void Update(GameTime gameTime)
         {
             if (firstUpdate)
             {
-                initialize();
                 firstUpdate = false;
+                initialize();
+
             }
 
             base.Update(gameTime);
