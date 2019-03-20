@@ -70,7 +70,7 @@ namespace FusionUI.UI.Elements
                 xPosition = addTabButton.UnitX;
                 addTabButton.UnitX += WidthTapLabel;
             }
-            
+
             var newTabLabel = new ScalableFrame(ui, xPosition, 0, WidthTapLabel, HeightTapLabel, name, Color.Zero)
             {
                 BackColor = PassiveColor,
@@ -90,8 +90,8 @@ namespace FusionUI.UI.Elements
                     ScalableFrame menu = null;
                     List<Button> buttons = null;
                     ui.RootFrame.Add(menu = ContextMenuFactory.ContextMenu(ui,
-                        Game.Mouse.Position.X / ApplicationInterface.ScaleMod,
-                        Game.Mouse.Position.Y / ApplicationInterface.ScaleMod,
+                        args.Position.X / ApplicationInterface.ScaleMod,
+                        args.Position.Y / ApplicationInterface.ScaleMod,
                         40, UIConfig.UnitMenuButtonHeight, new List<Tuple<string, Action>>()
                         {
                             new Tuple<string, Action>("Rename", () =>
@@ -153,7 +153,7 @@ namespace FusionUI.UI.Elements
 
         public void removeTab(string name)
         {
-            // TODO: need shift another tabs            
+            // TODO: need shift another tabs
             var tabInfo = listTab[name];
             if (ActiveLabel == tabInfo.Label)
             {
@@ -196,7 +196,7 @@ namespace FusionUI.UI.Elements
             ActiveFrame = frame;
             // action
             OnChangeTab?.Invoke(label.Text);
-            
+
         }
 
 
