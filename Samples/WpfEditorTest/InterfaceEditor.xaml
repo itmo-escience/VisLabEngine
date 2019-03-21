@@ -95,7 +95,8 @@
                     <MenuItem Command="{x:Static local:InterfaceEditor.NewSceneCmd}" Header="New scene" ToolTip="Create new empty scene"/>
                     <MenuItem Command="{x:Static local:InterfaceEditor.SaveSceneCmd}" Header="Save scene" ToolTip="Save scene to file..."/>
                     <MenuItem Command="{x:Static local:InterfaceEditor.LoadSceneCmd}" Header="Load scene" ToolTip="Load scene rom file..."/>
-                    <MenuItem Command="{x:Static local:InterfaceEditor.SaveFrameCmd}" Header="Save template" ToolTip="Save selected frame as template..."/>
+                    <MenuItem Name="SaveTemplateButton" Command="{x:Static local:InterfaceEditor.SaveFrameCmd}" Header="Save template" ToolTip="Save selected frame as template..."
+                              IsEnabled="{Binding IsSingleElementSelected}"/>
                 </MenuItem>
                 </Menu>
                 <Menu>

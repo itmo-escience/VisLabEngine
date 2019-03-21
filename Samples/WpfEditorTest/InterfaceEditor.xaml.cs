@@ -351,6 +351,7 @@ namespace WpfEditorTest
 
 			UndoButton.DataContext = CommandManager.Instance;
 			RedoButton.DataContext = CommandManager.Instance;
+			SaveTemplateButton.DataContext = SelectionManager.Instance;
 			LoadedScenesTabs.DataContext = LoadedScenes;
 
 			CommandManager.Instance.ChangedDirty += ( s, e ) =>
@@ -1219,36 +1220,24 @@ namespace WpfEditorTest
 		{
 			if (Zoomer != null)
 			{
-				//if (sign > 0)
-				//{
-					Zoomer.Height = DefaultSceneHeight * sceneScale;
-					Zoomer.Width = DefaultSceneWidth * sceneScale;
+				Zoomer.Width = DefaultSceneWidth * sceneScale;
+				Zoomer.Height = DefaultSceneHeight * sceneScale;
 
-					var mousePosition = System.Windows.Input.Mouse.GetPosition(ZoomerScroll);
-				var scrollerMouseOffsetX = mousePosition.X / ZoomerScroll.ActualWidth;
-				var scrollerMouseOffsetY = mousePosition.Y / ZoomerScroll.ActualHeight;
-				mousePosition = ZoomerScroll.TransformToVisual(Zoomer).Transform(mousePosition);
-				var scrollButtonWidth = ZoomerScroll.ExtentWidth - ZoomerScroll.ScrollableWidth;
-				var scrollButtonHeight = ZoomerScroll.ExtentHeight - ZoomerScroll.ScrollableHeight;
-				//var widthDelta = mousePosition.X / Zoomer.Width * ZoomerScroll.ScrollableWidth;
-				//widthDelta += scrollButtonWidth * (scrollerMouseOffsetX - 0.5f);
-				//var heightDelta = mousePosition.Y / Zoomer.Height * ZoomerScroll.ScrollableHeight;
-				//heightDelta += scrollButtonHeight * (scrollerMouseOffsetY - 0.5f);
-				ZoomerScroll.ScrollToHorizontalOffset(ZoomerScroll.HorizontalOffset+ scrollButtonWidth* scrollerMouseOffsetX)
-					ZoomerScroll.ScrollToVerticalOffset(ZoomerScroll.VerticalOffset + scrollButtonHeight * scrollerMouseOffsetY); 
-				//}
-				//if (sign < 0)
-				//{
-				//	Zoomer.Height -= DefaultSceneHeight;
-				//	Zoomer.Width -= DefaultSceneWidth;
+				var mousePosition = System.Windows.Input.Mouse.GetPosition(ZoomerScroll);
+				Point scaledTopLeftCornerPosition;
+				if (mousePosition.X >= 0 && mousePosition.Y >= 0)
+					scaledTopLeftCornerPosition = new Point(MouseX * sceneScale - mousePosition.X, MouseY * sceneScale - mousePosition.Y);
+				else
+				{
+					scaledTopLeftCornerPosition = new Point(ZoomerScroll.ViewportWidth / 2, ZoomerScroll.ViewportHeight / 2);
 
-				//	var mousePosition = System.Windows.Input.Mouse.GetPosition(ZoomerScroll);
-				//	mousePosition = ZoomerScroll.TransformToVisual(Zoomer).Transform(mousePosition);
-				//	mousePosition = new Point(mousePosition.X - DefaultSceneWidth, mousePosition.Y - DefaultSceneHeight);
+					mousePosition = ZoomerScroll.TransformToVisual(SelectionLayer).Transform(scaledTopLeftCornerPosition);
+					scaledTopLeftCornerPosition = new Point(mousePosition.X * sceneScale - ZoomerScroll.ViewportWidth / 2, mousePosition.Y * sceneScale - ZoomerScroll.ViewportHeight / 2);
+				}
 
-				//	ZoomerScroll.ScrollToHorizontalOffset(mousePosition.X);
-				//	ZoomerScroll.ScrollToVerticalOffset(mousePosition.Y);
-				//}
+				ZoomerScroll.ScrollToHorizontalOffset(scaledTopLeftCornerPosition.X);
+				ZoomerScroll.ScrollToVerticalOffset(scaledTopLeftCornerPosition.Y); 
+
 			}
 		}
 
