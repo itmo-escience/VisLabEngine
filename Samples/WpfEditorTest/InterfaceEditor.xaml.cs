@@ -351,6 +351,7 @@ namespace WpfEditorTest
 
 			UndoButton.DataContext = CommandManager.Instance;
 			RedoButton.DataContext = CommandManager.Instance;
+			SaveTemplateButton.DataContext = SelectionManager.Instance;
 			LoadedScenesTabs.DataContext = LoadedScenes;
 
 			CommandManager.Instance.ChangedDirty += ( s, e ) =>
@@ -380,7 +381,7 @@ namespace WpfEditorTest
 					DragFieldFrame.Width = (float)e.NewSize.Width;
 					DragFieldFrame.Height = (float)e.NewSize.Height;
 				}
-				ZoomScene();
+				ZoomScene(1);
 			};
 			this.UpdateTitle();
 
@@ -1210,16 +1211,33 @@ namespace WpfEditorTest
 
 		private void Slider_ValueChanged( object sender, RoutedPropertyChangedEventArgs<double> e )
 		{
+			var sign = Math.Sign(e.NewValue - e.OldValue);
 			this.sceneScale = e.NewValue;
-			ZoomScene();
+			ZoomScene(sign);
 		}
 
-		private void ZoomScene()
+		private void ZoomScene( int sign )
 		{
 			if (Zoomer != null)
 			{
-				Zoomer.Height = DefaultSceneHeight * sceneScale;
 				Zoomer.Width = DefaultSceneWidth * sceneScale;
+				Zoomer.Height = DefaultSceneHeight * sceneScale;
+
+				var mousePosition = System.Windows.Input.Mouse.GetPosition(ZoomerScroll);
+				Point scaledTopLeftCornerPosition;
+				if (mousePosition.X >= 0 && mousePosition.Y >= 0)
+					scaledTopLeftCornerPosition = new Point(MouseX * sceneScale - mousePosition.X, MouseY * sceneScale - mousePosition.Y);
+				else
+				{
+					scaledTopLeftCornerPosition = new Point(ZoomerScroll.ViewportWidth / 2, ZoomerScroll.ViewportHeight / 2);
+
+					mousePosition = ZoomerScroll.TransformToVisual(SelectionLayer).Transform(scaledTopLeftCornerPosition);
+					scaledTopLeftCornerPosition = new Point(mousePosition.X * sceneScale - ZoomerScroll.ViewportWidth / 2, mousePosition.Y * sceneScale - ZoomerScroll.ViewportHeight / 2);
+				}
+
+				ZoomerScroll.ScrollToHorizontalOffset(scaledTopLeftCornerPosition.X);
+				ZoomerScroll.ScrollToVerticalOffset(scaledTopLeftCornerPosition.Y); 
+
 			}
 		}
 

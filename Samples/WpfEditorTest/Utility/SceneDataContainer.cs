@@ -14,11 +14,19 @@ namespace WpfEditorTest.Utility
 	{
 		private string _sceneName = ApplicationConfig.BaseSceneName;
 		private bool _isDirty = false;
+		private string _sceneFileFullPath = null;
 
 		public event PropertyChangedEventHandler PropertyChanged;
 
 		public string SceneName { get => _sceneName + (IsDirty ? "*" : ""); set { _sceneName = value; OnPropertyChanged(); } }
-		public string SceneFileFullPath { get; set; } = null;
+		public string SceneFileFullPath {
+			get => _sceneFileFullPath;
+			set {
+				_sceneFileFullPath = value;
+				SceneName = _sceneFileFullPath.Split('\\').Last().Split('.').First();
+				OnPropertyChanged();
+			}
+		}
 		public UIContainer Scene { get; set; }
 		public bool IsDirty { get => _isDirty; set { _isDirty = value; SceneName = _sceneName; OnPropertyChanged(); } }
 		public double SceneZoom { get; set; }

@@ -32,8 +32,8 @@
         <TextBlock x:Name="txblSceneWidth" Grid.Row="0" Text="Scene Width" VerticalAlignment="Center" HorizontalAlignment="Right"/>
         <TextBlock x:Name="txblSceneHeight" Grid.Row="1" Text="Scene Height" VerticalAlignment="Center" HorizontalAlignment="Right"/>
         <xctk:DoubleUpDown x:Name="txbxSceneWidth" Grid.Row="0" Grid.ColumnSpan="3" Grid.Column="1" Text="SceneWidth" 
-                 Margin="4,0" HorizontalAlignment="Stretch" VerticalAlignment="Center"/>
+                 Margin="4,0" HorizontalAlignment="Stretch" VerticalAlignment="Center" KeyDown="txbxSceneWidth_KeyDown"/>
         <xctk:DoubleUpDown x:Name="txbxSceneHeight" Grid.Row="1" Grid.ColumnSpan="3" Grid.Column="1" Text="SceneHeight" 
-                 Margin="4,0" HorizontalAlignment="Stretch" VerticalAlignment="Center"/>
+                 Margin="4,0" HorizontalAlignment="Stretch" VerticalAlignment="Center" KeyDown="txbxSceneHeight_KeyDown"/>
     </Grid>
 </Window>

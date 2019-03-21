@@ -9,11 +9,15 @@ using Fusion.Engine.Frames2;
 
 namespace WpfEditorTest.FrameSelection
 {
-	internal class SelectionManager
+	internal class SelectionManager : INotifyPropertyChanged
 	{
 		public static SelectionManager Instance { get; } = new SelectionManager();
 
 		private SelectionManager() { }
+
+		public event PropertyChangedEventHandler PropertyChanged;
+
+		public bool IsSingleElementSelected { get { return SelectedFrames.Count == 1; } }
 
 		public List<UIComponent> SelectedFrames { get; private set; } = new List<UIComponent>();
 
@@ -33,11 +37,17 @@ namespace WpfEditorTest.FrameSelection
 				selectedFrame.PropertyChanged += OnFrameUpdated;
 			}
 			FrameSelected?.Invoke(this, SelectedFrames);
+			OnPropertyChanged(nameof(IsSingleElementSelected));
 		}
 
 		private void OnFrameUpdated( object frame, PropertyChangedEventArgs args)
 		{
 		    Application.Current.Dispatcher.InvokeAsync(() => FrameUpdated?.Invoke(this, (UIComponent)frame));
+		}
+
+		protected void OnPropertyChanged( [System.Runtime.CompilerServices.CallerMemberName] string changedProperty = "" )
+		{
+			PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(changedProperty));
 		}
 	}
 }
