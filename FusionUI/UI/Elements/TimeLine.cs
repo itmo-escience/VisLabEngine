@@ -20,7 +20,7 @@ namespace FusionUI.UI.Elements
         public bool IsUpdateWithMove = false;
 
         public int emptySizeImage = 0;
-        //        private StripLine stripLine;        
+        //        private StripLine stripLine;
 
         public bool isInited = false;
 
@@ -55,7 +55,7 @@ namespace FusionUI.UI.Elements
             {
                 _currentTime = value;
                 if(!LordOfTime.IsDrag && !LordOfTime.Selected)
-                    UpdatePostionLord();                
+                    UpdatePostionLord();
             }
         }
 
@@ -65,7 +65,7 @@ namespace FusionUI.UI.Elements
             this.emptySizeImage = emptyWidth;
             this.textureLord = lordTexture;
             UnitHPadding = initialUnitHPadding ?? UIConfig.UnitTimelineOffsetX;
-			Init(ui);            
+			Init(ui);
         }
 
         public void initTimeValue(AbstractTimeManager timeManager)
@@ -83,7 +83,7 @@ namespace FusionUI.UI.Elements
                 ////                stripLine.UnitX = LordOfTime.UnitX;
                 LordOfTime.SetFromRelativeX(TimeToXPositon(CurrentTime));
                 UpdatedTimeElement();
-            }    
+            }
         }
 
         public float TimeToXPositon(DateTime time)
@@ -103,17 +103,17 @@ namespace FusionUI.UI.Elements
 			timeLabelDate.UnitX = Math.Max(LordOfTime.UnitX + LordOfTime.UnitWidth / 2 - timeLabelDate.UnitWidth / 2,0);
 			timeLabelDate.UnitX = Math.Min(timeLabelDate.UnitX, this.UnitWidth - timeLabelDate.UnitWidth);
 			lineLineBeforeLord.UnitWidth = LordOfTime.UnitX - UnitPaddingLeft + LordOfTime.UnitWidth / 2;
-        }        
+        }
 
         public DateTime XPositionToDateTime(float x)
         {
-            var valueSecond =  (TimeManager.EndTime - TimeManager.StartTime).TotalSeconds * x;            
+            var valueSecond =  (TimeManager.EndTime - TimeManager.StartTime).TotalSeconds * x;
             var date = TimeManager.StartTime.AddSeconds(valueSecond);
             return date;
         }
 
         private void Init(FrameProcessor frameProcessor)
-        {            
+        {
             ui = frameProcessor;
             if (textureLord == null)
             {
@@ -124,7 +124,7 @@ namespace FusionUI.UI.Elements
                 IsFixedY = true,
                 Image = textureLord,
                 ImageColor = UIConfig.TimeLineColor1,
-                ImageMode = FrameImageMode.Centered, 
+                ImageMode = FrameImageMode.Centered,
             };
 
             var font = ui.DefaultFont;
@@ -135,7 +135,7 @@ namespace FusionUI.UI.Elements
 				//Border = 1,
 				//BorderColor = new Color(110, 110, 110),
 				TextAlignment = Alignment.MiddleCenter,
-                FontHolder = UIConfig.FontCaption,                
+                FontHolder = UIConfig.FontCaption,
                 Ghost = true
             };
 
@@ -197,7 +197,7 @@ namespace FusionUI.UI.Elements
 
             this.Add(lineLineAfterLord);
             this.Add(lineLineBeforeLord);
-            
+
 
             this.Add(timeLabelTime);
             this.Add(timeLabelDate);

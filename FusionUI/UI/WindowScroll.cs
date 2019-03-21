@@ -91,7 +91,7 @@ namespace FusionUI.UI
             scrollHolder.UnitY = (DrawHat ? UIConfig.UnitHatHeight : 0) + UnitPaddingTop;
             scrollHolder.UnitX = UnitPaddingLeft;
             scrollHolder.UnitWidth = UnitWidth - UnitPaddingLeft - UnitPaddingRight;
-            scrollHolder.UnitHeight = Math.Min(UnitHeight, HeightLimit) - UnitPaddingTop - UnitPaddingBottom;            
+            scrollHolder.UnitHeight = Math.Min(UnitHeight, HeightLimit) - UnitPaddingTop - UnitPaddingBottom;
             holder.UnitWidth = scrollHolder.UnitWidth;
         }
 
@@ -208,7 +208,7 @@ namespace FusionUI.UI
         protected override void Update(GameTime gameTime)
         {
             base.Update(gameTime);
-            scrollHolder.UnitHeight = Math.Min(HeightLimit, holder.UnitHeight);
+
             if (AllowShrink)
             {
 				if (!ResizedManually)
@@ -221,6 +221,11 @@ namespace FusionUI.UI
 					scrollHolder.UnitHeight = UnitHeight - ((HatPanel?.UnitHeight ?? 0) + (BasementPanel?.UnitHeight ?? 0) + UnitPaddingTop + UnitPaddingBottom);
 				}
             }
+            else
+            {
+                HeightLimit = UnitHeight - (HatPanel?.UnitHeight ?? 0) - (BasementPanel?.UnitHeight ?? 0);
+                scrollHolder.UnitHeight = Math.Min(HeightLimit, holder.UnitHeight);
+            }
             holder.UnitY = MathUtil.Clamp(holder.UnitY, Math.Min(MaxHeight - RealHeight, 0), 0);
         }
 
@@ -229,6 +234,7 @@ namespace FusionUI.UI
         private float ScrollDelta => holder.UnitY;
         protected virtual void DrawScrollLine(GameTime gameTime, SpriteLayer spriteLayer, int clipRectIndex)
         {
+
             var whiteTex = this.Game.RenderSystem.WhiteTexture;
             if (RealHeight > MaxHeight)
             {

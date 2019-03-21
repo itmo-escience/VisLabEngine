@@ -10,7 +10,7 @@ using SharpDX.Direct3D11;
 using System.Runtime.InteropServices;
 using Fusion.Core.Content;
 using Fusion.Core.Mathematics;
-using SharpDX.Direct3D;			
+using SharpDX.Direct3D;
 using Native.Dds;
 using Native.Wic;
 using Fusion.Core;
@@ -33,7 +33,7 @@ namespace Fusion.Drivers.Graphics {
 				return new Texture2D( content.Game.GraphicsDevice, stream, srgb );
 			}
 		}
-		
+
 
 
 		/// <summary>
@@ -60,13 +60,13 @@ namespace Fusion.Drivers.Graphics {
 			texDesc.SampleDescription.Quality	=	0;
 			texDesc.Usage			=	ResourceUsage.Default;
 			texDesc.Width			=	Width;
-													 
+
 			lock (device.DeviceContext) {
 				tex2D	=	new D3D.Texture2D( device.Device, texDesc );
 				SRV		=	new ShaderResourceView( device.Device, tex2D );
 			}
 		}
-		
+
 
 
 
@@ -118,7 +118,7 @@ namespace Fusion.Drivers.Graphics {
 
 
 		/// <summary>
-		/// Create texture inplace with new parameters. 
+		/// Create texture inplace with new parameters.
 		/// Old texture will be completely discarded
 		/// </summary>
 		/// <param name="width"></param>
@@ -133,19 +133,19 @@ namespace Fusion.Drivers.Graphics {
 			IntPtr	resourceView	=	new IntPtr(0);
 			bool	result;
 
-			//lock (device.DeviceContext) 
+			//lock (device.DeviceContext)
 			{
 				if ((char)fileInMemory[0]=='D' &&
 					(char)fileInMemory[1]=='D' &&
 					(char)fileInMemory[2]=='S' &&
 					(char)fileInMemory[3]==' ' ) {
-	
+
 					result = DdsLoader.CreateTextureFromMemory( device.Device.NativePointer, fileInMemory, forceSRgb, ref resource, ref resourceView );
 				} else {
 					result = WicLoader.CreateTextureFromMemory( device.Device.NativePointer, fileInMemory, forceSRgb, ref resource, ref resourceView );
 				}
 
-				if (!result) {	
+				if (!result) {
 					throw new GraphicsException( "Failed to load texture: " + name );
 				}
 
@@ -164,7 +164,7 @@ namespace Fusion.Drivers.Graphics {
 
 		internal Texture2D(GraphicsDevice dev) : base(dev)
 		{
-			
+
 		}
 
 		public static Texture2D CreateFromFile(string name, byte[] fileInMemory, bool forceSRgb)
@@ -227,7 +227,7 @@ namespace Fusion.Drivers.Graphics {
 		}
 
 
-		
+
 		/// <summary>
 		/// Sets 2D texture data, specifying a start index, and number of elements.
 		/// </summary>
@@ -240,7 +240,7 @@ namespace Fusion.Drivers.Graphics {
             this.SetData(0, null, data, startIndex, elementCount);
         }
 
-		
+
 
 		/// <summary>
 		/// Sets 2D texture data.
@@ -251,7 +251,7 @@ namespace Fusion.Drivers.Graphics {
         {
 			this.SetData(0, null, data, 0, data.Length);
         }
-		
+
 
 
 		/// <summary>
@@ -305,7 +305,7 @@ namespace Fusion.Drivers.Graphics {
 				lock (device.DeviceContext) {
 					device.DeviceContext.UpdateSubresource(box, tex2D, level, region);
 				}
-				
+
 			} finally {
 				dataHandle.Free();
 			}

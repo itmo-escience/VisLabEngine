@@ -23,8 +23,8 @@ namespace FusionUI.UI.Elements.TextFormatting
         AllowUncompleteTags = 1,
         AllowUnsupportedTags = 2,
         AllowEmptyImages = 4,
-        AllowUnsupportedParams = 8,                
-        
+        AllowUnsupportedParams = 8,
+
     }
 
     public enum ValidationInvokeType
@@ -52,7 +52,7 @@ namespace FusionUI.UI.Elements.TextFormatting
 
             public Tag Peek()
             {
-                
+
                 return stack.Any() ? stack[stack.Count - 1] : null;
             }
 
@@ -86,7 +86,7 @@ namespace FusionUI.UI.Elements.TextFormatting
                 n.lastTags = lastTags
                         .Select(a => new KeyValuePair<Tag.TagType, Stack<Tag>>(a.Key, new Stack<Tag>(a.Value)))
                         .ToDictionary(a => a.Key, a => a.Value);
-                return n;                
+                return n;
             }
         }
 
@@ -103,7 +103,7 @@ namespace FusionUI.UI.Elements.TextFormatting
 
         public static class ValidationControls
         {
-            
+
         }
 
         public ValidationInvokeType ValidationInvokeType = ValidationInvokeType.OnSet;
@@ -119,8 +119,8 @@ namespace FusionUI.UI.Elements.TextFormatting
                 Italic, //[i];[italic];[em] [/i];[/italic];[/em]
                 Underline, //[u];[underline] [/u][/underline]
                 Striketrough, //[s][striketrough] [/s][/striketrough]
-                Size, //[size=###] [/size] 
-                Color, //[color=###] [/color]              
+                Size, //[size=###] [/size]
+                Color, //[color=###] [/color]
                 Alignment, //[align=###][center][left][right][justify] [/align][/center][/left][/right][/justify]
                 Image, //[img=###] [/img]
                 Resource, //[r] [/r]
@@ -282,7 +282,7 @@ namespace FusionUI.UI.Elements.TextFormatting
         //}
 
         //private bool CheckString(string stringToCheck, bool passOpen, out Stack<Tag> tagStack)
-        //{   
+        //{
         //    tagStack = new Stack<Tag>();
         //    int last = 0;
         //    for (int i = 0; i < stringToCheck.Length; i = stringToCheck.IndexOf("[", i))
@@ -336,7 +336,7 @@ namespace FusionUI.UI.Elements.TextFormatting
         //}
 
         public override void init()
-        {            
+        {
             BaseHeight = this.Height;
             //UpdateGlobalRect(0, 0);
             splitByString();

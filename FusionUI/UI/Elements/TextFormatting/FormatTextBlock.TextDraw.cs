@@ -675,7 +675,7 @@ namespace FusionUI.UI.Elements.TextFormatting
                                 else if (tagStack.Peek()?.Type == Tag.TagType.Column)
                                 {
                                     var tag = new Tag(word);
-                                    var p = int.Parse(tag.Param);
+                                    var p = int.Parse(tagStack.Peek().Param);
                                     xOffset = Math.Max(p, xOffset);
                                 }
                                 else

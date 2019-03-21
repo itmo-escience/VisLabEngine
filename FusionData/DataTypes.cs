@@ -156,6 +156,13 @@ namespace FusionData
                     DefaultGen = () => new DataElement(0, Float),
                 };
 
+                public static DataType Double = new DataType("Double")
+                {
+                    TypeConversions = new HashSet<DataType>() { Default, Orderable, Quantitive, Numeric },
+                    ObjectCast = o => new DataElement(Convert.ToDouble(o.Item), Double),
+                    DefaultGen = () => new DataElement(0, Double),
+                };
+
 
                 static BasicTypes()
                 {
@@ -174,8 +181,16 @@ namespace FusionData
                     }
                 }
 
-                public static CompositeType Pair = new CompositeType("Pair")
+                private static CompositeType Pair = new CompositeType("Pair")
                 {
+                    TypeConversions = new HashSet<DataType>() { },
+                    ObjectCast = o => new DataElement(((ICollection<DataElement>)o.Item).Take(2).Select(Pair.ElementType.ObjectCast), Pair),
+                    Validate = o => (o is IEnumerable),
+                };
+
+                public static CompositeType DVector2 = new CompositeType("Vector")
+                {
+                    ElementType = BasicTypes.Double,
                     TypeConversions = new HashSet<DataType>() { },
                     ObjectCast = o => new DataElement(((ICollection<DataElement>)o.Item).Take(2).Select(Pair.ElementType.ObjectCast), Pair),
                     Validate = o => (o is IEnumerable),

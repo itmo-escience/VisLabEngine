@@ -176,83 +176,94 @@ namespace VisTest
 	        viewLayer.SpriteLayers.Add(console.ConsoleSpriteLayer);
 	        viewLayer.SpriteLayers.Add(uiLayer);
 
-	        LocalRAMDatasheet users = LocalRAMDatasheet.CreateWithLoader(new CSVLoader()
-	        {
-	            delimeter = ',',
-	            escape = '\\',
-	            quote = '"',
-	            hasHeader = true,
-	        }, @"Data\followers_short_profile_29425083.csv");
+            //LoadBSPBTest();
+	    }
+
+	    void LoadBSPBTest()
+	    {
+            LocalRAMDatasheet users = LocalRAMDatasheet.CreateWithLoader(new CSVLoader()
+            {
+                delimeter = ',',
+                escape = '\\',
+                quote = '"',
+                hasHeader = true,
+            }, @"Data\followers_short_profile_29425083.csv");
 
 
-	        LocalRAMDatasheet edges = LocalRAMDatasheet.CreateWithLoader(new BSPBGraphListJSONLoader(),
-	            @"Data\followers_communication_network_29425083.json");
+            LocalRAMDatasheet edges = LocalRAMDatasheet.CreateWithLoader(new BSPBGraphListJSONLoader(),
+                @"Data\followers_communication_network_29425083.json");
 
 
             Recalculator edgeListRec = OnlineRecalculatorFactory.CreateRecalculatorForSingleChannel(edges.Indexer,
-	            edges.outputs.First(a => a.Name == "ListId"), Recalculator.PresetRecFuncsFactory.UnrollList("Index", "ListId",
-	                "EdgeId", "Edge",
-	                DataType.BasicTypes.Integer));
+                edges.outputs.First(a => a.Name == "ListId"), Recalculator.PresetRecFuncsFactory.UnrollList("Index", "ListId",
+                    "EdgeId", "Edge",
+                    DataType.BasicTypes.Integer));
 
 
-	        var edgesIndex = edgeListRec.IndexOutput["EdgeId"];
-	        var edgesPair = edgeListRec.ChannelOutput["Edge"];
+            var edgesIndex = edgeListRec.IndexOutput["EdgeId"];
+            var edgesPair = edgeListRec.ChannelOutput["Edge"];
 
-	        Func<DataElement, DataElement> userColorFunc = d =>
-	        {
-	            Color.Cyan.ToHSB(out float hCyan, out float s, out float b);
-	            Color.Magenta.ToHSB(out float hMagenta, out float s1, out float b1);
-	            return new DataElement(Convert.ToInt32(d.Item) == 1 ? hMagenta : hCyan, DataType.BasicTypes.Float);
-	        };
+            Func<DataElement, DataElement> userColorFunc = d =>
+            {
+                Color.Cyan.ToHSB(out float hCyan, out float s, out float b);
+                Color.Magenta.ToHSB(out float hMagenta, out float s1, out float b1);
+                return new DataElement(Convert.ToInt32(d.Item) == 1 ? hMagenta : hCyan, DataType.BasicTypes.Float);
+            };
 
-	        Recalculator userColorRec = OnlineRecalculatorFactory.CreateTransformRecalculatorForSingleChannel(users.Indexer, users.Outputs["sex"], userColorFunc, "ColorHue", DataType.BasicTypes.Float);
-
-
-	        Recalculator nodeIdToIntRec = OnlineRecalculatorFactory.CreateTransformRecalculatorForSingleChannel(
-	            users.Indexer, users.Outputs["id"],
-	            d => new DataElement(Convert.ToInt32(d.Item), DataType.BasicTypes.Integer), "id",
-	            DataType.BasicTypes.Integer);
+            Recalculator userColorRec = OnlineRecalculatorFactory.CreateTransformRecalculatorForSingleChannel(users.Indexer, users.Outputs["sex"], userColorFunc, "ColorHue", DataType.BasicTypes.Float);
 
 
-	        Recalculator sizeRec = OnlineRecalculatorFactory.CreateTransformRecalculatorForSingleChannel(users.Indexer,
-	            users.Outputs["count_friends"],
-	            d => new DataElement((float) Math.Pow(1 + float.Parse((string) d.Item), 0.5f) / 10,
-	                DataType.BasicTypes.Float), "Size", DataType.BasicTypes.Float);
+            Recalculator nodeIdToIntRec = OnlineRecalculatorFactory.CreateTransformRecalculatorForSingleChannel(
+                users.Indexer, users.Outputs["id"],
+                d => new DataElement(Convert.ToInt32(d.Item), DataType.BasicTypes.Integer), "id",
+                DataType.BasicTypes.Integer);
 
 
-	        Recalculator massRec = OnlineRecalculatorFactory.CreateTransformRecalculatorForSingleChannel(users.Indexer, users.Outputs["count_friends"],
-                d => new DataElement((float) Math.Log(float.Parse((string) d.Item) / 20), DataType.BasicTypes.Float),
-	            "Size", DataType.BasicTypes.Float);
-
-	        ConstChannel nodeSaturation = new ConstChannel("NodeColorSaturation", users.Indexer,
-	            new DataElement(1, DataType.BasicTypes.Float));
-
-	        ConstChannel linkWidth =
-	            new ConstChannel("LinkWidth", edges.Indexer, new DataElement(0.05f, DataType.BasicTypes.Float));
-
-	        ConstChannel linkColorAlpha =
-	            new ConstChannel("LinkAlpha", edges.Indexer, new DataElement(0.75f, DataType.BasicTypes.Float));
+            Recalculator sizeRec = OnlineRecalculatorFactory.CreateTransformRecalculatorForSingleChannel(users.Indexer,
+                users.Outputs["count_friends"],
+                d => new DataElement((float)Math.Pow(1 + float.Parse((string)d.Item), 0.5f) / 10,
+                    DataType.BasicTypes.Float), "Size", DataType.BasicTypes.Float);
 
 
-	        vis = new GraphVisualiser();
-	        vis.IndexInputs["Vertices"].Assign(users.Indexer);
-	        vis.IndexInputs["Edges"].Assign(edgesIndex);
+            Recalculator massRec = OnlineRecalculatorFactory.CreateTransformRecalculatorForSingleChannel(users.Indexer, users.Outputs["count_friends"],
+                d => new DataElement((float)Math.Log(float.Parse((string)d.Item) / 20), DataType.BasicTypes.Float),
+                "Size", DataType.BasicTypes.Float);
+
+            ConstChannel nodeSaturation = new ConstChannel("NodeColorSaturation", users.Indexer,
+                new DataElement(1, DataType.BasicTypes.Float));
+
+            ConstChannel linkWidth =
+                new ConstChannel("LinkWidth", edges.Indexer, new DataElement(0.05f, DataType.BasicTypes.Float));
+
+            ConstChannel linkColorAlpha =
+                new ConstChannel("LinkAlpha", edges.Indexer, new DataElement(0.75f, DataType.BasicTypes.Float));
+
+
+            vis = new GraphVisualiser();
+            vis.IndexInputs["Vertices"].Assign(users.Indexer);
+            vis.IndexInputs["Edges"].Assign(edgesIndex);
 
             Log.Message("Assign NodeId: " + vis.Inputs["NodeId"].Assign(nodeIdToIntRec.ChannelOutput["id"]));
-	        Log.Message("Assign LinksInd1: " + vis.Inputs["LinksInd1"].Assign(edges.Outputs["Id"]));
-	        Log.Message("Assign LinksInd2: " + vis.Inputs["LinksInd2"].Assign(edgesPair));
-	        Log.Message("Assign NodeSize: " + vis.Inputs["NodeSize"].Assign(sizeRec.ChannelOutput["Size"]));
-	        Log.Message("Assign NodeMass: " + vis.Inputs["NodeMass"].Assign(massRec.ChannelOutput["Size"]));
-	        Log.Message("Assign NodeColorHUE: " + vis.Inputs["NodeColorHUE"].Assign(userColorRec.ChannelOutput["ColorHue"]));
-	        Log.Message("Assign NodeColorSat: " + vis.Inputs["NodeColorSaturation"].Assign(nodeSaturation));
-	        Log.Message("Assign LinkWidth: " + vis.Inputs["LinksWidth"].Assign(linkWidth));
-	        Log.Message("Assign LinkAlpha: " + vis.Inputs["LinkColorAlpha"].Assign(linkColorAlpha));
-	        //vis.LoadData();
-	        vis.Prepare();
+            Log.Message("Assign LinksInd1: " + vis.Inputs["LinksInd1"].Assign(edges.Outputs["Id"]));
+            Log.Message("Assign LinksInd2: " + vis.Inputs["LinksInd2"].Assign(edgesPair));
+            Log.Message("Assign NodeSize: " + vis.Inputs["NodeSize"].Assign(sizeRec.ChannelOutput["Size"]));
+            Log.Message("Assign NodeMass: " + vis.Inputs["NodeMass"].Assign(massRec.ChannelOutput["Size"]));
+            Log.Message("Assign NodeColorHUE: " + vis.Inputs["NodeColorHUE"].Assign(userColorRec.ChannelOutput["ColorHue"]));
+            Log.Message("Assign NodeColorSat: " + vis.Inputs["NodeColorSaturation"].Assign(nodeSaturation));
+            Log.Message("Assign LinkWidth: " + vis.Inputs["LinksWidth"].Assign(linkWidth));
+            Log.Message("Assign LinkAlpha: " + vis.Inputs["LinkColorAlpha"].Assign(linkColorAlpha));
+            //vis.LoadData();
+            vis.Prepare();
 
-	        Game.RenderSystem.AddLayer(vis.VisLayer);
-	    }
+            Game.RenderSystem.AddLayer(vis.VisLayer);
+        }
 
+	    void LoadGridTest()
+	    {
+	        LocalRAMDatasheet users = LocalRAMDatasheet.CreateWithLoader(new VisgridLoader(), @"Data\GridTest\1514764800.json");
+
+
+        }
 
 	    void LoadContent ()
 		{

@@ -110,7 +110,7 @@ namespace Fusion.Engine.Graphics.GIS.GlobeMath
         /// <summary>
         /// Initializes a new instance of the <see cref="DVector3"/> struct.
         /// </summary>
-        /// <param name="v">A <see cref="Vector3"/> object to convert.</param>        
+        /// <param name="v">A <see cref="Vector3"/> object to convert.</param>
         public DVector3(Vector3 v)
         {
             X = v.X;
@@ -161,6 +161,18 @@ namespace Fusion.Engine.Graphics.GIS.GlobeMath
             Y = values[1];
             Z = values[2];
         }
+
+        public static implicit operator DVector3(Vector3 v)
+        {
+            return new DVector3(v);
+        }
+
+        public static explicit operator Vector3(DVector3 v)
+        {
+            return v.ToVector3();
+        }
+
+
 
         /// <summary>
         /// Gets a value indicting whether this instance is normalized.
@@ -453,7 +465,7 @@ namespace Fusion.Engine.Graphics.GIS.GlobeMath
         {
             return new DVector3(value.X / scale, value.Y / scale, value.Z / scale);
         }
-        
+
         /// <summary>
         /// Scales a vector by the given value.
         /// </summary>
@@ -637,11 +649,11 @@ namespace Fusion.Engine.Graphics.GIS.GlobeMath
         /// <param name="value1">The first vector.</param>
         /// <param name="value2">The second vector.</param>
         /// <param name="result">When the method completes, contains the squared distance between the two vectors.</param>
-        /// <remarks>Distance squared is the value before taking the square root. 
-        /// Distance squared can often be used in place of distance if relative comparisons are being made. 
-        /// For example, consider three points A, B, and C. To determine whether B or C is further from A, 
-        /// compare the distance between A and B to the distance between A and C. Calculating the two distances 
-        /// involves two square roots, which are computationally expensive. However, using distance squared 
+        /// <remarks>Distance squared is the value before taking the square root.
+        /// Distance squared can often be used in place of distance if relative comparisons are being made.
+        /// For example, consider three points A, B, and C. To determine whether B or C is further from A,
+        /// compare the distance between A and B to the distance between A and C. Calculating the two distances
+        /// involves two square roots, which are computationally expensive. However, using distance squared
         /// provides the same information and avoids calculating two square roots.
         /// </remarks>
         public static void DistanceSquared(ref DVector3 value1, ref DVector3 value2, out double result)
@@ -659,11 +671,11 @@ namespace Fusion.Engine.Graphics.GIS.GlobeMath
         /// <param name="value1">The first vector.</param>
         /// <param name="value2">The second vector.</param>
         /// <returns>The squared distance between the two vectors.</returns>
-        /// <remarks>Distance squared is the value before taking the square root. 
-        /// Distance squared can often be used in place of distance if relative comparisons are being made. 
-        /// For example, consider three points A, B, and C. To determine whether B or C is further from A, 
-        /// compare the distance between A and B to the distance between A and C. Calculating the two distances 
-        /// involves two square roots, which are computationally expensive. However, using distance squared 
+        /// <remarks>Distance squared is the value before taking the square root.
+        /// Distance squared can often be used in place of distance if relative comparisons are being made.
+        /// For example, consider three points A, B, and C. To determine whether B or C is further from A,
+        /// compare the distance between A and B to the distance between A and C. Calculating the two distances
+        /// involves two square roots, which are computationally expensive. However, using distance squared
         /// provides the same information and avoids calculating two square roots.
         /// </remarks>
         public static double DistanceSquared(DVector3 value1, DVector3 value2)
@@ -753,7 +765,7 @@ namespace Fusion.Engine.Graphics.GIS.GlobeMath
         /// <param name="amount">Value between 0 and 1 indicating the weight of <paramref name="end"/>.</param>
         /// <param name="result">When the method completes, contains the linear interpolation of the two vectors.</param>
         /// <remarks>
-        /// Passing <paramref name="amount"/> a value of 0 will cause <paramref name="start"/> to be returned; a value of 1 will cause <paramref name="end"/> to be returned. 
+        /// Passing <paramref name="amount"/> a value of 0 will cause <paramref name="start"/> to be returned; a value of 1 will cause <paramref name="end"/> to be returned.
         /// </remarks>
         public static void Lerp(ref DVector3 start, ref DVector3 end, double amount, out DVector3 result)
         {
@@ -770,7 +782,7 @@ namespace Fusion.Engine.Graphics.GIS.GlobeMath
         /// <param name="amount">Value between 0 and 1 indicating the weight of <paramref name="end"/>.</param>
         /// <returns>The linear interpolation of the two vectors.</returns>
         /// <remarks>
-        /// Passing <paramref name="amount"/> a value of 0 will cause <paramref name="start"/> to be returned; a value of 1 will cause <paramref name="end"/> to be returned. 
+        /// Passing <paramref name="amount"/> a value of 0 will cause <paramref name="start"/> to be returned; a value of 1 will cause <paramref name="end"/> to be returned.
         /// </remarks>
         public static DVector3 Lerp(DVector3 start, DVector3 end, double amount)
         {
@@ -941,7 +953,7 @@ namespace Fusion.Engine.Graphics.GIS.GlobeMath
         }
 
         /// <summary>
-        /// Projects a 3D vector from object space into screen space. 
+        /// Projects a 3D vector from object space into screen space.
         /// </summary>
         /// <param name="vector">The vector to project.</param>
         /// <param name="x">The X position of the viewport.</param>
@@ -961,7 +973,7 @@ namespace Fusion.Engine.Graphics.GIS.GlobeMath
         }
 
         /// <summary>
-        /// Projects a 3D vector from object space into screen space. 
+        /// Projects a 3D vector from object space into screen space.
         /// </summary>
         /// <param name="vector">The vector to project.</param>
         /// <param name="x">The X position of the viewport.</param>
@@ -980,7 +992,7 @@ namespace Fusion.Engine.Graphics.GIS.GlobeMath
         }
 
         /// <summary>
-        /// Projects a 3D vector from screen space into object space. 
+        /// Projects a 3D vector from screen space into object space.
         /// </summary>
         /// <param name="vector">The vector to project.</param>
         /// <param name="x">The X position of the viewport.</param>
@@ -1005,7 +1017,7 @@ namespace Fusion.Engine.Graphics.GIS.GlobeMath
         }
 
         /// <summary>
-        /// Projects a 3D vector from screen space into object space. 
+        /// Projects a 3D vector from screen space into object space.
         /// </summary>
         /// <param name="vector">The vector to project.</param>
         /// <param name="x">The X position of the viewport.</param>
@@ -1024,12 +1036,12 @@ namespace Fusion.Engine.Graphics.GIS.GlobeMath
         }
 
         /// <summary>
-        /// Returns the reflection of a vector off a surface that has the specified normal. 
+        /// Returns the reflection of a vector off a surface that has the specified normal.
         /// </summary>
         /// <param name="vector">The source vector.</param>
         /// <param name="normal">Normal of the surface.</param>
         /// <param name="result">When the method completes, contains the reflected vector.</param>
-        /// <remarks>Reflect only gives the direction of a reflection off a surface, it does not determine 
+        /// <remarks>Reflect only gives the direction of a reflection off a surface, it does not determine
         /// whether the original vector was close enough to the surface to hit it.</remarks>
         public static void Reflect(ref DVector3 vector, ref DVector3 normal, out DVector3 result)
         {
@@ -1041,12 +1053,12 @@ namespace Fusion.Engine.Graphics.GIS.GlobeMath
         }
 
         /// <summary>
-        /// Returns the reflection of a vector off a surface that has the specified normal. 
+        /// Returns the reflection of a vector off a surface that has the specified normal.
         /// </summary>
         /// <param name="vector">The source vector.</param>
         /// <param name="normal">Normal of the surface.</param>
         /// <returns>The reflected vector.</returns>
-        /// <remarks>Reflect only gives the direction of a reflection off a surface, it does not determine 
+        /// <remarks>Reflect only gives the direction of a reflection off a surface, it does not determine
         /// whether the original vector was close enough to the surface to hit it.</remarks>
         public static DVector3 Reflect(DVector3 vector, DVector3 normal)
         {
@@ -1567,7 +1579,7 @@ namespace Fusion.Engine.Graphics.GIS.GlobeMath
         /// Scales a vector by the given value.
         /// </summary>
         /// <param name="scale">The amount by which to scale the vector.</param>
-        /// <param name="value">The vector to scale.</param>  
+        /// <param name="value">The vector to scale.</param>
         /// <returns>The scaled vector.</returns>
         public static DVector3 operator /(double scale, DVector3 value)
         {
@@ -1584,7 +1596,7 @@ namespace Fusion.Engine.Graphics.GIS.GlobeMath
         {
             return new DVector3(value.X / scale.X, value.Y / scale.Y, value.Z / scale.Z);
         }
-        
+
         /// <summary>
         /// Perform a component-wise addition
         /// </summary>
@@ -1694,7 +1706,7 @@ namespace Fusion.Engine.Graphics.GIS.GlobeMath
             if (format == null)
                 return ToString();
 
-            return string.Format(CultureInfo.CurrentCulture, "X:{0} Y:{1} Z:{2}", X.ToString(format, CultureInfo.CurrentCulture), 
+            return string.Format(CultureInfo.CurrentCulture, "X:{0} Y:{1} Z:{2}", X.ToString(format, CultureInfo.CurrentCulture),
                 Y.ToString(format, CultureInfo.CurrentCulture), Z.ToString(format, CultureInfo.CurrentCulture));
         }
 
@@ -1731,7 +1743,7 @@ namespace Fusion.Engine.Graphics.GIS.GlobeMath
         /// Returns a hash code for this instance.
         /// </summary>
         /// <returns>
-        /// A hash code for this instance, suitable for use in hashing algorithms and data structures like a hash table. 
+        /// A hash code for this instance, suitable for use in hashing algorithms and data structures like a hash table.
         /// </returns>
         public override int GetHashCode()
         {
@@ -1773,7 +1785,7 @@ namespace Fusion.Engine.Graphics.GIS.GlobeMath
         {
             return DMathUtil.NearEqual(other.X, X) && DMathUtil.NearEqual(other.Y, Y) && DMathUtil.NearEqual(other.Z, Z);
         }
-        
+
         /// <summary>
         /// Determines whether the specified <see cref="DVector3"/> is equal to this instance.
         /// </summary>

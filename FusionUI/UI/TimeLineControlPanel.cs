@@ -74,7 +74,7 @@ namespace FusionUI.UI
         };
 
         public bool ShowStartAndEndDate = true;
-        
+
 
         public TimeLineControlPanel(FrameProcessor ui, float x, float y, float w, float h, string text, Color backColor, bool addToolButtons = true, float? unitHPadding = null) : base(ui, x, y, w, h, text, backColor)
         {
@@ -128,7 +128,7 @@ namespace FusionUI.UI
                 if (timeManager != null)
                 timeLine.LordOfTime.XVal = args.X - (float)(timeLine.LordOfTime.Width) / 2 - timeLine.GetBorderedRectangle().X;
                 timeLine.LordOfTime.UpdatePosition();
-                //timeManager.CurrentTime = timeLine.XPositionToDateTime(timeLine.LordOfTime.GetRelative().X);                
+                //timeManager.CurrentTime = timeLine.XPositionToDateTime(timeLine.LordOfTime.GetRelative().X);
             };
             timeLine.LordOfTime.ActionLost += (ControlActionArgs args, ref bool flag) =>
             {
@@ -171,11 +171,11 @@ namespace FusionUI.UI
             this.Add(labelEndTime);
 //            this.Add(stepValueLabel, true);
 
-        }        
+        }
 
         private void createControlButtons(float x, float y, bool addToolButtons)
         {
-            downStepButton    =   createClickableButton(x + 0 * sizeButton, y, @"UI\timeline\fv-icons_playback-slow");            
+            downStepButton    =   createClickableButton(x + 0 * sizeButton, y, @"UI\timeline\fv-icons_playback-slow");
             buttonStepBack    =   createClickableButton(x + 1 * sizeButton, y, @"UI\timeline\fv-icons_playback-stp-bckw");
             buttonPlay        =  createToggleableButton(x + 2 * sizeButton, y, @"UI\timeline\fv-icons_playback-pause", @"UI\timeline\fv-icons_playback-play", true,"",false, 200);
             buttonStepForward =   createClickableButton(x + 3 * sizeButton, y, @"UI\timeline\fv-icons_playback-step-fwd");
@@ -198,9 +198,9 @@ namespace FusionUI.UI
 				buttonEnsembles = createClickableButton(this.UnitWidth - UIConfig.UnitTimelineOffsetX - 2 * sizeButton, y, @"UI\timeline\fv-icons_ensembles");
 				buttonMinimize = createClickableButton(this.UnitWidth - UIConfig.UnitTimelineOffsetX - 1 * sizeButton, y, @"UI\timeline\fv-icons_timeline-minimize");
 				buttonEnsembles.Tooltip = "Ensembles";
-				buttonMinimize.Tooltip = "Minimize ui"; 
+				buttonMinimize.Tooltip = "Minimize ui";
 			}
-            
+
             this.Resize += (sender, args) =>
             {
                 x = this.UnitWidth / 2 - sizeButton * 5 / 2;
@@ -219,7 +219,7 @@ namespace FusionUI.UI
             var button = new Button(ui, x, y, sizeButton, sizeButton, "", Color.Zero, UIConfig.ActiveColor, 200)
             {
 //                Border = 1,
-                Image = nameTexture != null ? ui.Game.Content.Load<DiscTexture>(nameTexture) : null,                
+                Image = nameTexture != null ? ui.Game.Content.Load<DiscTexture>(nameTexture) : null,
                 TextAlignment = Alignment.MiddleCenter,
                 Ghost = !IsVisible,
                 Visible = IsVisible,
@@ -244,7 +244,7 @@ namespace FusionUI.UI
         }
 
         private Button createToggleableButton(float x, float y, string activeTexture = null, string inactiveTexture = null, bool IsVisible = true, string currentStep = "", bool active = false, int transitionTime = 0)
-        {            
+        {
             var button = new Button(ui, x, y, sizeButton, sizeButton, "", UIConfig.ActiveColor, Color.Zero/*UIConfig.InactiveColor*/, activeTexture != null ? ui.Game.Content.Load<DiscTexture>(activeTexture) : null, inactiveTexture != null ? ui.Game.Content.Load<DiscTexture>(inactiveTexture) : null, null, active, transitionTime)
             {
                 //                Border = 1,
@@ -264,7 +264,7 @@ namespace FusionUI.UI
         {
             labelStartTime.Text = timeManager.StartTime.ToString(templateDate);
             labelEndTime.Text = timeManager.EndTime.ToString(templateDate);
-            timeLine.initTimeValue(timeManager);            
+            timeLine.initTimeValue(timeManager);
         }
 
         public virtual void SetTimeManager(AbstractTimeManager timeManager)

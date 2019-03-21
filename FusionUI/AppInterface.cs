@@ -24,7 +24,7 @@ namespace FusionUI
         public ResourceManager LangManager;
         public CultureInfo CurrentCulture;
         public void UpdateLanguage()
-        {            
+        {
             MainFrame.BFSList(rootFrame).ForEach(a =>
             {
                 if (a is ScalableFrame) ((ScalableFrame)a).UpdateLanguage();
@@ -33,7 +33,7 @@ namespace FusionUI
         }
 
 
-        public MainFrame rootFrame;        
+        public MainFrame rootFrame;
 
         public Action onScaleUpdate = null;
 
@@ -46,7 +46,7 @@ namespace FusionUI
         protected DiscTexture     debugFont;
         protected SpriteFont      textFont;
 
-		public RenderLayer ViewLayer;        
+		public RenderLayer ViewLayer;
 
         [Config]
         public static int gridUnitDefault = 4;

@@ -121,6 +121,7 @@ $ubershader PIXEL_SHADER VERTEX_SHADER DRAW_COLORED USE_VERT_COLOR NO_DEPTH CULL
 $ubershader PIXEL_SHADER VERTEX_SHADER DRAW_TEXTURED +USE_NORMAL +USE_CONST_COLOR
 $ubershader PIXEL_SHADER VERTEX_SHADER XRAY
 $ubershader PIXEL_SHADER VERTEX_SHADER DRAW_TEXTURED NO_DEPTH CULL_NONE USE_PALETTE_COLOR
+$ubershader PIXEL_SHADER VERTEX_SHADER DRAW_TEXTURED NO_DEPTH CULL_NONE USE_VERT_COLOR
 $ubershader PIXEL_SHADER VERTEX_SHADER DRAW_TEXTURED NO_DEPTH +CULL_NONE 
 $ubershader COMPUTE_SHADER BLUR_HORIZONTAL
 $ubershader COMPUTE_SHADER BLUR_VERTICAL
@@ -237,13 +238,22 @@ float4 PSMain ( VS_OUTPUT input ) : SV_Target
 			#ifdef USE_CONST_COLOR
 				return float4(ret, color.a) * HeatStage.Data;
 			#else
-				return float4(ret, color.a * input.Color.a);
+				#ifdef USE_VERT_COLOR
+					return float4(1, 0, 0, input.Color.a);				
+				#else
+					return float4(ret, color.a * input.Color.a);
+				#endif
 			#endif
 		#endif
 	#endif
 	#ifdef DRAW_COLORED
+		#ifdef USE_NORMAL
 		float t = dot(normalize(float3(1.0f, 1.0f, 1.0f)), input.Normal);	
 		float v = 0.5f * (1.0f + abs(t));		
+		#else
+			float v = 1.0f;
+		#endif
+		
 		float3 color = float3(1, 1, 1);
 		#ifdef USE_VERT_COLOR
 			color *= input.Color.rgb;

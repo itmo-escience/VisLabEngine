@@ -15,7 +15,7 @@ using Fusion.Core.Mathematics;
 namespace Fusion.Drivers.Graphics {
 
 	/// <summary>
-	/// 
+	///
 	/// </summary>
 	public sealed class StateFactory : GraphicsResource {
 
@@ -47,7 +47,7 @@ namespace Fusion.Drivers.Graphics {
 		/// <param name="vertexInputElements"></param>
 		/// <param name="blendState"></param>
 		/// <param name="rasterizerState"></param>
-		private StateFactory ( Ubershader ubershader, Type enumType, Primitive primitive, VertexInputElement[] vertexInputElements ) 
+		private StateFactory ( Ubershader ubershader, Type enumType, Primitive primitive, VertexInputElement[] vertexInputElements )
 		 : base(ubershader.GraphicsDevice)
 		{
 			this.ubershader		= ubershader;
@@ -66,9 +66,9 @@ namespace Fusion.Drivers.Graphics {
 		{
 			this.ubershader		= ubershader;
 
-			Enumerate( enumType, ubershader, (ps,i) => { 
+			Enumerate( enumType, ubershader, (ps,i) => {
 					ps.Primitive = primitive;
-					ps.VertexInputElements = vertexInputElements; 
+					ps.VertexInputElements = vertexInputElements;
 					ps.BlendState		=	blendState;
 					ps.RasterizerState	=	rasterizerState;
 				} );
@@ -85,9 +85,9 @@ namespace Fusion.Drivers.Graphics {
 		{
 			this.ubershader		= ubershader;
 
-			Enumerate( enumType, ubershader, (ps,i) => { 
+			Enumerate( enumType, ubershader, (ps,i) => {
 					ps.Primitive = primitive;
-					ps.VertexInputElements	=	vertexInputElements; 
+					ps.VertexInputElements	=	vertexInputElements;
 					ps.BlendState			=	blendState;
 					ps.RasterizerState		=	rasterizerState;
 					ps.DepthStencilState	=	depthStencilState;
@@ -103,7 +103,7 @@ namespace Fusion.Drivers.Graphics {
 		protected override void Dispose ( bool disposing )
 		{
 			if (disposing) {
-				
+
 				foreach ( var ps  in pipelineStates ) {
 					ps.Value.Dispose();
 				}
@@ -125,7 +125,7 @@ namespace Fusion.Drivers.Graphics {
 		public PipelineState this[ int combination ] {
 
 			get {
-				
+
 				PipelineState ps;
 
 				if (!pipelineStates.TryGetValue( combination, out ps )) {
@@ -145,7 +145,7 @@ namespace Fusion.Drivers.Graphics {
 
 
 		/// <summary>
-		/// 
+		///
 		/// </summary>
 		/// <param name="?"></param>
 		void Enumerate ( Type enumType, Ubershader ubershader, Action<PipelineState,int> enumAction )
@@ -178,11 +178,11 @@ namespace Fusion.Drivers.Graphics {
 			var defineList = ubershader.Defines;
 
 			foreach ( var defines in defineList ) {
-				
+
 				int combination = 0;
 
 				if ( GetCombinerSet( enumDict, defines, out combination ) ) {
-					
+
 					var ps = new PipelineState( device );
 
 					ps.PixelShader		=	ubershader.GetPixelShader		( defines );
@@ -191,23 +191,23 @@ namespace Fusion.Drivers.Graphics {
 					ps.HullShader		=	ubershader.GetHullShader		( defines );
 					ps.DomainShader		=	ubershader.GetDomainShader		( defines );
 					ps.ComputeShader	=	ubershader.GetComputeShader		( defines );
-					
+
 					enumAction( ps, combination );
 
 					pipelineStates.Add( combination, ps );
-				}	
+				}
 			}
 		}
 
 
 
 		/// <summary>
-		/// 
+		///
 		/// </summary>
 		/// <param name="delList"></param>
 		/// <returns></returns>
 		bool GetCombinerSet ( Dictionary<string,int> enumDict, string defList, out int combination )
-		{				
+		{
 			var defs	=	defList.Split( new[]{' ','\t'}, StringSplitOptions.RemoveEmptyEntries );
 			combination	=	0;
 
@@ -225,7 +225,7 @@ namespace Fusion.Drivers.Graphics {
 
 
 		/// <summary>
-		/// 
+		///
 		/// </summary>
 		/// <param name="value"></param>
 		/// <returns></returns>
@@ -233,11 +233,11 @@ namespace Fusion.Drivers.Graphics {
 		{
 			return Enum.GetName( combinerEnum, value );
 		}
-				
+
 
 
 		/// <summary>
-		/// 
+		///
 		/// </summary>
 		/// <param name="combination"></param>
 		/// <returns></returns>
@@ -247,9 +247,9 @@ namespace Fusion.Drivers.Graphics {
 
             for (int i=0; i<32; i++) {
 				int bit = 1<<i;
-				
+
 				if ( (bit & combination) != 0 ) {
-					defs.Add( GetEnumName(bit) );					
+					defs.Add( GetEnumName(bit) );
 				}
             }
 

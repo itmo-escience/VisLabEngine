@@ -35,7 +35,7 @@ namespace Fusion.Engine.Graphics.GIS
 			DRAW_COLORED	= 1 << 8,
 			XRAY			= 1 << 9,
 			NO_DEPTH	= 1 << 10,
-			CULL_NONE	= 1 << 11,		    
+			CULL_NONE	= 1 << 11,
 
             USE_PALETTE_COLOR	= 1 << 12,
 		    UV_TRANSPARENCY		= 1 << 13,
@@ -142,7 +142,7 @@ namespace Fusion.Engine.Graphics.GIS
 
 		public override void Dispose()
 		{
-			//shader.Dispose();	
+			//shader.Dispose();
 			factory.Dispose();
 			factoryXray.Dispose();
 
@@ -185,7 +185,7 @@ namespace Fusion.Engine.Graphics.GIS
 
 			if (((PolyFlags)Flags).HasFlag(PolyFlags.DRAW_TEXTURED)) {
 				if(Texture != null)
-					Game.GraphicsDevice.PixelShaderResources[0] = Texture; 
+					Game.GraphicsDevice.PixelShaderResources[0] = Texture;
 			}
 
 		    if (((PolyFlags) Flags).HasFlag(PolyFlags.LIFETIME))
@@ -230,15 +230,14 @@ namespace Fusion.Engine.Graphics.GIS
 
 		public override List<Gis.SelectedItem> Select(DVector3 nearPoint, DVector3 farPoint)
 		{
-			var slelectedList = new List<Gis.SelectedItem>();            
+			var slelectedList = new List<Gis.SelectedItem>();
 			foreach (var info in ObjectsInfo)
 			{
 				var localNearPoint	= DVector3.TransformCoordinate(nearPoint, info.WorldMatrixInvert);
 				var localFarPoint	= DVector3.TransformCoordinate(farPoint, info.WorldMatrixInvert);
 
 				var ray = new Ray(localNearPoint.ToVector3(), DVector3.Normalize(localFarPoint - localNearPoint).ToVector3());
-
-				float distance;                
+                float distance;
 				if (info.BoundingBox.Intersects(ref ray, out distance)) {
 					Console.WriteLine(info.NodeName);
 
@@ -278,7 +277,7 @@ namespace Fusion.Engine.Graphics.GIS
 	        var points = new List<Gis.GeoPoint>(PointsCpu);
 	        var indeces = new List<int>(IndecesCpu);
 	        var c = points.Count;
-	        foreach (var p in second.PointsCpu) 
+	        foreach (var p in second.PointsCpu)
 	        {
 	            points.Add(p);
 	        }
@@ -296,8 +295,9 @@ namespace Fusion.Engine.Graphics.GIS
 	    {
 	        var points = new List<Gis.GeoPoint>(PointsCpu);
 	        var indeces = new List<int>(IndecesCpu);
+	        var oi = ObjectsInfo.ToList();
             foreach (var second in list)
-	        {	            
+	        {
 	            var c = points.Count;
 	            foreach (var p in second.PointsCpu)
 	            {
@@ -308,19 +308,146 @@ namespace Fusion.Engine.Graphics.GIS
 	            {
 	                indeces.Add(index + c);
 	            }
+                oi.AddRange(second.ObjectsInfo);
 	        }
 
+	        ObjectsInfo = oi.ToArray();
 	        //PointsCpu = points.ToArray();
 	        //IndecesCpu = indeces.ToArray();
 	        Dispose();
 	        Initialize(points.ToArray(), indeces.ToArray(), false, true);
 	    }
 
+	    public static PolyGisLayer CreateQuad(Game engine, DVector2 topLeft, DVector2 bottomRight, Color color, bool usePalette = true)
+	    {
+	        var points = new List<Gis.GeoPoint>();
+	        points.Add(new Gis.GeoPoint
+	            {
+	                Lon = topLeft.X,
+	                Lat = topLeft.Y,
+	                Color = color
+	            });
+	        points.Add(new Gis.GeoPoint
+	        {
+	            Lon = topLeft.X,
+	            Lat = bottomRight.Y,
+	            Color = color
+	        });
+	        points.Add(new Gis.GeoPoint
+	        {
+	            Lon = bottomRight.X,
+	            Lat = bottomRight.Y,
+	            Color = color
+	        });
+	        points.Add(new Gis.GeoPoint
+	        {
+	            Lon = bottomRight.X,
+	            Lat = topLeft.Y,
+	            Color = color
+	        });
+
+            var indeces = new List<int>();
+	        indeces.Add(0);
+	        indeces.Add(1);
+	        indeces.Add(2);
+	        indeces.Add(0);
+	        indeces.Add(2);
+	        indeces.Add(3);
+
+            if (usePalette)
+	        {
+	            return new PolyGisLayer(engine, points.ToArray(), indeces.ToArray(), false)
+	            {
+	                Flags = (int)(PolyFlags.NO_DEPTH | PolyFlags.DRAW_TEXTURED | PolyFlags.CULL_NONE |
+	                              PolyFlags.VERTEX_SHADER | PolyFlags.PIXEL_SHADER | PolyFlags.USE_PALETTE_COLOR)
+	            };
+	        }
+	        else
+	        {
+	            return new PolyGisLayer(engine, points.ToArray(), indeces.ToArray(), false)
+	            {
+	                Flags = (int)(PolyFlags.NO_DEPTH | PolyFlags.DRAW_COLORED | PolyFlags.CULL_NONE |
+	                              PolyFlags.VERTEX_SHADER | PolyFlags.PIXEL_SHADER | PolyFlags.USE_VERT_COLOR)
+	            };
+	        }
+        }
+
+	    public static PolyGisLayer CreateQuads(Game engine, int count, DVector2[] topLeft, DVector2[] bottomRight, Color[] color, bool usePalette = true)
+	    {
+	        var points = new List<Gis.GeoPoint>();
+	        var indeces = new List<int>();
+	        SelectInfo[] objectsInfo = new SelectInfo[count];
+            for (int i = 0; i < count; i++)
+	        {
+	            points.Add(new Gis.GeoPoint
+	            {
+	                Lon = topLeft[i].X,
+	                Lat = topLeft[i].Y,
+	                Color = color[i]
+	            });
+	            points.Add(new Gis.GeoPoint
+	            {
+	                Lon = topLeft[i].X,
+	                Lat = bottomRight[i].Y,
+	                Color = color[i]
+                });
+	            points.Add(new Gis.GeoPoint
+	            {
+	                Lon = bottomRight[i].X,
+	                Lat = bottomRight[i].Y,
+	                Color = color[i]
+                });
+	            points.Add(new Gis.GeoPoint
+	            {
+	                Lon = bottomRight[i].X,
+	                Lat = topLeft[i].Y,
+	                Color = color[i]
+                });
+
+
+	            indeces.Add(i * 4 + 0);
+	            indeces.Add(i * 4 + 1);
+	            indeces.Add(i * 4 + 2);
+	            indeces.Add(i * 4 + 0);
+	            indeces.Add(i * 4 + 2);
+	            indeces.Add(i * 4 + 3);
+	            var m = GeoHelper.CalculateBasisOnSurface((topLeft[i] + bottomRight[i]) / 2, true);
+	            var mi = DMatrix.Invert(m);
+
+                objectsInfo[i] = new SelectInfo()
+	            {
+                    BoundingBox = new BoundingBox((Vector3)(DVector3)DVector3.Transform(GeoHelper.SphericalToCartesian(topLeft[i]), mi), (Vector3)(DVector3)DVector3.Transform(GeoHelper.SphericalToCartesian(bottomRight[i]), mi)),
+                    NodeIndex = i,
+                    NodeName = i.ToString(),
+                    WorldMatrix =m,
+                    WorldMatrixInvert = mi,
+	            };
+	        }
+
+	        if (usePalette)
+	        {
+	            return new PolyGisLayer(engine, points.ToArray(), indeces.ToArray(), false)
+	            {
+	                Flags = (int)(PolyFlags.NO_DEPTH | PolyFlags.DRAW_TEXTURED | PolyFlags.CULL_NONE |
+	                              PolyFlags.VERTEX_SHADER | PolyFlags.PIXEL_SHADER | PolyFlags.USE_PALETTE_COLOR),
+                    ObjectsInfo = objectsInfo,
+	            };
+	        }
+	        else
+	        {
+	            return new PolyGisLayer(engine, points.ToArray(), indeces.ToArray(), false)
+	            {
+	                Flags = (int)(PolyFlags.NO_DEPTH | PolyFlags.DRAW_COLORED | PolyFlags.CULL_NONE |
+	                              PolyFlags.VERTEX_SHADER | PolyFlags.PIXEL_SHADER | PolyFlags.USE_VERT_COLOR),
+	                ObjectsInfo = objectsInfo,
+                };
+	        }
+	    }
 
         public static PolyGisLayer CreateFromContour(Game engine, DVector2[] lonLatRad, Color color, bool usePalette = true, List<DVector2[]> excludeRad = null, TriangulationAlgorithm method = TriangulationAlgorithm.Dwyer, bool holesCCW = false)
 		{
 			var triangulator = new TriangleNet.Mesh();
-			triangulator.Behavior.Algorithm = method;		    
+			triangulator.Behavior.Algorithm = method;
 			InputGeometry ig = new InputGeometry();
 
 		    if (lonLatRad.Length < 3 || (lonLatRad[0] - lonLatRad[1]).Length() < float.Epsilon && (lonLatRad[0] - lonLatRad.Aggregate(DVector2.Zero, (v1, v2) => v1 + v2)).Length() < float.Epsilon)
@@ -565,7 +692,7 @@ namespace Fusion.Engine.Graphics.GIS
 				sideVec = sideVec / fx;
 
 				var sideOffset = sideVec * width;
-				
+
 				// Plane
 				var finalPosRight	= cPos0;// + sideOffset;
 				var finalPosLeft	= cPos0 - sideOffset;
@@ -652,7 +779,7 @@ namespace Fusion.Engine.Graphics.GIS
                 var sidePrevVec = DVector3.Normalize(DVector3.Cross(normal, prevDir));
 
                 var angleDot = DVector3.Dot(forwardDir, prevDir);
-                
+
                 if (MathUtil.RadiansToDegrees((float)Math.Acos(angleDot)) > 150)
                 {
                     var leftOffset = sidePrevVec * width;
@@ -715,15 +842,15 @@ namespace Fusion.Engine.Graphics.GIS
                         indeces.Add(p0Ind);
                         indeces.Add(p1Ind);
                         indeces.Add(p2Ind);
-                       
+
                         indeces.Add(p0Ind);
                         indeces.Add(p2Ind);
                         indeces.Add(p3Ind);
-                       
+
                         indeces.Add(p0Ind);
                         indeces.Add(p3Ind);
                         indeces.Add(p4Ind);
-                       
+
                         indeces.Add(p3Ind);
                         indeces.Add(p4Ind);
                         indeces.Add(p5Ind);
@@ -745,7 +872,7 @@ namespace Fusion.Engine.Graphics.GIS
                     var finalPosRight = cPos0; // + sideOffset;
                     var finalPosLeft = cPos0 - sideOffset;
 
-                    var lonLatRight = GeoHelper.CartesianToSpherical(finalPosRight); 
+                    var lonLatRight = GeoHelper.CartesianToSpherical(finalPosRight);
                     var lonLatLeft = GeoHelper.CartesianToSpherical(finalPosLeft);
 
 
@@ -996,7 +1123,7 @@ namespace Fusion.Engine.Graphics.GIS
 			double easting	= double.Parse(s[1].Replace(',', '.'));
 			double northing = double.Parse(s[2].Replace(',', '.'));
 			string region	= s[3];
-			
+
 			var transforms = new Matrix[scene.Nodes.Count];
 			scene.ComputeAbsoluteTransforms(transforms);
 
@@ -1033,9 +1160,9 @@ namespace Fusion.Engine.Graphics.GIS
 
 				oInfo[meshIndex].WorldMatrix		= worldBasis;
 				oInfo[meshIndex].WorldMatrixInvert	= worldBasisInvert;
-                
+
 				List<Vector3> cartPoints = new List<Vector3>();
-				
+
 				foreach (var vert in scene.Meshes[meshIndex].Vertices) {
 					var pos = vert.Position;
 

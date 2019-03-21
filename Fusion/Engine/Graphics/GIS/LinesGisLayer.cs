@@ -132,7 +132,7 @@ namespace Fusion.Engine.Graphics.GIS
 		    _currentBuffer?.SetData(PointsCpu);
 		}
 
-	    public void AddLine(List<Gis.GeoPoint> lonLatPoints)
+	    public void AddLine(List<Gis.GeoPoint> lonLatPoints, bool updateBuffer = true)
 	    {
 	        var textureRatio = Texture == null ? 1 : ((float)Texture.Width) / (Texture.Height);
             Gis.GeoPoint Clone(Gis.GeoPoint p, float textureDistance)
@@ -164,10 +164,54 @@ namespace Fusion.Engine.Graphics.GIS
 
             PointsCpu = newPoints.ToArray();
 
-            UpdatePointsBuffer();
+           if (updateBuffer) UpdatePointsBuffer();
 	    }
 
-	    public void AddLine(List<DVector3> cartPoints, Color4 lineColor)
+	    public static LinesGisLayer CreateFromLines(Game game, List<List<Gis.GeoPoint>> lonLatLines)
+	    {
+	        LinesGisLayer layer = new LinesGisLayer(game, lonLatLines.Sum(a => a.Count), false);
+
+            var textureRatio = layer.Texture == null ? 1 : ((float)layer.Texture.Width) / (layer.Texture.Height);
+
+	        Gis.GeoPoint Clone(Gis.GeoPoint p, float textureDistance)
+	        {
+	            var r = new Gis.GeoPoint { Lon = p.Lon, Lat = p.Lat, Color = p.Color, Tex0 = p.Tex0, Tex1 = p.Tex1 };
+	            var w = 2 * (Math.Abs(r.Tex0.X) < float.Epsilon ? .5f : r.Tex0.X);
+	            r.Tex1.Y = textureDistance / (textureRatio * w);
+	            return r;
+	        }
+
+
+	        List<Gis.GeoPoint> newPoints = new List<Gis.GeoPoint>();
+	        foreach (var lonLatPoints in lonLatLines)
+	        {
+	            float totalDistance = 0.0f;
+	            newPoints.Add(Clone(lonLatPoints[0], totalDistance));
+	            for (var i = 1; i < lonLatPoints.Count() - 1; i++)
+	            {
+	                totalDistance += (float)GeoHelper.DistanceBetweenTwoPoints(
+	                    new DVector2(lonLatPoints[i - 1].Lon, lonLatPoints[i - 1].Lat),
+	                    new DVector2(lonLatPoints[i].Lon, lonLatPoints[i - 1].Lat)
+	                );
+
+	                newPoints.Add(Clone(lonLatPoints[i], totalDistance));
+	                newPoints.Add(Clone(lonLatPoints[i], totalDistance));
+	            }
+	            totalDistance += (float)GeoHelper.DistanceBetweenTwoPoints(
+	                new DVector2(lonLatPoints[lonLatPoints.Count() - 2].Lon, lonLatPoints[lonLatPoints.Count() - 2].Lat),
+	                new DVector2(lonLatPoints[lonLatPoints.Count() - 1].Lon, lonLatPoints[lonLatPoints.Count() - 1].Lat)
+	            );
+	            newPoints.Add(Clone(lonLatPoints[lonLatPoints.Count() - 1], totalDistance));
+            }
+
+
+	        layer.PointsCpu = newPoints.ToArray();
+	        layer.UpdatePointsBuffer();
+            return layer;
+	    }
+
+
+        public void AddLine(List<DVector3> cartPoints, Color4 lineColor, bool updateBuffer = true)
 	    {
 	        var geoPoints = cartPoints
 	            .Select(p =>
@@ -185,10 +229,10 @@ namespace Fusion.Engine.Graphics.GIS
 	                };
 	            }).ToList();
 
-            AddLine(geoPoints);
+            AddLine(geoPoints, updateBuffer);
 	    }
 
-		public void AddLine(List<DVector3> cartPoints, float halfWidth, Color4 lineColor)
+		public void AddLine(List<DVector3> cartPoints, float halfWidth, Color4 lineColor, bool updateBuffer = true)
 		{
 			var geoPoints = cartPoints
 				.Select(p =>
@@ -205,10 +249,10 @@ namespace Fusion.Engine.Graphics.GIS
 					};
 				}).ToList();
 
-			AddLine(geoPoints);
+			AddLine(geoPoints, updateBuffer);
 		}
 
-		public void AddLine(List<DVector4> cartPoints, Color4 lineColor)
+        public void AddLine(List<DVector4> cartPoints, Color4 lineColor, bool updateBuffer = true)
 		{
 			var geoPoints = cartPoints
 				.Select(p =>
@@ -226,10 +270,10 @@ namespace Fusion.Engine.Graphics.GIS
 					};
 				}).ToList();
 
-			AddLine(geoPoints);
+			AddLine(geoPoints, updateBuffer);
 		}
 
-		public void AddLine(List<DVector2> lonLatPoints, float halfWidth, Color4 lineColor)
+		public void AddLine(List<DVector2> lonLatPoints, float halfWidth, Color4 lineColor, bool updateBuffer = true)
 		{
 			var geoPoints = lonLatPoints
 				.Select(p =>
@@ -244,7 +288,7 @@ namespace Fusion.Engine.Graphics.GIS
 					};
 				}).ToList();
 
-			AddLine(geoPoints);
+			AddLine(geoPoints, updateBuffer);
 		}
 
 		public void Clear()
