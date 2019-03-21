@@ -112,6 +112,12 @@ namespace Fusion.Engine.Graphics.SpritesD2D
         public void DrawBitmap(BitmapD2D bitmap, RectangleF destinationRectangle, float opacity, RectangleF sourceRectangle) =>
             RenderTarget.DrawBitmap(bitmap._bitmap, destinationRectangle.ToRawRectangleF(), opacity, BitmapInterpolationMode.NearestNeighbor, sourceRectangle.ToRawRectangleF());
 
+        public void DrawPathGeometry(PathGeometryD2D geometry, IBrushD2D brush) =>
+            RenderTarget.DrawGeometry(geometry.PathGeometry, _brushFactory.GetOrCreateBrush(brush));
+
+        public void DrawPathGeometry(PathGeometryD2D geometry, IBrushD2D brush, float strokeWidth) =>
+            RenderTarget.DrawGeometry(geometry.PathGeometry, _brushFactory.GetOrCreateBrush(brush), strokeWidth);
+
         private RawRectangleF createAlignedRectangle(RawRectangleF rectangle, float borderThickness = 1)
         {
             borderThickness /= 2;

@@ -177,24 +177,19 @@ namespace Fusion.Engine.Frames2
 
         public PathGeometryD2D GetClippingGeometry(SpriteLayerD2D layer)
         {
-            PathGeometry geometry = new PathGeometry(layer.Factory);
-            GeometrySink sink = geometry.Open();
-            sink.SetFillMode(FillMode.Winding);
+            PathGeometryD2D geometry = new PathGeometryD2D(layer);
+            geometry.SetFillMode(FillModeD2D.Winding);
 
-            RawVector2 p0 = Matrix3x2.TransformPoint(GlobalTransform, new Vector2(0, 0)).ToRawVector2();
-            RawVector2 p1 = Matrix3x2.TransformPoint(GlobalTransform, new Vector2(0, Height)).ToRawVector2();
-            RawVector2 p2 = Matrix3x2.TransformPoint(GlobalTransform, new Vector2(Width, Height)).ToRawVector2();
-            RawVector2 p3 = Matrix3x2.TransformPoint(GlobalTransform, new Vector2(Width, 0)).ToRawVector2();
+            Vector2 p0 = Matrix3x2.TransformPoint(GlobalTransform, new Vector2(0, 0));
+            Vector2 p1 = Matrix3x2.TransformPoint(GlobalTransform, new Vector2(0, Height));
+            Vector2 p2 = Matrix3x2.TransformPoint(GlobalTransform, new Vector2(Width, Height));
+            Vector2 p3 = Matrix3x2.TransformPoint(GlobalTransform, new Vector2(Width, 0));
 
-            sink.BeginFigure(p0, FigureBegin.Filled);
-            sink.AddLine(p1);
-            sink.AddLine(p2);
-            sink.AddLine(p3);
-            sink.EndFigure(FigureEnd.Closed);
-            sink.Close();
-            sink.Dispose();
+            geometry.BeginFigure(p0, FigureBeginD2D.Filled);
+            geometry.AddLines(new List<Vector2> {p1, p2, p3});
+            geometry.EndFigure(FigureEndD2D.Closed);
 
-            return new PathGeometryD2D(geometry);
+            return geometry;
         }
 
         internal void RestoreParents()
