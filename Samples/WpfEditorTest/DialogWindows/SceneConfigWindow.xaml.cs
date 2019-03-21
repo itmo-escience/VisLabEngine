@@ -35,15 +35,55 @@ namespace WpfEditorTest.DialogWindows
 
 		private void btnOK_Click( object sender, RoutedEventArgs e )
 		{
-			SceneWidth = txbxSceneWidth.Value.Value;
-			SceneHeight = txbxSceneHeight.Value.Value;
-
-			this.DialogResult = true;
+			AcceptChanges();
 		}
 
 		private void btnCancel_Click( object sender, RoutedEventArgs e )
 		{
+			DeclineChanges();
+		}
+
+		private void txbxSceneWidth_KeyDown( object sender, KeyEventArgs e )
+		{
+			CheckKey(e);
+		}
+
+		private void txbxSceneHeight_KeyDown( object sender, KeyEventArgs e )
+		{
+			CheckKey(e);
+		}
+
+		private void CheckKey( KeyEventArgs e )
+		{
+			switch (e.Key)
+			{
+				case Key.Enter:
+					{
+						AcceptChanges();
+						break;
+					}
+				case Key.Escape:
+					{
+						DeclineChanges();
+						break;
+					}
+			}
+		}
+
+		private void AcceptChanges()
+		{
+			SceneWidth = txbxSceneWidth.Value.Value;
+			SceneHeight = txbxSceneHeight.Value.Value;
+			this.DialogResult = true;
+		}
+
+		private void DeclineChanges()
+		{
 			this.DialogResult = false;
 		}
+
+
+
+
 	}
 }

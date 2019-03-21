@@ -380,7 +380,7 @@ namespace WpfEditorTest
 					DragFieldFrame.Width = (float)e.NewSize.Width;
 					DragFieldFrame.Height = (float)e.NewSize.Height;
 				}
-				ZoomScene();
+				ZoomScene(1);
 			};
 			this.UpdateTitle();
 
@@ -1210,16 +1210,45 @@ namespace WpfEditorTest
 
 		private void Slider_ValueChanged( object sender, RoutedPropertyChangedEventArgs<double> e )
 		{
+			var sign = Math.Sign(e.NewValue - e.OldValue);
 			this.sceneScale = e.NewValue;
-			ZoomScene();
+			ZoomScene(sign);
 		}
 
-		private void ZoomScene()
+		private void ZoomScene( int sign )
 		{
 			if (Zoomer != null)
 			{
-				Zoomer.Height = DefaultSceneHeight * sceneScale;
-				Zoomer.Width = DefaultSceneWidth * sceneScale;
+				//if (sign > 0)
+				//{
+					Zoomer.Height = DefaultSceneHeight * sceneScale;
+					Zoomer.Width = DefaultSceneWidth * sceneScale;
+
+					var mousePosition = System.Windows.Input.Mouse.GetPosition(ZoomerScroll);
+				var scrollerMouseOffsetX = mousePosition.X / ZoomerScroll.ActualWidth;
+				var scrollerMouseOffsetY = mousePosition.Y / ZoomerScroll.ActualHeight;
+				mousePosition = ZoomerScroll.TransformToVisual(Zoomer).Transform(mousePosition);
+				var scrollButtonWidth = ZoomerScroll.ExtentWidth - ZoomerScroll.ScrollableWidth;
+				var scrollButtonHeight = ZoomerScroll.ExtentHeight - ZoomerScroll.ScrollableHeight;
+				//var widthDelta = mousePosition.X / Zoomer.Width * ZoomerScroll.ScrollableWidth;
+				//widthDelta += scrollButtonWidth * (scrollerMouseOffsetX - 0.5f);
+				//var heightDelta = mousePosition.Y / Zoomer.Height * ZoomerScroll.ScrollableHeight;
+				//heightDelta += scrollButtonHeight * (scrollerMouseOffsetY - 0.5f);
+				ZoomerScroll.ScrollToHorizontalOffset(ZoomerScroll.HorizontalOffset+ scrollButtonWidth* scrollerMouseOffsetX)
+					ZoomerScroll.ScrollToVerticalOffset(ZoomerScroll.VerticalOffset + scrollButtonHeight * scrollerMouseOffsetY); 
+				//}
+				//if (sign < 0)
+				//{
+				//	Zoomer.Height -= DefaultSceneHeight;
+				//	Zoomer.Width -= DefaultSceneWidth;
+
+				//	var mousePosition = System.Windows.Input.Mouse.GetPosition(ZoomerScroll);
+				//	mousePosition = ZoomerScroll.TransformToVisual(Zoomer).Transform(mousePosition);
+				//	mousePosition = new Point(mousePosition.X - DefaultSceneWidth, mousePosition.Y - DefaultSceneHeight);
+
+				//	ZoomerScroll.ScrollToHorizontalOffset(mousePosition.X);
+				//	ZoomerScroll.ScrollToVerticalOffset(mousePosition.Y);
+				//}
 			}
 		}
 
