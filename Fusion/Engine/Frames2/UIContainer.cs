@@ -178,7 +178,7 @@ namespace Fusion.Engine.Frames2
         public PathGeometryD2D GetClippingGeometry(SpriteLayerD2D layer)
         {
             PathGeometryD2D geometry = new PathGeometryD2D(layer);
-            geometry.SetFillMode(FillModeD2D.Winding);
+            //geometry.SetFillMode(FillModeD2D.Winding);
 
             Vector2 p0 = Matrix3x2.TransformPoint(GlobalTransform, new Vector2(0, 0));
             Vector2 p1 = Matrix3x2.TransformPoint(GlobalTransform, new Vector2(0, Height));
