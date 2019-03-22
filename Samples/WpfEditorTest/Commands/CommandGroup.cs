@@ -15,7 +15,7 @@ namespace WpfEditorTest.UndoRedo
 			nestedCommands = commands;
 		}
 
-		public bool IsDirty => false;
+		public bool IsDirty => nestedCommands.Any(nc => nc.IsDirty);
 
 		public void Do()
 		{
