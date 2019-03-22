@@ -59,7 +59,7 @@ namespace FusionUI.UI
 		float unitHPadding;
 
 		public int currentStep = 0;
-        public List<Tuple<double, string>> listStepName = new List<Tuple<double, string>>()
+        private List<Tuple<double, string>> _listStepName = new List<Tuple<double, string>>()
         {
             new Tuple<double, string>(1, "1h"),
             new Tuple<double, string>(3, "3h"),
@@ -72,6 +72,16 @@ namespace FusionUI.UI
             new Tuple<double, string>(14*24, "2w"),
             new Tuple<double, string>(30*24, "1m"),
         };
+
+        public List<Tuple<double, string>> listStepName
+        {
+            get => _listStepName;
+            set
+            {
+                _listStepName = value;
+                updateStep();
+            }
+        }
 
         public bool ShowStartAndEndDate = true;
 
