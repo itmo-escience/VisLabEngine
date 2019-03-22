@@ -19,8 +19,8 @@ namespace FusionUI.Legenda
         {
         }
 
-        
-                
+
+
         public string Name { get; set; }
         public float Width { get; set; } = UIConfig.UnitLegendWidth;
 
@@ -41,7 +41,7 @@ namespace FusionUI.Legenda
                     {
                         var Caption = new FormatTextBlock(ui, 0, 0, Width,
                             UIConfig.UnitLegendElementHeight, Name, Color.Zero, UIConfig.FontSubtitle)
-                        {                            
+                        {
                             UnitPadding = 3,
                         };
                         legendFrame.Add(Caption);
@@ -57,7 +57,7 @@ namespace FusionUI.Legenda
                             ImageMode = FrameImageMode.Fitted,
                             ClippingMode = ClippingMode.ClipByPadding,
                             UnitVPadding = 2,
-                            UnitImageOffsetX = -(Width)/2 + (UIConfig.UnitLegendElementHeight - 2),                            
+                            UnitImageOffsetX = -(Width)/2 + (UIConfig.UnitLegendElementHeight - 2),
                         };
                         legendFrame.Add(entry);
                     }

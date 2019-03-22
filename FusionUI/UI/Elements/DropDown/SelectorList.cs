@@ -13,7 +13,7 @@ namespace FusionUI.UI.Elements.DropDown
     public class SelectorList<TR> : LayoutFrame where TR : DropDownSelectorRow, new()
     {
 
-        public HashSet<string> ValueList = new HashSet<string>();
+        public List<string> ValueList = new List<string>();
         private List<TR> rows = new List<TR>();
         public HashSet<string> SelectedList = new HashSet<string>();
         public SelectorList(FrameProcessor ui, float x, float y, float w, float h, Color backColor) : base(ui, x, y, w, h, backColor)
@@ -27,9 +27,9 @@ namespace FusionUI.UI.Elements.DropDown
         {
             CreateList();
         }
-        
+
         private int lastSelectIndex = -1;
-        
+
 
         public void CreateList()
         {
@@ -157,7 +157,7 @@ namespace FusionUI.UI.Elements.DropDown
             if (offset == lastOffset && !Dirty) return;
             Dirty = false;
             lastOffset = offset;
-            
+
             holderDummyTop.UnitHeight = offset * unitElementHeight;
             foreach (var frame in holder.Children.ToList())
             {
@@ -181,15 +181,15 @@ namespace FusionUI.UI.Elements.DropDown
                 };
 
                 valueRow.Initialize(0, 0, UnitWidth - UnitPaddingLeft - UnitPaddingRight - ScrollSize, unitElementHeight, value, Color.Zero);
-                
+
 
                 Add(valueRow);
                 currentRows.Add(valueRow);
                 int index = i;
-                
+
 
                 valueRow.ActionSelect += () =>
-                {                    
+                {
                     if (SelectedList.Contains(valueRow.Value))
                     {
                         valueRow.ForeColor = UIConfig.ActiveTextColor;
@@ -227,7 +227,7 @@ namespace FusionUI.UI.Elements.DropDown
                     OnUpdateSelection?.Invoke(SelectedList);
                     if (lastSelectIndex != -1) valueRow.Border = 1;
                     lastSelectIndex = index;
-                    valueRow.Border = 3;                    
+                    valueRow.Border = 3;
                 };
 
                 if (SelectedList.Contains(value))
