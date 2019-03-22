@@ -66,13 +66,13 @@ namespace FusionUI.UI.Elements
                     flag = true;
                 };
             }
-            
+
             this.ActionClick += (ControlActionArgs args, ref bool flag) => {
                 if (!args.IsClick) return;
                 ToggleOnOff(toggleState, true);
-                //ButtonAction?.Invoke(toggleState);                
+                //ButtonAction?.Invoke(toggleState);
                 if (transitionTime != 0)
-                {                    
+                {
                     this.BackColor = ActiveColor;
                     this.ForeColor = ActiveFColor;
                     this.ImageColor = ActiveFColor;
@@ -81,7 +81,7 @@ namespace FusionUI.UI.Elements
                     this.RunTransition("ImageColor", InactiveFColor, 0, transitionTime);
                 }
             };
-            ToggleOnOff(!toggleState);            
+            ToggleOnOff(!toggleState);
         }
 
         public void ToggleOn(bool invoke = true)
@@ -100,6 +100,8 @@ namespace FusionUI.UI.Elements
 
         public void ToggleOff(bool invoke = true)
         {
+            if(!Active) return;
+
             this.BackColor = InactiveColor;
             this.ForeColor = InactiveFColor;
             this.ImageColor = InactiveFColor;
@@ -117,7 +119,7 @@ namespace FusionUI.UI.Elements
             {
                 ToggleOff(invoke);
             }
-            else 
+            else
             {
                 ToggleOn(invoke);
             }
@@ -170,7 +172,7 @@ namespace FusionUI.UI.Elements
                 this.BackColor = ActiveColor;
                 this.ForeColor = ActiveFColor;
                 this.ImageColor = ActiveFColor;
-                this.RunTransition("BackColor", InactiveColor, 0, transitionTime);                
+                this.RunTransition("BackColor", InactiveColor, 0, transitionTime);
                 ButtonAction?.Invoke(true);
             };
             this.BackColor = InactiveColor;
