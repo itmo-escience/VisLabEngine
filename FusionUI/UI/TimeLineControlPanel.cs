@@ -270,8 +270,8 @@ namespace FusionUI.UI
         public virtual void SetTimeManager(AbstractTimeManager timeManager)
         {
             this.TimeManager = timeManager;
-            updateStep();
-            initTimeLine();
+            //updateStep();
+            //initTimeLine();
         }
 
         protected override void Update(GameTime gameTime)
@@ -315,6 +315,9 @@ namespace FusionUI.UI
         protected virtual void updateStep()
         {
             if (timeManager == null) return;
+
+            if (currentStep >= listStepName.Count) currentStep = 0;
+
             var stepConfig = listStepName[currentStep];
             timeManager.TimeStep	= TimeSpan.FromHours(stepConfig.Item1);
             stepValueLabel.Text		= stepConfig.Item2;
