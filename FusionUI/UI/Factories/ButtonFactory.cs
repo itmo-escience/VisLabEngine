@@ -75,7 +75,7 @@ namespace FusionUI.UI.Factories
         public static UIContainer<Button> RightAlignButtonHolder(FrameProcessor ui, float OffsetX, float OffsetY, ScalableFrame parent, float buttonWidth, string label, Action action, out Button button)
         {
             UIContainer<Button> holder = new UIContainer<Button>(ui, parent.UnitPaddingLeft, 0, parent.UnitWidth - parent.UnitPaddingLeft - parent.UnitPaddingRight, UIConfig.UnitFilterWindowButtonRowHeight + OffsetY, "", Color.Zero)
-            {                
+            {
             };
 
             button = new Button(ui,
@@ -85,11 +85,11 @@ namespace FusionUI.UI.Factories
             {
                 TextAlignment = Alignment.MiddleCenter,
                 ForeColor = UIConfig.ActiveTextColor,
-                
+
             };
 
             holder.Item = button;
-            holder.Add(button);            
+            holder.Add(button);
             return holder;
         }
 
@@ -106,6 +106,7 @@ namespace FusionUI.UI.Factories
             {
                 TextAlignment = Alignment.MiddleCenter,
                 ForeColor = UIConfig.ActiveTextColor,
+                UnitPaddingBottom = 1,
             };
 
             holder.Item = button;
@@ -119,10 +120,13 @@ namespace FusionUI.UI.Factories
             out RichTextBlock textBlockY, string buttonText = "coordinates", string richTextX= "0",
             string richTextY = "0")
         {
-            UIContainer<Button, RichTextBlock, RichTextBlock> holder = new UIContainer<Button, RichTextBlock, RichTextBlock>(ui, parent.UnitPaddingLeft, 0, 
-                parent.UnitWidth - parent.UnitPaddingLeft - parent.UnitPaddingRight, 
-                UIConfig.UnitFilterWindowConfirmationButtonRowHeight + OffsetY, 
-                "", Color.Zero);
+            UIContainer<Button, RichTextBlock, RichTextBlock> holder = new UIContainer<Button, RichTextBlock, RichTextBlock>(ui, parent.UnitPaddingLeft, 0,
+                parent.UnitWidth - parent.UnitPaddingLeft - parent.UnitPaddingRight,
+                UIConfig.UnitFilterWindowConfirmationButtonRowHeight + OffsetY,
+                "", Color.Zero)
+            {
+                SuppressActions = false,
+            };
             float bw = (holder.UnitWidth - 2 * OffsetX - distance * 2) / 3;
             //buttonXY = new Button(ui,
             //    OffsetX, OffsetY,
@@ -137,16 +141,24 @@ namespace FusionUI.UI.Factories
                 bw, UIConfig.UnitFilterWindowElementHeight,
                 buttonText, UIConfig.ActiveColor, UIConfig.ButtonColor, null, null, null, false, 0)
             {
-                TextAlignment = Alignment.MiddleCenter
+                TextAlignment = Alignment.MiddleCenter,
+                UnitPaddingBottom = 1,
             };
             textBlockX = new RichTextBlock(ui,
-                OffsetX + bw + distance, OffsetY, 
+                OffsetX + bw + distance, OffsetY + 2,
                 bw, UIConfig.UnitFilterWindowElementHeight,
-                richTextX, Color.Zero, UIConfig.FontBody, 10);
+                richTextX, Color.Zero, UIConfig.FontBody, 10)
+            {
+                SuppressActions = false,
+            };
             textBlockY = new RichTextBlock(ui,
-                OffsetX + 2 * bw + 2 * distance, OffsetY,
+                OffsetX + 2 * bw + 2 * distance, OffsetY + 2,
                 bw, UIConfig.UnitFilterWindowElementHeight,
-                richTextY, Color.Zero, UIConfig.FontBody, 10);
+                richTextY, Color.Zero, UIConfig.FontBody, 10)
+            {
+                SuppressActions = false,
+            };
+
             holder.Item1 = buttonXY;
             holder.Item2 = textBlockX;
             holder.Item3 = textBlockY;
