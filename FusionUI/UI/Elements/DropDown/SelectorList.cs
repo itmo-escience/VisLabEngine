@@ -148,7 +148,6 @@ namespace FusionUI.UI.Elements.DropDown
         protected override void Update(GameTime gameTime)
         {
             base.Update(gameTime);
-            Fusion.Log.Message(UnitHeight.ToString());
             recreateElements();
         }
 
