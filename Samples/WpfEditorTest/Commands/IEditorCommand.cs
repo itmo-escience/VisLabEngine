@@ -8,6 +8,8 @@ namespace WpfEditorTest.UndoRedo
 {
 	public interface IEditorCommand
 	{
+		bool IsDirty { get; }
+
 		void Do();
 
 		void Undo();

@@ -6,6 +6,8 @@ namespace WpfEditorTest.UndoRedo
 {
 	internal class FrameParentChangeCommand: IEditorCommand
 	{
+		public bool IsDirty => true;
+
 		private UIComponent _frame;
 		private UIContainer _newParent;
 		private UIContainer _oldParent;

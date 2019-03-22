@@ -35,7 +35,7 @@ namespace WpfEditorTest.UndoRedo
 			var movedCommand = ObservableScene.UndoCommands.Pop();
 			movedCommand.Undo();
 			ObservableScene.DoCommands.Push(movedCommand);
-			ObservableScene.IsDirty = true;
+			ObservableScene.IsDirty = movedCommand.IsDirty;
 			CheckForCommandStacks();
 			return true;
 		}
@@ -48,7 +48,7 @@ namespace WpfEditorTest.UndoRedo
 			var movedCommand = ObservableScene.DoCommands.Pop();
 			movedCommand.Do();
 			ObservableScene.UndoCommands.Push(movedCommand);
-			ObservableScene.IsDirty = true;
+			ObservableScene.IsDirty = movedCommand.IsDirty;
 			CheckForCommandStacks();
 			return true;
 		}
@@ -58,7 +58,7 @@ namespace WpfEditorTest.UndoRedo
 			command.Do();
 			ObservableScene.UndoCommands.Push(command);
 			ObservableScene.DoCommands.Clear();
-			ObservableScene.IsDirty = true;
+			ObservableScene.IsDirty = command.IsDirty;
 			CheckForCommandStacks();
 		}
 
