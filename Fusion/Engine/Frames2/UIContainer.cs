@@ -177,19 +177,20 @@ namespace Fusion.Engine.Frames2
 
         public PathGeometryD2D GetClippingGeometry(SpriteLayerD2D layer)
         {
-            PathGeometryD2D geometry = new PathGeometryD2D(layer);
-            geometry.SetFillMode(FillModeD2D.Winding);
+            PathGeometryD2DDesc geometryDesc = new PathGeometryD2DDesc()
+            {
+                FigureBeginD2D = FigureBeginD2D.Filled,
+                FigureEndD2D = FigureEndD2D.Closed,
+                FillModeD2D = FillModeD2D.Winding
+            };
 
-            Vector2 p0 = Matrix3x2.TransformPoint(GlobalTransform, new Vector2(0, 0));
-            Vector2 p1 = Matrix3x2.TransformPoint(GlobalTransform, new Vector2(0, Height));
-            Vector2 p2 = Matrix3x2.TransformPoint(GlobalTransform, new Vector2(Width, Height));
-            Vector2 p3 = Matrix3x2.TransformPoint(GlobalTransform, new Vector2(Width, 0));
+            List<Vector2> points = new List<Vector2>();
+            points.Add(Matrix3x2.TransformPoint(GlobalTransform, new Vector2(0, 0)));
+            points.Add(Matrix3x2.TransformPoint(GlobalTransform, new Vector2(0, Height)));
+            points.Add(Matrix3x2.TransformPoint(GlobalTransform, new Vector2(Width, Height)));
+            points.Add(Matrix3x2.TransformPoint(GlobalTransform, new Vector2(Width, 0)));
 
-            geometry.BeginFigure(p0, FigureBeginD2D.Filled);
-            geometry.AddLines(new List<Vector2> {p1, p2, p3});
-            geometry.EndFigure(FigureEndD2D.Closed);
-
-            return geometry;
+            return new PathGeometryD2D(points, geometryDesc, layer);
         }
 
         internal void RestoreParents()
