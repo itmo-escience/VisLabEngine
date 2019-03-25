@@ -2,8 +2,11 @@
 using System.Linq;
 using SharpDX.Direct2D1;
 using Fusion.Core;
-using Fusion.Core.Mathematics;
+using SharpDX;
 using SharpDX.Mathematics.Interop;
+using Size2 = Fusion.Core.Mathematics.Size2;
+using Size2F = Fusion.Core.Mathematics.Size2F;
+using Vector2 = Fusion.Core.Mathematics.Vector2;
 
 namespace Fusion.Engine.Graphics.SpritesD2D
 {
@@ -15,13 +18,35 @@ namespace Fusion.Engine.Graphics.SpritesD2D
         public PathGeometryD2D(SpriteLayerD2D layer)
         {
             PathGeometry = new PathGeometry(layer.Factory);
+            _sink = PathGeometry.Open();
         }
 
-        public void BeginFigure(Vector2 startPoint, FigureBeginD2D figureBegin)
+        public PathGeometryD2D(List<Vector2> points, PathGeometryD2DDesc geometryDesc, SpriteLayerD2D layer) : this(layer)
         {
-            _sink = PathGeometry.Open();
-            _sink.BeginFigure(startPoint.ToRawVector2(), figureBegin == FigureBeginD2D.Filled ? FigureBegin.Filled : FigureBegin.Hollow);
+            SetFillMode(geometryDesc.FillModeD2D);
+            BeginFigure(points[0], geometryDesc.FigureBeginD2D);
+            AddLines(points.GetRange(1, points.Count - 1));
+            EndFigure(geometryDesc.FigureEndD2D);
         }
+
+        public PathGeometryD2D(Vector2 startPoint, List<QuadraticBezierSegmentD2D> segments, PathGeometryD2DDesc geometryDesc, SpriteLayerD2D layer) : this(layer)
+        {
+            SetFillMode(geometryDesc.FillModeD2D);
+            BeginFigure(startPoint, geometryDesc.FigureBeginD2D);
+            AddQuadraticBeziers(segments);
+            EndFigure(geometryDesc.FigureEndD2D);
+        }
+
+        public PathGeometryD2D(Vector2 startPoint, List<BezierSegmentD2D> segments, PathGeometryD2DDesc geometryDesc, SpriteLayerD2D layer) : this(layer)
+        {
+            SetFillMode(geometryDesc.FillModeD2D);
+            BeginFigure(startPoint, geometryDesc.FigureBeginD2D);
+            AddBeziers(segments);
+            EndFigure(geometryDesc.FigureEndD2D);
+        }
+
+        public void BeginFigure(Vector2 startPoint, FigureBeginD2D figureBegin) =>
+            _sink.BeginFigure(startPoint.ToRawVector2(), figureBegin == FigureBeginD2D.Filled ? FigureBegin.Filled : FigureBegin.Hollow);
 
         public void EndFigure(FigureEndD2D figureEnd)
         {
@@ -43,7 +68,7 @@ namespace Fusion.Engine.Graphics.SpritesD2D
         public void AddBeziers(List<BezierSegmentD2D> segments) => 
             _sink.AddBeziers(segments.Select(s => s.ToBezierSegment()).ToArray());
 
-        //_sink.AddArc(new ArcSegment(){});
+        public void AddArc(ArcD2D arc) => _sink.AddArc(arc.ToArcSegment());
 
         public void SetFillMode(FillModeD2D fillMode) =>
             _sink.SetFillMode(fillMode == FillModeD2D.Alternate ? FillMode.Alternate : FillMode.Winding);
@@ -87,6 +112,34 @@ namespace Fusion.Engine.Graphics.SpritesD2D
         }
     }
 
+    public class ArcD2D
+    {
+        public ArcSizeD2D ArcSize { get; set; }
+        public Vector2 EndPoint { get; set; }
+        public float RotationAngle { get; set; }
+        public Size2F Size { get; set; }
+        public SweepDirectionD2D SweepDirection { get; set; }
+
+        internal ArcSegment ToArcSegment()
+        {
+            return new ArcSegment()
+            {
+                ArcSize = (ArcSize == ArcSizeD2D.Small) ? SharpDX.Direct2D1.ArcSize.Small : SharpDX.Direct2D1.ArcSize.Large,
+                Point = EndPoint.ToRawVector2(),
+                RotationAngle = RotationAngle,
+                Size = new SharpDX.Size2F(Size.Width, Size.Height),
+                SweepDirection = (SweepDirection == SweepDirectionD2D.Clockwise) ? SharpDX.Direct2D1.SweepDirection.Clockwise : SharpDX.Direct2D1.SweepDirection.CounterClockwise
+            };
+        }
+    }
+
+    public struct PathGeometryD2DDesc
+    {
+        public FigureBeginD2D FigureBeginD2D { get; set; }
+        public FigureEndD2D FigureEndD2D { get; set; }
+        public FillModeD2D FillModeD2D { get; set; }
+    }
+
     public enum FigureBeginD2D
     {
         Filled, Hollow
@@ -100,5 +153,15 @@ namespace Fusion.Engine.Graphics.SpritesD2D
     public enum FillModeD2D
     {
         Alternate, Winding
+    }
+
+    public enum ArcSizeD2D
+    {
+        Small, Large
+    }
+
+    public enum SweepDirectionD2D
+    {
+        Clockwise, CounterClockwise
     }
 }
