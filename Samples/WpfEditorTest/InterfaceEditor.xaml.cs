@@ -102,6 +102,7 @@ namespace WpfEditorTest
 
 					SelectionManager.Instance.SelectFrame(new List<UIComponent> { });
 					RootFrame.Remove(_currentScene.Scene);
+					CurrentScene.ChangedDirty -= UpdateSceneIndicator;
 					foreach (var panel in SelectionLayer.FrameSelectionPanelList.Values)
 					{
 						var commands = SelectionLayer.ResetSelectedFrame(new Point(0, 0), panel);
@@ -110,13 +111,21 @@ namespace WpfEditorTest
 					}
 				}
 				_currentScene = value;
+				CommandManager.Instance.ObservableScene = _currentScene;
+				CurrentScene.ChangedDirty += UpdateSceneIndicator;
 				RootFrame.Add(_currentScene.Scene);
 				SceneFrame = _currentScene.Scene;
 				ZoomerSlider.Value = _currentScene.SceneZoom;
 				SelectionLayer.Width = SceneFrame.Width;
 				SelectionLayer.Height = SceneFrame.Height;
 
+				CommandManager.Instance.CheckForCommandStacks();
 			}
+		}
+
+		private void UpdateSceneIndicator( object sender, bool isDirty )
+		{
+			this.SceneChangedIndicator = isDirty ? "*" : "";
 		}
 
 		public string CurrentSceneFile { get => _currentSceneFile; set { _currentSceneFile = value; this.UpdateTitle(); } }
@@ -345,20 +354,14 @@ namespace WpfEditorTest
 					//};
 					//_treeView.ElementHierarchyView.SetBinding(TreeView.ItemsSourceProperty, binding);
 					//_treeView.AttachScene(SceneFrame);
-
+					UndoButton.DataContext = CommandManager.Instance;
+					RedoButton.DataContext = CommandManager.Instance;
 				});
 			};
 
-			UndoButton.DataContext = CommandManager.Instance;
-			RedoButton.DataContext = CommandManager.Instance;
+
 			SaveTemplateButton.DataContext = SelectionManager.Instance;
 			LoadedScenesTabs.DataContext = LoadedScenes;
-
-			CommandManager.Instance.ChangedDirty += ( s, e ) =>
-			{
-				this.CurrentScene.IsDirty = e;
-				this.SceneChangedIndicator = e ? "*" : "";
-			};
 
 			SelectionLayer.FrameSelected += ( s, selection ) =>
 			{
@@ -1007,37 +1010,37 @@ namespace WpfEditorTest
 			ConfigurationManager.RefreshSection(configFile.AppSettings.SectionInformation.Name);
 		}
 
-		private bool CheckForChanges()
-		{
-			if (CommandManager.Instance.IsDirty)
-			{
-				var result = MessageBox.Show(@"There are unsaved changes in the current scene.
-								Do you want to save them?", "Attention", MessageBoxButton.YesNoCancel);
-				switch (result)
-				{
-					case MessageBoxResult.Yes:
-						{
-							return this.TrySaveScene();
-						}
-					case MessageBoxResult.No:
-						{
-							return true;
-						}
-					case MessageBoxResult.Cancel:
-						{
-							return false;
-						}
-					default:
-						{
-							return true;
-						}
-				}
-			}
-			else
-			{
-				return true;
-			}
-		}
+		//private bool CheckForChanges()
+		//{
+		//	if (CommandManager.Instance.IsDirty)
+		//	{
+		//		var result = MessageBox.Show(@"There are unsaved changes in the current scene.
+		//						Do you want to save them?", "Attention", MessageBoxButton.YesNoCancel);
+		//		switch (result)
+		//		{
+		//			case MessageBoxResult.Yes:
+		//				{
+		//					return this.TrySaveScene();
+		//				}
+		//			case MessageBoxResult.No:
+		//				{
+		//					return true;
+		//				}
+		//			case MessageBoxResult.Cancel:
+		//				{
+		//					return false;
+		//				}
+		//			default:
+		//				{
+		//					return true;
+		//				}
+		//		}
+		//	}
+		//	else
+		//	{
+		//		return true;
+		//	}
+		//}
 
 		private bool CheckForChanges(SceneDataContainer sceneData)
 		{

@@ -11,6 +11,8 @@ namespace WpfEditorTest.UndoRedo
 {
 	internal class FramePropertyChangeCommand : IEditorCommand
 	{
+		public bool IsDirty => true;
+
 		UIComponent _frame;
 		PropertyInfo _propertyToChange;
 		object _valueToSet;

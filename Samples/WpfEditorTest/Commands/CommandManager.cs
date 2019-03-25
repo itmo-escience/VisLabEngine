@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using WpfEditorTest.Utility;
 
 namespace WpfEditorTest.UndoRedo
 {
@@ -12,54 +13,53 @@ namespace WpfEditorTest.UndoRedo
 		{
 		}
 
-		private Stack<IEditorCommand> _doCommands = new Stack<IEditorCommand>();
-		private Stack<IEditorCommand> _undoCommands = new Stack<IEditorCommand>();
+		//private Stack<IEditorCommand> _doCommands = new Stack<IEditorCommand>();
+		//private Stack<IEditorCommand> _undoCommands = new Stack<IEditorCommand>();
 
 		public event PropertyChangedEventHandler PropertyChanged;
-		public event EventHandler<bool> ChangedDirty;
+		//public event EventHandler<bool> ChangedDirty;
 
-		public bool UndoStackIsNotEmpty { get { return _undoCommands.Count > 0; } }
-		public bool RedoStackIsNotEmpty { get { return _doCommands.Count > 0; } }
+		public SceneDataContainer ObservableScene { get; internal set; }
 
-		private bool _isDirty = false;
-		public bool IsDirty { get { return _isDirty; } private set { _isDirty = value; ChangedDirty?.Invoke(this, _isDirty); } }
+		public bool UndoStackIsNotEmpty { get { return ObservableScene.UndoCommands.Count > 0; } }
+		public bool RedoStackIsNotEmpty { get { return ObservableScene.DoCommands.Count > 0; } }
+
+		//private bool _isDirty = false;
+		//public bool IsDirty { get { return _isDirty; } private set { _isDirty = value; ChangedDirty?.Invoke(this, _isDirty); } }
 
 		public bool TryUndoCommand()
 		{
-			if (_undoCommands.Count==0)
+			if (ObservableScene.UndoCommands.Count==0)
 				return false;
 
-			var movedCommand = _undoCommands.Pop();
+			var movedCommand = ObservableScene.UndoCommands.Pop();
 			movedCommand.Undo();
-			_doCommands.Push(movedCommand);
-			IsDirty = true;
-			OnPropertyChanged(nameof(UndoStackIsNotEmpty));
-			OnPropertyChanged(nameof(RedoStackIsNotEmpty));
+			ObservableScene.DoCommands.Push(movedCommand);
+			ObservableScene.IsDirty = movedCommand.IsDirty;
+			CheckForCommandStacks();
 			return true;
 		}
 
 		public bool TryRedoCommand()
 		{
-			if (_doCommands.Count == 0)
+			if (ObservableScene.DoCommands.Count == 0)
 				return false;
 
-			var movedCommand = _doCommands.Pop();
+			var movedCommand = ObservableScene.DoCommands.Pop();
 			movedCommand.Do();
-			_undoCommands.Push(movedCommand);
-			IsDirty = true;
-			OnPropertyChanged(nameof(UndoStackIsNotEmpty));
-			OnPropertyChanged(nameof(RedoStackIsNotEmpty));
+			ObservableScene.UndoCommands.Push(movedCommand);
+			ObservableScene.IsDirty = movedCommand.IsDirty;
+			CheckForCommandStacks();
 			return true;
 		}
 
 		public void Execute(IEditorCommand command)
 		{
 			command.Do();
-			_undoCommands.Push(command);
-			_doCommands.Clear();
-			IsDirty = true;
-			OnPropertyChanged(nameof(UndoStackIsNotEmpty));
-			OnPropertyChanged(nameof(RedoStackIsNotEmpty));
+			ObservableScene.UndoCommands.Push(command);
+			ObservableScene.DoCommands.Clear();
+			ObservableScene.IsDirty = command.IsDirty;
+			CheckForCommandStacks();
 		}
 
 		public void ExecuteWithoutMemorising( IEditorCommand command )
@@ -70,18 +70,16 @@ namespace WpfEditorTest.UndoRedo
 		public void ExecuteWithoutSettingDirty( IEditorCommand command )
 		{
 			command.Do();
-			_undoCommands.Push(command);
-			_doCommands.Clear();
-			OnPropertyChanged(nameof(UndoStackIsNotEmpty));
-			OnPropertyChanged(nameof(RedoStackIsNotEmpty));
+			ObservableScene.UndoCommands.Push(command);
+			ObservableScene.DoCommands.Clear();
+			CheckForCommandStacks();
 		}
 
 		public void Reset()
 		{
-			_undoCommands.Clear();
-			_doCommands.Clear();
-			OnPropertyChanged(nameof(UndoStackIsNotEmpty));
-			OnPropertyChanged(nameof(RedoStackIsNotEmpty));
+			ObservableScene.UndoCommands.Clear();
+			ObservableScene.DoCommands.Clear();
+			CheckForCommandStacks();
 		}
 
 		protected void OnPropertyChanged( [System.Runtime.CompilerServices.CallerMemberName] string changedProperty = "" )
@@ -91,7 +89,13 @@ namespace WpfEditorTest.UndoRedo
 
 		public void SetNotDirty()
 		{
-			IsDirty = false;
+			ObservableScene.IsDirty = false;
+		}
+
+		internal void CheckForCommandStacks()
+		{
+			OnPropertyChanged(nameof(UndoStackIsNotEmpty));
+			OnPropertyChanged(nameof(RedoStackIsNotEmpty));
 		}
 	}
 }

@@ -10,6 +10,8 @@ namespace WpfEditorTest.UndoRedo
 {
 	public class SelectFrameCommand : IEditorCommand
 	{
+		public bool IsDirty => false;
+
 		private List<UIComponent> _frames;
 		private List<UIComponent> _oldFrames;
 

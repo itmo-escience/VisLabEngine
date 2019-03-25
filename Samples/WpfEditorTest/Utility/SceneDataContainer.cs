@@ -7,6 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
+using WpfEditorTest.UndoRedo;
 
 namespace WpfEditorTest.Utility
 {
@@ -28,10 +29,17 @@ namespace WpfEditorTest.Utility
 			}
 		}
 		public UIContainer Scene { get; set; }
-		public bool IsDirty { get => _isDirty; set { _isDirty = value; SceneName = _sceneName; OnPropertyChanged(); } }
+		public bool IsDirty { get => _isDirty; set { _isDirty = value; SceneName = _sceneName; OnPropertyChanged(); ChangedDirty?.Invoke(this, _isDirty); } }
 		public double SceneZoom { get; set; }
 		public List<UIComponent> SceneSelection { get; set; }
 		public Size SceneSize { get; set; }
+
+		#region UndoRedoStack
+		public Stack<IEditorCommand> DoCommands = new Stack<IEditorCommand>();
+		public Stack<IEditorCommand> UndoCommands = new Stack<IEditorCommand>();
+
+		public event EventHandler<bool> ChangedDirty;
+		#endregion
 
 		public SceneDataContainer()
 		{
