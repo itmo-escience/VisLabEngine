@@ -1,11 +1,14 @@
 ﻿using Fusion.Engine.Common;
 using Fusion.Engine.Frames2;
+using System.Threading;
 using System.Windows;
 
 namespace WpfEditorTest.UndoRedo
 {
 	internal class FrameParentChangeCommand: IEditorCommand
 	{
+		private AutoResetEvent _asyncThreadChangesDoneEvent = new AutoResetEvent(false);
+
 		public bool IsDirty => true;
 
 		private UIComponent _frame;
@@ -38,22 +41,32 @@ namespace WpfEditorTest.UndoRedo
 
 		public void Do()
 		{
-            Game.ResourceWorker.Post(r => {
+			_asyncThreadChangesDoneEvent.Reset();
+
+			Game.ResourceWorker.Post(r => {
                 r.ProcessQueue.Post(t => {
                     _oldParent?.Remove(_frame);
                     _newParent?.AddAt(_frame, _index);
-                }, null, int.MaxValue);
+					_asyncThreadChangesDoneEvent.Set();
+				}, null, int.MaxValue);
             }, null, int.MaxValue);
+
+			_asyncThreadChangesDoneEvent.WaitOne();
 		}
 
 		public void Undo()
 		{
-            Game.ResourceWorker.Post(r => {
+			_asyncThreadChangesDoneEvent.Reset();
+
+			Game.ResourceWorker.Post(r => {
                 r.ProcessQueue.Post(t => {
                     _newParent?.Remove(_frame);
                     _oldParent?.AddAt(_frame, _index);
-                }, null, int.MaxValue);
+					_asyncThreadChangesDoneEvent.Set();
+				}, null, int.MaxValue);
             }, null, int.MaxValue);
-        }
+
+			_asyncThreadChangesDoneEvent.WaitOne();
+		}
 	}
 }

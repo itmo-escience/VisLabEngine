@@ -5,12 +5,15 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace WpfEditorTest.UndoRedo
 {
 	internal class FramePropertyChangeCommand : IEditorCommand
 	{
+		private AutoResetEvent _asyncThreadChangesDoneEvent = new AutoResetEvent(false);
+
 		public bool IsDirty => true;
 
 		UIComponent _frame;
@@ -33,20 +36,30 @@ namespace WpfEditorTest.UndoRedo
 
 		public void Do()
 		{
-            Game.ResourceWorker.Post(r => {
+			_asyncThreadChangesDoneEvent.Reset();
+
+			Game.ResourceWorker.Post(r => {
                 r.ProcessQueue.Post(t => {
                     _propertyToChange.SetValue(_frame, _valueToSet);
-                }, null, int.MaxValue);
+					_asyncThreadChangesDoneEvent.Set();
+				}, null, int.MaxValue);
             }, null, int.MaxValue);
-        }
+
+			_asyncThreadChangesDoneEvent.WaitOne();
+		}
 
 		public void Undo()
 		{
-            Game.ResourceWorker.Post(r => {
+			_asyncThreadChangesDoneEvent.Reset();
+
+			Game.ResourceWorker.Post(r => {
                 r.ProcessQueue.Post(t => {
                     _propertyToChange.SetValue(_frame, _previousValue);
-                }, null, int.MaxValue);
+					_asyncThreadChangesDoneEvent.Set();
+				}, null, int.MaxValue);
             }, null, int.MaxValue);
-        }
+
+			_asyncThreadChangesDoneEvent.WaitOne();
+		}
 	}
 }

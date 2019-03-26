@@ -20,22 +20,22 @@
             <TextBlock Text="{Binding Name}" Tag="{Binding}" 
                                MouseDown="TextBlock_MouseDown" DragOver="TextBlock_PreviewDragOver" Drop="TextBlock_PreviewDrop" 
                                PreviewDragLeave="TextBlock_PreviewDragLeave" PreviewDragEnter="TextBlock_PreviewDragEnter"
-                               MouseMove="TextBlock_MouseMove"/>
+                               />
         </HierarchicalDataTemplate>
         <HierarchicalDataTemplate x:Key="tvTemplate2" ItemsSource="{Binding Path=Slots}">
             <TextBlock Text="{Binding Name}" Tag="{Binding}" 
                                MouseDown="TextBlock_MouseDown" DragOver="TextBlock_PreviewDragOver" Drop="TextBlock_PreviewDrop" 
                                PreviewDragLeave="TextBlock_PreviewDragLeave" PreviewDragEnter="TextBlock_PreviewDragEnter"
-                               MouseMove="TextBlock_MouseMove" FontStyle="Italic"/>
+                                FontStyle="Italic"/>
         </HierarchicalDataTemplate>
         <HierarchicalDataTemplate x:Key="tvTemplate3" ItemsSource="{Binding Path=Component, Converter={StaticResource enumConverter}}">
             <TextBlock Text="{Binding Name}" Tag="{Binding}" 
                                MouseDown="TextBlock_MouseDown" DragOver="TextBlock_PreviewDragOver" Drop="TextBlock_PreviewDrop" 
                                PreviewDragLeave="TextBlock_PreviewDragLeave" PreviewDragEnter="TextBlock_PreviewDragEnter"
-                               MouseMove="TextBlock_MouseMove" FontStyle="Italic" Foreground="Purple"/>
+                               FontStyle="Italic" Foreground="Purple"/>
         </HierarchicalDataTemplate>
     </Window.Resources>
-    <ScrollViewer Height="auto" Width="auto" Background="LightGray">
+    <ScrollViewer Height="auto" Width="auto" Background="LightGray" PreviewMouseWheel="ScrollViewer_PreviewMouseWheel">
         <AdornerDecorator>
             <TreeView Name="ElementHierarchyView"
                       Background="LightGray" Height="auto" Width="auto" AllowDrop="True" Drop="ElementHierarchyView_Drop">

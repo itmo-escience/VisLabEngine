@@ -5,7 +5,6 @@ using System.ComponentModel;
 using System.Linq;
 using System.Reflection;
 using System.Text;
-using System.Threading.Tasks;
 using WpfEditorTest.UndoRedo;
 using WpfEditorTest.Utility;
 
@@ -65,7 +64,7 @@ namespace WpfEditorTest.ChildPanels
 				var command = new FramePropertyChangeCommand(Obj, PropName, value);
 				CommandManager.Instance.Execute(command);
 
-				OnPropertyChanged();
+				//OnPropertyChanged();
 			}
 		}
 

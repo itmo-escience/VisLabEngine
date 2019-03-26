@@ -865,6 +865,15 @@ namespace WpfEditorTest
 				e.Effects = DragDropEffects.Copy | DragDropEffects.Move;
 				var hovered = GetHoveredFrameOnScene(e.GetPosition(this), true);
 				ParentHighlightPanel.SelectedFrame = hovered;
+				return;
+			}
+
+			// If the string can be converted into a Brush, allow copying.
+			if (e.Data.GetDataPresent(DataFormats.FileDrop))
+			{
+				e.Effects = DragDropEffects.Copy | DragDropEffects.Move;
+				var hovered = GetHoveredFrameOnScene(e.GetPosition(this), true);
+				ParentHighlightPanel.SelectedFrame = hovered;
 			}
 		}
 

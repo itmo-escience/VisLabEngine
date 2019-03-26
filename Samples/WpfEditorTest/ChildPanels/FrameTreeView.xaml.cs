@@ -134,10 +134,13 @@ namespace WpfEditorTest.ChildPanels
 
 			components.Reverse();
 			TreeViewItem childNode;
-
 			foreach (var frame in components)
 			{
 				childNode = parent.ItemContainerGenerator.ContainerFromItem(frame) as TreeViewItem;
+				if (childNode == null)
+				{
+					return;
+				}
 				childNode.IsExpanded = true;
 				parent.UpdateLayout();
 				parent = parent
@@ -302,9 +305,17 @@ namespace WpfEditorTest.ChildPanels
 			customAdorner.Visibility = Visibility.Hidden;
 		}
 
-		private void TextBlock_MouseMove( object sender, MouseEventArgs e )
+		private void ScrollViewer_PreviewMouseWheel( object sender, MouseWheelEventArgs e )
 		{
-			//IsInFirstHalf(sender as TreeViewItem, e.GetPosition(sender as TreeViewItem));
+			var scroll = sender as ScrollViewer;
+			if (e.Delta>0)
+			{
+				scroll.LineUp();
+			}
+			else
+			{
+				scroll.LineDown();
+			}
 		}
 	}
 }

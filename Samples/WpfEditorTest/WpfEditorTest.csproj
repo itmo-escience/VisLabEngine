@@ -123,6 +123,7 @@
     <Compile Include="Commands\CommandManager.cs" />
     <Compile Include="Commands\IEditorCommand.cs" />
     <Compile Include="Commands\PropertyChangeCommand.cs" />
+    <Compile Include="WPFConverters\TextBoxConverter.cs" />
     <Compile Include="WPFConverters\TransformValueConverter.cs" />
     <Compile Include="WPFSelectionUILayer.xaml.cs">
       <DependentUpon>WPFSelectionUILayer.xaml</DependentUpon>
