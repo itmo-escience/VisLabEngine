@@ -12,27 +12,26 @@ using Fusion.Engine.Frames2.Events;
 
 namespace Fusion.Engine.Frames2.Managing
 {
-    internal class RootSlot : ISlot
+    internal class RootSlot : Slot
     {
-        public float X => 0;
-        public float Y => 0;
-        public float Angle => 0;
-        public float Width { get; internal set; }
-        public float Height { get; internal set; }
-        public float AvailableWidth => Width;
-        public float AvailableHeight => Height;
+        public override float X => 0;
+        public override float Y => 0;
+        public override float Angle => 0;
+        public override float Width { get; internal set; }
+        public override float Height { get; internal set; }
+        public override float AvailableWidth => Width;
+        public override float AvailableHeight => Height;
 
-        public Matrix3x2 Transform => Matrix3x2.Identity;
-        public bool Clip => false;
-        public bool Visible => true;
-        public IUIContainer<ISlot> Parent => null;
-        public UIComponent Component { get; }
+        internal override Matrix3x2 Transform => Matrix3x2.Identity;
+        public override bool Clip => false;
+        public override bool Visible => true;
+        public override IUIContainer<Slot> Parent => null;
 
-        public SolidBrushD2D DebugBrush => new SolidBrushD2D(Color4.White);
-        public TextFormatD2D DebugTextFormat => new TextFormatD2D("Calibri", 10);
-        public void DebugDraw(SpriteLayerD2D layer) {}
+        public override SolidBrushD2D DebugBrush => new SolidBrushD2D(Color4.White);
+        public override TextFormatD2D DebugTextFormat => new TextFormatD2D("Calibri", 10);
+        public override void DebugDraw(SpriteLayerD2D layer) {}
 
-        internal RootSlot(float width, float height, IUIContainer<ISlot> rootContainer)
+        internal RootSlot(float width, float height, IUIContainer<Slot> rootContainer)
         {
             Width = width;
             Height = height;
@@ -41,7 +40,7 @@ namespace Fusion.Engine.Frames2.Managing
         }
 
         // This object is immutable
-        public event PropertyChangedEventHandler PropertyChanged;
+        //public event PropertyChangedEventHandler PropertyChanged;
     }
 
     public class UIManager
@@ -53,9 +52,9 @@ namespace Fusion.Engine.Frames2.Managing
 
         public bool DebugEnabled { get; set; }
 
-        private readonly Dictionary<ISlot, Matrix3x2> _localTransforms = new Dictionary<ISlot, Matrix3x2>();
-        private readonly Dictionary<ISlot, Matrix3x2> _globalTransforms = new Dictionary<ISlot, Matrix3x2>();
-        private readonly Dictionary<ISlot, bool> _dirtyTransforms = new Dictionary<ISlot, bool>();
+        private readonly Dictionary<Slot, Matrix3x2> _localTransforms = new Dictionary<Slot, Matrix3x2>();
+        private readonly Dictionary<Slot, Matrix3x2> _globalTransforms = new Dictionary<Slot, Matrix3x2>();
+        private readonly Dictionary<Slot, bool> _dirtyTransforms = new Dictionary<Slot, bool>();
 
         public UIManager(RenderSystem rs)
         {
@@ -63,7 +62,7 @@ namespace Fusion.Engine.Frames2.Managing
             Root.Name = "Root";
 
             _rootSlot = new RootSlot(rs.DisplayBounds.Width, rs.DisplayBounds.Height, Root);
-            var t = _rootSlot.Transform();
+            var t = _rootSlot.Transform;
             _localTransforms[_rootSlot] = t;
             _globalTransforms[_rootSlot] = Matrix3x2.Identity;
             _dirtyTransforms[_rootSlot] = false;
@@ -96,12 +95,12 @@ namespace Fusion.Engine.Frames2.Managing
             RecalculateAllTransforms();
         }
 
-        private bool SlotTransformChanged(ISlot slot)
+        private bool SlotTransformChanged(Slot slot)
         {
-            return !_localTransforms.TryGetValue(slot, out var storedTransform) || storedTransform != slot.Transform();
+            return !_localTransforms.TryGetValue(slot, out var storedTransform) || storedTransform != slot.Transform;
         }
 
-        public Matrix3x2 GlobalTransform(ISlot slot)
+        public Matrix3x2 GlobalTransform(Slot slot)
         {
             if (!_dirtyTransforms.TryGetValue(slot, out var isDirty))
             {
@@ -116,7 +115,7 @@ namespace Fusion.Engine.Frames2.Managing
             return _globalTransforms[slot];
         }
 
-        private void InvalidateTransformsDown(ISlot slot)
+        private void InvalidateTransformsDown(Slot slot)
         {
             foreach (var component in UIHelper.DFSTraverse(slot.Component))
             {
@@ -124,7 +123,7 @@ namespace Fusion.Engine.Frames2.Managing
             }
         }
 
-        private void RecalculateTransformsUp(ISlot slot)
+        private void RecalculateTransformsUp(Slot slot)
         {
             if (slot == null) return;
 
@@ -132,7 +131,7 @@ namespace Fusion.Engine.Frames2.Managing
 
             if (slot == _rootSlot)
             {
-                _localTransforms[slot] = slot.Transform();
+                _localTransforms[slot] = slot.Transform;
                 _globalTransforms[slot] = _localTransforms[slot];
                 _dirtyTransforms[slot] = false;
 
@@ -141,7 +140,7 @@ namespace Fusion.Engine.Frames2.Managing
 
             RecalculateTransformsUp(slot.Parent.Placement);
 
-            var local = slot.Transform();
+            var local = slot.Transform;
             _localTransforms[slot] = local;
             _globalTransforms[slot] = _globalTransforms[slot.Parent.Placement] * local;
             _dirtyTransforms[slot] = false;
@@ -154,7 +153,7 @@ namespace Fusion.Engine.Frames2.Managing
                 var slot = component.Placement;
                 if (slot == _rootSlot)
                 {
-                    _localTransforms[_rootSlot] = _rootSlot.Transform();
+                    _localTransforms[_rootSlot] = _rootSlot.Transform;
                     _globalTransforms[_rootSlot] = _localTransforms[_rootSlot];
                     _dirtyTransforms[_rootSlot] = false;
                     continue;
@@ -167,7 +166,7 @@ namespace Fusion.Engine.Frames2.Managing
                 Debug.Assert(_globalTransforms.ContainsKey(parent));
 #endif
 
-                _localTransforms[slot] = slot.Transform();
+                _localTransforms[slot] = slot.Transform;
                 _globalTransforms[slot] = _globalTransforms[parent] * _localTransforms[slot];
                 _dirtyTransforms[slot] = false;
             }
@@ -179,7 +178,7 @@ namespace Fusion.Engine.Frames2.Managing
         /// <param name="slot"></param>
         /// <param name="globalPoint"></param>
         /// <returns></returns>
-        internal bool IsInsideSlotInternal(ISlot slot, Vector2 globalPoint)
+        internal bool IsInsideSlotInternal(Slot slot, Vector2 globalPoint)
         {
             var invertTransform = GlobalTransform(slot);
             invertTransform.Invert();
@@ -193,7 +192,7 @@ namespace Fusion.Engine.Frames2.Managing
         /// <param name="slot"></param>
         /// <param name="point"></param>
         /// <returns></returns>
-        public bool IsPointInsideSlot(ISlot slot, Vector2 point)
+        public bool IsPointInsideSlot(Slot slot, Vector2 point)
         {
             throw new NotImplementedException();
         }
@@ -226,12 +225,12 @@ namespace Fusion.Engine.Frames2.Managing
 
             if (component.Placement.Clip)
             {
-                layer.Draw(new StartClippingAlongRectangle(component.Placement.BoundingBox(), AntialiasModeD2D.Aliased));
+                layer.Draw(new StartClippingAlongRectangle(component.Placement.BoundingBox, AntialiasModeD2D.Aliased));
             }
 
             component.Draw(layer);
 
-            if (component is IUIContainer<ISlot> container)
+            if (component is IUIContainer<Slot> container)
             {
                 foreach (var child in container.Slots)
                 {
@@ -250,13 +249,13 @@ namespace Fusion.Engine.Frames2.Managing
             }
         }
 
-        private void DebugDraw(SpriteLayerD2D layer, ISlot slot, Matrix3x2 transform)
+        private void DebugDraw(SpriteLayerD2D layer, Slot slot, Matrix3x2 transform)
         {
             layer.Draw(new TransformCommand(transform));
 
             slot.DebugDraw(layer);
 
-            var b = slot.BoundingBox();
+            var b = slot.BoundingBox;
             layer.Draw(new Rect(b.X, b.Y, b.Width, b.Height, slot.DebugBrush));
 
             var debugText = $"{slot.Component.Name} X:{b.X:0.00} Y:{b.Y:0.00} W:{b.Width:0.00} H:{b.Height:0.00}";

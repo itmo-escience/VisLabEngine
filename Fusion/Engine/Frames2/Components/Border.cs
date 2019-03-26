@@ -11,7 +11,7 @@ namespace Fusion.Engine.Frames2.Components
         public Color4 BackgroundColor { get; set; } = Color4.Zero;
         public Color4 BorderColor { get; set; } = Color4.White;
 
-        public ISlot Placement { get; set; }
+        public Slot Placement { get; set; }
         public UIEventsHolder Events { get; } = new UIEventsHolder();
 
         public float DesiredWidth { get; set; } = -1;

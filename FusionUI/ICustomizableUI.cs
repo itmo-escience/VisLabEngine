@@ -5,7 +5,7 @@ namespace FusionUI
 {
 	public interface ICustomizableUI
 	{
-		IUIModifiableContainer<ISlot> GetUIRoot();
+		IUIModifiableContainer<Slot> GetUIRoot();
         UIManager GetUIManager();
     }
 }

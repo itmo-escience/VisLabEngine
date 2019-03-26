@@ -1,40 +1,113 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel;
+using System.Runtime.CompilerServices;
 using Fusion.Core.Mathematics;
 using Fusion.Engine.Graphics.SpritesD2D;
 
 namespace Fusion.Engine.Frames2
 {
-    public interface ISlot : INotifyPropertyChanged
+    public abstract class Slot : INotifyPropertyChanged
     {
-        float X { get; }
-        float Y { get; }
-        float Angle { get; }
+        private float _x;
+        public virtual float X
+        {
+            get => _x;
+            set => SetAndNotify(ref _x, value);
+        }
+
+        private float _y;
+        public virtual float Y
+        {
+            get => _y;
+            set => SetAndNotify(ref _y, value);
+        }
+
+        private float _angle;
+        public virtual float Angle
+        {
+            get => _angle;
+            set => SetAndNotify(ref _angle, value);
+        }
+
+        internal virtual Matrix3x2 Transform => Matrix3x2.Transformation(1.0f, 1.0f, Angle, X, Y);
 
         /* Current width and height */
-        float Width { get; }
-        float Height { get; }
+        private float _width;
+        public virtual float Width
+        {
+            get => _width;
+            internal set => SetAndNotify(ref _width, value);
+        }
+
+        private float _height;
+        public virtual float Height
+        {
+            get => _height;
+            internal set => SetAndNotify(ref _height, value);
+        }
+
+        public RectangleF BoundingBox => Visible ? new RectangleF(0, 0, Width, Height) : new RectangleF(0, 0, 0, 0);
 
         /* Container specifies available dimensions for component */
-        float AvailableWidth { get; }
-        float AvailableHeight { get; }
+        public virtual float AvailableWidth => MathUtil.Clamp(Parent.Placement.Width - X, 0, float.MaxValue);
+        public virtual float AvailableHeight => MathUtil.Clamp(Parent.Placement.Height - Y, 0, float.MaxValue);
 
-        bool Clip { get; }
-        bool Visible { get; }
+        private bool _clip = true;
+        public virtual bool Clip
+        {
+            get => _clip;
+            set => SetAndNotify(ref _clip, value);
+        }
 
-        IUIContainer<ISlot> Parent { get; }
-        UIComponent Component { get; }
+        private bool _visible = true;
+        public virtual bool Visible
+        {
+            get => _visible;
+            set => SetAndNotify(ref _visible, value);
+        }
 
-        SolidBrushD2D DebugBrush { get; }
-        TextFormatD2D DebugTextFormat { get; }
-        void DebugDraw(SpriteLayerD2D layer);
+        public abstract IUIContainer<Slot> Parent { get; }
+        
+        private UIComponent _component;
+        public virtual UIComponent Component
+        {
+            get => _component;
+            protected set => SetAndNotify(ref _component, value);
+        }
+
+        public abstract SolidBrushD2D DebugBrush { get; }
+        public abstract TextFormatD2D DebugTextFormat { get; }
+        public abstract void DebugDraw(SpriteLayerD2D layer);
+
+        public event PropertyChangedEventHandler PropertyChanged;
+
+        protected bool SetAndNotify<T>(ref T field, T value, [CallerMemberName] string propertyName = null)
+        {
+            if (EqualityComparer<T>.Default.Equals(field, value))
+                return false;
+
+            field = value;
+            NotifyPropertyChanged(propertyName);
+
+            System.Console.WriteLine($"{propertyName} = {value}");
+
+            return true;
+        }
+
+        protected void NotifyPropertyChanged([CallerMemberName] string propertyName = null)
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+        }
     }
 
-    public interface ISlotAttachable : ISlot
+    public abstract class AttachableSlot : Slot
     {
-        void Attach(UIComponent component);
+        public abstract void Attach(UIComponent component);
 
-        event EventHandler<SlotAttachmentChangedEventArgs> ComponentAttached;
+        public abstract event EventHandler<SlotAttachmentChangedEventArgs> ComponentAttached;
+
+        public void Detach() => Attach(null);
     }
 
     public class SlotAttachmentChangedEventArgs : EventArgs
@@ -46,24 +119,6 @@ namespace Fusion.Engine.Frames2
         {
             Old = oldComponent;
             New = newComponent;
-        }
-    }
-
-    public static class SlotExtensions
-    {
-        internal static Matrix3x2 Transform(this ISlot slot) => Matrix3x2.Transformation(1.0f, 1.0f, slot.Angle, slot.X, slot.Y);
-
-        public static RectangleF BoundingBox(this ISlot slot)
-        {
-            var rectangle = slot.Visible
-                ? new RectangleF(0, 0, slot.Width, slot.Height)
-                : new RectangleF(0, 0, 0, 0);
-            return rectangle;
-        }
-
-        public static void Detach(this ISlotAttachable slot)
-        {
-            slot.Attach(null);
         }
     }
 }

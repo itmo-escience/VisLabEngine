@@ -8,8 +8,8 @@ namespace Fusion.Engine.Frames2.Components
 {
     public sealed class Label : UIComponent
     {
-        private ISlot _placement;
-        public ISlot Placement
+        private Slot _placement;
+        public Slot Placement
         {
             get => _placement;
             set
@@ -29,7 +29,7 @@ namespace Fusion.Engine.Frames2.Components
 
         private void SlotChanged(object sender, PropertyChangedEventArgs e)
         {
-            if(e.PropertyName == nameof(ISlot.Width) || e.PropertyName == nameof(ISlot.Height))
+            if(e.PropertyName == nameof(Slot.Width) || e.PropertyName == nameof(Slot.Height))
                 _isDirtyLayout = true;
         }
 

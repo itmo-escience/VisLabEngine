@@ -9,7 +9,7 @@ namespace Fusion.Engine.Frames2.Components
 {
     public sealed class Image : UIComponent
     {
-        public ISlot Placement { get; set; }
+        public Slot Placement { get; set; }
 
         public UIEventsHolder Events { get; } = new UIEventsHolder();
 

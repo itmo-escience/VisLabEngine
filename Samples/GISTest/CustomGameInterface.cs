@@ -384,7 +384,7 @@ namespace GISTest
 	        messages.Add(string.Format(messageFormat, args));
 	    }
 
-        public IUIModifiableContainer<ISlot> GetUIRoot()
+        public IUIModifiableContainer<Slot> GetUIRoot()
         {
             return UIManager.Root;
         }

@@ -9,12 +9,12 @@ using Fusion.Engine.Graphics.SpritesD2D;
 
 namespace Fusion.Engine.Frames2.Controllers
 {
-    public interface IControllerSlot : ISlot
+    public interface IHasProperties
     {
         ObservableCollection<PropertyValueStates> Properties { get; }
     }
 
-    public abstract class UIController<T> : IUIContainer<T> where T : IControllerSlot
+    public abstract class UIController<T> : IUIContainer<T> where T : Slot, IHasProperties
     {
         public State CurrentState { get; protected set; } = State.Default;
 
@@ -73,7 +73,7 @@ namespace Fusion.Engine.Frames2.Controllers
             _initialized = true;
         }
 
-        public ISlot Placement { get; set; }
+        public Slot Placement { get; set; }
         public UIEventsHolder Events { get; } = new UIEventsHolder();
         public float DesiredWidth { get; set; }
         public float DesiredHeight { get; set; }
