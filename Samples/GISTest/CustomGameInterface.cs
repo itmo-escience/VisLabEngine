@@ -171,25 +171,26 @@ namespace GISTest
             img1 = new Image(image);
             img2 = new Image(image);
 
-		    var imgFreePlacement = new FreePlacement
+		    var imgVerticalBox = new VerticalBox()
 		    {
-		        Name = "ImageFreePlacement",
+		        Name = "ImageVerticalBox",
 		        DesiredWidth = 500,
-		        DesiredHeight = 800
+		        DesiredHeight = 800,
+                Alignment = VerticalAlignment.Center
 		    };
 
-		    var imgFpSlot = UIManager.Root.Insert(imgFreePlacement, 0);
+		    var imgFpSlot = UIManager.Root.Insert(imgVerticalBox, 0);
 		    imgFpSlot.X = 50;
 		    imgFpSlot.Y = 50;
 
-            var slot = imgFreePlacement.Insert(img1, 0);
+            var slot = imgVerticalBox.Insert(img1, 0);
 		    slot.X = 10;
 		    slot.Y = 10;
 		    img1.DesiredWidth = 250;
 		    img1.DesiredHeight = 50;
 
 
-            var slot2 = imgFreePlacement.Insert(img2, 0);
+            var slot2 = imgVerticalBox.Insert(img2, 0);
 		    slot2.X = 20;
 		    slot2.Y = 80;
 		    img2.DesiredWidth = 450;
@@ -224,7 +225,7 @@ namespace GISTest
 		    img2.Events.Click += (sender, args) => Log.Message("Image 2 click");
 		    img1.Events.Click += (sender, args) => Log.Message("Image 1 click");
 		    border.Events.Click += (sender, args) => Log.Message("Border click");
-		    imgFreePlacement.Events.Click += (sender, args) => Log.Message("Image Container click");
+		    imgVerticalBox.Events.Click += (sender, args) => Log.Message("Image Container click");
 		    labelFreePlacement.Events.Click += (sender, args) => Log.Message("Label Container click");
 
             #endregion
