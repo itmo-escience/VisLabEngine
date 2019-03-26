@@ -47,7 +47,7 @@ namespace Fusion.Engine.Frames2
             internal set => SetAndNotify(ref _height, value);
         }
 
-        public RectangleF BoundingBox => Visible ? new RectangleF(0, 0, Width, Height) : new RectangleF(0, 0, 0, 0);
+        public RectangleF BoundingBox => Visible ? new RectangleF(X, Y, Width, Height) : new RectangleF(0, 0, 0, 0);
 
         /* Container specifies available dimensions for component */
         public virtual float AvailableWidth => MathUtil.Clamp(Parent.Placement.Width - X, 0, float.MaxValue);
@@ -89,8 +89,6 @@ namespace Fusion.Engine.Frames2
 
             field = value;
             NotifyPropertyChanged(propertyName);
-
-            System.Console.WriteLine($"{propertyName} = {value}");
 
             return true;
         }

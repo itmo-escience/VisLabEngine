@@ -225,7 +225,7 @@ namespace Fusion.Engine.Frames2.Managing
 
             if (component.Placement.Clip)
             {
-                layer.Draw(new StartClippingAlongRectangle(component.Placement.BoundingBox, AntialiasModeD2D.Aliased));
+                layer.Draw(new StartClippingAlongRectangle(new RectangleF(0, 0, component.Placement.Width, component.Placement.Height), AntialiasModeD2D.Aliased));
             }
 
             component.Draw(layer);
@@ -256,11 +256,11 @@ namespace Fusion.Engine.Frames2.Managing
             slot.DebugDraw(layer);
 
             var b = slot.BoundingBox;
-            layer.Draw(new Rect(b.X, b.Y, b.Width, b.Height, slot.DebugBrush));
+            layer.Draw(new Rect(0, 0, b.Width, b.Height, slot.DebugBrush));
 
             var debugText = $"{slot.Component.Name} X:{b.X:0.00} Y:{b.Y:0.00} W:{b.Width:0.00} H:{b.Height:0.00}";
             var dtl = new TextLayoutD2D(debugText, slot.DebugTextFormat, float.MaxValue, float.MaxValue);
-            layer.Draw(new Text(debugText, new RectangleF(b.X, b.Y - dtl.Height, dtl.Width + 1, dtl.Height), slot.DebugTextFormat, slot.DebugBrush));
+            layer.Draw(new Text(debugText, new RectangleF(0, - dtl.Height, dtl.Width + 1, dtl.Height), slot.DebugTextFormat, slot.DebugBrush));
         }
 
         public static bool IsComponentNameValid(string name, UIComponent root, UIComponent ignoredComponent = null)
