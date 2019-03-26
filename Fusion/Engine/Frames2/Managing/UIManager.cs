@@ -67,9 +67,11 @@ namespace Fusion.Engine.Frames2.Managing
 
                 if (c is UIContainer container)
                 {
+                    PathGeometryD2D clippingGeometry = null;
                     if (container.NeedClipping)
                     {
-                        queue.Enqueue(new Components.StartClippingFlag(container.GetClippingGeometry(layer)));
+                        clippingGeometry = container.GetClippingGeometry(layer);
+                        queue.Enqueue(new Components.StartClippingFlag(clippingGeometry));
                     }
 
                     foreach (var child in container.Children)
@@ -79,6 +81,7 @@ namespace Fusion.Engine.Frames2.Managing
 
                     if (container.NeedClipping)
                     {
+                        clippingGeometry?.Dispose();
                         queue.Enqueue(new Components.EndClippingFlag());
                     }
                 }
