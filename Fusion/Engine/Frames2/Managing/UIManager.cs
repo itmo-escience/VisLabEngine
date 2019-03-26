@@ -12,7 +12,7 @@ using Fusion.Engine.Frames2.Events;
 
 namespace Fusion.Engine.Frames2.Managing
 {
-    internal class RootSlot : Slot
+    internal sealed class RootSlot : Slot
     {
         public override float X => 0;
         public override float Y => 0;

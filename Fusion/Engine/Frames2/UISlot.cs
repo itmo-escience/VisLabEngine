@@ -50,7 +50,7 @@ namespace Fusion.Engine.Frames2
         public RectangleF BoundingBox => Visible ? new RectangleF(X, Y, Width, Height) : new RectangleF(0, 0, 0, 0);
 
         /* Container specifies available dimensions for component */
-        public virtual float AvailableWidth => MathUtil.Clamp(Parent.Placement.Width - X, 0, float.MaxValue);
+        public virtual float AvailableWidth => MathUtil.Clamp(Parent.Placement.Width - X, 0, float.MaxValue);   //TODO: Use angle
         public virtual float AvailableHeight => MathUtil.Clamp(Parent.Placement.Height - Y, 0, float.MaxValue);
 
         private bool _clip = true;

@@ -70,10 +70,10 @@ namespace Fusion.Engine.Frames2.Containers
             foreach (var slot in Slots)
             {
                 if (slot.Component.DesiredWidth >= 0)
-                    slot.Width = slot.Component.DesiredWidth;
+                    slot.Width = Math.Min(slot.Component.DesiredWidth, Placement.Width - slot.Component.Placement.X);
 
                 if (slot.Component.DesiredHeight >= 0)
-                    slot.Height = slot.Component.DesiredHeight;
+                    slot.Height = Math.Min(slot.Component.DesiredHeight, Placement.Height - slot.Component.Placement.Y);
             }
         }
 
