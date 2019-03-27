@@ -7,7 +7,7 @@ using Fusion.Engine.Graphics.SpritesD2D;
 
 namespace Fusion.Engine.Frames2
 {
-    public abstract class Slot : INotifyPropertyChanged
+    public abstract class Slot : IUIDebugDrawable, INotifyPropertyChanged
     {
         private float _x;
         public virtual float X
