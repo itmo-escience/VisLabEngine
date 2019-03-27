@@ -18,7 +18,6 @@ namespace Fusion.Engine.Frames2.Controllers
         public override float AvailableWidth => Width;
         public override float AvailableHeight => Height;
         public override bool Clip => true;
-        public override bool Visible { get; set; } = false;
 
         public override IUIContainer<Slot> Parent { get; }
         public override SolidBrushD2D DebugBrush => new SolidBrushD2D(Color4.White);
@@ -30,6 +29,7 @@ namespace Fusion.Engine.Frames2.Controllers
         {
             Parent = parent;
             Name = name;
+            Visible = false;
         }
 
         public override void DebugDraw(SpriteLayerD2D layer) { }
