@@ -1,20 +1,19 @@
 ﻿using Fusion.Engine.Common;
 using Fusion.Engine.Frames2;
 using System.Threading;
-using System.Windows;
 
-namespace WpfEditorTest.UndoRedo
+namespace WpfEditorTest.Commands
 {
 	internal class FrameParentChangeCommand: IEditorCommand
 	{
-		private AutoResetEvent _asyncThreadChangesDoneEvent = new AutoResetEvent(false);
+		private readonly AutoResetEvent _asyncThreadChangesDoneEvent = new AutoResetEvent(false);
 
 		public bool IsDirty => true;
 
-		private UIComponent _frame;
-		private UIContainer _newParent;
-		private UIContainer _oldParent;
-		private int _index;
+		private readonly UIComponent _frame;
+		private readonly UIContainer _newParent;
+		private readonly UIContainer _oldParent;
+		private readonly int _index;
 
 		public FrameParentChangeCommand( UIComponent frame, UIContainer newParent )
 		{

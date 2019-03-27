@@ -1,5 +1,4 @@
-﻿using Fusion.Engine.Frames;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Windows;
@@ -7,9 +6,7 @@ using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
 using Fusion.Engine.Frames2;
-using WpfEditorTest.UndoRedo;
-using CommandManager = WpfEditorTest.UndoRedo.CommandManager;
-using Fusion.Engine.Frames2.Managing;
+using Fusion.Engine.Frames;
 using Matrix3x2 = Fusion.Core.Mathematics.Matrix3x2;
 
 namespace WpfEditorTest.ChildPanels
@@ -39,7 +36,7 @@ namespace WpfEditorTest.ChildPanels
 				_selectedFrame = value;
 				if (_selectedFrame == null) return;
 
-				//Width = 
+				//Width =
 				WidthBuffer = _selectedFrame.Width * Math.Sign(_selectedFrame.Transform.M11);
 				//Height =
 				HeightBuffer = _selectedFrame.Height * Math.Sign(_selectedFrame.Transform.M22);

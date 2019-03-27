@@ -1,40 +1,41 @@
-﻿using Fusion.Engine.Common;
-using FusionUI;
-using System;
+﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.Configuration;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Threading;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Forms;
+using System.Windows.Interop;
 using System.Windows.Input;
 using System.Windows.Media;
-using Fusion.Engine.Frames;
-using Fusion.Engine.Input;
-using WpfEditorTest.ChildPanels;
-using Fusion.Engine.Frames2;
-using KeyEventArgs = System.Windows.Input.KeyEventArgs;
-using CommandManager = WpfEditorTest.UndoRedo.CommandManager;
-using WpfEditorTest.UndoRedo;
-using System.Windows.Media.Imaging;
-using Bitmap = System.Drawing.Bitmap;
-using System.Windows.Interop;
-using System.Configuration;
-using System.Threading;
 using System.Windows.Media.Animation;
-using WpfEditorTest.FrameSelection;
-using ZWpfLib;
-using Keyboard = System.Windows.Input.Keyboard;
-using WpfEditorTest.DialogWindows;
+using System.Windows.Media.Imaging;
+using Fusion.Engine.Common;
+using Fusion.Engine.Client;
+using Fusion.Engine.Input;
+using Fusion.Engine.Server;
+using Fusion.Engine.Frames2;
+using Fusion.Engine.Frames2.Components;
 using Fusion.Engine.Frames2.Containers;
 using Fusion.Engine.Frames2.Managing;
+using FusionUI;
+using WpfEditorTest.ChildPanels;
 using WpfEditorTest.ChildWindows;
-using System.Collections.ObjectModel;
-using System.Windows.Forms;
-using Fusion.Engine.Client;
-using Fusion.Engine.Server;
+using WpfEditorTest.Commands;
+using WpfEditorTest.DialogWindows;
+using WpfEditorTest.FrameSelection;
 using WpfEditorTest.Utility;
+
+using CommandManager = WpfEditorTest.Commands.CommandManager;
+
+using KeyEventArgs = System.Windows.Input.KeyEventArgs;
+using Bitmap = System.Drawing.Bitmap;
+using Keyboard = System.Windows.Input.Keyboard;
 using Application = System.Windows.Application;
 using Binding = System.Windows.Data.Binding;
 using Button = System.Windows.Controls.Button;
@@ -45,7 +46,6 @@ using MouseEventArgs = System.Windows.Input.MouseEventArgs;
 using RadioButton = System.Windows.Controls.RadioButton;
 using TabControl = System.Windows.Controls.TabControl;
 using TreeView = System.Windows.Controls.TreeView;
-using Fusion.Engine.Frames2.Components;
 
 namespace WpfEditorTest
 {
@@ -105,8 +105,7 @@ namespace WpfEditorTest
 					CurrentScene.ChangedDirty -= UpdateSceneIndicator;
 					foreach (var panel in SelectionLayer.FrameSelectionPanelList.Values)
 					{
-						var commands = SelectionLayer.ResetSelectedFrame(new Point(0, 0), panel);
-						var command = new CommandGroup(commands.ToArray());
+						var command = SelectionLayer.ResetSelectedFrame(new Point(0, 0), panel);
 						CommandManager.Instance.ExecuteWithoutMemorising(command);
 					}
 				}
@@ -172,7 +171,7 @@ namespace WpfEditorTest
 				configFile.Save(ConfigurationSaveMode.Modified);
 				ConfigurationManager.RefreshSection(configFile.AppSettings.SectionInformation.Name);
 			}
-			else 
+			else
 			{
 				System.Windows.Application.Current.Shutdown();
 				return;
@@ -219,7 +218,7 @@ namespace WpfEditorTest
 				//throw;
 			}
 			Directory.SetCurrentDirectory(Path.GetDirectoryName(fileName));
-			
+
 
 			//_engine.GameServer = new CustomGameServer(_engine);
 			//_engine.GameClient = new CustomGameClient(_engine);
@@ -281,7 +280,7 @@ namespace WpfEditorTest
 
 			_treeView.SelectedFrameChangedInUI += ( _, frame ) =>
 			{
-				var command = new SelectFrameCommand(new List<UIComponent> { frame });
+				var command = new SelectFrameCommand(frame);
 				CommandManager.Instance.ExecuteWithoutSettingDirty(command);
 			};
 			_treeView.ControllerSlotSelected += ( _, slot ) =>
@@ -302,7 +301,7 @@ namespace WpfEditorTest
 
 			_palette.AvailableComponents.ItemsSource = customUIComponentTypes;
 
-			
+
 
 			_palette.BaseComponents.ItemsSource = Assembly.GetAssembly(typeof(UIComponent)).GetTypes()
 				.Where(t => t.IsSubclassOf(typeof(UIComponent)) && !t.IsAbstract && t != typeof(StartClippingFlag) && t != typeof(EndClippingFlag));
@@ -418,14 +417,13 @@ namespace WpfEditorTest
 		{
 			if (SelectionLayer.FrameSelectionPanelList.Count >= 0)
 			{
-				List<IEditorCommand> commands = new List<IEditorCommand>();
-				commands.Add(new SelectFrameCommand(new List<UIComponent> { }));
+			    var group = new CommandGroup();
+                group.Append(new SelectFrameCommand());
 				foreach (var frame in SelectionLayer.FrameSelectionPanelList.Keys)
 				{
-					commands.Add(new FrameParentChangeCommand(frame, null));
+					group.Append(new FrameParentChangeCommand(frame, null));
 				}
-				var command = new CommandGroup(commands.ToArray());
-				CommandManager.Instance.Execute(command);
+				CommandManager.Instance.Execute(group);
 			}
 		}
 
@@ -557,7 +555,7 @@ namespace WpfEditorTest
 			}
 		}
 
-		internal List<IEditorCommand> AddFrameToScene( UIComponent createdFrame, Point point )
+		internal CommandGroup AddFrameToScene( UIComponent createdFrame, Point point )
 		{
 			var hoveredFrame = SelectionLayer.GetHoveredFrameOnScene(point, false) ?? SceneFrame;
 
@@ -568,14 +566,11 @@ namespace WpfEditorTest
 
 			UIContainer container = hoveredFrame as UIContainer;
 
-			List<IEditorCommand> commands = new List<IEditorCommand>
-			{
-				new CommandGroup(
-					new FrameParentChangeCommand(createdFrame, container),
-					new FramePropertyChangeCommand(createdFrame, "X", (int)point.X - hoveredFrame.BoundingBox.X),
-					new FramePropertyChangeCommand(createdFrame, "Y", (int)point.Y - hoveredFrame.BoundingBox.Y)
-				)
-			};
+			var commands = new CommandGroup(
+				new FrameParentChangeCommand(createdFrame, container),
+				new FramePropertyChangeCommand(createdFrame, "X", (int)point.X - hoveredFrame.BoundingBox.X),
+				new FramePropertyChangeCommand(createdFrame, "Y", (int)point.Y - hoveredFrame.BoundingBox.Y)
+			);
 
 			UIManager.MakeComponentNameValid(createdFrame, SceneFrame);
 
@@ -699,15 +694,15 @@ namespace WpfEditorTest
 			{
 				var step = SelectionLayer.VisualGrid.Visibility == Visibility.Visible ?
 					(int)(FusionUI.UI.ScalableFrame.ScaleMultiplier * SelectionLayer.GridSizeMultiplier) : 1;
-				List<IEditorCommand> commands = new List<IEditorCommand>();
+				var group = new CommandGroup();
 				foreach (UIComponent frame in SelectionLayer.FrameSelectionPanelList.Keys)
 				{
-					commands.Add(new CommandGroup(
+					group.Append(new CommandGroup(
 						new FramePropertyChangeCommand(frame, "X", frame.X + (int)delta.X * step),
-						new FramePropertyChangeCommand(frame, "Y", frame.Y + (int)delta.Y * step)));
+						new FramePropertyChangeCommand(frame, "Y", frame.Y + (int)delta.Y * step))
+					);
 				}
-				var command = new CommandGroup(commands.ToArray());
-				CommandManager.Instance.Execute(command);
+				CommandManager.Instance.Execute(group);
 			}
 			else
 			{
@@ -734,91 +729,92 @@ namespace WpfEditorTest
 
 		private void ExecutedAlignFrameCommand( object sender, ExecutedRoutedEventArgs e )
 		{
-			if (SelectionLayer.FrameSelectionPanelList.Count > 0)
-			{
-				List<IEditorCommand> commands = new List<IEditorCommand>();
-				var frames = SelectionLayer.FrameSelectionPanelList.Keys;
-				int minX, maxX, minY, maxY;
-				minX = int.MaxValue; /*SelectionLayer.FrameSelectionPanelList.First().Key.X;*/
-				minY = int.MaxValue; /*SelectionLayer.FrameSelectionPanelList.First().Key.Y;*/
-				maxX = int.MinValue; /*minX + SelectionLayer.FrameSelectionPanelList.First().Key.Width;*/
-				maxY = int.MinValue; /*minY + SelectionLayer.FrameSelectionPanelList.First().Key.Height;*/
+		    if (SelectionLayer.FrameSelectionPanelList.Count == 0)
+		        return;
 
+			var frames = SelectionLayer.FrameSelectionPanelList.Keys;
+			int minX, maxX, minY, maxY;
+			minX = int.MaxValue; /*SelectionLayer.FrameSelectionPanelList.First().Key.X;*/
+			minY = int.MaxValue; /*SelectionLayer.FrameSelectionPanelList.First().Key.Y;*/
+			maxX = int.MinValue; /*minX + SelectionLayer.FrameSelectionPanelList.First().Key.Width;*/
+			maxY = int.MinValue; /*minY + SelectionLayer.FrameSelectionPanelList.First().Key.Height;*/
+
+			switch (e.Parameter.ToString())
+			{
+				case "up":
+					{
+						minY = (int)(frames.Select(f => f.Y).Min() + 0.5f);
+						break;
+					}
+				case "down":
+					{
+						maxY = (int)(frames.Select(f => f.Y + f.Height).Max() + 0.5f);
+						break;
+					}
+				case "left":
+					{
+						minX = (int)(frames.Select(f => f.X).Min() + 0.5f);
+						break;
+					}
+				case "right":
+					{
+						maxX = (int)(frames.Select(f => f.X + f.Width).Max() + 0.5f);
+						break;
+					}
+				case "horizontal":
+					{
+						minX = (int)(frames.Select(f => f.X).Min() + 0.5f);
+						maxX = (int)(frames.Select(f => f.X + f.Width).Max() + 0.5f);
+						break;
+					}
+				case "vertical":
+					{
+						minY = (int)(frames.Select(f => f.Y).Min() + 0.5f);
+						maxY = (int)(frames.Select(f => f.Y + f.Height).Max() + 0.5f);
+						break;
+					}
+			}
+
+			var commands = new CommandGroup();
+			foreach (UIComponent frame in SelectionLayer.FrameSelectionPanelList.Keys)
+			{
 				switch (e.Parameter.ToString())
 				{
 					case "up":
 						{
-							minY = (int)(frames.Select(f => f.Y).Min() + 0.5f);
+							commands.Append(new FramePropertyChangeCommand(frame, "Y", minY));
 							break;
 						}
 					case "down":
 						{
-							maxY = (int)(frames.Select(f => f.Y + f.Height).Max() + 0.5f);
+							commands.Append(new FramePropertyChangeCommand(frame, "Y", maxY - frame.Height));
 							break;
 						}
 					case "left":
 						{
-							minX = (int)(frames.Select(f => f.X).Min() + 0.5f);
+							commands.Append(new FramePropertyChangeCommand(frame, "X", minX));
 							break;
 						}
 					case "right":
 						{
-							maxX = (int)(frames.Select(f => f.X + f.Width).Max() + 0.5f);
+							commands.Append(new FramePropertyChangeCommand(frame, "X", maxX - frame.Width));
 							break;
 						}
 					case "horizontal":
 						{
-							minX = (int)(frames.Select(f => f.X).Min() + 0.5f);
-							maxX = (int)(frames.Select(f => f.X + f.Width).Max() + 0.5f);
+							commands.Append(new FramePropertyChangeCommand(frame, "X", (minX + maxX - frame.Width) / 2));
 							break;
 						}
 					case "vertical":
 						{
-							minY = (int)(frames.Select(f => f.Y).Min() + 0.5f);
-							maxY = (int)(frames.Select(f => f.Y + f.Height).Max() + 0.5f);
+							commands.Append(new FramePropertyChangeCommand(frame, "Y", (minY + maxY - frame.Height) / 2));
 							break;
 						}
 				}
-				foreach (UIComponent frame in SelectionLayer.FrameSelectionPanelList.Keys)
-				{
-					switch (e.Parameter.ToString())
-					{
-						case "up":
-							{
-								commands.Add(new FramePropertyChangeCommand(frame, "Y", minY));
-								break;
-							}
-						case "down":
-							{
-								commands.Add(new FramePropertyChangeCommand(frame, "Y", maxY - frame.Height));
-								break;
-							}
-						case "left":
-							{
-								commands.Add(new FramePropertyChangeCommand(frame, "X", minX));
-								break;
-							}
-						case "right":
-							{
-								commands.Add(new FramePropertyChangeCommand(frame, "X", maxX - frame.Width));
-								break;
-							}
-						case "horizontal":
-							{
-								commands.Add(new FramePropertyChangeCommand(frame, "X", (minX + maxX - frame.Width) / 2));
-								break;
-							}
-						case "vertical":
-							{
-								commands.Add(new FramePropertyChangeCommand(frame, "Y", (minY + maxY - frame.Height) / 2));
-								break;
-							}
-					}
-				}
-
-				var command = new CommandGroup(commands.ToArray());
-				CommandManager.Instance.Execute(command);
 			}
+
+            if(!commands.IsEmpty)
+    			CommandManager.Instance.Execute(commands);
 		}
 
 		private void ExecutedCopyFrameCommand( object sender, ExecutedRoutedEventArgs e )
@@ -879,11 +875,10 @@ namespace WpfEditorTest
 					{
 						pastedComponents.Add(component);
 
-						List<IEditorCommand> commands = AddFrameToScene(component,
+						var command = AddFrameToScene(component,
 							System.Windows.Input.Mouse.GetPosition(SelectionLayer) + componentOffset);
 
-						var command = new CommandGroup(commands.ToArray());
-						CommandManager.Instance.Execute(command); 
+						CommandManager.Instance.Execute(command);
 					}
 				}
 			}
@@ -919,7 +914,7 @@ namespace WpfEditorTest
 
 		private void ExecutedRemoveSelectionCommand( object sender, ExecutedRoutedEventArgs e )
 		{
-			CommandManager.Instance.Execute(new SelectFrameCommand(new List<UIComponent>()));
+			CommandManager.Instance.Execute(new SelectFrameCommand());
 		}
 
 		private void AlwaysCanExecute( object sender, CanExecuteRoutedEventArgs e )
@@ -962,7 +957,7 @@ namespace WpfEditorTest
 					{
 						return;
 					}
-				} 
+				}
 			}
 			else
 			{
@@ -1047,8 +1042,8 @@ namespace WpfEditorTest
 			if (sceneData.IsDirty)
 			{
 				var result = MessageBox.Show(
-					$"There are unsaved changes in the scene: {sceneData.SceneName} Do you want to save them?", 
-					"Attention", 
+					$"There are unsaved changes in the scene: {sceneData.SceneName} Do you want to save them?",
+					"Attention",
 					MessageBoxButton.YesNoCancel
 					);
 				switch (result)
@@ -1239,7 +1234,7 @@ namespace WpfEditorTest
 				}
 
 				ZoomerScroll.ScrollToHorizontalOffset(scaledTopLeftCornerPosition.X);
-				ZoomerScroll.ScrollToVerticalOffset(scaledTopLeftCornerPosition.Y); 
+				ZoomerScroll.ScrollToVerticalOffset(scaledTopLeftCornerPosition.Y);
 
 			}
 		}

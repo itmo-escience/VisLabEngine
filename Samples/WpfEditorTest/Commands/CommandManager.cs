@@ -1,9 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
+﻿using System.ComponentModel;
 using WpfEditorTest.Utility;
 
-namespace WpfEditorTest.UndoRedo
+namespace WpfEditorTest.Commands
 {
 	internal class CommandManager : INotifyPropertyChanged
 	{
@@ -29,7 +27,7 @@ namespace WpfEditorTest.UndoRedo
 
 		public bool TryUndoCommand()
 		{
-			if (ObservableScene.UndoCommands.Count==0)
+			if (ObservableScene.UndoCommands.Count == 0)
 				return false;
 
 			var movedCommand = ObservableScene.UndoCommands.Pop();

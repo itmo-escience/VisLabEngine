@@ -9,9 +9,9 @@ using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
 using Fusion.Engine.Frames2;
-using WpfEditorTest.UndoRedo;
+using WpfEditorTest.Commands;
 using WpfEditorTest.Utility;
-using CommandManager = WpfEditorTest.UndoRedo.CommandManager;
+using CommandManager = WpfEditorTest.Commands.CommandManager;
 
 namespace WpfEditorTest.ChildPanels
 {
@@ -152,7 +152,7 @@ namespace WpfEditorTest.ChildPanels
 			childNode = parent.ItemContainerGenerator.ContainerFromItem(child) as TreeViewItem;
 			if (childNode != null)
 			{
-				childNode.IsSelected = true; 
+				childNode.IsSelected = true;
 			}
 		}
 
@@ -271,7 +271,7 @@ namespace WpfEditorTest.ChildPanels
 					//command = new FrameParentChangeCommand(dataComponent, treeViewItemHolder.Tag as UIContainer, dataComponent.Parent);
 					if (command!=null)
 					{
-						CommandManager.Instance.Execute(command); 
+						CommandManager.Instance.Execute(command);
 					}
 				}
 			}

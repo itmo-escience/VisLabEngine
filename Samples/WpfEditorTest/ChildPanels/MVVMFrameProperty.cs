@@ -4,8 +4,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
 using System.Reflection;
-using System.Text;
-using WpfEditorTest.UndoRedo;
+using WpfEditorTest.Commands;
 using WpfEditorTest.Utility;
 
 namespace WpfEditorTest.ChildPanels
