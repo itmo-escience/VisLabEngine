@@ -34,36 +34,6 @@ namespace Fusion.Engine.Frames2.Controllers
 
         public override void DebugDraw(SpriteLayerD2D layer) { }
 
-        public override void Attach(UIComponent component)
-        {
-            var s = component.Placement;
-
-            if (s != null)
-            {
-                if (s is AttachableSlot sa)
-                {
-                    sa.Detach();
-                }
-                else
-                {
-                    Log.Error("Attempt to attach component from unmodifiable");
-                    return;
-                }
-            }
-
-            UIComponent old = null;
-            if (Component != null)
-            {
-                old = Component;
-                Component.Placement = null;
-            }
-
-            component.Placement = this;
-            Component = component;
-            ComponentAttached?.Invoke(this, new SlotAttachmentChangedEventArgs(old, component));
-        }
-
-        public override event EventHandler<SlotAttachmentChangedEventArgs> ComponentAttached;
         public ObservableCollection<PropertyValueStates> Properties { get; } = new ObservableCollection<PropertyValueStates>();
     }
 

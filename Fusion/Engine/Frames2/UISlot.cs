@@ -101,9 +101,36 @@ namespace Fusion.Engine.Frames2
 
     public abstract class AttachableSlot : Slot
     {
-        public abstract void Attach(UIComponent component);
+        public void Attach(UIComponent newComponent)
+        {
+            var s = newComponent.Placement;
 
-        public abstract event EventHandler<SlotAttachmentChangedEventArgs> ComponentAttached;
+            if (s != null)
+            {
+                if (s is AttachableSlot sa)
+                {
+                    sa.Detach();
+                }
+                else
+                {
+                    Log.Error("Attempt to attach component from unmodifiable");
+                    return;
+                }
+            }
+
+            UIComponent old = null;
+            if (Component != null)
+            {
+                old = Component;
+                Component.Placement = null;
+            }
+
+            newComponent.Placement = this;
+            Component = newComponent;
+            ComponentAttached?.Invoke(this, new SlotAttachmentChangedEventArgs(old, newComponent));
+        }
+
+        public event EventHandler<SlotAttachmentChangedEventArgs> ComponentAttached;
 
         public void Detach() => Attach(null);
     }

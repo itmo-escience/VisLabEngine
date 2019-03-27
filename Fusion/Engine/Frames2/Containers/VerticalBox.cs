@@ -30,24 +30,6 @@ namespace Fusion.Engine.Frames2.Containers
         public override TextFormatD2D DebugTextFormat => new TextFormatD2D("Calibri", 10);
         public override void DebugDraw(SpriteLayerD2D layer) { }
 
-        #region ISlotAttachable
-
-        public override void Attach(UIComponent newComponent)
-        {
-            var old = Component;
-
-            Component = newComponent;
-            newComponent.Placement = this;
-
-            ComponentAttached?.Invoke(this,
-                new SlotAttachmentChangedEventArgs(old, newComponent)
-            );
-        }
-
-        public override event EventHandler<SlotAttachmentChangedEventArgs> ComponentAttached;
-
-        #endregion
-
         public override string ToString() => $"FreePlacementSlot with {Component}";
     }
 
