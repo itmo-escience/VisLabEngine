@@ -3,11 +3,12 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using Fusion.Core.Mathematics;
+using Fusion.Engine.Frames2.Managing;
 using Fusion.Engine.Graphics.SpritesD2D;
 
 namespace Fusion.Engine.Frames2
 {
-    public abstract class Slot : IUIDebugDrawable, INotifyPropertyChanged
+    public abstract class Slot : PropertyChangedHelper, IUIDebugDrawable, INotifyPropertyChanged
     {
         private float _x;
         public virtual float X
@@ -81,22 +82,6 @@ namespace Fusion.Engine.Frames2
         public abstract void DebugDraw(SpriteLayerD2D layer);
 
         public event PropertyChangedEventHandler PropertyChanged;
-
-        protected bool SetAndNotify<T>(ref T field, T value, [CallerMemberName] string propertyName = null)
-        {
-            if (EqualityComparer<T>.Default.Equals(field, value))
-                return false;
-
-            field = value;
-            NotifyPropertyChanged(propertyName);
-
-            return true;
-        }
-
-        protected void NotifyPropertyChanged([CallerMemberName] string propertyName = null)
-        {
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
-        }
     }
 
     public abstract class AttachableSlot : Slot
