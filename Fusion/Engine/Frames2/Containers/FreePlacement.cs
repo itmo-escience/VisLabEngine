@@ -6,28 +6,114 @@ using Fusion.Core.Mathematics;
 using Fusion.Core.Utils;
 using Fusion.Engine.Common;
 using Fusion.Engine.Frames2.Events;
+using Fusion.Engine.Frames2.Managing;
 using Fusion.Engine.Graphics.SpritesD2D;
 
 namespace Fusion.Engine.Frames2.Containers
 {
-    public sealed class FreePlacementSlot : AttachableSlot
+    public class FreePlacementSlot : PropertyChangedHelper, ISlotAttachable
     {
         internal FreePlacementSlot(FreePlacement holder, float x, float y, float width, float height)
         {
             InternalHolder = holder;
-            X = x;
-            Y = y;
-            Width = width;
-            Height = height;
+            _x = x;
+            _y = y;
+            _width = width;
+            _height = height;
         }
-        
+
+        #region ISlot
+        private float _x;
+        public float X
+        {
+            get => _x;
+            set => SetAndNotify(ref _x, value);
+        }
+
+        private float _y;
+        public float Y
+        {
+            get => _y;
+            set => SetAndNotify(ref _y, value);
+        }
+
+        private float _angle;
+        public float Angle
+        {
+            get => _angle;
+            set => SetAndNotify(ref _angle, value);
+        }
+
+        private float _width;
+        public float Width
+        {
+            get => _width;
+            internal set => SetAndNotify(ref _width, value);
+        }
+
+        private float _height;
+        public float Height
+        {
+            get => _height;
+            internal set => SetAndNotify(ref _height, value);
+        }
+
+        public float AvailableWidth => MathUtil.Clamp(Parent.Placement.Width - X, 0, float.MaxValue);
+        public float AvailableHeight => MathUtil.Clamp(Parent.Placement.Height - Y, 0, float.MaxValue);
+
+        private Matrix3x2 _transform = Matrix3x2.Identity;
+        public Matrix3x2 Transform
+        {
+            get => _transform;
+            set => SetAndNotify(ref _transform, value);
+        }
+
+        private bool _clip = true;
+        public bool Clip
+        {
+            get => _clip;
+            set => SetAndNotify(ref _clip, value);
+        }
+
+        private bool _visible = true;
+        public bool Visible
+        {
+            get => _visible;
+            set => SetAndNotify(ref _visible, value);
+        }
+
         internal IUIModifiableContainer<FreePlacementSlot> InternalHolder { get; }
+        public IUIContainer<ISlot> Parent => InternalHolder;
 
-        public override IUIContainer<Slot> Parent => InternalHolder;
+        private UIComponent _component;
+        public UIComponent Component
+        {
+            get => _component;
+            private set => SetAndNotify(ref _component, value);
+        }
 
-        public override SolidBrushD2D DebugBrush => new SolidBrushD2D(new Color4(0, 1.0f, 0, 1.0f));
-        public override TextFormatD2D DebugTextFormat => new TextFormatD2D("Calibri", 10);
-        public override void DebugDraw(SpriteLayerD2D layer) { }
+        public SolidBrushD2D DebugBrush => new SolidBrushD2D(new Color4(0, 1.0f, 0, 1.0f));
+        public TextFormatD2D DebugTextFormat => new TextFormatD2D("Calibri", 10);
+        public void DebugDraw(SpriteLayerD2D layer) { }
+        #endregion
+
+        #region ISlotAttachable
+
+        public virtual void Attach(UIComponent newComponent)
+        {
+            var old = Component;
+
+            Component = newComponent;
+            newComponent.Placement = this;
+
+            ComponentAttached?.Invoke(this,
+                new SlotAttachmentChangedEventArgs(old, newComponent)
+            );
+        }
+
+        public event EventHandler<SlotAttachmentChangedEventArgs> ComponentAttached;
+
+        #endregion
 
         public override string ToString() => $"FreePlacementSlot with {Component}";
     }
@@ -38,7 +124,7 @@ namespace Fusion.Engine.Frames2.Containers
         public IEnumerable<FreePlacementSlot> Slots => _slots;
 
         public event PropertyChangedEventHandler PropertyChanged;
-        public Slot Placement { get; set; }
+        public ISlot Placement { get; set; }
         public UIEventsHolder Events { get; } = new UIEventsHolder();
 
         public float DesiredWidth { get; set; } = -1;
@@ -52,10 +138,10 @@ namespace Fusion.Engine.Frames2.Containers
             foreach (var slot in Slots)
             {
                 if (slot.Component.DesiredWidth >= 0)
-                    slot.Width = Math.Min(slot.Component.DesiredWidth, Placement.Width - slot.Component.Placement.X);
+                    slot.Width = slot.Component.DesiredWidth;
 
                 if (slot.Component.DesiredHeight >= 0)
-                    slot.Height = Math.Min(slot.Component.DesiredHeight, Placement.Height - slot.Component.Placement.Y);
+                    slot.Height = slot.Component.DesiredHeight;
             }
         }
 

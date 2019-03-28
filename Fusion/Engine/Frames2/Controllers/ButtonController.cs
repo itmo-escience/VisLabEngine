@@ -8,20 +8,23 @@ using Fusion.Engine.Graphics.SpritesD2D;
 
 namespace Fusion.Engine.Frames2.Controllers
 {
-    public sealed class ButtonSlot : AttachableSlot, IHasProperties
+    public class ButtonSlot : IControllerSlot, ISlotAttachable
     {
-        public override float X => 0;
-        public override float Y => 0;
-        public override float Angle => 0;
-        public override float Width => Parent.Placement.Width;
-        public override float Height => Parent.Placement.Width;
-        public override float AvailableWidth => Width;
-        public override float AvailableHeight => Height;
-        public override bool Clip => true;
+        public event PropertyChangedEventHandler PropertyChanged;
+        public float X => 0;
+        public float Y => 0;
+        public float Angle => 0;
+        public float Width => Parent.Placement.Width;
+        public float Height => Parent.Placement.Width;
+        public float AvailableWidth => Width;
+        public float AvailableHeight => Height;
+        public bool Clip => true;
+        public bool Visible { get; set; } = false;
 
-        public override IUIContainer<Slot> Parent { get; }
-        public override SolidBrushD2D DebugBrush => new SolidBrushD2D(Color4.White);
-        public override TextFormatD2D DebugTextFormat => new TextFormatD2D("Calibri", 10);
+        public IUIContainer<ISlot> Parent { get; }
+        public UIComponent Component { get; private set; }
+        public SolidBrushD2D DebugBrush => new SolidBrushD2D(Color4.White);
+        public TextFormatD2D DebugTextFormat => new TextFormatD2D("Calibri", 10);
 
         public string Name { get; }
 
@@ -29,11 +32,40 @@ namespace Fusion.Engine.Frames2.Controllers
         {
             Parent = parent;
             Name = name;
-            Visible = false;
         }
 
-        public override void DebugDraw(SpriteLayerD2D layer) { }
+        public void DebugDraw(SpriteLayerD2D layer) { }
 
+        public void Attach(UIComponent component)
+        {
+            var s = component.Placement;
+
+            if (s != null)
+            {
+                if (s is ISlotAttachable sa)
+                {
+                    sa.Detach();
+                }
+                else
+                {
+                    Log.Error("Attempt to attach component from unmodifiable");
+                    return;
+                }
+            }
+
+            UIComponent old = null;
+            if (Component != null)
+            {
+                old = Component;
+                Component.Placement = null;
+            }
+
+            component.Placement = this;
+            Component = component;
+            ComponentAttached?.Invoke(this, new SlotAttachmentChangedEventArgs(old, component));
+        }
+
+        public event EventHandler<SlotAttachmentChangedEventArgs> ComponentAttached;
         public ObservableCollection<PropertyValueStates> Properties { get; } = new ObservableCollection<PropertyValueStates>();
     }
 

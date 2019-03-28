@@ -8,7 +8,7 @@ namespace Fusion.Engine.Frames2
 {
     public interface UIComponent : IUIDrawable, INotifyPropertyChanged //, IUIInputAware
     {
-        Slot Placement { get; set; }
+        ISlot Placement { get; set; }
 
         UIEventsHolder Events { get; }
 
@@ -23,7 +23,7 @@ namespace Fusion.Engine.Frames2
 
     public static class UIComponentExtensions
     {
-        public static IUIContainer<Slot> Parent(this UIComponent component) => component.Placement.Parent;
+        public static IUIContainer<ISlot> Parent(this UIComponent component) => component.Placement.Parent;
     }
 
     public static class UINameManager

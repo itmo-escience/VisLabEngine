@@ -10,7 +10,7 @@ namespace Fusion.Engine.Frames2.Events
     public class UIEventProcessor
     {
         private readonly Game _game;
-        private readonly IUIContainer<Slot> _root;
+        private readonly IUIContainer<ISlot> _root;
         private readonly UIManager _manager;
 
         private UIComponent _focusComponent;
@@ -25,7 +25,7 @@ namespace Fusion.Engine.Frames2.Events
 
         private List<UIComponent> _componentsWithMouse;
 
-        internal UIEventProcessor(UIManager manager, IUIContainer<Slot> root)
+        internal UIEventProcessor(UIManager manager, IUIContainer<ISlot> root)
         {
             _root = root;
             _game = Game.Instance;

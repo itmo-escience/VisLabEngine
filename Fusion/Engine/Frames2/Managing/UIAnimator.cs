@@ -4,9 +4,9 @@ namespace Fusion.Engine.Frames2.Managing
 {
     public class UIAnimator
     {
-        private IUIModifiableContainer<Slot> _root;
+        private IUIModifiableContainer<ISlot> _root;
 
-        internal UIAnimator(IUIModifiableContainer<Slot> root)
+        internal UIAnimator(IUIModifiableContainer<ISlot> root)
         {
             _root = root;
         }

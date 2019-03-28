@@ -3,7 +3,7 @@ using System.Linq;
 
 namespace Fusion.Engine.Frames2
 {
-    public interface IUIContainer<out T> : UIComponent where T : Slot
+    public interface IUIContainer<out T> : UIComponent where T : ISlot
     {
         IEnumerable<T> Slots { get; }
 
@@ -12,7 +12,7 @@ namespace Fusion.Engine.Frames2
         bool Contains(UIComponent component);
     }
 
-    public interface IUIModifiableContainer<out T> : IUIContainer<T> where T : Slot
+    public interface IUIModifiableContainer<out T> : IUIContainer<T> where T : ISlot
     {
         T Insert(UIComponent child, int index);
 
@@ -74,7 +74,7 @@ namespace Fusion.Engine.Frames2
 
     public static class ContainerExtensions
     {
-        public static int IndexOf<T>(this IUIContainer<T> c, UIComponent child) where T : Slot
+        public static int IndexOf<T>(this IUIContainer<T> c, UIComponent child) where T : ISlot
         {
             var i = 0;
             foreach (var slot in c.Slots)
@@ -87,12 +87,12 @@ namespace Fusion.Engine.Frames2
             return -1;
         }
 
-        public static bool Contains<T>(this IUIContainer<T> c, UIComponent component) where T : Slot
+        public static bool Contains<T>(this IUIContainer<T> c, UIComponent component) where T : ISlot
         {
             return c.Slots.Any(slot => slot.Component == component);
         }
 
-        public static IEnumerable<UIComponent> GetChildren<T>(this IUIContainer<T> container) where T : Slot
+        public static IEnumerable<UIComponent> GetChildren<T>(this IUIContainer<T> container) where T : ISlot
         {
             return container.Slots.Select(slot => slot.Component);
         }
