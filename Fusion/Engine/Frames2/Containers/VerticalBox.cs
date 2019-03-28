@@ -27,21 +27,21 @@ namespace Fusion.Engine.Frames2.Containers
         public float X
         {
             get => _x;
-            set => SetAndNotify(ref _x, value);
+            internal set => SetAndNotify(ref _x, value);
         }
 
         private float _y;
         public float Y
         {
             get => _y;
-            set => SetAndNotify(ref _y, value);
+            internal set => SetAndNotify(ref _y, value);
         }
 
         private float _angle;
         public float Angle
         {
             get => _angle;
-            set => SetAndNotify(ref _angle, value);
+            internal set => SetAndNotify(ref _angle, value);
         }
 
         private float _width;
@@ -83,7 +83,7 @@ namespace Fusion.Engine.Frames2.Containers
         }
 
         internal IUIModifiableContainer<VerticalBoxSlot> InternalHolder { get; }
-        public IUIContainer<ISlot> Parent => InternalHolder;
+        public IUIContainer Parent => InternalHolder;
 
         private UIComponent _component;
         public UIComponent Component
@@ -126,7 +126,7 @@ namespace Fusion.Engine.Frames2.Containers
     public class VerticalBox : PropertyChangedHelper, IUIModifiableContainer<VerticalBoxSlot>
     {
         private readonly AsyncObservableCollection<VerticalBoxSlot> _slots = new AsyncObservableCollection<VerticalBoxSlot>();
-        public IEnumerable<VerticalBoxSlot> Slots => _slots;
+        public IEnumerable<ISlot> Slots => _slots;
 
         public ISlot Placement { get; set; }
         public UIEventsHolder Events { get; } = new UIEventsHolder();
@@ -148,7 +148,7 @@ namespace Fusion.Engine.Frames2.Containers
         {
             float bottomBorder = 0;
             float maxChildWidth = 0;
-            foreach (var slot in Slots)
+            foreach (var slot in _slots)
             {
                 slot.Width = slot.Component.DesiredWidth;
                 slot.Height = slot.Component.DesiredHeight;
@@ -176,7 +176,7 @@ namespace Fusion.Engine.Frames2.Containers
                     break;
             }
 
-            foreach (var slot in Slots)
+            foreach (var slot in _slots)
             {
                 slot.X = deltaXMultiplier * (DesiredWidth - slot.Width);
             }

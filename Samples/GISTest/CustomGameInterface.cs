@@ -184,15 +184,11 @@ namespace GISTest
 		    imgFpSlot.Y = 50;
 
             var slot = imgVerticalBox.Insert(img1, 0);
-		    slot.X = 10;
-		    slot.Y = 10;
 		    img1.DesiredWidth = 250;
 		    img1.DesiredHeight = 50;
 
 
             var slot2 = imgVerticalBox.Insert(img2, 0);
-		    slot2.X = 20;
-		    slot2.Y = 80;
 		    img2.DesiredWidth = 450;
 		    img2.DesiredHeight = 250;
 
