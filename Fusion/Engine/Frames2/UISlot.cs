@@ -22,7 +22,7 @@ namespace Fusion.Engine.Frames2
         bool Clip { get; }
         bool Visible { get; }
 
-        IUIContainer<ISlot> Parent { get; }
+        IUIContainer Parent { get; }
         UIComponent Component { get; }
 
         SolidBrushD2D DebugBrush { get; }

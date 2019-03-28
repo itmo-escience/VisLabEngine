@@ -21,7 +21,7 @@ namespace Fusion.Engine.Frames2.Controllers
         public bool Clip => true;
         public bool Visible { get; set; } = false;
 
-        public IUIContainer<ISlot> Parent { get; }
+        public IUIContainer Parent { get; }
         public UIComponent Component { get; private set; }
         public SolidBrushD2D DebugBrush => new SolidBrushD2D(Color4.White);
         public TextFormatD2D DebugTextFormat => new TextFormatD2D("Calibri", 10);
@@ -75,7 +75,7 @@ namespace Fusion.Engine.Frames2.Controllers
         protected override IEnumerable<State> NonDefaultStates => new List<State> { Pressed };
 
         private readonly List<ButtonSlot> _slots;
-        public override IEnumerable<ButtonSlot> Slots => _slots;
+        protected override IEnumerable<IControllerSlot> ControllerSlots => _slots;
 
         public ButtonSlot Foreground { get; }
         public ButtonSlot Background { get; }

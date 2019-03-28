@@ -83,7 +83,7 @@ namespace Fusion.Engine.Frames2.Containers
         }
 
         internal IUIModifiableContainer<FreePlacementSlot> InternalHolder { get; }
-        public IUIContainer<ISlot> Parent => InternalHolder;
+        public IUIContainer Parent => InternalHolder;
 
         private UIComponent _component;
         public UIComponent Component
@@ -121,7 +121,7 @@ namespace Fusion.Engine.Frames2.Containers
     public class FreePlacement : IUIModifiableContainer<FreePlacementSlot>
     {
         private readonly AsyncObservableCollection<FreePlacementSlot> _slots = new AsyncObservableCollection<FreePlacementSlot>();
-        public IEnumerable<FreePlacementSlot> Slots => _slots;
+        public IEnumerable<ISlot> Slots => _slots;
 
         public event PropertyChangedEventHandler PropertyChanged;
         public ISlot Placement { get; set; }
@@ -135,7 +135,7 @@ namespace Fusion.Engine.Frames2.Containers
 
         public void Update(GameTime gameTime)
         {
-            foreach (var slot in Slots)
+            foreach (var slot in _slots)
             {
                 if (slot.Component.DesiredWidth >= 0)
                     slot.Width = slot.Component.DesiredWidth;

@@ -49,7 +49,7 @@ namespace Fusion.Engine.Frames2.Managing
                 var c = queue.Dequeue();
                 yield return c;
 
-                if (c is IUIContainer<ISlot> container)
+                if (c is IUIContainer container)
                 {
                     foreach (var child in container.Slots)
                     {
@@ -70,7 +70,7 @@ namespace Fusion.Engine.Frames2.Managing
                 var c = queue.Dequeue();
                 yield return c;
 
-                if (c is IUIContainer<ISlot> container)
+                if (c is IUIContainer container)
                 {
                     foreach (var child in container.Slots.Select(s => s.Component))
                     {
@@ -83,7 +83,7 @@ namespace Fusion.Engine.Frames2.Managing
 
         private static bool InsideComponent(UIManager manager, UIComponent component, Vector2 point)
         {
-            if (component is IUIContainer<ISlot> container && !container.Placement.Clip)
+            if (component is IUIContainer container && !container.Placement.Clip)
             {
                 return true;
             }
@@ -101,7 +101,7 @@ namespace Fusion.Engine.Frames2.Managing
                 var c = stack.Pop();
                 stack2.Push(c);
 
-                if (c is IUIContainer<ISlot> container)
+                if (c is IUIContainer container)
                 {
                     foreach (var child in container.Slots)
                     {
@@ -117,7 +117,7 @@ namespace Fusion.Engine.Frames2.Managing
             }
         }
 
-        public static UIComponent GetLowestComponentInHierarchy(UIManager manager, IUIContainer<ISlot> root, Vector2 innerPoint)
+        public static UIComponent GetLowestComponentInHierarchy(UIManager manager, IUIContainer root, Vector2 innerPoint)
         {
             if (!InsideComponent(manager, root, innerPoint)) return null;
 
@@ -129,7 +129,7 @@ namespace Fusion.Engine.Frames2.Managing
                     .Component;
 
                 if (newLowest == null) return lowestContainer;
-                if (newLowest is IUIContainer<ISlot> newContainer)
+                if (newLowest is IUIContainer newContainer)
                 {
                     lowestContainer = newContainer;
                 }
@@ -140,7 +140,7 @@ namespace Fusion.Engine.Frames2.Managing
             }
         }
 
-        public static IEnumerable<IUIContainer<ISlot>> Ancestors(UIComponent component)
+        public static IEnumerable<IUIContainer> Ancestors(UIComponent component)
         {
             if(component == null)
                 yield break;

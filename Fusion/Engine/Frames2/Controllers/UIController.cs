@@ -14,7 +14,7 @@ namespace Fusion.Engine.Frames2.Controllers
         ObservableCollection<PropertyValueStates> Properties { get; }
     }
 
-    public abstract class UIController<T> : IUIContainer<T> where T : IControllerSlot
+    public abstract class UIController<T> : IUIContainer where T : IControllerSlot
     {
         public State CurrentState { get; protected set; } = State.Default;
 
@@ -35,13 +35,14 @@ namespace Fusion.Engine.Frames2.Controllers
 
         protected virtual IEnumerable<State> NonDefaultStates => new List<State>();
 
-        public abstract IEnumerable<T> Slots { get; }
+        public virtual IEnumerable<ISlot> Slots => ControllerSlots;
+        protected abstract IEnumerable<IControllerSlot> ControllerSlots { get; }
 
         public void ChangeState(State newState)
         {
             if (!States.Contains(newState)) return;
 
-            foreach (var slot in Slots)
+            foreach (var slot in ControllerSlots)
             {
                 var component = slot.Component;
                 var type = component.GetType();
