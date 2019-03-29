@@ -11,7 +11,7 @@ using Fusion.Engine.Graphics.SpritesD2D;
 
 namespace Fusion.Engine.Frames2.Containers
 {
-    public class FreePlacementSlot : PropertyChangedHelper, ISlotAttachable
+    public sealed class FreePlacementSlot : PropertyChangedHelper, ISlotAttachable
     {
         internal FreePlacementSlot(FreePlacement holder, float x, float y, float width, float height)
         {
@@ -99,7 +99,7 @@ namespace Fusion.Engine.Frames2.Containers
 
         #region ISlotAttachable
 
-        public virtual void Attach(UIComponent newComponent)
+        public void Attach(UIComponent newComponent)
         {
             var old = Component;
 
@@ -137,10 +137,14 @@ namespace Fusion.Engine.Frames2.Containers
         {
             foreach (var slot in Slots)
             {
-                if (slot.Component.DesiredWidth >= 0)
+                // If it's not changed than it's strictly equal
+                // ReSharper disable once CompareOfFloatsByEqualityOperator
+                if (slot.Component.DesiredWidth >= 0 && slot.Width != slot.Component.DesiredWidth)
                     slot.Width = slot.Component.DesiredWidth;
 
-                if (slot.Component.DesiredHeight >= 0)
+                // If it's not changed than it's strictly equal
+                // ReSharper disable once CompareOfFloatsByEqualityOperator
+                if (slot.Component.DesiredHeight >= 0 && slot.Height != slot.Component.DesiredHeight)
                     slot.Height = slot.Component.DesiredHeight;
             }
         }
