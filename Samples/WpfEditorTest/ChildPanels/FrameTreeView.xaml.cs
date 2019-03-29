@@ -49,6 +49,8 @@ namespace WpfEditorTest.ChildPanels
 		{
 			InitializeComponent();
 
+		    System.Diagnostics.PresentationTraceSources.SetTraceLevel(ElementHierarchyView.ItemContainerGenerator, System.Diagnostics.PresentationTraceLevel.High);
+
 			Height = double.Parse(ConfigurationManager.AppSettings.Get("TreeViewPanelHeight"));
 		    Width = ApplicationConfig.OptionsWindowSize;
 

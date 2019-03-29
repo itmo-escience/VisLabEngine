@@ -1,11 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Shapes;
+using Fusion.Engine.Common;
 using Fusion.Engine.Frames2;
 using Fusion.Engine.Frames2.Managing;
 using WpfEditorTest.FrameSelection;
@@ -898,7 +900,6 @@ namespace WpfEditorTest
 		        if (dataType != null)
 		        {
 		            createdFrame = Activator.CreateInstance(dataType) as UIComponent;
-
 		            createdFrame?.DefaultInit();
 		        }
 		    }

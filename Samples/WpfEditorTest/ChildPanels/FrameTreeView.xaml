@@ -16,21 +16,21 @@
         MaxWidth="350" MaxHeight="950" KeyDown="Window_KeyDown">
     <Window.Resources>
         <conv:EnumerateConverter x:Key="enumConverter"/>
-        <HierarchicalDataTemplate x:Key="tvTemplate1" ItemsSource="{Binding Path=Children}">
-            <TextBlock Text="{Binding Name}" Tag="{Binding}" 
-                               MouseDown="TextBlock_MouseDown" DragOver="TextBlock_PreviewDragOver" Drop="TextBlock_PreviewDrop" 
+        <HierarchicalDataTemplate x:Key="tvContainerTemplate" ItemsSource="{Binding Path=Children}">
+            <TextBlock Text="{Binding Name}" Tag="{Binding}"
+                               MouseDown="TextBlock_MouseDown" DragOver="TextBlock_PreviewDragOver" Drop="TextBlock_PreviewDrop"
                                PreviewDragLeave="TextBlock_PreviewDragLeave" PreviewDragEnter="TextBlock_PreviewDragEnter"
                                />
         </HierarchicalDataTemplate>
-        <HierarchicalDataTemplate x:Key="tvTemplate2" ItemsSource="{Binding Path=Slots}">
-            <TextBlock Text="{Binding Name}" Tag="{Binding}" 
-                               MouseDown="TextBlock_MouseDown" DragOver="TextBlock_PreviewDragOver" Drop="TextBlock_PreviewDrop" 
+        <HierarchicalDataTemplate x:Key="tvControllerTemplate" ItemsSource="{Binding Path=Slots}">
+            <TextBlock Text="{Binding Name}" Tag="{Binding}"
+                               MouseDown="TextBlock_MouseDown" DragOver="TextBlock_PreviewDragOver" Drop="TextBlock_PreviewDrop"
                                PreviewDragLeave="TextBlock_PreviewDragLeave" PreviewDragEnter="TextBlock_PreviewDragEnter"
                                 FontStyle="Italic"/>
         </HierarchicalDataTemplate>
-        <HierarchicalDataTemplate x:Key="tvTemplate3" ItemsSource="{Binding Path=Component, Converter={StaticResource enumConverter}}">
-            <TextBlock Text="{Binding Name}" Tag="{Binding}" 
-                               MouseDown="TextBlock_MouseDown" DragOver="TextBlock_PreviewDragOver" Drop="TextBlock_PreviewDrop" 
+        <HierarchicalDataTemplate x:Key="tvComponentTemplate" ItemsSource="{Binding Path=Component, Converter={StaticResource enumConverter}}">
+            <TextBlock Text="{Binding Name}" Tag="{Binding}"
+                               MouseDown="TextBlock_MouseDown" DragOver="TextBlock_PreviewDragOver" Drop="TextBlock_PreviewDrop"
                                PreviewDragLeave="TextBlock_PreviewDragLeave" PreviewDragEnter="TextBlock_PreviewDragEnter"
                                FontStyle="Italic" Foreground="Purple"/>
         </HierarchicalDataTemplate>
@@ -38,10 +38,13 @@
     <ScrollViewer Height="auto" Width="auto" Background="LightGray" PreviewMouseWheel="ScrollViewer_PreviewMouseWheel">
         <AdornerDecorator>
             <TreeView Name="ElementHierarchyView"
-                      Background="LightGray" Height="auto" Width="auto" AllowDrop="True" Drop="ElementHierarchyView_Drop">
+                      Background="LightGray" Height="auto" Width="auto" AllowDrop="True" Drop="ElementHierarchyView_Drop"
+                      PresentationTraceSources.TraceLevel="High">
                 <TreeView.ItemTemplateSelector>
-                    <conv:DataTemplateSelectorOfTreeView tv1Template="{StaticResource tvTemplate1}" tv2Template="{StaticResource tvTemplate2}"
-                                                         tv3Template="{StaticResource tvTemplate3}"/>
+                    <conv:DataTemplateSelectorOfTreeView
+                        tvContainerTemplate="{StaticResource tvContainerTemplate}"
+                        tvControllerTemplate="{StaticResource tvControllerTemplate}"
+                        tvComponentTemplate="{StaticResource tvComponentTemplate}"/>
                 </TreeView.ItemTemplateSelector>
             </TreeView>
         </AdornerDecorator>

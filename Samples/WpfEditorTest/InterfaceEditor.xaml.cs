@@ -9,6 +9,7 @@ using System.Reflection;
 using System.Threading;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Data;
 using System.Windows.Forms;
 using System.Windows.Interop;
 using System.Windows.Input;
@@ -634,7 +635,7 @@ namespace WpfEditorTest
 			UIComponent createdFrame = null;
 			try
 			{
-				Fusion.Core.Utils.UIComponentSerializer.Read(filePath, out createdFrame);
+			    Fusion.Core.Utils.UIComponentSerializer.Read(filePath, out createdFrame);
 			}
 			catch (Exception ex)
 			{
@@ -644,6 +645,7 @@ namespace WpfEditorTest
 				Fusion.Log.Error($"Exception stack trace:\n{ex.StackTrace}");
 				Fusion.Log.Error($"---------------ERROR---------------\n");
 			}
+
 			return createdFrame;
 		}
 
@@ -1271,6 +1273,8 @@ namespace WpfEditorTest
 						Source = CurrentScene.Scene,
 					};
 					_treeView.ElementHierarchyView.SetBinding(TreeView.ItemsSourceProperty, _childrenBinding);
+				    BindingOperations.EnableCollectionSynchronization(CurrentScene.Scene.Children,
+				        CurrentScene.Scene.ChildrenAccessLock);
 					_treeView.AttachScene(SceneFrame);
 					SelectionManager.Instance.SelectFrame(CurrentScene.SceneSelection);
 				}

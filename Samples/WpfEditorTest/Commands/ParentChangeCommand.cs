@@ -40,32 +40,32 @@ namespace WpfEditorTest.Commands
 
 		public void Do()
 		{
-			_asyncThreadChangesDoneEvent.Reset();
+			//_asyncThreadChangesDoneEvent.Reset();
 
 			Game.ResourceWorker.Post(r => {
                 r.ProcessQueue.Post(t => {
                     _oldParent?.Remove(_frame);
                     _newParent?.AddAt(_frame, _index);
-					_asyncThreadChangesDoneEvent.Set();
+					//_asyncThreadChangesDoneEvent.Set();
 				}, null, int.MaxValue);
             }, null, int.MaxValue);
 
-			_asyncThreadChangesDoneEvent.WaitOne();
+			//_asyncThreadChangesDoneEvent.WaitOne();
 		}
 
 		public void Undo()
 		{
-			_asyncThreadChangesDoneEvent.Reset();
+			//_asyncThreadChangesDoneEvent.Reset();
 
 			Game.ResourceWorker.Post(r => {
                 r.ProcessQueue.Post(t => {
                     _newParent?.Remove(_frame);
                     _oldParent?.AddAt(_frame, _index);
-					_asyncThreadChangesDoneEvent.Set();
+					//_asyncThreadChangesDoneEvent.Set();
 				}, null, int.MaxValue);
             }, null, int.MaxValue);
 
-			_asyncThreadChangesDoneEvent.WaitOne();
+			//_asyncThreadChangesDoneEvent.WaitOne();
 		}
 	}
 }

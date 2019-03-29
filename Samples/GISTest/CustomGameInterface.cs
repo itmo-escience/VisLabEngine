@@ -250,7 +250,7 @@ namespace GISTest
             //
 
             //UIManager.Root.Add(freePlacement);
-            
+
             #endregion
 
             /*
@@ -283,7 +283,7 @@ namespace GISTest
 
             UIManager.Root.Add(tb);
             #endregion
-    */
+
             #region radioButtons
 
             RadioButtonController CreateSimpleRadioButton(float x, float y)
@@ -291,7 +291,7 @@ namespace GISTest
                 float width = 100;
                 float height = 25;
                 RadioButtonController rbtn = new RadioButtonController(x, y, width, height);
-                
+
                 rbtn.Background.Attach(new Border(0, 0, width, height));
                 rbtn.RadioButton.Attach(new Border(0, 0, height, height));
                 rbtn.Text.Attach(new Label("RadioButton", new TextFormatD2D("Calibry", 12), height, 0, width - height, height));
@@ -353,7 +353,7 @@ namespace GISTest
             UIManager.Root.Add(dlg);
 
             #endregion
-
+    */
             userInterface.RootFrame = this.rootFrame = new MainFrame(FrameProcessor);
             viewLayer.SpriteLayers.Add(userInterface.FramesSpriteLayer);
 

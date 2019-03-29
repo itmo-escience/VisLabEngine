@@ -5,29 +5,31 @@ using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Diagnostics;
+using System.Linq;
 using System.Reflection;
 using System.Runtime.Serialization;
 using System.Threading;
+using System.Windows.Data;
 using System.Windows.Threading;
 
 namespace Fusion.Core.Utils
 {
-    //https://stackoverflow.com/questions/23108045/how-to-make-observablecollection-thread-safe
+    //https://gist.github.com/anonymous/26d9d070619de58fa8e28ea21fff04fd
 
     /// <summary>
     /// A version of <see cref="ObservableCollection{T}"/> that is locked so that it can be accessed by multiple threads. When you enumerate it (foreach),
     /// you will get a snapshot of the current contents. Also the <see cref="CollectionChanged"/> event will be called on the thread that added it if that
     /// thread is a Dispatcher (WPF/Silverlight/WinRT) thread. This means that you can update this from any thread and recieve notifications of those updates
     /// on the UI thread.
-    /// 
+    ///
     /// You can't modify the collection during a callback (on the thread that recieved the callback -- other threads can do whatever they want). This is the
     /// same as <see cref="ObservableCollection{T}"/>.
     /// </summary>
     [Serializable, DebuggerDisplay("Count = {Count}")]
     public sealed class AsyncObservableCollection<T> : IList<T>, IReadOnlyList<T>, IList, INotifyCollectionChanged, INotifyPropertyChanged, ISerializable
     {
-        // we implement IReadOnlyList<T> because ObservableCollection<T> does, and we want to mostly keep API compatability...
-        // this collection is NOT read only, but neither is ObservableCollection<T>
+		// we implement IReadOnlyList<T> because ObservableCollection<T> does, and we want to mostly keep API compatability...
+		// this collection is NOT read only, but neither is ObservableCollection<T>
 
         private readonly ObservableCollection<T> _collection;       // actual collection
         private readonly ThreadLocal<ThreadView> _threadView;       // every thread has its own view of this collection
@@ -39,10 +41,10 @@ namespace Fusion.Core.Utils
             _collection = new ObservableCollection<T>();
             _lock = new ReaderWriterLockSlim();
             _threadView = new ThreadLocal<ThreadView>(() => new ThreadView(this));
-            // It was a design decision to NOT implement IDisposable here for disposing the ThreadLocal instance. ThreaLocal has a finalizer
-            // so it will be taken care of eventually. Since the cache itself is a weak reference, the only difference between explicitly
-            // disposing of it and waiting for finalization will be ~80 bytes per thread of memory in the TLS table that will stay around for
-            // an extra couple GC cycles. This is a tiny, tiny cost, and reduces the API complexity of this class.
+			// It was a design decision to NOT implement IDisposable here for disposing the ThreadLocal instance. ThreaLocal has a finalizer
+			// so it will be taken care of eventually. Since the cache itself is a weak reference, the only difference between explicitly
+			// disposing of it and waiting for finalization will be ~80 bytes per thread of memory in the TLS table that will stay around for
+			// an extra couple GC cycles. This is a tiny, tiny cost, and reduces the API complexity of this class.
         }
 
         public AsyncObservableCollection(IEnumerable<T> collection)
@@ -60,6 +62,11 @@ namespace Fusion.Core.Utils
         /// </summary>
         private sealed class ThreadView
         {
+            private struct VersionedEventArgs
+            {
+                public EventArgs Args;
+                public int Version; //
+            }
             // These fields will always be accessed from the correct thread, so no sync issues
             public readonly List<EventArgs> waitingEvents = new List<EventArgs>();    // events waiting to be dispatched
             public bool dissalowReenterancy;                                          // don't allow write methods to be called on the thread that's executing events
@@ -88,7 +95,7 @@ namespace Fusion.Core.Utils
                 Debug.Assert(Thread.CurrentThread.ManagedThreadId == _threadId);
                 List<T> list;
                 // if we have a cached snapshot that's up to date, just use that one
-                if (!_snapshot.TryGetTarget(out list) || _listVersion != _owner._version)
+                if(!_snapshot.TryGetTarget(out list) || _listVersion != _owner._version)
                 {
                     // need to create a new snapshot
                     // if nothing is using the old snapshot, we can clear and reuse the existing list instead
@@ -101,7 +108,7 @@ namespace Fusion.Core.Utils
                     try
                     {
                         _listVersion = _owner._version;
-                        if (list == null || enumCount > 0)
+                        if(list == null || enumCount > 0)
                         {
                             // if enumCount > 0 here that means something is currently using the instance of list. we create a new list
                             // here and "strand" the old list so the enumerator can finish enumerating it in peace.
@@ -144,9 +151,9 @@ namespace Fusion.Core.Utils
                 // if the enumerator is being disposed from a different thread than the one that creatd it, there's no way
                 // to garuntee the atomicity of this operation. if this (EXTREMELY rare) case happens, we'll ditch the list next
                 // time we need to make a new snapshot. this can never happen with a regular foreach()
-                if (Thread.CurrentThread.ManagedThreadId == _threadId)
+                if(Thread.CurrentThread.ManagedThreadId == _threadId)
                 {
-                    if (_snapshotId == oldId)
+                    if(_snapshotId == oldId)
                         _enumeratingCurrentSnapshot--;
                 }
             }
@@ -167,8 +174,10 @@ namespace Fusion.Core.Utils
             }
         }
 
-        public int Count {
-            get {
+        public int Count
+        {
+            get
+            {
                 _lock.EnterReadLock();
                 try
                 {
@@ -202,7 +211,7 @@ namespace Fusion.Core.Utils
         public void Add(T item)
         {
             ThreadView view = _threadView.Value;
-            if (view.dissalowReenterancy)
+            if(view.dissalowReenterancy)
                 throwReenterancyException();
             _lock.EnterWriteLock();
             try
@@ -210,7 +219,7 @@ namespace Fusion.Core.Utils
                 _version++;
                 _collection.Add(item);
             }
-            catch (Exception)
+            catch(Exception)
             {
                 view.waitingEvents.Clear();
                 throw;
@@ -225,16 +234,16 @@ namespace Fusion.Core.Utils
         public void AddRange(IEnumerable<T> items)
         {
             ThreadView view = _threadView.Value;
-            if (view.dissalowReenterancy)
+            if(view.dissalowReenterancy)
                 throwReenterancyException();
             _lock.EnterWriteLock();
             try
             {
                 _version++;
-                foreach (T item in items)
+                foreach(T item in items)
                     _collection.Add(item);
             }
-            catch (Exception)
+            catch(Exception)
             {
                 view.waitingEvents.Clear();
                 throw;
@@ -249,16 +258,16 @@ namespace Fusion.Core.Utils
         int IList.Add(object value)
         {
             ThreadView view = _threadView.Value;
-            if (view.dissalowReenterancy)
+            if(view.dissalowReenterancy)
                 throwReenterancyException();
             int result;
             _lock.EnterWriteLock();
             try
             {
                 _version++;
-                result = ((IList)_collection).Add(value);
+                result = ((IList) _collection).Add(value);
             }
-            catch (Exception)
+            catch(Exception)
             {
                 view.waitingEvents.Clear();
                 throw;
@@ -274,7 +283,7 @@ namespace Fusion.Core.Utils
         public void Insert(int index, T item)
         {
             ThreadView view = _threadView.Value;
-            if (view.dissalowReenterancy)
+            if(view.dissalowReenterancy)
                 throwReenterancyException();
             _lock.EnterWriteLock();
             try
@@ -282,7 +291,7 @@ namespace Fusion.Core.Utils
                 _version++;
                 _collection.Insert(index, item);
             }
-            catch (Exception)
+            catch(Exception)
             {
                 view.waitingEvents.Clear();
                 throw;
@@ -297,7 +306,7 @@ namespace Fusion.Core.Utils
         public bool Remove(T item)
         {
             ThreadView view = _threadView.Value;
-            if (view.dissalowReenterancy)
+            if(view.dissalowReenterancy)
                 throwReenterancyException();
             bool result;
             _lock.EnterWriteLock();
@@ -306,7 +315,7 @@ namespace Fusion.Core.Utils
                 _version++;
                 result = _collection.Remove(item);
             }
-            catch (Exception)
+            catch(Exception)
             {
                 view.waitingEvents.Clear();
                 throw;
@@ -316,13 +325,14 @@ namespace Fusion.Core.Utils
                 _lock.ExitWriteLock();
             }
             dispatchWaitingEvents(view);
+
             return result;
         }
 
         public void RemoveAt(int index)
         {
             ThreadView view = _threadView.Value;
-            if (view.dissalowReenterancy)
+            if(view.dissalowReenterancy)
                 throwReenterancyException();
             _lock.EnterWriteLock();
             try
@@ -330,7 +340,7 @@ namespace Fusion.Core.Utils
                 _version++;
                 _collection.RemoveAt(index);
             }
-            catch (Exception)
+            catch(Exception)
             {
                 view.waitingEvents.Clear();
                 throw;
@@ -345,7 +355,7 @@ namespace Fusion.Core.Utils
         public void Clear()
         {
             ThreadView view = _threadView.Value;
-            if (view.dissalowReenterancy)
+            if(view.dissalowReenterancy)
                 throwReenterancyException();
             _lock.EnterWriteLock();
             try
@@ -353,7 +363,7 @@ namespace Fusion.Core.Utils
                 _version++;
                 _collection.Clear();
             }
-            catch (Exception)
+            catch(Exception)
             {
                 view.waitingEvents.Clear();
                 throw;
@@ -368,7 +378,7 @@ namespace Fusion.Core.Utils
         public void Move(int oldIndex, int newIndex)
         {
             ThreadView view = _threadView.Value;
-            if (view.dissalowReenterancy)
+            if(view.dissalowReenterancy)
                 throwReenterancyException();
             _lock.EnterWriteLock();
             try
@@ -376,7 +386,7 @@ namespace Fusion.Core.Utils
                 _version++;
                 _collection.Move(oldIndex, newIndex);
             }
-            catch (Exception)
+            catch(Exception)
             {
                 view.waitingEvents.Clear();
                 throw;
@@ -390,8 +400,10 @@ namespace Fusion.Core.Utils
         #endregion
 
         #region A little bit o' both
-        public T this[int index] {
-            get {
+        public T this[int index]
+        {
+            get
+            {
                 _lock.EnterReadLock();
                 try
                 {
@@ -403,9 +415,10 @@ namespace Fusion.Core.Utils
                 }
             }
 
-            set {
+            set
+            {
                 ThreadView view = _threadView.Value;
-                if (view.dissalowReenterancy)
+                if(view.dissalowReenterancy)
                     throwReenterancyException();
                 _lock.EnterWriteLock();
                 try
@@ -413,7 +426,7 @@ namespace Fusion.Core.Utils
                     _version++;
                     _collection[index] = value;
                 }
-                catch (Exception)
+                catch(Exception)
                 {
                     view.waitingEvents.Clear();
                     throw;
@@ -461,9 +474,11 @@ namespace Fusion.Core.Utils
             }
 
             object IEnumerator.Current { get { return Current; } }
-            public T Current {
-                get {
-                    if (_isDisposed)
+            public T Current
+            {
+                get
+                {
+                    if(_isDisposed)
                         throwDisposedException();
                     return _enumerator.Current;
                 }
@@ -471,14 +486,14 @@ namespace Fusion.Core.Utils
 
             public bool MoveNext()
             {
-                if (_isDisposed)
+                if(_isDisposed)
                     throwDisposedException();
                 return _enumerator.MoveNext();
             }
 
             public void Dispose()
             {
-                if (!_isDisposed)
+                if(!_isDisposed)
                 {
                     _enumerator.Dispose();
                     _isDisposed = true;
@@ -503,17 +518,23 @@ namespace Fusion.Core.Utils
         // as soon as the write method is complete
 
         // Collection changed
-        private readonly AsyncDispatcherEvent<NotifyCollectionChangedEventHandler, NotifyCollectionChangedEventArgs> _collectionChanged = new AsyncDispatcherEvent<NotifyCollectionChangedEventHandler, NotifyCollectionChangedEventArgs>();
-        private void onCollectionChangedInternal(object sender, NotifyCollectionChangedEventArgs args) { _threadView.Value.waitingEvents.Add(args); }
-        public event NotifyCollectionChangedEventHandler CollectionChanged {
-            add {
-                if (value == null) return;
+        private readonly AsyncDispatcherEvent<NotifyCollectionChangedEventHandler, NotifyCollectionChangedEventArgs> _collectionChanged =  new AsyncDispatcherEvent<NotifyCollectionChangedEventHandler, NotifyCollectionChangedEventArgs>();
+
+        private void onCollectionChangedInternal(object sender, NotifyCollectionChangedEventArgs args)
+        {
+            _threadView.Value.waitingEvents.Add(args);
+        }
+        public event NotifyCollectionChangedEventHandler CollectionChanged
+        {
+            add
+            {
+                if(value == null) return;
                 _lock.EnterWriteLock(); // can't add/remove event during write operation
                 try
                 {
                     // even though this is technically a write operation, there's no reason to check reenterancy since it won't ever call handler
                     // in fact, removing handlers in the callback could be a useful scenario
-                    if (_collectionChanged.isEmpty) // if we were empty before, the handler wasn't attached
+                    if(_collectionChanged.isEmpty) // if we were empty before, the handler wasn't attached
                         _collection.CollectionChanged += onCollectionChangedInternal;
                     _collectionChanged.add(value);
                 }
@@ -522,15 +543,16 @@ namespace Fusion.Core.Utils
                     _lock.ExitWriteLock();
                 }
             }
-            remove {
-                if (value == null) return;
+            remove
+            {
+                if(value == null) return;
                 _lock.EnterWriteLock(); // can't add/remove event during write operation
                 try
                 {
                     // even though this is technically a write operation, there's no reason to check reenterancy since it won't ever call handler
                     // in fact, removing handlers in the callback could be a useful scenario
                     _collectionChanged.remove(value);
-                    if (_collectionChanged.isEmpty) // if we're now empty, detatch handler
+                    if(_collectionChanged.isEmpty) // if we're now empty, detatch handler
                         _collection.CollectionChanged -= onCollectionChangedInternal;
                 }
                 finally
@@ -543,16 +565,18 @@ namespace Fusion.Core.Utils
         // Property changed
         private readonly AsyncDispatcherEvent<PropertyChangedEventHandler, PropertyChangedEventArgs> _propertyChanged = new AsyncDispatcherEvent<PropertyChangedEventHandler, PropertyChangedEventArgs>();
         private void onPropertyChangedInternal(object sender, PropertyChangedEventArgs args) { _threadView.Value.waitingEvents.Add(args); }
-        event PropertyChangedEventHandler INotifyPropertyChanged.PropertyChanged {
-            add {
-                if (value == null) return;
+        event PropertyChangedEventHandler INotifyPropertyChanged.PropertyChanged
+        {
+            add
+            {
+                if(value == null) return;
                 _lock.EnterWriteLock(); // can't add/remove event during write operation
                 try
                 {
                     // even though this is technically a write operation, there's no reason to check reenterancy since it won't ever call handler
                     // in fact, removing handlers in the callback could be a useful scenario
-                    if (_propertyChanged.isEmpty) // if we were empty before, the handler wasn't attached
-                        ((INotifyPropertyChanged)_collection).PropertyChanged += onPropertyChangedInternal;
+                    if(_propertyChanged.isEmpty) // if we were empty before, the handler wasn't attached
+                        ((INotifyPropertyChanged) _collection).PropertyChanged += onPropertyChangedInternal;
                     _propertyChanged.add(value);
                 }
                 finally
@@ -560,16 +584,17 @@ namespace Fusion.Core.Utils
                     _lock.ExitWriteLock();
                 }
             }
-            remove {
-                if (value == null) return;
+            remove
+            {
+                if(value == null) return;
                 _lock.EnterWriteLock(); // can't add/remove event during write operation
                 try
                 {
                     // even though this is technically a write operation, there's no reason to check reenterancy since it won't ever call handler
                     // in fact, removing handlers in the callback could be a useful scenario
                     _propertyChanged.remove(value);
-                    if (_propertyChanged.isEmpty) // if we're now empty, detatch handler
-                        ((INotifyPropertyChanged)_collection).PropertyChanged -= onPropertyChangedInternal;
+                    if(_propertyChanged.isEmpty) // if we're now empty, detatch handler
+                        ((INotifyPropertyChanged) _collection).PropertyChanged -= onPropertyChangedInternal;
                 }
                 finally
                 {
@@ -583,27 +608,27 @@ namespace Fusion.Core.Utils
             List<EventArgs> waitingEvents = view.waitingEvents;
             try
             {
-                if (waitingEvents.Count == 0) return; // fast path for no events
-                if (view.dissalowReenterancy)
+                if(waitingEvents.Count == 0) return; // fast path for no events
+                if(view.dissalowReenterancy)
                 {
                     // Write methods should have checked this before we got here. Since we didn't that means there's a bugg in this class
                     // itself. However, we can't dispatch the events anyways, so we'll have to throw an exception.
-                    if (Debugger.IsAttached)
+                    if(Debugger.IsAttached)
                         Debugger.Break();
                     throwReenterancyException();
                 }
                 view.dissalowReenterancy = true;
-                foreach (EventArgs args in waitingEvents)
+                foreach(EventArgs args in waitingEvents)
                 {
                     NotifyCollectionChangedEventArgs ccArgs = args as NotifyCollectionChangedEventArgs;
-                    if (ccArgs != null)
+                    if(ccArgs != null)
                     {
                         _collectionChanged.raise(this, ccArgs);
                     }
                     else
                     {
                         PropertyChangedEventArgs pcArgs = args as PropertyChangedEventArgs;
-                        if (pcArgs != null)
+                        if(pcArgs != null)
                         {
                             _propertyChanged.raise(this, pcArgs);
                         }
@@ -625,17 +650,17 @@ namespace Fusion.Core.Utils
 
         #region Methods to make interfaces happy -- most of these just foreward to the appropriate methods above
         IEnumerator IEnumerable.GetEnumerator() { return GetEnumerator(); }
-        void IList.Remove(object value) { Remove((T)value); }
-        object IList.this[int index] { get { return this[index]; } set { this[index] = (T)value; } }
-        void IList.Insert(int index, object value) { Insert(index, (T)value); }
+        void IList.Remove(object value) { Remove((T) value); }
+        object IList.this[int index] { get { return this[index]; } set { this[index] = (T) value; } }
+        void IList.Insert(int index, object value) { Insert(index, (T) value); }
         bool ICollection<T>.IsReadOnly { get { return false; } }
         bool IList.IsReadOnly { get { return false; } }
         bool IList.IsFixedSize { get { return false; } }
-        bool IList.Contains(object value) { return Contains((T)value); }
+        bool IList.Contains(object value) { return Contains((T) value); }
         object ICollection.SyncRoot { get { throw new NotSupportedException("AsyncObservableCollection doesn't need external synchronization"); } }
         bool ICollection.IsSynchronized { get { return false; } }
-        void ICollection.CopyTo(Array array, int index) { CopyTo((T[])array, index); }
-        int IList.IndexOf(object value) { return IndexOf((T)value); }
+        void ICollection.CopyTo(Array array, int index) { CopyTo((T[]) array, index); }
+        int IList.IndexOf(object value)  { return IndexOf((T) value); }
         #endregion
 
         #region Serialization
@@ -643,7 +668,7 @@ namespace Fusion.Core.Utils
         /// Constructor is only here for serialization, you should use the default constructor instead.
         /// </summary>
         public AsyncObservableCollection(SerializationInfo info, StreamingContext context)
-            : this((T[])info.GetValue("values", typeof(T[])))
+            : this((T[]) info.GetValue("values", typeof(T[])))
         {
         }
 
@@ -654,19 +679,19 @@ namespace Fusion.Core.Utils
         #endregion
     }
 
-    /// <summary>
+        /// <summary>
     /// Wrapper around an event so that any events added from a Dispatcher thread are invoked on that thread. This means
     /// that if the UI adds an event and that event is called on a different thread, the callback will be dispatched
     /// to the UI thread and called asynchronously. If an event is added from a non-dispatcher thread, or the event
     /// is raised from within the same thread as it was added from, it will be called normally.
-    /// 
+    ///
     /// Note that this means that the callback will be asynchronous and may happen at some time in the future rather than as
     /// soon as the event is raised.
-    /// 
+    ///
     /// Example usage:
     /// -----------
-    /// 
-    ///     private readonly AsyncDispatcherEvent{PropertyChangedEventHandler, PropertyChangedEventArgs} _propertyChanged = 
+    ///
+    ///     private readonly AsyncDispatcherEvent{PropertyChangedEventHandler, PropertyChangedEventArgs} _propertyChanged =
     ///        new DispatcherEventHelper{PropertyChangedEventHandler, PropertyChangedEventArgs}();
     ///
     ///     public event PropertyChangedEventHandler PropertyChanged
@@ -674,12 +699,12 @@ namespace Fusion.Core.Utils
     ///         add { _propertyChanged.add(value); }
     ///         remove { _propertyChanged.remove(value); }
     ///     }
-    ///     
+    ///
     ///     private void OnPropertyChanged(PropertyChangedEventArgs args)
     ///     {
     ///         _propertyChanged.invoke(this, args);
     ///     }
-    /// 
+    ///
     /// This class is thread-safe.
     /// </summary>
     /// <typeparam name="TEvent">The delagate type to wrap (ie PropertyChangedEventHandler). Must have a void delegate(object, TArgs) signature.</typeparam>
@@ -719,22 +744,22 @@ namespace Fusion.Core.Utils
         {
             Type tEvent = typeof(TEvent);
             Type tArgs = typeof(TArgs);
-            if (!tEvent.IsSubclassOf(typeof(MulticastDelegate)))
+            if(!tEvent.IsSubclassOf(typeof(MulticastDelegate)))
                 throw new InvalidOperationException("TEvent " + tEvent.Name + " is not a subclass of MulticastDelegate");
             MethodInfo method = tEvent.GetMethod("Invoke", BindingFlags.Instance | BindingFlags.Public | BindingFlags.DeclaredOnly);
-            if (method == null)
+            if(method == null)
                 throw new InvalidOperationException("Could not find method Invoke() on TEvent " + tEvent.Name);
-            if (method.ReturnType != typeof(void))
+            if(method.ReturnType != typeof(void))
                 throw new InvalidOperationException("TEvent " + tEvent.Name + " must have return type of void");
             ParameterInfo[] paramz = method.GetParameters();
-            if (paramz.Length != 2)
+            if(paramz.Length != 2)
                 throw new InvalidOperationException("TEvent " + tEvent.Name + " must have 2 parameters");
-            if (paramz[0].ParameterType != typeof(object))
+            if(paramz[0].ParameterType != typeof(object))
                 throw new InvalidOperationException("TEvent " + tEvent.Name + " must have first parameter of type object, instead was " + paramz[0].ParameterType.Name);
-            if (paramz[1].ParameterType != tArgs)
+            if(paramz[1].ParameterType != tArgs)
                 throw new InvalidOperationException("TEvent " + tEvent.Name + " must have second paramater of type TArgs " + tArgs.Name + ", instead was " + paramz[1].ParameterType.Name);
-            _invoke = (InvokeMethod)method.CreateDelegate(typeof(InvokeMethod));
-            if (_invoke == null)
+            _invoke = (InvokeMethod) method.CreateDelegate(typeof(InvokeMethod));
+            if(_invoke == null)
                 throw new InvalidOperationException("CreateDelegate() returned null");
         }
 
@@ -743,7 +768,7 @@ namespace Fusion.Core.Utils
         /// </summary>
         public void add(TEvent value)
         {
-            if (value == null)
+            if(value == null)
                 return;
             _event += (new DelegateWrapper(getDispatcherOrNull(), value)).invoke;
         }
@@ -754,20 +779,20 @@ namespace Fusion.Core.Utils
         /// </summary>
         public void remove(TEvent value)
         {
-            if (value == null)
+            if(value == null)
                 return;
             Dispatcher dispatcher = getDispatcherOrNull();
-            lock (_removeLock) // because events are intrinsically threadsafe, and dispatchers are thread-local, the only time this lock matters is when removing non-dispatcher events
+            lock(_removeLock) // because events are intrinsically threadsafe, and dispatchers are thread-local, the only time this lock matters is when removing non-dispatcher events
             {
                 EventHandler<TArgs> evt = _event;
-                if (evt != null)
+                if(evt != null)
                 {
                     Delegate[] invList = evt.GetInvocationList();
-                    for (int i = invList.Length - 1; i >= 0; i--) // Need to go backwards since that's what event -= something does.
+                    for(int i = invList.Length - 1; i >= 0; i--) // Need to go backwards since that's what event -= something does.
                     {
-                        DelegateWrapper wrapper = (DelegateWrapper)invList[i].Target;
+                        DelegateWrapper wrapper = (DelegateWrapper) invList[i].Target;
                         // need to use Equals instead of == for delegates
-                        if (wrapper.handler.Equals(value) && wrapper.dispatcher == dispatcher)
+                        if(wrapper.handler.Equals(value) && wrapper.dispatcher == dispatcher)
                         {
                             _event -= wrapper.invoke;
                             return;
@@ -780,8 +805,10 @@ namespace Fusion.Core.Utils
         /// <summary>
         /// Checks if any delegate has been added to this event.
         /// </summary>
-        public bool isEmpty {
-            get {
+        public bool isEmpty
+        {
+            get
+            {
                 return _event == null;
             }
         }
@@ -792,7 +819,7 @@ namespace Fusion.Core.Utils
         public void raise(object sender, TArgs args)
         {
             EventHandler<TArgs> evt = _event;
-            if (evt != null)
+            if(evt != null)
                 evt(sender, args);
         }
 
@@ -814,7 +841,7 @@ namespace Fusion.Core.Utils
 
             public void invoke(object sender, TArgs args)
             {
-                if (dispatcher == null || dispatcher == getDispatcherOrNull())
+                if(dispatcher == null || dispatcher == getDispatcherOrNull())
                     _invoke(handler, sender, args);
                 else
                     // ReSharper disable once AssignNullToNotNullAttribute
