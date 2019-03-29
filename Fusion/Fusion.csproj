@@ -256,6 +256,7 @@
     <Compile Include="Engine\Common\Commands\CrashServer.cs" />
     <Compile Include="Engine\Common\AtomAttribute.cs" />
     <Compile Include="Engine\Common\UserInterface.Internal.cs" />
+    <Compile Include="Engine\Frames2\Containers\AnchorBox.cs" />
     <Compile Include="Engine\Frames2\Events\UIEventsHolder.cs" />
     <Compile Include="Engine\Frames2\Managing\ClippingFlags.cs" />
     <Compile Include="Engine\Frames2\Components\Image.cs" />
