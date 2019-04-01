@@ -163,7 +163,7 @@ namespace GISTest
             viewLayer.SpriteLayersD2D.Add(_spriteLayer);
 
             #region UITesting
-
+			//----------
             UIManager = new UIManager(Game.RenderSystem);
 		    UIManager.DebugEnabled = true;
 
@@ -171,17 +171,17 @@ namespace GISTest
             img1 = new Image(image);
             img2 = new Image(image);
 
-		    var imgVerticalBox = new VerticalBox()
-		    {
-		        Name = "ImageFreePlacement",
-		        DesiredWidth = 500,
-		        DesiredHeight = 800,
-                Alignment = HorizontalAlignment.Center
-		    };
+		    //var imgVerticalBox = new VerticalBox()
+		    //{
+		    //    Name = "ImageFreePlacement",
+		    //    DesiredWidth = 500,
+		    //    DesiredHeight = 800,
+      //          Alignment = HorizontalAlignment.Center
+		    //};
 
-		    var imgFpSlot = UIManager.Root.Insert(imgVerticalBox, 0);
-		    imgFpSlot.X = 50;
-		    imgFpSlot.Y = 50;
+		    //var imgFpSlot = UIManager.Root.Insert(imgVerticalBox, 0);
+		    //imgFpSlot.X = 50;
+		    //imgFpSlot.Y = 50;
 
             var slot = imgVerticalBox.Insert(img1, 0);
 		    img1.DesiredWidth = 250;
@@ -208,7 +208,24 @@ namespace GISTest
 		    textSlot.Y = 200;
 		    textSlot.Angle = -0.3f;
 
-            var border = new Border();
+			var labelAnchorBox = new AnchorBox();
+			labelAnchorBox.Name = "LabelAnchorBox";
+			labelAnchorBox.DesiredWidth = 300;
+			labelAnchorBox.DesiredHeight = 300;
+
+			var labelAbSlot = UIManager.Root.Insert(labelAnchorBox, 0);
+			labelAbSlot.X = 600;
+			labelAbSlot.Y = 650;
+			labelAbSlot.Angle = 0.0f;
+
+			var text2 = new Label("Hello, anchor!", "Calibri", 50) {};
+			var text2Slot = labelAnchorBox.Insert(text2, 0);
+			text2Slot.Fixators[AnchorBoxSlot.Fixator.Right] = 50;
+			text2Slot.Fixators[AnchorBoxSlot.Fixator.Left] = 50;
+			text2Slot.Fixators[AnchorBoxSlot.Fixator.Bottom] = 10;
+			text2Slot.Fixators[AnchorBoxSlot.Fixator.Top] = 10;
+
+			var border = new Border();
 		    border.DesiredWidth = 300;
 		    border.DesiredHeight = 400;
             border.BackgroundColor = new Color4(1, 1, 1, 1);
@@ -221,14 +238,14 @@ namespace GISTest
 		    img2.Events.Click += (sender, args) => Log.Message("Image 2 click");
 		    img1.Events.Click += (sender, args) => Log.Message("Image 1 click");
 		    border.Events.Click += (sender, args) => Log.Message("Border click");
-            imgVerticalBox.Events.Click += (sender, args) => Log.Message("Image Container click");
+            //imgVerticalBox.Events.Click += (sender, args) => Log.Message("Image Container click");
 		    labelFreePlacement.Events.Click += (sender, args) => Log.Message("Label Container click");
+			//----------
+			#endregion
 
-            #endregion
 
-
-            #region button
-            var btn = new ButtonController();
+			#region button
+			var btn = new ButtonController();
 		    btn.DesiredWidth = 100;
 		    btn.DesiredHeight = 100;
 			btn.Background.Attach(new Border() {DesiredWidth = 100, DesiredHeight = 100});
