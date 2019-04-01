@@ -87,7 +87,7 @@ namespace Fusion.Engine.Frames2.Controllers
 
         public bool IsInside(Vector2 point) => Placement.IsInside(point);
 
-        public void Update(GameTime gameTime)
+        public virtual void Update(GameTime gameTime)
         {
             if (!_initialized)
                 Initialize();
