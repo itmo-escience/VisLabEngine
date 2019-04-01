@@ -19,7 +19,7 @@ namespace Fusion.Engine.Frames2.Controllers
         public float AvailableWidth => Width;
         public float AvailableHeight => Height;
         public bool Clip => true;
-        public bool Visible { get; set; } = false;
+        public bool Visible { get; set; } = true;
 
         public IUIContainer Parent { get; }
         public UIComponent Component { get; private set; }
