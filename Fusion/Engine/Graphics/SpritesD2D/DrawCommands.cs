@@ -247,6 +247,25 @@ namespace Fusion.Engine.Graphics.SpritesD2D
         }
     }
 
+    public sealed class DrawPath : IDrawCommand
+    {
+        private PathGeometryD2D _geometry;
+        private IBrushD2D _brush;
+        private float _strokeWidth;
+
+        public DrawPath(PathGeometryD2D geometry, IBrushD2D brush, float strokeWidth = 1)
+        {
+            _geometry = geometry;
+            _brush = brush;
+            _strokeWidth = strokeWidth;
+        }
+
+        public void Apply(RenderTargetD2D target)
+        {
+            target.DrawPathGeometry(_geometry, _brush, _strokeWidth);
+        }
+    }
+
     public sealed class DrawBitmap : IDrawCommand
     {
         private readonly float _x, _y;
