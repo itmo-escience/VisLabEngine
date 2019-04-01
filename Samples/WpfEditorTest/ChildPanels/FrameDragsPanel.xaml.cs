@@ -1,20 +1,17 @@
-﻿using Vector2 = Fusion.Core.Mathematics.Vector2;
-using Matrix3x2 = Fusion.Core.Mathematics.Matrix3x2;
-using Fusion.Engine.Frames2;
+﻿using Fusion.Engine.Frames2;
 using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
 using WpfEditorTest.FrameSelection;
-using WpfEditorTest.UndoRedo;
 using WpfEditorTest.Utility;
-using CommandManager = WpfEditorTest.UndoRedo.CommandManager;
-using Frame = Fusion.Engine.Frames.Frame;
+
 using RectangleF = Fusion.Core.Mathematics.RectangleF;
+using Vector2 = Fusion.Core.Mathematics.Vector2;
+using Matrix3x2 = Fusion.Core.Mathematics.Matrix3x2;
 
 namespace WpfEditorTest.ChildPanels
 {
@@ -312,7 +309,7 @@ namespace WpfEditorTest.ChildPanels
 						dX += stickingDelta;
 						//closestStickX1.IsActive = true;
 					}
-					
+
 
 					stickingDelta = 0;
 					if (Math.Abs(closestStickY1.Y - newYHelper) <= StickingCoordsSensitivity)
@@ -321,7 +318,7 @@ namespace WpfEditorTest.ChildPanels
 						dY += stickingDelta;
 						//closestStickY1.IsActive = true;
 					}
-					
+
 				}
 			}
 			/*---*/
@@ -400,13 +397,13 @@ namespace WpfEditorTest.ChildPanels
 					stickingCoordsX.Where(scX => Math.Abs(Math.Abs(newXHelper - scX.X) - stickingCoordsX.Select(x => Math.Abs(newXHelper - x.X)).Min())<=float.Epsilon).FirstOrDefault();
 				var closestStickX2 =
 					stickingCoordsX.Where(scX => Math.Abs(Math.Abs(newXHelper + widthHelper - scX.X) - stickingCoordsX.Select(x => Math.Abs(newXHelper + widthHelper - x.X)).Min()) <= float.Epsilon).FirstOrDefault();
-				var closestStickX3 =			 
+				var closestStickX3 =
 					stickingCoordsX.Where(scX => Math.Abs(Math.Abs(newXHelper + widthHelper / 2 - scX.X) - stickingCoordsX.Select(x => Math.Abs(newXHelper + widthHelper / 2 - x.X)).Min()) <= float.Epsilon).FirstOrDefault();
-				var closestStickY1 =			 
+				var closestStickY1 =
 					stickingCoordsY.Where(scY => Math.Abs(Math.Abs(newYHelper - scY.Y) - stickingCoordsY.Select(y => Math.Abs(newYHelper - y.Y)).Min()) <= float.Epsilon).FirstOrDefault();
-				var closestStickY2 =			 
+				var closestStickY2 =
 					stickingCoordsY.Where(scY => Math.Abs(Math.Abs(newYHelper + heightHelper - scY.Y) - stickingCoordsY.Select(y => Math.Abs(newYHelper + heightHelper - y.Y)).Min()) <= float.Epsilon).FirstOrDefault();
-				var closestStickY3 =			 
+				var closestStickY3 =
 					stickingCoordsY.Where(scY => Math.Abs(Math.Abs(newYHelper + heightHelper / 2 - scY.Y) - stickingCoordsY.Select(y => Math.Abs(newYHelper + heightHelper / 2 - y.Y)).Min()) <= float.Epsilon).FirstOrDefault();
 
 				if (closestStickX1 == null || closestStickX2 == null ||

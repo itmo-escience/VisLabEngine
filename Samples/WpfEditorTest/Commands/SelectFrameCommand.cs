@@ -1,19 +1,18 @@
 ﻿using Fusion.Engine.Frames2;
-using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using WpfEditorTest.FrameSelection;
 
-namespace WpfEditorTest.UndoRedo
+namespace WpfEditorTest.Commands
 {
 	public class SelectFrameCommand : IEditorCommand
 	{
 		public bool IsDirty => false;
 
-		private List<UIComponent> _frames;
-		private List<UIComponent> _oldFrames;
+		private readonly List<UIComponent> _frames;
+		private readonly List<UIComponent> _oldFrames;
+
+	    public SelectFrameCommand( params UIComponent[] frame ) : this(frame.ToList()) { }
 
 		public SelectFrameCommand( List<UIComponent> frame )
 		{

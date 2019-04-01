@@ -168,7 +168,7 @@ namespace WpfEditorTest.Utility
 
 		public override object Prop
 		{
-			get => Slot.Properties.Where(p => p.Name == PropName).FirstOrDefault()[State];
+			get => Slot.Properties.FirstOrDefault(p => p.Name == PropName)?[State];
 			set
 			{
 				var convertedValue = Convert.ChangeType(value, PropInfo.PropertyType);

@@ -1,11 +1,8 @@
 ﻿using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using Fusion.Core.Mathematics;
 using Fusion.Core.Utils;
 using Fusion.Engine.Common;
 using Fusion.Engine.Graphics.SpritesD2D;
-using SharpDX.Direct2D1;
-using SharpDX.Mathematics.Interop;
 
 namespace Fusion.Engine.Frames2
 {
@@ -22,6 +19,8 @@ namespace Fusion.Engine.Frames2
                 NotifyPropertyChanged();
             }
         }
+
+        public readonly object ChildrenAccessLock = new object();
 
         private bool _needClipping;
         public bool NeedClipping {
@@ -93,16 +92,20 @@ namespace Fusion.Engine.Frames2
 			if (_children.Contains(child))
 				return;
 
-			child.Parent = this;
-			if (index >= Children.Count)
-			{
-				Children.Add(child);
-			} else
-			{
-				Children.Insert(index, child);
-			}
+		    child.Parent = this;
+		    lock (ChildrenAccessLock)
+		    {
+		        if (index >= Children.Count)
+		        {
+		            Children.Add(child);
+		        }
+		        else
+		        {
+		            Children.Insert(index, child);
+		        }
+		    }
 
-            UpdateChildrenLayout();
+		    UpdateChildrenLayout();
         }
 
         protected virtual void UpdateChildrenLayout() { }
@@ -113,7 +116,11 @@ namespace Fusion.Engine.Frames2
                 return false;
 
             child.Parent = null;
-            _children.Remove(child);
+            lock (ChildrenAccessLock)
+            {
+                _children.Remove(child);
+            }
+
             return true;
         }
 

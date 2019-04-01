@@ -1,25 +1,19 @@
 ﻿using Fusion.Engine.Common;
 using Fusion.Engine.Frames2;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Reflection;
-using System.Text;
 using System.Threading;
-using System.Threading.Tasks;
 
-namespace WpfEditorTest.UndoRedo
+namespace WpfEditorTest.Commands
 {
 	internal class FramePropertyChangeCommand : IEditorCommand
 	{
-		private AutoResetEvent _asyncThreadChangesDoneEvent = new AutoResetEvent(false);
+		private readonly AutoResetEvent _asyncThreadChangesDoneEvent = new AutoResetEvent(false);
+	    private readonly UIComponent _frame;
+	    private readonly PropertyInfo _propertyToChange;
+	    private readonly object _valueToSet;
+	    private readonly object _previousValue;
 
 		public bool IsDirty => true;
-
-		UIComponent _frame;
-		PropertyInfo _propertyToChange;
-		object _valueToSet;
-		object _previousValue;
 
 		public FramePropertyChangeCommand( UIComponent frame, string propertyName, object valueToSet)
 		{

@@ -32,11 +32,11 @@ namespace Fusion.Core.Development {
 
 			//	force visible cursor!
 			Cursor.Show();
-			Cursor.Clip	=	new Rectangle( int.MinValue, int.MinValue, int.MaxValue, int.MaxValue );
+		    Cursor.Clip = new Rectangle();
 		}
 
 
-		
+
 		void ShowExceptionData ( Exception exception )
 		{
 			this.labelExceptionType.Text	=	exception.GetType().ToString();
