@@ -75,7 +75,8 @@ namespace Fusion.Engine.Frames2.Controllers
         protected override IEnumerable<State> NonDefaultStates => new List<State> { Pressed };
 
         private readonly List<ButtonSlot> _slots;
-        protected override IEnumerable<IControllerSlot> ControllerSlots => _slots;
+        protected override IEnumerable<IControllerSlot> MainControllerSlots => _slots;
+        protected override IEnumerable<IControllerSlot> AdditionalControllerSlots { get; } = new List<IControllerSlot>();
 
         public ButtonSlot Foreground { get; }
         public ButtonSlot Background { get; }

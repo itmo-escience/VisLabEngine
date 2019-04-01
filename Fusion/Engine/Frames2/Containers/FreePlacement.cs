@@ -133,6 +133,8 @@ namespace Fusion.Engine.Frames2.Containers
         public object Tag { get; set; }
         public string Name { get; set; }
 
+        public bool IsInside(Vector2 point) => Placement.IsInside(point);
+
         public void Update(GameTime gameTime)
         {
             foreach (var slot in _slots)

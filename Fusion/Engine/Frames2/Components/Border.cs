@@ -28,6 +28,8 @@ namespace Fusion.Engine.Frames2.Components
             BorderColor = border.ToColor4();
         }
 
+        public bool IsInside(Vector2 point) => Placement.IsInside(point);
+
         public void Update(GameTime gameTime) { }
 
         public void Draw(SpriteLayerD2D layer)

@@ -144,6 +144,8 @@ namespace Fusion.Engine.Frames2.Containers
             set => SetAndNotify(ref _alignment, value);
         }
 
+        public bool IsInside(Vector2 point) => Placement.IsInside(point);
+
         public void Update(GameTime gameTime)
         {
             float bottomBorder = 0;

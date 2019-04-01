@@ -3,8 +3,10 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
+using Fusion.Core.Mathematics;
 using Fusion.Engine.Common;
 using Fusion.Engine.Frames2.Events;
+using Fusion.Engine.Frames2.Managing;
 using Fusion.Engine.Graphics.SpritesD2D;
 
 namespace Fusion.Engine.Frames2.Controllers
@@ -14,7 +16,7 @@ namespace Fusion.Engine.Frames2.Controllers
         ObservableCollection<PropertyValueStates> Properties { get; }
     }
 
-    public abstract class UIController<T> : IUIContainer where T : IControllerSlot
+    public abstract class UIController<T> : PropertyChangedHelper, IUIContainer where T : IControllerSlot
     {
         public State CurrentState { get; protected set; } = State.Default;
 
@@ -35,14 +37,16 @@ namespace Fusion.Engine.Frames2.Controllers
 
         protected virtual IEnumerable<State> NonDefaultStates => new List<State>();
 
-        public virtual IEnumerable<ISlot> Slots => ControllerSlots;
-        protected abstract IEnumerable<IControllerSlot> ControllerSlots { get; }
+        public virtual IEnumerable<ISlot> Slots => AllSlots;
+        private IEnumerable<IControllerSlot> AllSlots => MainControllerSlots.Concat(AdditionalControllerSlots);
+        protected abstract IEnumerable<IControllerSlot> MainControllerSlots { get; }
+        protected abstract IEnumerable<IControllerSlot> AdditionalControllerSlots { get; }
 
         public void ChangeState(State newState)
         {
             if (!States.Contains(newState)) return;
 
-            foreach (var slot in ControllerSlots)
+            foreach (var slot in AllSlots)
             {
                 var component = slot.Component;
                 var type = component.GetType();
@@ -81,6 +85,8 @@ namespace Fusion.Engine.Frames2.Controllers
         public object Tag { get; set; }
         public string Name { get; set; }
 
+        public bool IsInside(Vector2 point) => Placement.IsInside(point);
+
         public void Update(GameTime gameTime)
         {
             if (!_initialized)
@@ -95,8 +101,6 @@ namespace Fusion.Engine.Frames2.Controllers
         }
 
         public bool Contains(UIComponent component) => Slots.Any(slot => slot.Component == component);
-
-        public event PropertyChangedEventHandler PropertyChanged;
     }
 
     public struct State : IEquatable<State>
