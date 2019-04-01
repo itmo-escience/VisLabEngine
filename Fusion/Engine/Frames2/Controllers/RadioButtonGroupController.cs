@@ -10,6 +10,7 @@ using Fusion.Core.Mathematics;
 using Fusion.Core.Utils;
 using Fusion.Engine.Common;
 using Fusion.Engine.Frames;
+using Fusion.Engine.Frames2.Components;
 using Fusion.Engine.Frames2.Managing;
 using Fusion.Engine.Graphics.SpritesD2D;
 
@@ -186,6 +187,35 @@ namespace Fusion.Engine.Frames2.Controllers
             var slot = new RadioButtonGroupSlot(this, 0, 0, 100, 100);
             slot.Attach(child);
 
+            _slots.Insert(index, slot);
+
+            return slot;
+        }
+
+        public RadioButtonGroupSlot InsertRadioButtonWith(UIComponent body, int index)
+        {
+            var radioButton = new RadioButtonController
+            {
+                DesiredWidth = 100,
+                DesiredHeight = 25
+            };
+
+            radioButton.Background.Attach(new Border(Color.Gray, Color.White) { DesiredWidth = 100, DesiredHeight = 25});
+            radioButton.Body.Attach(body);
+            radioButton.RadioButton.Attach(new Border(Color.Blue, Color.White) { DesiredWidth = 25, DesiredHeight = 25});
+
+            var radioButtonColor = new PropertyValueStates("BackgroundColor", new Color4(1.0f, 0.0f, 0.0f, 1.0f));
+            radioButtonColor[State.Hovered] = new Color4(0.5f, 0.0f, 0.0f, 1.0f);
+            radioButtonColor[State.Disabled] = new Color4(1.0f, 0.5f, 0.5f, 1.0f);
+            radioButtonColor[RadioButtonController.Pressed] = new Color4(0.5f, 0.5f, 0.0f, 1.0f);
+            radioButtonColor[RadioButtonController.Checked] = new Color4(0.0f, 1.0f, 0.0f, 1.0f);
+            radioButtonColor[RadioButtonController.CheckedHovered] = new Color4(0.0f, 0.5f, 0.0f, 1.0f);
+            radioButtonColor[RadioButtonController.CheckedDisabled] = new Color4(0.5f, 1.0f, 0.5f, 1.0f);
+
+            radioButton.RadioButton.Properties.Add(radioButtonColor);
+
+            var slot = new RadioButtonGroupSlot(this, 0, 0, 100, 100);
+            slot.Attach(radioButton);
             _slots.Insert(index, slot);
 
             return slot;

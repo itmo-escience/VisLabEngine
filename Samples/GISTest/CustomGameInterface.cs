@@ -277,33 +277,8 @@ namespace GISTest
             };
             rbg.Background.Attach(new Border());
 
-            RadioButtonController CreateSimpleRadioButton()
-            {
-                var rb = new RadioButtonController
-                {
-                    DesiredWidth = 100,
-                    DesiredHeight = 25
-                };
-
-                rb.Background.Attach(new Border(Color.Gray, Color.White) { DesiredWidth = 100, DesiredHeight = 25});
-                rb.Body.Attach(new Label("RadioButton", "Calibri", 14));
-                rb.RadioButton.Attach(new Border(Color.Blue, Color.White) { DesiredWidth = 25, DesiredHeight = 25});
-
-                var radioButtoncolor = new PropertyValueStates("BackgroundColor", new Color4(1.0f, 0.0f, 0.0f, 1.0f));
-                radioButtoncolor[State.Hovered] = new Color4(0.5f, 0.0f, 0.0f, 1.0f);
-                radioButtoncolor[State.Disabled] = new Color4(1.0f, 0.5f, 0.5f, 1.0f);
-                radioButtoncolor[RadioButtonController.Pressed] = new Color4(0.5f, 0.5f, 0.0f, 1.0f);
-                radioButtoncolor[RadioButtonController.Checked] = new Color4(0.0f, 1.0f, 0.0f, 1.0f);
-                radioButtoncolor[RadioButtonController.CheckedHovered] = new Color4(0.0f, 0.5f, 0.0f, 1.0f);
-                radioButtoncolor[RadioButtonController.CheckedDisabled] = new Color4(0.5f, 1.0f, 0.5f, 1.0f);
-
-                rb.RadioButton.Properties.Add(radioButtoncolor);
-
-                return rb;
-            }
-
-            rbg.Insert(CreateSimpleRadioButton(), 0);
-            rbg.Insert(CreateSimpleRadioButton(), 0);
+            rbg.InsertRadioButtonWith(new Label("RadioButton", "Calibri", 14), 0);
+            rbg.InsertRadioButtonWith(new Label("RadioButton", "Calibri", 14), 0);
 
             var rbgSlot = UIManager.Root.Insert(rbg, 0);
             rbgSlot.X = 300;
