@@ -171,28 +171,28 @@ namespace GISTest
             img1 = new Image(image);
             img2 = new Image(image);
 
-		    //var imgVerticalBox = new VerticalBox()
-		    //{
-		    //    Name = "ImageFreePlacement",
-		    //    DesiredWidth = 500,
-		    //    DesiredHeight = 800,
-      //          Alignment = HorizontalAlignment.Center
-		    //};
+            var imgVerticalBox = new VerticalBox()
+            {
+                Name = "ImageFreePlacement",
+                DesiredWidth = 500,
+                DesiredHeight = 800,
+                Alignment = HorizontalAlignment.Center
+            };
 
-		    //var imgFpSlot = UIManager.Root.Insert(imgVerticalBox, 0);
-		    //imgFpSlot.X = 50;
-		    //imgFpSlot.Y = 50;
+            var imgFpSlot = UIManager.Root.Insert(imgVerticalBox, 0);
+            imgFpSlot.X = 50;
+            imgFpSlot.Y = 50;
 
             var slot = imgVerticalBox.Insert(img1, 0);
-		    img1.DesiredWidth = 250;
-		    img1.DesiredHeight = 50;
+            img1.DesiredWidth = 250;
+            img1.DesiredHeight = 50;
 
 
             var slot2 = imgVerticalBox.Insert(img2, 0);
-		    img2.DesiredWidth = 450;
-		    img2.DesiredHeight = 250;
+            img2.DesiredWidth = 450;
+            img2.DesiredHeight = 250;
 
-		    var labelFreePlacement = new FreePlacement();
+            var labelFreePlacement = new FreePlacement();
 		    labelFreePlacement.Name = "LabelFreePlacement";
 		    labelFreePlacement.DesiredWidth  = 400;
 		    labelFreePlacement.DesiredHeight = 600;
