@@ -268,6 +268,7 @@
     <Compile Include="Engine\Frames2\Managing\EditionSceneManager.cs" />
     <Compile Include="Engine\Frames2\Managing\UIHelper.cs" />
     <Compile Include="Engine\Frames2\IUIDrawable.cs" />
+    <Compile Include="Engine\Frames2\Controllers\UIStyleManager.cs" />
     <Compile Include="Engine\Frames2\UISlot.cs" />
     <Compile Include="Engine\Frames2\UIComponent.cs" />
     <Compile Include="Engine\Frames2\Controllers\UIController.cs" />

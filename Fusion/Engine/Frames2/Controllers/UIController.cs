@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
 using Fusion.Engine.Common;
@@ -11,11 +10,13 @@ namespace Fusion.Engine.Frames2.Controllers
 {
     public interface IControllerSlot : ISlot
     {
-        ObservableCollection<PropertyValueStates> Properties { get; }
+        string Name { get; }
     }
 
     public abstract class UIController<T> : IUIContainer<T> where T : IControllerSlot
     {
+        public IUIStyle Style { get; protected set; }
+
         public State CurrentState { get; protected set; } = State.Default;
 
         public IEnumerable<State> States
@@ -41,11 +42,15 @@ namespace Fusion.Engine.Frames2.Controllers
         {
             if (!States.Contains(newState)) return;
 
+            CurrentState = newState;
+            Log.Debug($"{this} Changed state to {CurrentState}");
+
             foreach (var slot in Slots)
             {
                 var component = slot.Component;
                 var type = component.GetType();
-                foreach (var propertyValue in slot.Properties)
+
+                foreach (var propertyValue in Style[slot.Name])
                 {
                     var info = type.GetProperty(propertyValue.Name);
                     if (info == null) continue;
@@ -53,17 +58,12 @@ namespace Fusion.Engine.Frames2.Controllers
                     info.SetValue(
                         component,
                         Convert.ChangeType(
-                            propertyValue[newState],
+                            propertyValue[CurrentState],
                             info.PropertyType),
                         null
                     );
                 }
             }
-
-
-            CurrentState = newState;
-
-            Log.Verbose(CurrentState);
         }
 
         private bool _initialized = false;
@@ -142,35 +142,5 @@ namespace Fusion.Engine.Frames2.Controllers
         }
 
         public static implicit operator string(State s) => s.ToString();
-    }
-
-    public class PropertyValueStates
-    {
-        public string Name { get; }
-        public object Default { get; }
-
-
-        private readonly Dictionary<State, object> _storedValues = new Dictionary<State, object>();
-
-        public PropertyValueStates(string name, object defaultValue)
-        {
-            Name = name;
-            Default = defaultValue;
-
-            _storedValues[State.Default] = Default;
-        }
-
-        public object this[State s]
-        {
-            get
-            {
-                if (!_storedValues.TryGetValue(s, out var result))
-                    result = Default;
-                return result;
-            }
-            set => _storedValues[s] = value;
-        }
-
-        public override string ToString() => Name;
     }
 }

@@ -5,10 +5,11 @@ using System.Diagnostics;
 using Fusion.Core.Mathematics;
 using Fusion.Engine.Common;
 using Fusion.Engine.Frames2.Containers;
+using Fusion.Engine.Frames2.Events;
 using Fusion.Engine.Graphics;
 using Fusion.Engine.Graphics.SpritesD2D;
 using System.Text.RegularExpressions;
-using Fusion.Engine.Frames2.Events;
+using Fusion.Engine.Frames2.Controllers;
 
 namespace Fusion.Engine.Frames2.Managing
 {
@@ -47,6 +48,7 @@ namespace Fusion.Engine.Frames2.Managing
     public class UIManager
     {
         public UIEventProcessor UIEventProcessor { get; }
+        public UIStyleManager StyleManager { get; }
 
         private readonly RootSlot _rootSlot;
         public FreePlacement Root { get; }
@@ -69,6 +71,7 @@ namespace Fusion.Engine.Frames2.Managing
             _dirtyTransforms[_rootSlot] = false;
 
             UIEventProcessor = new UIEventProcessor(this, Root);
+            StyleManager = new UIStyleManager();
 
             rs.DisplayBoundsChanged += (s, e) =>
             {

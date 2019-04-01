@@ -19,7 +19,7 @@ namespace Fusion.Engine.Frames2.Controllers
         public float AvailableWidth => Width;
         public float AvailableHeight => Height;
         public bool Clip => true;
-        public bool Visible { get; set; } = false;
+        public bool Visible { get; set; } = true;
 
         public IUIContainer<ISlot> Parent { get; }
         public UIComponent Component { get; private set; }
@@ -80,8 +80,10 @@ namespace Fusion.Engine.Frames2.Controllers
         public ButtonSlot Foreground { get; }
         public ButtonSlot Background { get; }
 
-        public ButtonController()
+        public ButtonController(string styleName = UIStyleManager.DefaultStyle)
         {
+            Style = UIStyleManager.Instance.GetStyle(this.GetType(), styleName);
+
             Foreground = new ButtonSlot("Foreground", this);
             Background = new ButtonSlot("Background", this);
 

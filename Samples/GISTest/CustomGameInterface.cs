@@ -1,4 +1,5 @@
 ﻿using System;
+using System.CodeDom;
 using System.Collections.Generic;
 using Fusion.Core.Mathematics;
 using Fusion.Engine.Common;
@@ -247,6 +248,35 @@ namespace GISTest
 			//----------
 			#endregion
 
+            #region Styles
+
+		    var buttonStyle = new UISimpleStyle(typeof(ButtonController))
+		    {
+		        ["Background"] = new[]
+		        {
+		            new PropertyValueStates("BackgroundColor", Color4.Black)
+		            {
+		                [State.Hovered] = new Color4(1.0f, 0.0f, 0.0f, 1.0f),
+		                [ButtonController.Pressed] = new Color4(0.0f, 1.0f, 1.0f, 1.0f),
+		            },
+		            new PropertyValueStates("BorderColor", Color4.White)
+		            {
+		                [State.Hovered] = new Color4(1.0f, 0.0f, 1.0f, 1.0f),
+		                [ButtonController.Pressed] = new Color4(1.0f, 1.0f, 1.0f, 1.0f),
+		            }
+		        },
+		        ["Foreground"] = new[]
+		        {
+		            new PropertyValueStates("Text", "Idle")
+		            {
+		                [State.Hovered] = "Hovered",
+		                [ButtonController.Pressed] = "Pressed",
+		            }
+		        }
+		    };
+		    UIStyleManager.Instance.AddStyle(buttonStyle);
+
+            #endregion
 
 			#region button
 			var btn = new ButtonController();
@@ -254,17 +284,6 @@ namespace GISTest
 		    btn.DesiredHeight = 100;
 			btn.Background.Attach(new Border());
             btn.Foreground.Attach(new Label("Button", new TextFormatD2D("Calibry", 15)));
-
-		    var bgColor = new PropertyValueStates("BackgroundColor", Color4.White);
-		    bgColor[State.Hovered] = new Color4(1.0f, 0.0f, 0.0f, 1.0f);
-		    bgColor[ButtonController.Pressed] = new Color4(0.0f, 1.0f, 1.0f, 1.0f);
-
-		    var color = new PropertyValueStates("BackgroundColor", new Color4(1.0f, 1.0f, 0.0f, 1.0f));
-		    color[State.Hovered] = new Color4(1.0f, 0.0f, 1.0f, 1.0f);
-		    color[ButtonController.Pressed] = new Color4(1.0f, 1.0f, 1.0f, 1.0f);
-
-            btn.Background.Properties.Add(bgColor);
-            btn.Background.Properties.Add(color);
 
             var btnSlot = UIManager.Root.Insert(btn, 0);
 		    btnSlot.X = 1100;
