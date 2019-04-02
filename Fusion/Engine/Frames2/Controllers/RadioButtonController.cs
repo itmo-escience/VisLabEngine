@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using Fusion.Core.Mathematics;
 using Fusion.Engine.Common;
 using Fusion.Engine.Graphics.SpritesD2D;
@@ -86,13 +87,14 @@ namespace Fusion.Engine.Frames2.Controllers
     public class RadioButtonController : UIController<RadioButtonSlot>
     {
         protected override IEnumerable<IControllerSlot> MainControllerSlots => new List<IControllerSlot>() { Background, RadioButton, Body };
-        protected override IEnumerable<IControllerSlot> AdditionalControllerSlots { get; } = new List<IControllerSlot>();
+        protected override IEnumerable<IControllerSlot> AdditionalControllerSlots => Enumerable.Empty<IControllerSlot>();
 
         public static ControllerState Pressed = new ControllerState("Pressed");
         public static ControllerState Checked = new ControllerState("Checked");
+        public static ControllerState CheckedPressed = new ControllerState("PressedChecked");
         public static ControllerState CheckedHovered = new ControllerState("HoveredChecked");
         public static ControllerState CheckedDisabled = new ControllerState("DisabledChecked");
-        protected override IEnumerable<ControllerState> NonDefaultStates => new List<ControllerState> { Pressed, Checked, CheckedHovered, CheckedDisabled };
+        protected override IEnumerable<ControllerState> NonDefaultStates { get; } = new[] { Pressed, Checked, CheckedHovered, CheckedDisabled };
 
         public RadioButtonSlot RadioButton { get; }
         public SimpleControllerSlot Body { get; }
@@ -172,8 +174,14 @@ namespace Fusion.Engine.Frames2.Controllers
             if (CurrentState == ControllerState.Disabled || CurrentState == CheckedDisabled)
                 return;
 
-            if (CurrentState == Pressed)
+            if (CurrentState == Pressed || CurrentState == CheckedPressed)
                 return;
+
+            if (CurrentState == CheckedHovered)
+            {
+                ChangeState(CheckedPressed);
+                return;
+            }
 
             ChangeState(Pressed);
         }
@@ -183,7 +191,7 @@ namespace Fusion.Engine.Frames2.Controllers
             if (CurrentState == ControllerState.Disabled || CurrentState == CheckedDisabled)
                 return;
 
-            if (CurrentState == Pressed)
+            if (CurrentState == Pressed || CurrentState == CheckedPressed)
             {
                 RadioButtonClick?.Invoke(this, new RadioButtonClickEventArgs(this));
                 ChangeState(CheckedHovered);
@@ -192,14 +200,8 @@ namespace Fusion.Engine.Frames2.Controllers
 
         private void OnMouseUpOutside(UIComponent sender, ClickEventArgs e)
         {
-            if (CurrentState == ControllerState.Disabled || CurrentState == CheckedDisabled)
-                return;
-
             if (CurrentState == Pressed)
-            {
-                RadioButtonClick?.Invoke(this, new RadioButtonClickEventArgs(this));
-                ChangeState(Checked);
-            }
+                ChangeState(ControllerState.Default);
         }
 
         public event EventHandler<RadioButtonClickEventArgs> RadioButtonClick;

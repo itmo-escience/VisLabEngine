@@ -262,8 +262,9 @@ namespace GISTest
             };
             rbg.Background.Attach(new Border());
 
-            rbg.InsertRadioButtonWith(new Label("RadioButton", "Calibri", 14), 0);
-            rbg.InsertRadioButtonWith(new Label("RadioButton", "Calibri", 14), 0);
+            rbg.InsertRadioButtonWith(new Label("First option", "Calibri", 14), 0);
+            rbg.InsertRadioButtonWith(new Label("Second option", "Calibri", 14), 0);
+            rbg.InsertRadioButtonWith(new Label("Third option", "Calibri", 14), 0);
 
             var rbgSlot = UIManager.Root.Insert(rbg, 0);
             rbgSlot.X = 300;
