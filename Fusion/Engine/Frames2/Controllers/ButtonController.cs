@@ -48,7 +48,7 @@ namespace Fusion.Engine.Frames2.Controllers
                 }
                 else
                 {
-                    Log.Error("Attempt to attach component from unmodifiable");
+                    Log.Error("Attempt to attach component from unmodifiable slot");
                     return;
                 }
             }
@@ -71,8 +71,8 @@ namespace Fusion.Engine.Frames2.Controllers
 
     public class ButtonController : UIController<ButtonSlot>
     {
-        public static State Pressed = new State("Pressed");
-        protected override IEnumerable<State> NonDefaultStates => new List<State> { Pressed };
+        public static ControllerState Pressed = new ControllerState("Pressed");
+        protected override IEnumerable<ControllerState> NonDefaultStates => new List<ControllerState> { Pressed };
 
         private readonly List<ButtonSlot> _slots;
         public override IEnumerable<ButtonSlot> Slots => _slots;
@@ -100,22 +100,22 @@ namespace Fusion.Engine.Frames2.Controllers
 
         private void OnMouseUpOutside(UIComponent sender, ClickEventArgs e)
         {
-            ChangeState(State.Default);
+            ChangeState(ControllerState.Default);
         }
 
         private void OnEnter(UIComponent sender)
         {
-            if (CurrentState == State.Default)
+            if (CurrentState == ControllerState.Default)
             {
-                ChangeState(State.Hovered);
+                ChangeState(ControllerState.Hovered);
             }
         }
 
         private void OnLeave(UIComponent sender)
         {
-            if (CurrentState == State.Hovered)
+            if (CurrentState == ControllerState.Hovered)
             {
-                ChangeState(State.Default);
+                ChangeState(ControllerState.Default);
             }
         }
 
@@ -132,7 +132,7 @@ namespace Fusion.Engine.Frames2.Controllers
             if(CurrentState == Pressed)
                 ButtonClick?.Invoke(this, new ButtonClickEventArgs(this));
 
-            ChangeState(State.Hovered);
+            ChangeState(ControllerState.Hovered);
         }
 
         public event EventHandler<ButtonClickEventArgs> ButtonClick;

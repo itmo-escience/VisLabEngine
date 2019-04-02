@@ -17,15 +17,15 @@ namespace Fusion.Engine.Frames2.Controllers
     {
         public IUIStyle Style { get; protected set; }
 
-        public State CurrentState { get; protected set; } = State.Default;
+        public ControllerState CurrentState { get; protected set; } = ControllerState.Default;
 
-        public IEnumerable<State> States
+        public IEnumerable<ControllerState> States
         {
             get
             {
-                yield return State.Default;
-                yield return State.Hovered;
-                yield return State.Disabled;
+                yield return ControllerState.Default;
+                yield return ControllerState.Hovered;
+                yield return ControllerState.Disabled;
 
                 foreach (var state in NonDefaultStates)
                 {
@@ -34,11 +34,11 @@ namespace Fusion.Engine.Frames2.Controllers
             }
         }
 
-        protected virtual IEnumerable<State> NonDefaultStates => new List<State>();
+        protected virtual IEnumerable<ControllerState> NonDefaultStates => new List<ControllerState>();
 
         public abstract IEnumerable<T> Slots { get; }
 
-        public void ChangeState(State newState)
+        public void ChangeState(ControllerState newState)
         {
             if (!States.Contains(newState)) return;
 
@@ -69,7 +69,7 @@ namespace Fusion.Engine.Frames2.Controllers
         private bool _initialized = false;
         private void Initialize()
         {
-            ChangeState(State.Default);
+            ChangeState(ControllerState.Default);
             _initialized = true;
         }
 
@@ -98,29 +98,29 @@ namespace Fusion.Engine.Frames2.Controllers
         public event PropertyChangedEventHandler PropertyChanged;
     }
 
-    public struct State : IEquatable<State>
+    public struct ControllerState : IEquatable<ControllerState>
     {
         public readonly string Name;
-        public State(string name)
+        public ControllerState(string name)
         {
             Name = name;
         }
 
-        public static State Default = new State("Default");
-        public static State Hovered = new State("Hovered");
-        public static State Disabled = new State("Disabled");
+        public static ControllerState Default = new ControllerState("Default");
+        public static ControllerState Hovered = new ControllerState("Hovered");
+        public static ControllerState Disabled = new ControllerState("Disabled");
 
-        public static bool operator ==(State self, State other)
+        public static bool operator ==(ControllerState self, ControllerState other)
         {
             return self.Equals(other);
         }
 
-        public static bool operator !=(State self, State other)
+        public static bool operator !=(ControllerState self, ControllerState other)
         {
             return !self.Equals(other);
         }
 
-        public bool Equals(State other)
+        public bool Equals(ControllerState other)
         {
             return string.Equals(Name, other.Name);
         }
@@ -128,7 +128,7 @@ namespace Fusion.Engine.Frames2.Controllers
         public override bool Equals(object obj)
         {
             if (ReferenceEquals(null, obj)) return false;
-            return obj is State other && Equals(other);
+            return obj is ControllerState other && Equals(other);
         }
 
         public override int GetHashCode()
@@ -141,6 +141,6 @@ namespace Fusion.Engine.Frames2.Controllers
             return $"State: {Name}";
         }
 
-        public static implicit operator string(State s) => s.ToString();
+        public static implicit operator string(ControllerState s) => s.ToString();
     }
 }

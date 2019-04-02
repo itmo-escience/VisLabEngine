@@ -256,12 +256,12 @@ namespace GISTest
 		        {
 		            new PropertyValueStates("BackgroundColor", Color4.Black)
 		            {
-		                [State.Hovered] = new Color4(1.0f, 0.0f, 0.0f, 1.0f),
+		                [ControllerState.Hovered] = new Color4(1.0f, 0.0f, 0.0f, 1.0f),
 		                [ButtonController.Pressed] = new Color4(0.0f, 1.0f, 1.0f, 1.0f),
 		            },
 		            new PropertyValueStates("BorderColor", Color4.White)
 		            {
-		                [State.Hovered] = new Color4(1.0f, 0.0f, 1.0f, 1.0f),
+		                [ControllerState.Hovered] = new Color4(1.0f, 0.0f, 1.0f, 1.0f),
 		                [ButtonController.Pressed] = new Color4(1.0f, 1.0f, 1.0f, 1.0f),
 		            }
 		        },
@@ -269,7 +269,7 @@ namespace GISTest
 		        {
 		            new PropertyValueStates("Text", "Idle")
 		            {
-		                [State.Hovered] = "Hovered",
+		                [ControllerState.Hovered] = "Hovered",
 		                [ButtonController.Pressed] = "Pressed",
 		            }
 		        }

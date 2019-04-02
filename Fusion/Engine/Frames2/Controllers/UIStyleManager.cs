@@ -61,17 +61,17 @@ namespace Fusion.Engine.Frames2.Controllers
         public string Name { get; }
         public object Default { get; }
 
-        private readonly Dictionary<State, object> _storedValues = new Dictionary<State, object>();
+        private readonly Dictionary<ControllerState, object> _storedValues = new Dictionary<ControllerState, object>();
 
         public PropertyValueStates(string name, object defaultValue)
         {
             Name = name;
             Default = defaultValue;
 
-            _storedValues[State.Default] = Default;
+            _storedValues[ControllerState.Default] = Default;
         }
 
-        public object this[State s]
+        public object this[ControllerState s]
         {
             get
             {
