@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Fusion.Core.Mathematics;
 using Fusion.Engine.Frames2.Managing;
+using Fusion.Engine.Graphics.SpritesD2D;
 
 namespace Fusion.Engine.Frames2.Controllers
 {
@@ -14,7 +16,10 @@ namespace Fusion.Engine.Frames2.Controllers
 
         private readonly Dictionary<Type, Dictionary<string, IUIStyle>> _styles = new Dictionary<Type, Dictionary<string, IUIStyle>>();
 
-        internal UIStyleManager() { }
+        internal UIStyleManager()
+        {
+            LoadDefaultStyles();
+        }
 
         public IUIStyle GetStyle(Type type, string name = DefaultStyle)
         {
@@ -33,6 +38,61 @@ namespace Fusion.Engine.Frames2.Controllers
                 _styles[style.ControllerType] = new Dictionary<string, IUIStyle>();
 
             _styles[style.ControllerType][style.Name] = style;
+        }
+
+        private void LoadDefaultStyles()
+        {
+            var buttonStyle = new UISimpleStyle(typeof(ButtonController))
+            {
+                ["Background"] = new[]
+                {
+                    new PropertyValueStates("BackgroundColor", Color4.Black)
+                    {
+                        [ControllerState.Hovered] = new Color4(1.0f, 0.0f, 0.0f, 1.0f),
+                        [ButtonController.Pressed] = new Color4(0.0f, 1.0f, 1.0f, 1.0f),
+                    },
+                    new PropertyValueStates("BorderColor", Color4.White)
+                    {
+                        [ControllerState.Hovered] = new Color4(1.0f, 0.0f, 1.0f, 1.0f),
+                        [ButtonController.Pressed] = new Color4(1.0f, 1.0f, 1.0f, 1.0f),
+                    }
+                },
+                ["Foreground"] = new[]
+                {
+                    new PropertyValueStates("Text", "Idle")
+                    {
+                        [ControllerState.Hovered] = "Hovered",
+                        [ButtonController.Pressed] = "Pressed",
+                    }
+                }
+            };
+            AddStyle(buttonStyle);
+
+            var rbStyle = new UISimpleStyle(typeof(RadioButtonController))
+            {
+                ["Background"] = new[]
+                {
+                    new PropertyValueStates("BackgroundColor", Color.Gray.ToColor4())
+                    {
+                    },
+                    new PropertyValueStates("BorderColor", Color4.White)
+                    {
+                    }
+                },
+                ["RadioButton"] = new[]
+                {
+                    new PropertyValueStates("BackgroundColor", new Color4(1.0f, 0.0f, 0.0f, 1.0f))
+                    {
+                        [ControllerState.Hovered] = new Color4(0.5f, 0.0f, 0.0f, 1.0f),
+                        [ControllerState.Disabled] = new Color4(1.0f, 0.5f, 0.5f, 1.0f),
+                        [RadioButtonController.Pressed] = new Color4(0.5f, 0.5f, 0.0f, 1.0f),
+                        [RadioButtonController.Checked] = new Color4(0.0f, 1.0f, 0.0f, 1.0f),
+                        [RadioButtonController.CheckedHovered] = new Color4(0.0f, 0.5f, 0.0f, 1.0f),
+                        [RadioButtonController.CheckedDisabled] = new Color4(0.5f, 1.0f, 0.5f, 1.0f)
+                    }
+                }
+            };
+            AddStyle(rbStyle);
         }
     }
 

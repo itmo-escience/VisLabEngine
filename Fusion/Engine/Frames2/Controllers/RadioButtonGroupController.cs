@@ -97,8 +97,6 @@ namespace Fusion.Engine.Frames2.Controllers
         public SolidBrushD2D DebugBrush => new SolidBrushD2D(new Color4(0, 1.0f, 0, 1.0f));
         public TextFormatD2D DebugTextFormat => new TextFormatD2D("Calibri", 10);
 
-        public ObservableCollection<PropertyValueStates> Properties { get; } = new ObservableCollection<PropertyValueStates>();
-
         public event EventHandler<SlotAttachmentChangedEventArgs> ComponentAttached;
 
         public virtual void Attach(UIComponent newComponent)
@@ -201,16 +199,6 @@ namespace Fusion.Engine.Frames2.Controllers
             radioButton.Background.Attach(new Border(Color.Gray, Color.White) { DesiredWidth = 100, DesiredHeight = 25});
             radioButton.Body.Attach(body);
             radioButton.RadioButton.Attach(new Border(Color.Blue, Color.White) { DesiredWidth = 25, DesiredHeight = 25});
-
-            var radioButtonColor = new PropertyValueStates("BackgroundColor", new Color4(1.0f, 0.0f, 0.0f, 1.0f));
-            radioButtonColor[ControllerState.Hovered] = new Color4(0.5f, 0.0f, 0.0f, 1.0f);
-            radioButtonColor[ControllerState.Disabled] = new Color4(1.0f, 0.5f, 0.5f, 1.0f);
-            radioButtonColor[RadioButtonController.Pressed] = new Color4(0.5f, 0.5f, 0.0f, 1.0f);
-            radioButtonColor[RadioButtonController.Checked] = new Color4(0.0f, 1.0f, 0.0f, 1.0f);
-            radioButtonColor[RadioButtonController.CheckedHovered] = new Color4(0.0f, 0.5f, 0.0f, 1.0f);
-            radioButtonColor[RadioButtonController.CheckedDisabled] = new Color4(0.5f, 1.0f, 0.5f, 1.0f);
-
-            radioButton.RadioButton.Properties.Add(radioButtonColor);
 
             var slot = new RadioButtonGroupSlot(this, 0, 0, 100, 100);
             slot.Attach(radioButton);

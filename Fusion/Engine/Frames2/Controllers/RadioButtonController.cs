@@ -1,13 +1,9 @@
-﻿using Fusion.Engine.Frames2.Managing;
-using Fusion.Engine.Graphics.SpritesD2D;
-using System;
+﻿using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Fusion.Core.Mathematics;
 using Fusion.Engine.Common;
+using Fusion.Engine.Graphics.SpritesD2D;
+using Fusion.Engine.Frames2.Managing;
 using Fusion.Engine.Frames2.Events;
 
 namespace Fusion.Engine.Frames2.Controllers
@@ -62,8 +58,6 @@ namespace Fusion.Engine.Frames2.Controllers
         public SolidBrushD2D DebugBrush => new SolidBrushD2D(new Color4(0, 1.0f, 0, 1.0f));
         public TextFormatD2D DebugTextFormat => new TextFormatD2D("Calibri", 10);
 
-        public ObservableCollection<PropertyValueStates> Properties { get; } = new ObservableCollection<PropertyValueStates>();
-
         public event EventHandler<SlotAttachmentChangedEventArgs> ComponentAttached;
 
         public string Name { get; }
@@ -91,7 +85,7 @@ namespace Fusion.Engine.Frames2.Controllers
 
     public class RadioButtonController : UIController<RadioButtonSlot>
     {
-        protected override IEnumerable<IControllerSlot> MainControllerSlots => new List<IControllerSlot>() { Background, RadioButton, Body  };
+        protected override IEnumerable<IControllerSlot> MainControllerSlots => new List<IControllerSlot>() { Background, RadioButton, Body };
         protected override IEnumerable<IControllerSlot> AdditionalControllerSlots { get; } = new List<IControllerSlot>();
 
         public static ControllerState Pressed = new ControllerState("Pressed");
@@ -109,6 +103,8 @@ namespace Fusion.Engine.Frames2.Controllers
             RadioButton = new RadioButtonSlot("RadioButton", this);
             Body = new SimpleControllerSlot("Body", this);
             Background = new SimpleControllerSlot("Background", this);
+
+            Style = UIStyleManager.Instance.GetStyle(GetType());
 
             Events.MouseDown += OnMouseDown;
             Events.MouseUp += OnMouseUp;
