@@ -57,6 +57,8 @@ namespace Fusion.Engine.Frames2.Components
             DesiredHeight = height;
         }
 
+        public bool IsInside(Vector2 point) => Placement.IsInside(point);
+
         public void Update(GameTime gameTime)
         {
             if (Texture != null &&

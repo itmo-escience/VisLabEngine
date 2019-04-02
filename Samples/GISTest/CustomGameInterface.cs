@@ -172,32 +172,28 @@ namespace GISTest
             img1 = new Image(image);
             img2 = new Image(image);
 
-		    //var imgVerticalBox = new VerticalBox()
-		    //{
-		    //    Name = "ImageFreePlacement",
-		    //    DesiredWidth = 500,
-		    //    DesiredHeight = 800,
-      //          Alignment = HorizontalAlignment.Center
-		    //};
+            var imgVerticalBox = new VerticalBox()
+            {
+                Name = "ImageFreePlacement",
+                DesiredWidth = 500,
+                DesiredHeight = 800,
+                Alignment = HorizontalAlignment.Center
+            };
 
-		    //var imgFpSlot = UIManager.Root.Insert(imgVerticalBox, 0);
-		    //imgFpSlot.X = 50;
-		    //imgFpSlot.Y = 50;
+            var imgFpSlot = UIManager.Root.Insert(imgVerticalBox, 0);
+            imgFpSlot.X = 50;
+            imgFpSlot.Y = 50;
 
-      //      var slot = imgVerticalBox.Insert(img1, 0);
-		    //slot.X = 10;
-		    //slot.Y = 10;
-		    //img1.DesiredWidth = 250;
-		    //img1.DesiredHeight = 50;
+            var slot = imgVerticalBox.Insert(img1, 0);
+            img1.DesiredWidth = 250;
+            img1.DesiredHeight = 50;
 
 
-      //      var slot2 = imgVerticalBox.Insert(img2, 0);
-		    //slot2.X = 20;
-		    //slot2.Y = 80;
-		    //img2.DesiredWidth = 450;
-		    //img2.DesiredHeight = 250;
+            var slot2 = imgVerticalBox.Insert(img2, 0);
+            img2.DesiredWidth = 450;
+            img2.DesiredHeight = 250;
 
-		    var labelFreePlacement = new FreePlacement();
+            var labelFreePlacement = new FreePlacement();
 		    labelFreePlacement.Name = "LabelFreePlacement";
 		    labelFreePlacement.DesiredWidth  = 400;
 		    labelFreePlacement.DesiredHeight = 600;
@@ -236,7 +232,7 @@ namespace GISTest
             border.BackgroundColor = new Color4(1, 1, 1, 1);
 
             var borderSlot = UIManager.Root.Insert(border, 0);
-		    borderSlot.X = 1100;
+		    borderSlot.X = 800;
 		    borderSlot.Y = 300;
 
 		    text.Events.Click += (sender, args) => Log.Message("Label click");
@@ -282,15 +278,32 @@ namespace GISTest
 			var btn = new ButtonController();
 		    btn.DesiredWidth = 100;
 		    btn.DesiredHeight = 100;
-			btn.Background.Attach(new Border());
+			btn.Background.Attach(new Border() {DesiredWidth = 100, DesiredHeight = 100});
             btn.Foreground.Attach(new Label("Button", new TextFormatD2D("Calibry", 15)));
 
             var btnSlot = UIManager.Root.Insert(btn, 0);
-		    btnSlot.X = 1100;
-		    btnSlot.Y = 100;
+		    btnSlot.X = 100;
+		    btnSlot.Y = 500;
 
             #endregion
 
+            #region radioButtons
+
+            var rbg = new RadioButtonGroupController
+            {
+                DesiredWidth = 100,
+                DesiredHeight = 100
+            };
+            rbg.Background.Attach(new Border());
+
+            rbg.InsertRadioButtonWith(new Label("RadioButton", "Calibri", 14), 0);
+            rbg.InsertRadioButtonWith(new Label("RadioButton", "Calibri", 14), 0);
+
+            var rbgSlot = UIManager.Root.Insert(rbg, 0);
+            rbgSlot.X = 300;
+            rbgSlot.Y = 500;
+
+            #endregion
 
             /*
             #region textbox

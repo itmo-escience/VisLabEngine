@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using Fusion.Engine.Frames2.Managing;
 
 namespace Fusion.Engine.Frames2.Controllers
@@ -9,6 +10,7 @@ namespace Fusion.Engine.Frames2.Controllers
         public static UIStyleManager Instance = new UIStyleManager();
 
         public const string DefaultStyle = "Default";
+        public const string MissingStyle = "StyleMissing";
 
         private readonly Dictionary<Type, Dictionary<string, IUIStyle>> _styles = new Dictionary<Type, Dictionary<string, IUIStyle>>();
 
@@ -16,7 +18,13 @@ namespace Fusion.Engine.Frames2.Controllers
 
         public IUIStyle GetStyle(Type type, string name = DefaultStyle)
         {
-            return _styles[type][name];
+            if (!_styles.TryGetValue(type, out var typeStyle) ||
+                !typeStyle.TryGetValue(name, out var result))
+            {
+                return new UISimpleStyle(type, MissingStyle);
+            }
+
+            return result;
         }
 
         public void AddStyle(IUIStyle style)
@@ -52,7 +60,7 @@ namespace Fusion.Engine.Frames2.Controllers
         public IEnumerable<PropertyValueStates> this[string slotName]
         {
             get => _slots.GetOrDefault(slotName, new List<PropertyValueStates>());
-            set => _slots[slotName] = new List<PropertyValueStates>(value);
+            set => _slots[slotName] = value.ToList();
         }
     }
 

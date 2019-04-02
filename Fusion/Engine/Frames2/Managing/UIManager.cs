@@ -26,14 +26,14 @@ namespace Fusion.Engine.Frames2.Managing
         public Matrix3x2 Transform => Matrix3x2.Identity;
         public bool Clip => false;
         public bool Visible => true;
-        public IUIContainer<ISlot> Parent => null;
+        public IUIContainer Parent => null;
         public UIComponent Component { get; }
 
         public SolidBrushD2D DebugBrush => new SolidBrushD2D(Color4.White);
         public TextFormatD2D DebugTextFormat => new TextFormatD2D("Calibri", 10);
         public void DebugDraw(SpriteLayerD2D layer) {}
 
-        internal RootSlot(float width, float height, IUIContainer<ISlot> rootContainer)
+        internal RootSlot(float width, float height, IUIContainer rootContainer)
         {
             Width = width;
             Height = height;
@@ -234,7 +234,7 @@ namespace Fusion.Engine.Frames2.Managing
 
             component.Draw(layer);
 
-            if (component is IUIContainer<ISlot> container)
+            if (component is IUIContainer container)
             {
                 foreach (var child in container.Slots)
                 {

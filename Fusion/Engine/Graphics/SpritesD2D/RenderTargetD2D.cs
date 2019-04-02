@@ -56,32 +56,22 @@ namespace Fusion.Engine.Graphics.SpritesD2D
 
         /// <inheritdoc cref="RenderTarget.PushAxisAlignedClip(RawRectangleF, AntialiasMode)"/>
         public void PushAxisAlignedClip(RectangleF clippingRecrangle, AntialiasModeD2D antialiasMode) =>
-            RenderTarget.PushAxisAlignedClip(createAlignedRectangle(clippingRecrangle.ToRawRectangleF()), antialiasMode.ToAntialiasMode());
+            RenderTarget.PushAxisAlignedClip(clippingRecrangle.ToRawRectangleF(), antialiasMode.ToAntialiasMode());
 
         /// <inheritdoc cref="RenderTarget.PopAxisAlignedClip()"/>
         public void PopAxisAlignedClip() => RenderTarget.PopAxisAlignedClip();
 
-        private RawVector2 createAlignedVector(RawVector2 vector)
-        {
-            return new RawVector2(vector.X + 0.5f, vector.Y + 0.5f);
-        }
-
-        private RawRectangleF createAlignedRectangle(RawRectangleF rectangle)
-        {
-            return new RawRectangleF(rectangle.Left + 0.5f, rectangle.Top + 0.5f, rectangle.Right + 0.5f, rectangle.Bottom + 0.5f);
-        }
-
         public void DrawEllipse(Vector2 center, float rX, float rY, IBrushD2D brush) =>
-            RenderTarget.DrawEllipse(new SharpDX.Direct2D1.Ellipse(createAlignedVector(center.ToRawVector2()), rX, rY), _brushFactory.GetOrCreateBrush(brush));
+            RenderTarget.DrawEllipse(new SharpDX.Direct2D1.Ellipse(center.ToRawVector2(), rX - 1, rY - 1), _brushFactory.GetOrCreateBrush(brush));
 
         public void DrawEllipse(Vector2 center, float rX, float rY, IBrushD2D brush, float strokeWidth) =>
-            RenderTarget.DrawEllipse(new SharpDX.Direct2D1.Ellipse(createAlignedVector(center.ToRawVector2()), rX, rY), _brushFactory.GetOrCreateBrush(brush), strokeWidth);
+            RenderTarget.DrawEllipse(new SharpDX.Direct2D1.Ellipse(center.ToRawVector2(), rX - strokeWidth, rY - strokeWidth), _brushFactory.GetOrCreateBrush(brush), strokeWidth);
 
         public void DrawLine(Vector2 p0, Vector2 p1, IBrushD2D brush) =>
-            RenderTarget.DrawLine(createAlignedVector(p0.ToRawVector2()), createAlignedVector(p1.ToRawVector2()), _brushFactory.GetOrCreateBrush(brush));
+            RenderTarget.DrawLine(p0.ToRawVector2(), p1.ToRawVector2(), _brushFactory.GetOrCreateBrush(brush));
 
         public void DrawLine(Vector2 p0, Vector2 p1, IBrushD2D brush, float strokeWidth) =>
-            RenderTarget.DrawLine(createAlignedVector(p0.ToRawVector2()), createAlignedVector(p1.ToRawVector2()), _brushFactory.GetOrCreateBrush(brush), strokeWidth);
+            RenderTarget.DrawLine(p0.ToRawVector2(), p1.ToRawVector2(), _brushFactory.GetOrCreateBrush(brush), strokeWidth);
 
         public void DrawStrokeLine(Vector2 p0, Vector2 p1, IBrushD2D brush, float strokeWidth = 1)
         {
@@ -89,14 +79,14 @@ namespace Fusion.Engine.Graphics.SpritesD2D
             {
                 DashStyle = DashStyle.Dash,
             };
-            RenderTarget.DrawLine(createAlignedVector(p0.ToRawVector2()), createAlignedVector(p1.ToRawVector2()), _brushFactory.GetOrCreateBrush(brush), strokeWidth, new StrokeStyle(RenderTarget.Factory, prop));
+            RenderTarget.DrawLine(p0.ToRawVector2(), p1.ToRawVector2(), _brushFactory.GetOrCreateBrush(brush), strokeWidth, new StrokeStyle(RenderTarget.Factory, prop));
         }
 
         public void DrawRect(RectangleF rectangle, IBrushD2D brush) =>
             RenderTarget.DrawRectangle(createAlignedRectangle(rectangle.ToRawRectangleF()), _brushFactory.GetOrCreateBrush(brush));
 
         public void DrawRect(RectangleF rectangle, IBrushD2D brush, float strokeWidth) =>
-            RenderTarget.DrawRectangle(createAlignedRectangle(rectangle.ToRawRectangleF()), _brushFactory.GetOrCreateBrush(brush), strokeWidth);
+            RenderTarget.DrawRectangle(createAlignedRectangle(rectangle.ToRawRectangleF(), strokeWidth), _brushFactory.GetOrCreateBrush(brush), strokeWidth);
 
         public void DrawStrokeRect(RectangleF rectangle, IBrushD2D brush, float strokeWidth = 1)
         {
@@ -104,23 +94,35 @@ namespace Fusion.Engine.Graphics.SpritesD2D
             {
                 DashStyle = DashStyle.Dash,
             };
-            RenderTarget.DrawRectangle(createAlignedRectangle(rectangle.ToRawRectangleF()), _brushFactory.GetOrCreateBrush(brush), strokeWidth, new StrokeStyle(RenderTarget.Factory, prop));
+            RenderTarget.DrawRectangle(createAlignedRectangle(rectangle.ToRawRectangleF(), strokeWidth), _brushFactory.GetOrCreateBrush(brush), strokeWidth, new StrokeStyle(RenderTarget.Factory, prop));
         }
 
         public void FillEllipse(Vector2 center, float rX, float rY, IBrushD2D brush) =>
-            RenderTarget.FillEllipse(new SharpDX.Direct2D1.Ellipse(createAlignedVector(center.ToRawVector2()), rX, rY), _brushFactory.GetOrCreateBrush(brush));
+            RenderTarget.FillEllipse(new SharpDX.Direct2D1.Ellipse(center.ToRawVector2(), rX, rY), _brushFactory.GetOrCreateBrush(brush));
 
         public void FillRect(RectangleF rectangle, IBrushD2D brush) =>
-            RenderTarget.FillRectangle(createAlignedRectangle(rectangle.ToRawRectangleF()), _brushFactory.GetOrCreateBrush(brush));
+            RenderTarget.FillRectangle(rectangle.ToRawRectangleF(), _brushFactory.GetOrCreateBrush(brush));
 
         public void DrawText(string text, TextFormatD2D textFormat, RectangleF rectangleF, IBrushD2D brush) =>
-            RenderTarget.DrawText(text, _dwFactory.CreateTextFormat(textFormat), createAlignedRectangle(rectangleF.ToRawRectangleF()), _brushFactory.GetOrCreateBrush(brush));
+            RenderTarget.DrawText(text, _dwFactory.CreateTextFormat(textFormat), rectangleF.ToRawRectangleF(), _brushFactory.GetOrCreateBrush(brush));
 
         public void DrawTextLayout(Vector2 origin, TextLayoutD2D layout, IBrushD2D brush) =>
-            RenderTarget.DrawTextLayout(createAlignedVector(origin.ToRawVector2()), _layoutFactory.CreateTextLayout(layout), _brushFactory.GetOrCreateBrush(brush));
+            RenderTarget.DrawTextLayout(origin.ToRawVector2(), _layoutFactory.CreateTextLayout(layout), _brushFactory.GetOrCreateBrush(brush));
 
         public void DrawBitmap(BitmapD2D bitmap, RectangleF destinationRectangle, float opacity, RectangleF sourceRectangle) =>
-            RenderTarget.DrawBitmap(bitmap._bitmap, createAlignedRectangle(destinationRectangle.ToRawRectangleF()), opacity, BitmapInterpolationMode.NearestNeighbor, createAlignedRectangle(sourceRectangle.ToRawRectangleF()));
+            RenderTarget.DrawBitmap(bitmap._bitmap, destinationRectangle.ToRawRectangleF(), opacity, BitmapInterpolationMode.NearestNeighbor, sourceRectangle.ToRawRectangleF());
+
+        public void DrawPathGeometry(PathGeometryD2D geometry, IBrushD2D brush) =>
+            RenderTarget.DrawGeometry(geometry.PathGeometry, _brushFactory.GetOrCreateBrush(brush));
+
+        public void DrawPathGeometry(PathGeometryD2D geometry, IBrushD2D brush, float strokeWidth) =>
+            RenderTarget.DrawGeometry(geometry.PathGeometry, _brushFactory.GetOrCreateBrush(brush), strokeWidth);
+
+        private RawRectangleF createAlignedRectangle(RawRectangleF rectangle, float borderThickness = 1)
+        {
+            borderThickness /= 2;
+            return new RawRectangleF(rectangle.Left + borderThickness, rectangle.Top + borderThickness, rectangle.Right - borderThickness, rectangle.Bottom - borderThickness);
+        }
 
         private readonly Stack<Layer> _layers = new Stack<Layer>();
         public void PushLayer(PathGeometryD2D clippingGeometry, AntialiasModeD2D antialiasMode)

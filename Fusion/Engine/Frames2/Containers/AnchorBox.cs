@@ -98,7 +98,7 @@ namespace Fusion.Engine.Frames2.Containers
 		}
 
 		internal IUIModifiableContainer<AnchorBoxSlot> InternalHolder { get; }
-		public IUIContainer<ISlot> Parent => InternalHolder;
+		public IUIContainer Parent => InternalHolder;
 
 		private UIComponent _component;
 		public UIComponent Component
@@ -136,7 +136,7 @@ namespace Fusion.Engine.Frames2.Containers
 	public class AnchorBox : IUIModifiableContainer<AnchorBoxSlot>
 	{
 		private readonly AsyncObservableCollection<AnchorBoxSlot> _slots = new AsyncObservableCollection<AnchorBoxSlot>();
-		public IEnumerable<AnchorBoxSlot> Slots => _slots;
+		public IEnumerable<ISlot> Slots => _slots;
 
 		public event PropertyChangedEventHandler PropertyChanged;
 		public ISlot Placement { get; set; }
@@ -148,9 +148,11 @@ namespace Fusion.Engine.Frames2.Containers
 		public object Tag { get; set; }
 		public string Name { get; set; }
 
-		public void Update( GameTime gameTime )
+        public bool IsInside(Vector2 point) => Placement.IsInside(point);
+
+        public void Update( GameTime gameTime )
 		{
-			foreach (var slot in Slots)
+			foreach (var slot in _slots)
 			{
 				if (slot.Fixators[AnchorBoxSlot.Fixator.Left] >= 0)
 				{
@@ -238,5 +240,5 @@ namespace Fusion.Engine.Frames2.Containers
 
 			return true;
 		}
-	}
+    }
 }

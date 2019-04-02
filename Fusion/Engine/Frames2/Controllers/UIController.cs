@@ -1,9 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Linq;
+using Fusion.Core.Mathematics;
 using Fusion.Engine.Common;
 using Fusion.Engine.Frames2.Events;
+using Fusion.Engine.Frames2.Managing;
 using Fusion.Engine.Graphics.SpritesD2D;
 
 namespace Fusion.Engine.Frames2.Controllers
@@ -13,7 +14,7 @@ namespace Fusion.Engine.Frames2.Controllers
         string Name { get; }
     }
 
-    public abstract class UIController<T> : IUIContainer<T> where T : IControllerSlot
+    public abstract class UIController<T> : PropertyChangedHelper, IUIContainer where T : IControllerSlot
     {
         public IUIStyle Style { get; protected set; }
 
@@ -36,7 +37,11 @@ namespace Fusion.Engine.Frames2.Controllers
 
         protected virtual IEnumerable<ControllerState> NonDefaultStates => new List<ControllerState>();
 
-        public abstract IEnumerable<T> Slots { get; }
+        public IEnumerable<ISlot> Slots => AllSlots;
+        private IEnumerable<IControllerSlot> AllSlots => MainControllerSlots.Concat(AdditionalControllerSlots);
+
+        protected abstract IEnumerable<IControllerSlot> MainControllerSlots { get; }
+        protected abstract IEnumerable<IControllerSlot> AdditionalControllerSlots { get; }
 
         public void ChangeState(ControllerState newState)
         {
@@ -45,7 +50,13 @@ namespace Fusion.Engine.Frames2.Controllers
             CurrentState = newState;
             Log.Debug($"{this} Changed state to {CurrentState}");
 
-            foreach (var slot in Slots)
+            if (Style == null)
+            {
+                Log.Debug($"{this}.Style is empty");
+                return;
+            }
+
+            foreach (var slot in AllSlots)
             {
                 var component = slot.Component;
                 var type = component.GetType();
@@ -80,7 +91,9 @@ namespace Fusion.Engine.Frames2.Controllers
         public object Tag { get; set; }
         public string Name { get; set; }
 
-        public void Update(GameTime gameTime)
+        public bool IsInside(Vector2 point) => Placement.IsInside(point);
+
+        public virtual void Update(GameTime gameTime)
         {
             if (!_initialized)
                 Initialize();
@@ -94,8 +107,6 @@ namespace Fusion.Engine.Frames2.Controllers
         }
 
         public bool Contains(UIComponent component) => Slots.Any(slot => slot.Component == component);
-
-        public event PropertyChangedEventHandler PropertyChanged;
     }
 
     public struct ControllerState : IEquatable<ControllerState>
