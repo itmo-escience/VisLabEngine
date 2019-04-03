@@ -166,7 +166,7 @@ namespace GISTest
 
             var imgVerticalBox = new VerticalBox()
             {
-                Name = "ImageFreePlacement",
+                Name = "ImageVerticalBox",
                 DesiredWidth = 500,
                 DesiredHeight = 800,
                 Alignment = HorizontalAlignment.Center
@@ -255,18 +255,24 @@ namespace GISTest
 
             #region radioButtons
 
-            var rbg = new RadioButtonGroupController
+            var rbg = new RadioButtonGroup("TestRbGroup");
+            var rb1 = new RadioButtonController(new Label("First option", "Calibri", 14), rbg);
+            var rb2 = new RadioButtonController(new Label("Second option", "Calibri", 14), rbg);
+            var rb3 = new RadioButtonController(new Label("Third option", "Calibri", 14), rbg);
+
+            var rbVerticalBox = new VerticalBox()
             {
+                Name = "RadioButtonsVerticalBox",
                 DesiredWidth = 100,
-                DesiredHeight = 100
+                DesiredHeight = 100,
+                Alignment = HorizontalAlignment.Left
             };
-            rbg.Background.Attach(new Border());
 
-            rbg.InsertRadioButtonWith(new Label("First option", "Calibri", 14), 0);
-            rbg.InsertRadioButtonWith(new Label("Second option", "Calibri", 14), 0);
-            rbg.InsertRadioButtonWith(new Label("Third option", "Calibri", 14), 0);
+            rbVerticalBox.Insert(rb1, 0);
+            rbVerticalBox.Insert(rb2, 1);
+            rbVerticalBox.Insert(rb3, 2);
 
-            var rbgSlot = UIManager.Root.Insert(rbg, 0);
+            var rbgSlot = UIManager.Root.Insert(rbVerticalBox, 0);
             rbgSlot.X = 300;
             rbgSlot.Y = 500;
 

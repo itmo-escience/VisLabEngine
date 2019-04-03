@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Fusion.Core.Mathematics;
 using Fusion.Engine.Common;
+using Fusion.Engine.Frames2.Components;
 using Fusion.Engine.Graphics.SpritesD2D;
 using Fusion.Engine.Frames2.Managing;
 using Fusion.Engine.Frames2.Events;
@@ -100,7 +101,19 @@ namespace Fusion.Engine.Frames2.Controllers
         public SimpleControllerSlot Body { get; }
         public SimpleControllerSlot Background { get; }
 
-        public RadioButtonController()
+        private RadioButtonGroup _group;
+        public RadioButtonGroup Group
+        {
+            get => _group;
+            set
+            {
+                _group?.Remove(this);
+                _group = value;
+                _group?.Add(this);
+            }
+        }
+
+        public RadioButtonController(RadioButtonGroup group = null)
         {
             RadioButton = new RadioButtonSlot("RadioButton", this);
             Body = new SimpleControllerSlot("Body", this);
@@ -115,6 +128,17 @@ namespace Fusion.Engine.Frames2.Controllers
             Events.Leave += OnLeave;
 
             RadioButtonClick += (sender, args) => { };
+
+            Group = group;
+        }
+
+        public RadioButtonController(UIComponent body, RadioButtonGroup group = null) : this(group)
+        {
+            DesiredWidth = 100;
+            DesiredHeight = 25;
+            Background.Attach(new Border(Color.Gray, Color.White) { DesiredWidth = 100, DesiredHeight = 25});
+            Body.Attach(body);
+            RadioButton.Attach(new Border(Color.Blue, Color.White) { DesiredWidth = 25, DesiredHeight = 25});
         }
 
         public override void Update(GameTime gameTime)
