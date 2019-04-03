@@ -1,7 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using System.Xml;
+using System.Xml.Schema;
+using System.Xml.Serialization;
 using Fusion.Core.Mathematics;
+using Fusion.Core.Utils;
 using Fusion.Engine.Frames2.Managing;
 using Fusion.Engine.Graphics.SpritesD2D;
 
@@ -9,14 +14,14 @@ namespace Fusion.Engine.Frames2.Controllers
 {
     public class UIStyleManager
     {
-        public static UIStyleManager Instance = new UIStyleManager();
+        public static UIStyleManager Instance { get; } = new UIStyleManager();
 
         public const string DefaultStyle = "Default";
         public const string MissingStyle = "StyleMissing";
 
-        private readonly Dictionary<Type, Dictionary<string, IUIStyle>> _styles = new Dictionary<Type, Dictionary<string, IUIStyle>>();
+        private readonly SerializableDictionary<Type, SerializableDictionary<string, IUIStyle>> _styles = new SerializableDictionary<Type, SerializableDictionary<string, IUIStyle>>();
 
-        internal UIStyleManager()
+        private UIStyleManager()
         {
             LoadDefaultStyles();
         }
@@ -35,7 +40,7 @@ namespace Fusion.Engine.Frames2.Controllers
         public void AddStyle(IUIStyle style)
         {
             if(!_styles.ContainsKey(style.ControllerType))
-                _styles[style.ControllerType] = new Dictionary<string, IUIStyle>();
+                _styles[style.ControllerType] = new SerializableDictionary<string, IUIStyle>();
 
             _styles[style.ControllerType][style.Name] = style;
         }
@@ -93,10 +98,22 @@ namespace Fusion.Engine.Frames2.Controllers
                 }
             };
             AddStyle(rbStyle);
+
+            #region StyleSerializationTesting
+
+            string result;
+            using(var textWriter = new StringWriter())
+            {
+                new XmlSerializer(typeof(UISimpleStyle)).Serialize(textWriter, _styles[typeof(RadioButtonController)][DefaultStyle]);
+                result = textWriter.ToString();
+            }
+            Console.WriteLine(result);
+
+            #endregion
         }
     }
 
-    public interface IUIStyle
+    public interface IUIStyle : IXmlSerializable
     {
         string Name { get; }
         Type ControllerType { get; }
@@ -111,6 +128,10 @@ namespace Fusion.Engine.Frames2.Controllers
         public string Name { get; }
         public Type ControllerType { get; }
 
+        public UISimpleStyle()
+        {
+        }
+
         public UISimpleStyle(Type controllerType, string name = UIStyleManager.DefaultStyle)
         {
             Name = name;
@@ -122,14 +143,49 @@ namespace Fusion.Engine.Frames2.Controllers
             get => _slots.GetOrDefault(slotName, new List<PropertyValueStates>());
             set => _slots[slotName] = value.ToList();
         }
+
+        public XmlSchema GetSchema()
+        {
+            return null;
+        }
+
+        public void ReadXml(XmlReader reader)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void WriteXml(XmlWriter writer)
+        {
+            var propertySerializer = new XmlSerializer(typeof(PropertyValueStates));
+
+            writer.WriteAttributeString("Name", Name);
+            writer.WriteAttributeString("ControllerType", ControllerType.FullName);
+
+            foreach (var slotName in _slots.Keys)
+            {
+                writer.WriteStartElement("Slot");
+                writer.WriteAttributeString("Name", slotName);
+
+                foreach (var property in _slots[slotName])
+                {
+                    propertySerializer.Serialize(writer, property);
+                }
+
+                writer.WriteEndElement();
+            }
+        }
     }
 
-    public sealed class PropertyValueStates
+
+    [XmlRoot(ElementName = "Property")]
+    public sealed class PropertyValueStates : IXmlSerializable
     {
         public string Name { get; }
         public object Default { get; }
 
         private readonly Dictionary<ControllerState, object> _storedValues = new Dictionary<ControllerState, object>();
+
+        public PropertyValueStates() {}
 
         public PropertyValueStates(string name, object defaultValue)
         {
@@ -151,5 +207,32 @@ namespace Fusion.Engine.Frames2.Controllers
         }
 
         public override string ToString() => Name;
+
+        public XmlSchema GetSchema()
+        {
+            return null;
+        }
+
+        public void ReadXml(XmlReader reader)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void WriteXml(XmlWriter writer)
+        {
+            writer.WriteAttributeString("Name", Name);
+
+            foreach (var state in _storedValues.Keys)
+            {
+                writer.WriteStartElement("State");
+                writer.WriteAttributeString("Name", state.Name);
+
+                var value = _storedValues[state];
+                var valueSerializer = new XmlSerializer(value.GetType());
+                valueSerializer.Serialize(writer, value, new XmlSerializerNamespaces(new []{ new XmlQualifiedName("", "") }));
+
+                writer.WriteEndElement();
+            }
+        }
     }
 }
