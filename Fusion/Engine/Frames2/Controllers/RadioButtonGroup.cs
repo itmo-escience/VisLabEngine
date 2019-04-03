@@ -38,8 +38,22 @@ namespace Fusion.Engine.Frames2.Controllers
             var newButton = args.RadioButton;
             if (newButton == CheckedRadioButton) return;
 
-            CheckedRadioButton?.ChangeState(ControllerState.Default);
+            CheckedRadioButtonChange?.Invoke(this, new CheckedRadioButtonChangeEventArgs(newButton, CheckedRadioButton));
             CheckedRadioButton = newButton;
+        }
+
+        public event EventHandler<CheckedRadioButtonChangeEventArgs> CheckedRadioButtonChange;
+
+        public class CheckedRadioButtonChangeEventArgs : EventArgs
+        {
+            public RadioButtonController OldRadioButton { get; }
+            public RadioButtonController NewRadioButton { get; }
+
+            public CheckedRadioButtonChangeEventArgs(RadioButtonController newRb, RadioButtonController oldRb)
+            {
+                NewRadioButton = newRb;
+                OldRadioButton = oldRb;
+            }
         }
     }
 }

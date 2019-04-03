@@ -107,9 +107,19 @@ namespace Fusion.Engine.Frames2.Controllers
             get => _group;
             set
             {
-                _group?.Remove(this);
+                if (_group != null)
+                {
+                    _group.CheckedRadioButtonChange -= RespondToStateChanges;
+                    _group.Remove(this);
+                }
+
                 _group = value;
-                _group?.Add(this);
+                
+                if (_group != null)
+                {
+                    _group.Add(this);
+                    _group.CheckedRadioButtonChange += RespondToStateChanges;
+                }
             }
         }
 
@@ -168,6 +178,11 @@ namespace Fusion.Engine.Frames2.Controllers
                 ? Math.Min(Body.Component.DesiredHeight, Body.AvailableHeight)
                 : Body.AvailableHeight;
         }
+
+        private void RespondToStateChanges(object sender, RadioButtonGroup.CheckedRadioButtonChangeEventArgs args)
+        {
+            if (args.OldRadioButton == this) ChangeState(ControllerState.Default);
+        } 
 
         private void OnEnter(UIComponent sender)
         {

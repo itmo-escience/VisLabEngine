@@ -43,7 +43,7 @@ namespace Fusion.Engine.Frames2.Controllers
         protected abstract IEnumerable<IControllerSlot> MainControllerSlots { get; }
         protected abstract IEnumerable<IControllerSlot> AdditionalControllerSlots { get; }
 
-        public void ChangeState(ControllerState newState)
+        protected void ChangeState(ControllerState newState)
         {
             if (!States.Contains(newState)) return;
 
