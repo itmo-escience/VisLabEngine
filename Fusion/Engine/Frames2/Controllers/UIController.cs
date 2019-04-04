@@ -152,6 +152,6 @@ namespace Fusion.Engine.Frames2.Controllers
             return $"State: {Name}";
         }
 
-        public static implicit operator string(ControllerState s) => s.ToString();
+        public static implicit operator string(ControllerState s) => s.Name;
     }
 }

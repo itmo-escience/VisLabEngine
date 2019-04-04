@@ -102,12 +102,21 @@ namespace Fusion.Engine.Frames2.Controllers
             #region StyleSerializationTesting
 
             string result;
+            var style = _styles[typeof(RadioButtonController)][DefaultStyle];
+            var styleSerializer = new XmlSerializer(style.GetType());
             using(var textWriter = new StringWriter())
             {
-                new XmlSerializer(typeof(UISimpleStyle)).Serialize(textWriter, _styles[typeof(RadioButtonController)][DefaultStyle]);
+                styleSerializer.Serialize(textWriter, style);
                 result = textWriter.ToString();
             }
             Console.WriteLine(result);
+            
+            using(var textReader= new StringReader(result))
+            {
+                style = (IUIStyle)styleSerializer.Deserialize(textReader);
+            }
+
+            int i = 0;
 
             #endregion
         }
@@ -125,8 +134,8 @@ namespace Fusion.Engine.Frames2.Controllers
         // map slotName => props
         private readonly Dictionary<string, List<PropertyValueStates>> _slots = new Dictionary<string, List<PropertyValueStates>>();
 
-        public string Name { get; }
-        public Type ControllerType { get; }
+        public string Name { get; private set; }
+        public Type ControllerType { get; private set; }
 
         public UISimpleStyle()
         {
@@ -151,7 +160,33 @@ namespace Fusion.Engine.Frames2.Controllers
 
         public void ReadXml(XmlReader reader)
         {
-            throw new NotImplementedException();
+            var propertySerializer = new XmlSerializer(typeof(PropertyValueStates));
+
+            Name = reader.GetAttribute("Name");
+            ControllerType = Type.GetType(reader.GetAttribute("ControllerType"));
+
+            bool wasEmpty = reader.IsEmptyElement;
+            reader.Read();
+
+            if (wasEmpty)
+                return;
+
+            while (reader.NodeType != XmlNodeType.EndElement)
+            {
+                var slotName = reader.GetAttribute("Name");
+                reader.ReadStartElement("Slot");
+
+                _slots[slotName] = new List<PropertyValueStates>();
+                while (reader.NodeType != XmlNodeType.EndElement)
+                {
+                    _slots[slotName].Add((PropertyValueStates)propertySerializer.Deserialize(reader));
+                    reader.MoveToContent();
+                }
+
+                reader.ReadEndElement();
+                reader.MoveToContent();
+            }
+            reader.ReadEndElement();
         }
 
         public void WriteXml(XmlWriter writer)
@@ -180,10 +215,11 @@ namespace Fusion.Engine.Frames2.Controllers
     [XmlRoot(ElementName = "Property")]
     public sealed class PropertyValueStates : IXmlSerializable
     {
-        public string Name { get; }
-        public object Default { get; }
+        public string Name { get; private set; }
+        public object Default { get; private set; }
+        private Type Type { get; set; }
 
-        private readonly Dictionary<ControllerState, object> _storedValues = new Dictionary<ControllerState, object>();
+        private readonly Dictionary<string, object> _storedValues = new Dictionary<string, object>();
 
         public PropertyValueStates() {}
 
@@ -191,6 +227,7 @@ namespace Fusion.Engine.Frames2.Controllers
         {
             Name = name;
             Default = defaultValue;
+            Type = defaultValue.GetType();
 
             _storedValues[ControllerState.Default] = Default;
         }
@@ -215,21 +252,48 @@ namespace Fusion.Engine.Frames2.Controllers
 
         public void ReadXml(XmlReader reader)
         {
-            throw new NotImplementedException();
+            Name = reader.GetAttribute("Name");
+            reader.ReadStartElement("Property");
+
+            var typeName = reader.GetAttribute("Type");
+            Type = Type.GetType(typeName);
+            var valueSerializer = new XmlSerializer(Type);
+
+            if (reader.IsEmptyElement)
+                return;
+
+            while (reader.NodeType != XmlNodeType.EndElement)
+            {
+                var stateName = reader.GetAttribute("Name");
+                reader.ReadStartElement("State");
+
+                var value = Convert.ChangeType(valueSerializer.Deserialize(reader), Type);
+                _storedValues[stateName] = value;
+
+                if (stateName == ControllerState.Default.Name)
+                {
+                    Default = value;
+                }
+
+                reader.ReadEndElement();
+                reader.MoveToContent();
+            }
+            reader.ReadEndElement();
         }
 
         public void WriteXml(XmlWriter writer)
         {
             writer.WriteAttributeString("Name", Name);
+            writer.WriteAttributeString("Type", Type.FullName);
 
             foreach (var state in _storedValues.Keys)
             {
                 writer.WriteStartElement("State");
-                writer.WriteAttributeString("Name", state.Name);
+                writer.WriteAttributeString("Name", state);
 
                 var value = _storedValues[state];
-                var valueSerializer = new XmlSerializer(value.GetType());
-                valueSerializer.Serialize(writer, value, new XmlSerializerNamespaces(new []{ new XmlQualifiedName("", "") }));
+                var valueSerializer = new XmlSerializer(Type);
+                valueSerializer.Serialize(writer, value, new XmlSerializerNamespaces(new []{ XmlQualifiedName.Empty }));
 
                 writer.WriteEndElement();
             }
