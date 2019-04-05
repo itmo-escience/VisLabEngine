@@ -23,26 +23,34 @@ namespace WpfEditorTest.FrameSelection
 
 		public event EventHandler<List<UIComponent>> FrameSelected;
 
-		public event EventHandler<UIComponent> FrameUpdated;
+		public event EventHandler<UIComponent> UIComponentUpdated;
+		public event EventHandler<ISlot> SlotUpdated;
 
 		public void SelectFrame( List<UIComponent> frame )
 		{
 			foreach (UIComponent selectedFrame in SelectedFrames)
 			{
-				selectedFrame.PropertyChanged -= OnFrameUpdated;
+				selectedFrame.PropertyChanged -= OnUIComponentUpdated;
+				selectedFrame.Placement.PropertyChanged -= OnSlotUpdated;
 			}
 			SelectedFrames = frame;
 			foreach (UIComponent selectedFrame in SelectedFrames)
 			{
-				selectedFrame.PropertyChanged += OnFrameUpdated;
+				selectedFrame.PropertyChanged += OnUIComponentUpdated;
+				selectedFrame.Placement.PropertyChanged += OnSlotUpdated;
 			}
 			FrameSelected?.Invoke(this, SelectedFrames);
 			OnPropertyChanged(nameof(IsSingleElementSelected));
 		}
 
-		private void OnFrameUpdated( object frame, PropertyChangedEventArgs args)
+		private void OnSlotUpdated( object slot, PropertyChangedEventArgs args )
 		{
-		    Application.Current.Dispatcher.InvokeAsync(() => FrameUpdated?.Invoke(this, (UIComponent)frame));
+			Application.Current.Dispatcher.InvokeAsync(() => SlotUpdated?.Invoke(this, (ISlot)slot));
+		}
+
+		private void OnUIComponentUpdated( object frame, PropertyChangedEventArgs args)
+		{
+		    Application.Current.Dispatcher.InvokeAsync(() => UIComponentUpdated?.Invoke(this, (UIComponent)frame));
 		}
 
 		protected void OnPropertyChanged( [System.Runtime.CompilerServices.CallerMemberName] string changedProperty = "" )

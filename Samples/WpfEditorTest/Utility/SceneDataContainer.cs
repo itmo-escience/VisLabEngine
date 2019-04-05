@@ -26,7 +26,7 @@ namespace WpfEditorTest.Utility
 				OnPropertyChanged();
 			}
 		}
-		public UIContainer Scene { get; set; }
+		public FreePlacement Scene { get; set; }
 		public bool IsDirty { get => _isDirty; set { _isDirty = value; SceneName = _sceneName; OnPropertyChanged(); ChangedDirty?.Invoke(this, _isDirty); } }
 		public double SceneZoom { get; set; }
 		public List<UIComponent> SceneSelection { get; set; }
@@ -47,14 +47,18 @@ namespace WpfEditorTest.Utility
 
 		public SceneDataContainer( float width, float height ) : this()
 		{
-			Scene = new FreePlacement(0, 0, width, height) { Name = "SCENE" };
+			Scene = new FreePlacement() { Name = "SCENE" };
+			//Scene.Placement.X = 0;
+			//Scene.Placement.Y = 0;
+			Scene.DesiredWidth = width;
+			Scene.DesiredHeight = height;
 			SceneSize = new Size(width, height);
 		}
 
-		public SceneDataContainer( UIContainer scene ) : this()
+		public SceneDataContainer( FreePlacement scene ) : this()
 		{
 			Scene = scene;
-			SceneSize = new Size(Scene.Width, Scene.Height);
+			SceneSize = new Size(Scene.Placement.Width, Scene.Placement.Height);
 		}
 
 		protected void OnPropertyChanged( [System.Runtime.CompilerServices.CallerMemberName] string changedProperty = "" )

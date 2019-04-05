@@ -1,50 +1,80 @@
-﻿using Fusion.Core.Mathematics;
+﻿using System.ComponentModel;
+using Fusion.Core.Mathematics;
 using Fusion.Engine.Common;
+using Fusion.Engine.Frames2.Events;
 using Fusion.Engine.Graphics.SpritesD2D;
 
 namespace Fusion.Engine.Frames2.Components
 {
     public sealed class Label : UIComponent
     {
-        private bool _isDirtyText;
+        private ISlot _placement;
+        public ISlot Placement
+        {
+            get => _placement;
+            set
+            {
+                if (_placement != null)
+                {
+                    _placement.PropertyChanged -= SlotChanged;
+                }
+                _placement = value;
+
+                if (_placement != null)
+                    _placement.PropertyChanged += SlotChanged;
+            }
+        }
+
+        public UIEventsHolder Events { get; } = new UIEventsHolder();
+
+        private void SlotChanged(object sender, PropertyChangedEventArgs e)
+        {
+            if(e.PropertyName == nameof(ISlot.Width) || e.PropertyName == nameof(ISlot.Height))
+                _isDirtyLayout = true;
+        }
+
+        private bool _autoSize = true;
+        public bool AutoSize
+        {
+            get => _autoSize;
+            set => _autoSize = value;
+        }
+
+        private float _desiredWidth = -1;
+
+        public float DesiredWidth
+        {
+            get => _desiredWidth;
+            set {
+                _desiredWidth = value;
+                AutoSize = false;
+            }
+        }
+
+        private float _desiredHeight = -1;
+        public float DesiredHeight
+        {
+            get => _desiredHeight;
+            set {
+                _desiredHeight = value;
+                AutoSize = false;
+            }
+        }
+
+        public object Tag { get; set; }
+        public string Name { get; set; }
 
         private TextFormatD2D _textFormat;
         public TextFormatD2D TextFormat {
             get => _textFormat;
             set {
                 _textFormat = value;
-                NotifyPropertyChanged();
+                _isDirtyLayout = true;
+                //NotifyPropertyChanged();
             }
         }
 
         private TextLayoutD2D _textLayout;
-        public TextLayoutD2D TextLayout
-        {
-            get => _textLayout;
-            set
-            {
-                _textLayout = value;
-                NotifyPropertyChanged();
-            }
-        }
-
-        private float _maxWidth;
-        public float MaxWidth {
-            get => _maxWidth;
-            set {
-                if (SetAndNotify(ref _maxWidth, value))
-                    InvalidateTransform();
-            }
-        }
-
-        private float _maxHeight;
-        public float MaxHeight {
-            get => _maxHeight;
-            set {
-                if (SetAndNotify(ref _maxHeight, value))
-                    InvalidateTransform();
-            }
-        }
 
         private string _text;
         public string Text
@@ -52,91 +82,60 @@ namespace Fusion.Engine.Frames2.Components
             get => _text;
             set
             {
-                _isDirtyText = true;
                 _text = value;
-
-                var layout = new TextLayoutD2D(_text, _textFormat, _maxWidth, _maxHeight);
-
-                Width = layout.Width < _maxWidth ? layout.Width : _maxWidth;
-                Height = layout.Height < _maxHeight ? layout.Height : _maxHeight;
-                NotifyPropertyChanged();
+                _isDirtyLayout = true;
             }
         }
 
-        private Text _textCommand;
+        private LayoutedText _textCommand;
 
-        public Label() : base()
-        {
-            _isDirtyText = true;
+        private bool _isDirtyLayout;
 
-            PropertyChanged += (s, e) =>
-            {
-                if (e.PropertyName == "Width" || e.PropertyName == "Height") _isDirtyText = true;
-            };
-        }
+        public Label() : this("", "Arial", 10) { }
 
-        public Label(string text, string fontName, float fontSize, float x, float y, float width, float height)
-            : this(text, new TextFormatD2D(fontName, fontSize), x, y, width, height) { }
+        public Label(string text, string fontName, float fontSize) : this(text, new TextFormatD2D(fontName, fontSize)) { }
 
-        public Label(string text, TextFormatD2D textFormat, float x, float y, float width, float height) : base(x, y, width, height)
+        public Label(string text, TextFormatD2D textFormat)
         {
             _textFormat = textFormat;
-            _maxWidth = width;
-            _maxHeight = height;
             Text = text;
 
-            _isDirtyText = true;
+            _isDirtyLayout = true;
+        }
 
-            PropertyChanged += (s, e) =>
+        public void Update(GameTime gameTime)
+        {
+            if (!_isDirtyLayout) return;
+
+            if (AutoSize)
             {
-                if (e.PropertyName == "Width" || e.PropertyName == "Height") _isDirtyText = true;
-            };
-        }
-
-        public Label(string text, TextLayoutD2D textLayout, float x, float y, float width, float height) : base(x, y, width, height)
-        {
-            _textLayout = textLayout;
-            _maxWidth = width;
-            _maxHeight = height;
-            Text = text;
-
-            _isDirtyText = true;
-
-            PropertyChanged += (s, e) =>
+                _textLayout = new TextLayoutD2D(_text, _textFormat, Placement.AvailableWidth, Placement.AvailableHeight);
+                _desiredWidth = _textLayout.Width;
+                _desiredHeight = _textLayout.Height;
+            }
+            else
             {
-                if (e.PropertyName == "Width" || e.PropertyName == "Height") _isDirtyText = true;
-            };
+                _textLayout = new TextLayoutD2D(_text, _textFormat, Placement.Width, Placement.Height);
+            }
+
+            _textCommand = new LayoutedText(new Vector2(), _textLayout, new SolidBrushD2D(Color4.White));
+
+            _isDirtyLayout = false;
         }
 
-        public override void DefaultInit()
-        {
-            Width = 100;
-            Height = 100;
-            _textFormat = new TextFormatD2D("Calibri", 12);
-            _maxWidth = Width;
-            _maxHeight = Height;
-            Text = "Label";
-
-            _isDirtyText = true;
-        }
-
-        public override void Update(GameTime gameTime)
-        {
-            if (_isDirtyText)
-                _textCommand = new Text(
-                    Text,
-                    new RectangleF(0, 0, Width, Height),
-                    _textFormat,
-                    new SolidBrushD2D(Color4.White)
-                );
-
-            _isDirtyText = false;
-        }
-
-        public override void Draw(SpriteLayerD2D layer)
+        public void Draw(SpriteLayerD2D layer)
         {
             if(_textCommand != null)
                 layer.Draw(_textCommand);
         }
-    }
+
+        public event PropertyChangedEventHandler PropertyChanged;
+
+        public override string ToString() => $"Label: {Text}";
+
+		public void DefaultInit()
+		{
+			Name = this.GetType().Name;
+		}
+	}
 }

@@ -1,4 +1,5 @@
 ﻿using Fusion.Engine.Frames2;
+using Fusion.Engine.Frames2.Controllers;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -14,10 +15,10 @@ namespace WpfEditorTest.Utility
     public class MVVMControllerData : INotifyPropertyChanged
 	{
 		public List<ControllerSlotData> Slots { get; set; } = new List<ControllerSlotData>();
-		public List<UIController.Slot> SlotValues = new List<UIController.Slot>();
-		public Dictionary<ControllerSlotData, UIController.Slot> SlotAssotiativeDictionary = new Dictionary<ControllerSlotData, UIController.Slot>();
+		public List<IControllerSlot> SlotValues = new List<IControllerSlot>();
+		public Dictionary<ControllerSlotData, IControllerSlot> SlotAssotiativeDictionary = new Dictionary<ControllerSlotData, IControllerSlot>();
 
-		public MVVMControllerData( UIController controller )
+		public MVVMControllerData( UIController<IControllerSlot> controller )
 		{
 			foreach (var slot in controller.Slots)
 			{
@@ -39,10 +40,10 @@ namespace WpfEditorTest.Utility
 	public class ControllerStateData : INotifyPropertyChanged
 	{
 		public string Name { get; set; }
-		public UIController.Slot Slot { get; set; }
+		public IControllerSlot Slot { get; set; }
 		public ObservableCollection<ControllerSlotProperty> Properties { get; set; } = new ObservableCollection<ControllerSlotProperty>();
 
-		public ControllerStateData( UIController.State state, UIController.Slot slot, UIController controller )
+		public ControllerStateData( State state, IControllerSlot slot, UIController<IControllerSlot> controller )
 		{
 			Name = state.Name;
 			Slot = slot;
@@ -75,12 +76,12 @@ namespace WpfEditorTest.Utility
 	public class ControllerSlotProperty : INotifyPropertyChanged
 	{
 		public string Name { get; set; }
-		public UIController.Slot Slot { get; set; }
-		public UIController.State State { get; set; }
-		public UIController.PropertyValue PropertyValue { get; set; }
+		public IControllerSlot Slot { get; set; }
+		public State State { get; set; }
+		public PropertyValueStates PropertyValue { get; set; }
 		public MVVMControllerSlotProperty SlotPropertyInfo { get; }
 
-		public ControllerSlotProperty( UIController.Slot slot, UIController.PropertyValue propertyValue, UIController controller, UIController.State state )
+		public ControllerSlotProperty( IControllerSlot slot, PropertyValueStates propertyValue, UIController<IControllerSlot> controller, State state )
 		{
 			Name = propertyValue.Name;
 			Slot = slot;
@@ -105,18 +106,18 @@ namespace WpfEditorTest.Utility
 
 	public class ControllerSlotData : INotifyPropertyChanged
 	{
-		public UIController.Slot Slot { get; set; }
+		public IControllerSlot Slot { get; set; }
 		public List<ControllerStateData> States { get; set; } = new List<ControllerStateData>();
-		public List<UIController.State> StateValues = new List<UIController.State>();
-		public Dictionary<ControllerStateData, UIController.State> StateAssotiativeDictionary = new Dictionary<ControllerStateData, UIController.State>();
+		public List<State> StateValues = new List<State>();
+		public Dictionary<ControllerStateData, State> StateAssotiativeDictionary = new Dictionary<ControllerStateData, State>();
 
 		public ObservableCollection<string> AvailableProperties { get; set; }
 
 		public string Name { get; set; }
 
-		public ControllerSlotData( UIController.Slot slot, UIController controller )
+		public ControllerSlotData( IControllerSlot slot, UIController<IControllerSlot> controller )
 		{
-			Name = slot.Name;
+			//Name = slot.Name;
 			Slot = slot;
 
 			foreach (var state in controller.States)
@@ -157,14 +158,14 @@ namespace WpfEditorTest.Utility
 
 	public class MVVMControllerSlotProperty : MVVMFrameProperty
 	{
-		public MVVMControllerSlotProperty( PropertyInfo prop, UIComponent obj, UIController.Slot slot, UIController.State state ) : base(prop, obj)
+		public MVVMControllerSlotProperty( PropertyInfo prop, UIComponent obj, IControllerSlot slot, State state ) : base(prop, obj)
 		{
 			Slot = slot;
 			State = state;
 		}
 
-		public UIController.Slot Slot { get; set; }
-		public UIController.State State { get; set; }
+		public IControllerSlot Slot { get; set; }
+		public State State { get; set; }
 
 		public override object Prop
 		{

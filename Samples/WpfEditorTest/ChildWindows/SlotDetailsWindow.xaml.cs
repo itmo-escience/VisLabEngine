@@ -8,6 +8,7 @@ using System.Windows.Controls;
 using System.Windows.Data;
 using System.Windows.Media;
 using Fusion.Engine.Frames2;
+using Fusion.Engine.Frames2.Controllers;
 using WpfEditorTest.Utility;
 
 namespace WpfEditorTest.ChildWindows
@@ -17,7 +18,7 @@ namespace WpfEditorTest.ChildWindows
 	/// </summary>
 	public partial class SlotDetailsWindow : Window
 	{
-		private UIController selectedController;
+		private UIController<IControllerSlot> selectedController;
 
 		public SlotDetailsWindow()
 		{
@@ -34,7 +35,7 @@ namespace WpfEditorTest.ChildWindows
             Closing += (s, e) => {this.Hide(); e.Cancel = true; };
 		}
 
-		public void SetSelectFrame(UIController controller)
+		public void SetSelectFrame( UIController<IControllerSlot> controller )
 		{
 			if (controller==null)
 			{
@@ -78,14 +79,14 @@ namespace WpfEditorTest.ChildWindows
 			Button button = (sender as Button);
 			var panel = VisualTreeHelper.GetParent(button);
 			var box = VisualTreeHelper.GetChild(panel,1) as ComboBox;
-			UIController.Slot slot = (sender as Button).Tag as UIController.Slot;
+			IControllerSlot slot = (sender as Button).Tag as IControllerSlot;
 
 			var prop = slot.Component.GetType().GetProperty(box.Text);
 
 			if (prop!=null)
 			{
 				var value = prop.GetValue(slot.Component);
-				slot.Properties.Add(new UIController.PropertyValue(box.Text, value));
+				slot.Properties.Add(new PropertyValueStates(box.Text, value));
 			}
 		}
 	}

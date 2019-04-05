@@ -9,6 +9,7 @@ using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
 using Fusion.Engine.Frames2;
+using Fusion.Engine.Frames2.Controllers;
 using WpfEditorTest.Commands;
 using WpfEditorTest.Utility;
 using CommandManager = WpfEditorTest.Commands.CommandManager;
@@ -20,7 +21,7 @@ namespace WpfEditorTest.ChildPanels
     /// </summary>
     public partial class FrameTreeView : Window
     {
-		private UIContainer _scene { get; set; }
+		private IUIModifiableContainer<ISlot> _scene { get; set; }
 
         private UIComponent _selectedFrame;
         public UIComponent SelectedFrame
@@ -34,7 +35,7 @@ namespace WpfEditorTest.ChildPanels
         }
 
         public EventHandler<UIComponent> SelectedFrameChangedInUI;
-		public EventHandler<UIController> ControllerSlotSelected;
+		public EventHandler<UIController<IControllerSlot>> ControllerSlotSelected;
 		public EventHandler RequestFrameDeletionInUI;
 
 		private TextBlock initTreeViewItemHolder;
@@ -66,7 +67,7 @@ namespace WpfEditorTest.ChildPanels
 			parentAdorner.Add(customAdorner = new CustomTreeViewAdorner(ElementHierarchyView, this));
 		}
 
-		public void AttachScene(UIContainer scene )
+		public void AttachScene( IUIModifiableContainer<ISlot> scene )
 		{
 			_scene = scene;
 		}
@@ -75,14 +76,14 @@ namespace WpfEditorTest.ChildPanels
 		{
 			this.initTreeViewItemHolder = sender as TextBlock;
 			var objectChecking = (sender as TextBlock).Tag;
-			if (objectChecking is UIController.Slot)
+			if (objectChecking is IControllerSlot)
 			{
 				//ControllerSlotSelected?.Invoke(this, objectChecking as UIController.Slot);
 				return;
 			}
-			else if (objectChecking is UIController)
+			else if (objectChecking is UIController<IControllerSlot>)
 			{
-				ControllerSlotSelected?.Invoke(this, objectChecking as UIController);
+				ControllerSlotSelected?.Invoke(this, objectChecking as UIController<IControllerSlot>);
 			}
 			else
 			{
@@ -117,17 +118,17 @@ namespace WpfEditorTest.ChildPanels
 			var currentFrame = child;
 			List<object> components = new List<object>();
 
-			while (currentFrame.Parent != null && currentFrame.Parent != _scene)
+			while (currentFrame.Parent() != null && currentFrame.Parent() != _scene)
 			{
-				if (currentFrame.Parent is UIController)
+				if (currentFrame.Parent() is UIController<IControllerSlot>)
 				{
-					components.Add((currentFrame.Parent as UIController).Slots.Where(s => s.Component == currentFrame).FirstOrDefault());
-					currentFrame = currentFrame.Parent;
+					components.Add((currentFrame.Parent() as UIController<IControllerSlot>).Slots.Where(s => s.Component == currentFrame).FirstOrDefault());
+					currentFrame = currentFrame.Parent();
 					components.Add(currentFrame);
 				}
 				else
 				{
-					currentFrame = currentFrame.Parent;
+					currentFrame = currentFrame.Parent();
 					components.Add(currentFrame);
 				}
 
@@ -182,19 +183,17 @@ namespace WpfEditorTest.ChildPanels
 		private void TextBlock_PreviewDragOver( object sender, DragEventArgs e )
 		{
 			var treeViewItemHolder = sender as TextBlock;
-			//e.Handled = false;
 
 			e.Effects = DragDropEffects.None;
 
 			UIComponent dataComponent = (UIComponent)e.Data.GetData(DataFormats.FileDrop);
 
-			// If the string can be converted into a Brush, allow copying.
 			if (dataComponent != null && treeViewItemHolder != this.initTreeViewItemHolder)
 			{
 				customAdorner.Visibility = Visibility.Visible;
 				var toAncestor = (treeViewItemHolder.TransformToAncestor(ElementHierarchyView) as Transform);
 
-				if (treeViewItemHolder.Tag is UIContainer && !(treeViewItemHolder.Tag is UIController))
+				if (treeViewItemHolder.Tag is IUIModifiableContainer<ISlot> && !(treeViewItemHolder.Tag is UIController<IControllerSlot>))
 				{
 					e.Effects = DragDropEffects.Copy | DragDropEffects.Move;
 					treeViewItemHolder.Background = ApplicationConfig.TreeViewItemHolderAllowedHoveredColor;
@@ -249,28 +248,26 @@ namespace WpfEditorTest.ChildPanels
 				if (dataComponent !=null && treeViewItemHolder != this.initTreeViewItemHolder && treeViewItemHolder.Tag is UIComponent)
 				{
 					IEditorCommand command = null;
-					int index = (treeViewItemHolder.Tag as UIComponent).Parent.Children.IndexOf(treeViewItemHolder.Tag as UIComponent);
+					int index = (treeViewItemHolder.Tag as UIComponent).Parent().IndexOf((treeViewItemHolder.Tag as UIComponent));
 					switch (IsOnEdges(treeViewItemHolder, e.GetPosition(treeViewItemHolder)))
 					{
 						case -1:
 							{
-								command = new FrameParentChangeCommand(dataComponent, (treeViewItemHolder.Tag as UIComponent).Parent, dataComponent.Parent, index);
+								command = new UIComponentParentChangeCommand(dataComponent, (treeViewItemHolder.Tag as UIComponent).Parent() as IUIModifiableContainer<ISlot>, dataComponent.Parent() as IUIModifiableContainer<ISlot>, index);
 								break;
 							}
 						case 1:
 							{
-								command = new FrameParentChangeCommand(dataComponent, (treeViewItemHolder.Tag as UIComponent).Parent, dataComponent.Parent, index+1);
+								command = new UIComponentParentChangeCommand(dataComponent, (treeViewItemHolder.Tag as UIComponent).Parent() as IUIModifiableContainer<ISlot>, dataComponent.Parent() as IUIModifiableContainer<ISlot>, index+1);
 								break;
 							}
 						case 0:
 							{
-								if (treeViewItemHolder.Tag is UIContainer && !(treeViewItemHolder.Tag is UIController))
-									command = new FrameParentChangeCommand(dataComponent, treeViewItemHolder.Tag as UIContainer, dataComponent.Parent);
+								if (treeViewItemHolder.Tag is IUIModifiableContainer<ISlot> && !(treeViewItemHolder.Tag is UIController<IControllerSlot>))
+									command = new UIComponentParentChangeCommand(dataComponent, treeViewItemHolder.Tag as IUIModifiableContainer<ISlot>, dataComponent.Parent() as IUIModifiableContainer<ISlot>);
 								break;
 							}
 					}
-
-					//command = new FrameParentChangeCommand(dataComponent, treeViewItemHolder.Tag as UIContainer, dataComponent.Parent);
 					if (command!=null)
 					{
 						CommandManager.Instance.Execute(command);
@@ -300,7 +297,7 @@ namespace WpfEditorTest.ChildPanels
 				UIComponent dataComponent = (UIComponent)e.Data.GetData(DataFormats.FileDrop);
 				if (dataComponent != null)
 				{
-					var command = new FrameParentChangeCommand(dataComponent, _scene, dataComponent.Parent);
+					var command = new UIComponentParentChangeCommand(dataComponent, _scene, dataComponent.Parent() as IUIModifiableContainer<ISlot>);
 					CommandManager.Instance.Execute(command);
 				}
 			}

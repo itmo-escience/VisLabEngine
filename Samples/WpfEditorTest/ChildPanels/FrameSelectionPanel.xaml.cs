@@ -8,6 +8,8 @@ using System.Windows.Media;
 using Fusion.Engine.Frames2;
 using Fusion.Engine.Frames;
 using Matrix3x2 = Fusion.Core.Mathematics.Matrix3x2;
+using Fusion.Engine.Frames2.Managing;
+using Fusion.Engine.Frames2.Containers;
 
 namespace WpfEditorTest.ChildPanels
 {
@@ -24,6 +26,7 @@ namespace WpfEditorTest.ChildPanels
 		private double _oldY;
 		private bool _locked = false;
 		private bool _isInDragField;
+		private UIManager _uiManager;
 
 		public UIComponent SelectedFrame
 		{
@@ -31,19 +34,24 @@ namespace WpfEditorTest.ChildPanels
 			set
 			{
 				if (_selectedFrame != null)
-					_selectedFrame.PropertyChanged -= FrameDimensionsChange;
+				{ 
+					_selectedFrame.PropertyChanged -= ComponentDimensionsChange;
+					_selectedFrame.Placement.PropertyChanged -= SlotDimensionsChange;
+				}
 
 				_selectedFrame = value;
 				if (_selectedFrame == null) return;
 
 				//Width =
-				WidthBuffer = _selectedFrame.Width * Math.Sign(_selectedFrame.Transform.M11);
+				WidthBuffer = _selectedFrame.Placement.Width * Math.Sign(_selectedFrame.Placement.Transform().M11);
 				//Height =
-				HeightBuffer = _selectedFrame.Height * Math.Sign(_selectedFrame.Transform.M22);
+				HeightBuffer = _selectedFrame.Placement.Height * Math.Sign(_selectedFrame.Placement.Transform().M22);
 
-                var transform = new MatrixTransform(_selectedFrame.GlobalTransform.M11, _selectedFrame.GlobalTransform.M12,
-                                                    _selectedFrame.GlobalTransform.M21, _selectedFrame.GlobalTransform.M22,
-                                                    _selectedFrame.GlobalTransform.M31, _selectedFrame.GlobalTransform.M32);
+				var globalTransform = _uiManager.GlobalTransform(_selectedFrame.Placement);
+
+				var transform = new MatrixTransform(globalTransform.M11, globalTransform.M12,
+                                                    globalTransform.M21, globalTransform.M22,
+                                                    globalTransform.M31, globalTransform.M32);
                 RenderTransform = transform;
 
                 _oldX = RenderTransform.Value.OffsetX;
@@ -51,72 +59,75 @@ namespace WpfEditorTest.ChildPanels
 
 				//UpdateVisualAnchors(_selectedFrame.Anchor);
 
-				_selectedFrame.PropertyChanged += FrameDimensionsChange;
+				_selectedFrame.PropertyChanged += ComponentDimensionsChange;
+				_selectedFrame.Placement.PropertyChanged += SlotDimensionsChange;
 			}
 		}
 
-		private void FrameDimensionsChange( object sender, PropertyChangedEventArgs args )
+		private void ComponentDimensionsChange( object sender, PropertyChangedEventArgs args )
 		{
 		    var selected = _selectedFrame;
             if (_locked || selected == null) return;
 
 		    Application.Current.Dispatcher.InvokeAsync(() =>
 		    {
-		        switch (args.PropertyName)
+				var globalTransform = _uiManager.GlobalTransform(selected.Placement);
+
+				switch (args.PropertyName)
 		        {
-		            case "Width":
-		            {
-		                WidthBuffer = selected.Width * Math.Sign(selected.GlobalTransform.M11);
-		                break;
-		            }
-		            case "Height":
-		            {
-		                HeightBuffer = selected.Height * Math.Sign(selected.GlobalTransform.M22);
-		                break;
-		            }
+		            //case "Width":
+		            //{
+		            //    WidthBuffer = selected.Placement.Width * Math.Sign(globalTransform.M11);
+		            //    break;
+		            //}
+		            //case "Height":
+		            //{
+		            //    HeightBuffer = selected.Placement.Height * Math.Sign(globalTransform.M22);
+		            //    break;
+		            //}
 		            case "Parent":
 		            {
-                        var transform = new MatrixTransform(_selectedFrame.GlobalTransform.M11, _selectedFrame.GlobalTransform.M12,
-                                                    _selectedFrame.GlobalTransform.M21, _selectedFrame.GlobalTransform.M22,
-                                                    _selectedFrame.GlobalTransform.M31, _selectedFrame.GlobalTransform.M32);
+                        var transform = new MatrixTransform(globalTransform.M11, globalTransform.M12,
+															globalTransform.M21, globalTransform.M22,
+															globalTransform.M31, globalTransform.M32);
                         RenderTransform = transform;
 
                         _oldX = RenderTransform.Value.OffsetX;
 		                _oldY = RenderTransform.Value.OffsetY;
 		                break;
 		            }
-                    case "Angle":
-                    {
-                        var transform = new MatrixTransform(_selectedFrame.GlobalTransform.M11, _selectedFrame.GlobalTransform.M12,
-                                                    _selectedFrame.GlobalTransform.M21, _selectedFrame.GlobalTransform.M22,
-                                                    _selectedFrame.GlobalTransform.M31, _selectedFrame.GlobalTransform.M32);
-                        RenderTransform = transform;
-                        _oldX = RenderTransform.Value.OffsetX;
-                        _oldY = RenderTransform.Value.OffsetY;
-                        break;
-                    }
-					case "Transform":
-						{
-							var transform = new MatrixTransform(_selectedFrame.GlobalTransform.M11, _selectedFrame.GlobalTransform.M12,
-														_selectedFrame.GlobalTransform.M21, _selectedFrame.GlobalTransform.M22,
-														_selectedFrame.GlobalTransform.M31, _selectedFrame.GlobalTransform.M32);
-							RenderTransform = transform;
-							_oldX = RenderTransform.Value.OffsetX;
-							_oldY = RenderTransform.Value.OffsetY;
-							break;
-						}
-					case "X":
-                    case "Y":
-                    {
-                        var transform = new TransformGroup();
-                        var transformDelta = new TranslateTransform(selected.GlobalTransform.M31 - RenderTransform.Value.OffsetX, selected.GlobalTransform.M32 - RenderTransform.Value.OffsetY);
-                        transform.Children.Add(RenderTransform);
-                        transform.Children.Add(transformDelta);
-                        RenderTransform = transform;
-                        _oldX = RenderTransform.Value.OffsetX;
-                        _oldY = RenderTransform.Value.OffsetY;
-                        break;
-                    }
+     //               case "Angle":
+     //               {
+     //                   var transform = new MatrixTransform(globalTransform.M11, globalTransform.M12,
+					//										globalTransform.M21, globalTransform.M22,
+					//										globalTransform.M31, globalTransform.M32);
+     //                   RenderTransform = transform;
+     //                   _oldX = RenderTransform.Value.OffsetX;
+     //                   _oldY = RenderTransform.Value.OffsetY;
+     //                   break;
+     //               }
+					//case "Transform":
+					//	{
+					//		var transform = new MatrixTransform(globalTransform.M11, globalTransform.M12,
+					//											globalTransform.M21, globalTransform.M22,
+					//											globalTransform.M31, globalTransform.M32);
+					//		RenderTransform = transform;
+					//		_oldX = RenderTransform.Value.OffsetX;
+					//		_oldY = RenderTransform.Value.OffsetY;
+					//		break;
+					//	}
+					//case "X":
+     //               case "Y":
+     //               {
+     //                   var transform = new TransformGroup();
+     //                   var transformDelta = new TranslateTransform(globalTransform.M31 - RenderTransform.Value.OffsetX, globalTransform.M32 - RenderTransform.Value.OffsetY);
+     //                   transform.Children.Add(RenderTransform);
+     //                   transform.Children.Add(transformDelta);
+     //                   RenderTransform = transform;
+     //                   _oldX = RenderTransform.Value.OffsetX;
+     //                   _oldY = RenderTransform.Value.OffsetY;
+     //                   break;
+     //               }
 		            case "Anchor":
 		            {
 		                //UpdateVisualAnchors(selected.Anchor);
@@ -124,6 +135,68 @@ namespace WpfEditorTest.ChildPanels
 		            }
 		        }
 		    });
+		}
+
+		private void SlotDimensionsChange( object sender, PropertyChangedEventArgs args )
+		{
+			var selected = _selectedFrame;
+			if (_locked || selected == null) return;
+
+			Application.Current.Dispatcher.InvokeAsync(() =>
+			{
+				var globalTransform = _uiManager.GlobalTransform(selected.Placement);
+
+				switch (args.PropertyName)
+				{
+					case "Width":
+						{
+							WidthBuffer = selected.Placement.Width * Math.Sign(globalTransform.M11);
+							break;
+						}
+					case "Height":
+						{
+							HeightBuffer = selected.Placement.Height * Math.Sign(globalTransform.M22);
+							break;
+						}
+					case "Angle":
+						{
+							var transform = new MatrixTransform(globalTransform.M11, globalTransform.M12,
+																globalTransform.M21, globalTransform.M22,
+																globalTransform.M31, globalTransform.M32);
+							RenderTransform = transform;
+							_oldX = RenderTransform.Value.OffsetX;
+							_oldY = RenderTransform.Value.OffsetY;
+							break;
+						}
+					case "Transform":
+						{
+							var transform = new MatrixTransform(globalTransform.M11, globalTransform.M12,
+																globalTransform.M21, globalTransform.M22,
+																globalTransform.M31, globalTransform.M32);
+							RenderTransform = transform;
+							_oldX = RenderTransform.Value.OffsetX;
+							_oldY = RenderTransform.Value.OffsetY;
+							break;
+						}
+					case "X":
+					case "Y":
+						{
+							var transform = new TransformGroup();
+							var transformDelta = new TranslateTransform(globalTransform.M31 - RenderTransform.Value.OffsetX, globalTransform.M32 - RenderTransform.Value.OffsetY);
+							transform.Children.Add(RenderTransform);
+							transform.Children.Add(transformDelta);
+							RenderTransform = transform;
+							_oldX = RenderTransform.Value.OffsetX;
+							_oldY = RenderTransform.Value.OffsetY;
+							break;
+						}
+					case "Anchor":
+						{
+							//UpdateVisualAnchors(selected.Anchor);
+							break;
+						}
+				}
+			});
 		}
 
 		private void UpdateVisualAnchors( FrameAnchor anchor )
@@ -180,15 +253,17 @@ namespace WpfEditorTest.ChildPanels
 		}
 
 		public Matrix3x2 InitialTransform { get; internal set; }
-		public UIContainer InitFrameParent { get; internal set; }
+		public IUIModifiableContainer<ISlot> InitFrameParent { get; internal set; }
 		public Point InitPanelPosition { get; internal set; }
 		public Point InitFramePosition { get; internal set; }
 		public Size InitialFrameSize { get; internal set; }
 		public Point InitFrameScale { get; internal set; }
 
-		public FrameSelectionPanel()
+		public FrameSelectionPanel( UIManager uiManager )
 		{
 			InitializeComponent();
+
+			_uiManager = uiManager;
 
 			Height = ApplicationConfig.OptionsWindowSize; Width = ApplicationConfig.OptionsWindowSize;
 
@@ -204,14 +279,19 @@ namespace WpfEditorTest.ChildPanels
 				if (_selectedFrame == null) return;
 
 				_locked = true;
-				_selectedFrame.Width = (float)Math.Max(0, Math.Abs(WidthBuffer));
-				_selectedFrame.Height = (float)Math.Max(0, Math.Abs(HeightBuffer));
+				_selectedFrame.DesiredWidth = (float)Math.Max(0, Math.Abs(WidthBuffer));
+				_selectedFrame.DesiredHeight = (float)Math.Max(0, Math.Abs(HeightBuffer));
 
-				_selectedFrame.Transform = new Matrix3x2(
-					Math.Sign(WidthBuffer)<0?-1:1, _selectedFrame.Transform.M12,
-					_selectedFrame.Transform.M21, Math.Sign(HeightBuffer) < 0 ? -1 : 1,
-					_selectedFrame.Transform.M31, _selectedFrame.Transform.M32
-					);
+				var transform = _selectedFrame.Placement.Transform();
+
+				if (_selectedFrame.Placement is FreePlacementSlot fpSlot)
+				{
+					fpSlot.SetTransform(new Matrix3x2(
+					Math.Sign(WidthBuffer) < 0 ? -1 : 1, transform.M12,
+					transform.M21, Math.Sign(HeightBuffer) < 0 ? -1 : 1,
+					transform.M31, transform.M32
+					)); 
+				}
 				_locked = false;
 
 			};
@@ -232,15 +312,18 @@ namespace WpfEditorTest.ChildPanels
 		{
 			_locked = true;
 
-			var parent = _selectedFrame.Parent;
-			var parentMatrixInvert = Matrix3x2.Invert(parent.GlobalTransform);
+			var parent = _selectedFrame.Parent();
+			var parentMatrixInvert = Matrix3x2.Invert(_uiManager.GlobalTransform(parent.Placement));
 			var vectorHelper = Matrix3x2.TransformPoint(parentMatrixInvert, new Fusion.Core.Mathematics.Vector2((float)RenderTransform.Value.OffsetX, (float)RenderTransform.Value.OffsetY));
 
-			_selectedFrame.X = vectorHelper.X;
-			_selectedFrame.Y = vectorHelper.Y;
+			if (_selectedFrame.Placement is FreePlacementSlot slot)
+			{
+				slot.X = vectorHelper.X;
+				slot.Y = vectorHelper.Y;
 
-			_oldX = RenderTransform.Value.OffsetX;
-			_oldY = RenderTransform.Value.OffsetY;
+				_oldX = RenderTransform.Value.OffsetX;
+				_oldY = RenderTransform.Value.OffsetY; 
+			}
 
 			UpdateAnchorLines();
 			_locked = false;
@@ -253,25 +336,25 @@ namespace WpfEditorTest.ChildPanels
 			double measure;
 			if (TopAnchorLine.Visibility == Visibility.Visible)
 			{
-				measure = _selectedFrame.Y;
+				measure = _selectedFrame.Placement.Y;
 				TopAnchorLine.Height = Math.Abs(measure);
 				TopAnchorLine.Margin = new Thickness(0, -measure, 0, 9);
 			}
 			if (BottomAnchorLine.Visibility == Visibility.Visible)
 			{
-				measure = _selectedFrame.Parent.Height - (_selectedFrame.Y + _selectedFrame.Height);
+				measure = _selectedFrame.Parent().Placement.Height - (_selectedFrame.Placement.Y + _selectedFrame.Placement.Height);
 				BottomAnchorLine.Height = Math.Abs(measure);
 				BottomAnchorLine.Margin = new Thickness(0, 9, 0, -measure);
 			}
 			if (LeftAnchorLine.Visibility == Visibility.Visible)
 			{
-				measure = _selectedFrame.X;
+				measure = _selectedFrame.Placement.X;
 				LeftAnchorLine.Width = Math.Abs(measure);
 				LeftAnchorLine.Margin = new Thickness(-measure, 0, 9, 0);
 			}
 			if (RightAnchorLine.Visibility == Visibility.Visible)
 			{
-				measure = _selectedFrame.Parent.Width - (_selectedFrame.X + _selectedFrame.Width);
+				measure = _selectedFrame.Parent().Placement.Width - (_selectedFrame.Placement.X + _selectedFrame.Placement.Width);
 				RightAnchorLine.Width = Math.Abs(measure);
 				RightAnchorLine.Margin = new Thickness(9, 0, -measure, 0);
 			}

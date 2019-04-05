@@ -1,10 +1,43 @@
 ﻿using Fusion.Core.Mathematics;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
+using System.Runtime.CompilerServices;
 
 namespace Fusion.Engine.Frames2.Managing
 {
-    public class UIHelper
+    public abstract class PropertyChangedHelper
+    {
+        #region PropertyChaged implementation
+        public event PropertyChangedEventHandler PropertyChanged;
+
+        /// <summary>
+        /// Sets field with new value and fires <seealso cref="PropertyChanged"/> event if provided value is different from the old one.
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="field">Private field to set.</param>
+        /// <param name="value">New value.</param>
+        /// <param name="propertyName">Name that will be passed in a PropertyChanged event.</param>
+        /// <returns>True if new value is different and PropertyChanged event was fired, false otherwise.</returns>
+        protected bool SetAndNotify<T>(ref T field, T value, [CallerMemberName] string propertyName = null)
+        {
+            if (EqualityComparer<T>.Default.Equals(field, value))
+                return false;
+
+            field = value;
+            NotifyPropertyChanged(propertyName);
+
+            return true;
+        }
+
+        protected void NotifyPropertyChanged([CallerMemberName] string propertyName = null)
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+        }
+        #endregion
+    }
+
+    public static class UIHelper
     {
         public static IEnumerable<UIComponent> BFSTraverse(UIComponent root)
         {
@@ -14,36 +47,51 @@ namespace Fusion.Engine.Frames2.Managing
             while (queue.Any())
             {
                 var c = queue.Dequeue();
-                yield return c;
 
-                if (c is UIContainer container)
+				if(c != null)
+					yield return c;
+
+                if (c is IUIContainer<ISlot> container)
                 {
-                    foreach (var child in container.Children)
+                    foreach (var child in container.Slots)
                     {
-                        queue.Enqueue(child);
+                        queue.Enqueue(child.Component);
                     }
                 }
             }
         }
 
-        public static IEnumerable<UIComponent> BFSTraverseForPoint(UIComponent root, Vector2 innerPoint)
+        public static IEnumerable<UIComponent> BFSTraverseForPoint(UIManager manager, UIComponent root, Vector2 point)
         {
             var queue = new Queue<UIComponent>();
-            if (root.IsInside(innerPoint)) queue.Enqueue(root);
+
+            if (InsideComponent(manager, root, point)) queue.Enqueue(root);
 
             while (queue.Any())
             {
                 var c = queue.Dequeue();
                 yield return c;
 
-                if (c is UIContainer container)
+                if (c is IUIContainer<ISlot> container)
                 {
-                    foreach (var child in container.Children)
+                    foreach (var child in container.Slots.Select(s => s.Component))
                     {
-                        if (child.IsInside(innerPoint)) queue.Enqueue(child);
+                        if (InsideComponent(manager, child, point))
+                            queue.Enqueue(child);
                     }
                 }
             }
+        }
+
+        private static bool InsideComponent(UIManager manager, UIComponent component, Vector2 point)
+        {
+            if (component is IUIContainer<ISlot> container && !container.Placement.Clip)
+            {
+                return true;
+            }
+			if (component == null)
+				return false;
+            return manager.IsInsideSlotInternal(component.Placement, point);
         }
 
         public static IEnumerable<UIComponent> DFSTraverse(UIComponent root)
@@ -57,11 +105,11 @@ namespace Fusion.Engine.Frames2.Managing
                 var c = stack.Pop();
                 stack2.Push(c);
 
-                if (c is UIContainer container)
+                if (c is IUIContainer<ISlot> container)
                 {
-                    foreach (var child in container.Children)
+                    foreach (var child in container.Slots)
                     {
-                        stack.Push(child);
+                        stack.Push(child.Component);
                     }
                 }
             }
@@ -69,20 +117,29 @@ namespace Fusion.Engine.Frames2.Managing
             while (stack2.Any())
             {
                 var c = stack2.Pop();
-                yield return c;
+				if(c != null)
+					yield return c;
             }
         }
 
-        public static UIComponent GetLowestComponentInHierarchy(UIContainer root, Vector2 innerPoint)
-        {
-            if (!root.IsInside(innerPoint)) return null;
+		public static UIComponent GetLowestComponentInHierarchy( UIManager manager, IUIContainer<ISlot> root, Vector2 innerPoint)
+		{
+			return GetLowestComponentInHierarchy(manager, root, innerPoint, new List<UIComponent>());
+		}
 
-            UIContainer lowestContainer = root;
+		public static UIComponent GetLowestComponentInHierarchy( UIManager manager, IUIContainer<ISlot> root, Vector2 innerPoint, List<UIComponent> ignoreComponents )
+        {
+            if (!InsideComponent(manager, root, innerPoint)) return null;
+
+            var lowestContainer = root;
             while (true)
             {
-                UIComponent newLowest = lowestContainer.Children.LastOrDefault(c => c.IsInside(innerPoint));
+                var newLowest = lowestContainer.Slots.Where(c=> !ignoreComponents.Contains(c.Component))
+                    .LastOrDefault(c => InsideComponent(manager, c.Component, innerPoint))?
+                    .Component;
+
                 if (newLowest == null) return lowestContainer;
-                if (newLowest is UIContainer newContainer)
+                if (newLowest is IUIContainer<ISlot> newContainer)
                 {
                     lowestContainer = newContainer;
                 }
@@ -93,17 +150,22 @@ namespace Fusion.Engine.Frames2.Managing
             }
         }
 
-        public static IEnumerable<UIContainer> Ancestors(UIComponent component)
+        public static IEnumerable<IUIContainer<ISlot>> Ancestors(UIComponent component)
         {
             if(component == null)
                 yield break;
 
-            var current = component.Parent;
+            var current = component.Placement.Parent;
             while (current != null)
             {
                 yield return current;
-                current = current.Parent;
+                current = current.Placement.Parent;
             }
+        }
+
+        public static TValue GetOrDefault<TKey, TValue>(this Dictionary<TKey, TValue> dict, TKey key, TValue defaultValue)
+        {
+            return dict.TryGetValue(key, out var result) ? result : defaultValue;
         }
     }
 }

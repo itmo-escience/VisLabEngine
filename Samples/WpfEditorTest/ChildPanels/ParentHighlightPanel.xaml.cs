@@ -13,6 +13,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 using Fusion.Engine.Frames2;
+using Fusion.Engine.Frames2.Managing;
 
 namespace WpfEditorTest.ChildPanels
 {
@@ -23,6 +24,8 @@ namespace WpfEditorTest.ChildPanels
 	{
 
 		private UIComponent _selectedFrame;
+		private UIManager _uiManager;
+
 		public UIComponent SelectedFrame
 		{
 			get => _selectedFrame;
@@ -36,26 +39,24 @@ namespace WpfEditorTest.ChildPanels
 				}
 
 
-				Width = _selectedFrame.Width;
-				Height = _selectedFrame.Height;
+				Width = _selectedFrame.Placement.Width;
+				Height = _selectedFrame.Placement.Height;
 
-				//var delta = new TranslateTransform();
-				//RenderTransform = delta;
-				//delta.X = _selectedFrame.BoundingBox.X;
-				//delta.Y = _selectedFrame.BoundingBox.Y;
+				var globalTransform = _uiManager.GlobalTransform(_selectedFrame.Placement);
 
-				var transform = new MatrixTransform(_selectedFrame.GlobalTransform.M11, _selectedFrame.GlobalTransform.M12,
-									_selectedFrame.GlobalTransform.M21, _selectedFrame.GlobalTransform.M22,
-									_selectedFrame.GlobalTransform.M31, _selectedFrame.GlobalTransform.M32);
+				var transform = new MatrixTransform(globalTransform.M11, globalTransform.M12,
+													globalTransform.M21, globalTransform.M22,
+													globalTransform.M31, globalTransform.M32);
 				RenderTransform = transform;
 
 				this.Visibility = Visibility.Visible;
 			}
 		}
 
-		public ParentHighlightPanel()
+		public ParentHighlightPanel( Fusion.Engine.Frames2.Managing.UIManager uiManager )
 		{
 			InitializeComponent();
+			_uiManager = uiManager;
 		}
 	}
 }

@@ -12,6 +12,7 @@ using WpfEditorTest.Utility;
 using RectangleF = Fusion.Core.Mathematics.RectangleF;
 using Vector2 = Fusion.Core.Mathematics.Vector2;
 using Matrix3x2 = Fusion.Core.Mathematics.Matrix3x2;
+using Fusion.Engine.Frames2.Managing;
 
 namespace WpfEditorTest.ChildPanels
 {
@@ -40,6 +41,9 @@ namespace WpfEditorTest.ChildPanels
 		}
 
 		public Transform PreviousDragTransform { get; set; }
+
+		private UIManager _uiManager;
+
 		public List<Border> Drags { get; set; }
 
 		public Dictionary<UIComponent, RectangleF> InitialFramesRectangles { get; private set; }
@@ -58,9 +62,11 @@ namespace WpfEditorTest.ChildPanels
 
 		public Matrix3x2 GlobalFrameMatrix;
 
-		public FrameDragsPanel()
+		public FrameDragsPanel( Fusion.Engine.Frames2.Managing.UIManager uiManager )
 		{
 			InitializeComponent();
+
+			_uiManager = uiManager;
 
 			Drags = new List<Border>
 			{
@@ -86,7 +92,7 @@ namespace WpfEditorTest.ChildPanels
 				this.UpdateBoundingBox();
 			};
 
-			SelectionManager.Instance.FrameUpdated += ( s, e ) =>
+			SelectionManager.Instance.SlotUpdated += ( s, e ) =>
 			{
 				this.UpdateBoundingBox();
 			};
@@ -98,10 +104,10 @@ namespace WpfEditorTest.ChildPanels
 			if (frames.Count > 1)
 			{
 				Visibility = Visibility.Visible;
-				SelectedGroupMinX = frames.Select(f => f.BoundingBox.X).Min();
-				SelectedGroupMinY = frames.Select(f => f.BoundingBox.Y).Min();
-				SelectedGroupMaxX = frames.Select(f => f.BoundingBox.X + f.BoundingBox.Width).Max();
-				SelectedGroupMaxY = frames.Select(f => f.BoundingBox.Y + f.BoundingBox.Height).Max();
+				SelectedGroupMinX = frames.Select(f => _uiManager.BoundingBox(f.Placement).X).Min();
+				SelectedGroupMinY = frames.Select(f => _uiManager.BoundingBox(f.Placement).Y).Min();
+				SelectedGroupMaxX = frames.Select(f => _uiManager.BoundingBox(f.Placement).X + _uiManager.BoundingBox(f.Placement).Width).Max();
+				SelectedGroupMaxY = frames.Select(f => _uiManager.BoundingBox(f.Placement).Y + _uiManager.BoundingBox(f.Placement).Height).Max();
 				Width = Math.Max(SelectedGroupMaxX - SelectedGroupMinX, double.Epsilon);
 				Height = Math.Max(SelectedGroupMaxY - SelectedGroupMinY, double.Epsilon);
 				var delta = new TranslateTransform();
@@ -113,17 +119,20 @@ namespace WpfEditorTest.ChildPanels
 			{
 				Visibility = Visibility.Visible;
 				var component = SelectionManager.Instance.SelectedFrames.First();
-				SelectedGroupMinX = component.BoundingBox.X;
-				SelectedGroupMinY = component.BoundingBox.Y;
-				SelectedGroupMaxX = component.BoundingBox.X + component.BoundingBox.Width;
-				SelectedGroupMaxY = component.BoundingBox.Y + component.BoundingBox.Height;
+				SelectedGroupMinX = _uiManager.BoundingBox(component.Placement).X;
+				SelectedGroupMinY = _uiManager.BoundingBox(component.Placement).Y;
+				SelectedGroupMaxX = _uiManager.BoundingBox(component.Placement).X + _uiManager.BoundingBox(component.Placement).Width;
+				SelectedGroupMaxY = _uiManager.BoundingBox(component.Placement).Y + _uiManager.BoundingBox(component.Placement).Height;
 
 				UIComponent frame = frames.First();
-				Width = frame.Width;
-				Height = frame.Height;
-				var transform = new MatrixTransform(frame.GlobalTransform.M11, frame.GlobalTransform.M12,
-													frame.GlobalTransform.M21, frame.GlobalTransform.M22,
-													frame.GlobalTransform.M31, frame.GlobalTransform.M32);
+				Width = frame.Placement.Width;
+				Height = frame.Placement.Height;
+
+				var globalTransform = _uiManager.GlobalTransform(frame.Placement);
+
+				var transform = new MatrixTransform(globalTransform.M11, globalTransform.M12,
+													globalTransform.M21, globalTransform.M22,
+													globalTransform.M31, globalTransform.M32);
 				RenderTransform = transform;
 			}
 			else
@@ -144,15 +153,15 @@ namespace WpfEditorTest.ChildPanels
 			InitialFramesRectangles = new Dictionary<UIComponent, RectangleF>();
 			foreach (UIComponent frame in selectedFrames)
 			{
-
+				var globalTransform = _uiManager.GlobalTransform(frame.Placement);
 
 				InitialFramesRectangles.Add(
 					frame,
 					new RectangleF(
-						frame.GlobalTransform.M31 - (float)RenderTransform.Value.OffsetX,
-						frame.GlobalTransform.M32 - (float)RenderTransform.Value.OffsetY,
-						frame.Width,
-						frame.Height
+						globalTransform.M31 - (float)RenderTransform.Value.OffsetX,
+						globalTransform.M32 - (float)RenderTransform.Value.OffsetY,
+						frame.Placement.Width,
+						frame.Placement.Height
 					)
 				);
 			}
@@ -171,7 +180,7 @@ namespace WpfEditorTest.ChildPanels
 			CenteredPivot = new Point((CurrentPivot.X + CurrentDragInitPosition.X) / 2, (CurrentPivot.Y + CurrentDragInitPosition.Y) / 2);
 			if (SelectionManager.Instance.SelectedFrames.Count == 1)
 			{
-				GlobalFrameMatrix = new Matrix3x2(SelectionManager.Instance.SelectedFrames.First().GlobalTransform.ToArray());
+				GlobalFrameMatrix = new Matrix3x2(_uiManager.GlobalTransform(SelectionManager.Instance.SelectedFrames.First().Placement).ToArray());
 				GlobalFrameMatrix.Invert();
 
 				var vectorHelper = Matrix3x2.TransformPoint(GlobalFrameMatrix, new Vector2((float)CurrentPivot.X, (float)CurrentPivot.Y));
@@ -201,11 +210,13 @@ namespace WpfEditorTest.ChildPanels
 			var offset = VisualTreeHelper.GetOffset(border);
 			double angle = 0;
 
-			var globalTransform = SelectionManager.Instance.SelectedFrames.First().GlobalTransform;
+			var globalTransform = _uiManager.GlobalTransform(SelectionManager.Instance.SelectedFrames.First().Placement);
 
 			if (SelectionManager.Instance.SelectedFrames.Count == 1)
 			{
-				angle = SelectionManager.Instance.SelectedFrames.First().GlobalAngle;
+				//TODO
+				//Return GlobalAngle
+				//angle = SelectionManager.Instance.SelectedFrames.First().GlobalAngle;
 			}
 			return new Point(
 				RenderTransform.Value.OffsetX +

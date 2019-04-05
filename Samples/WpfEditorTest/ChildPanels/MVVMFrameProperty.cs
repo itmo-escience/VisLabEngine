@@ -43,7 +43,7 @@ namespace WpfEditorTest.ChildPanels
 				if (e.PropertyName == PropName)
 				{
 					var val = PropInfo.GetValue(Obj);
-					if (!Prop.Equals(val))
+					if (Prop!=null && !Prop.Equals(val))
 					{
 						_prop = PropInfo.GetValue(Obj);
 						OnPropertyChanged(nameof(Prop));
@@ -60,7 +60,7 @@ namespace WpfEditorTest.ChildPanels
 			{
 				var convertedValue = Convert.ChangeType(value, PropInfo.PropertyType);
 
-				var command = new FramePropertyChangeCommand(Obj, PropName, value);
+				var command = new UIComponentPropertyChangeCommand(Obj, PropName, value);
 				CommandManager.Instance.Execute(command);
 
 				//OnPropertyChanged();

@@ -1,5 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="..\..\VisLabProjects\packages\PropertyChanged.Fody.2.6.1\build\PropertyChanged.Fody.props" Condition="Exists('..\..\VisLabProjects\packages\PropertyChanged.Fody.2.6.1\build\PropertyChanged.Fody.props')" />
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
@@ -13,6 +14,8 @@
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <TargetFrameworkProfile />
+    <NuGetPackageImportStamp>
+    </NuGetPackageImportStamp>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x64'">
     <DebugSymbols>true</DebugSymbols>
@@ -57,6 +60,9 @@
     </Reference>
     <Reference Include="PresentationCore" />
     <Reference Include="PresentationFramework" />
+    <Reference Include="PropertyChanged, Version=2.6.1.0, Culture=neutral, PublicKeyToken=ee3ee20bcf148ddd, processorArchitecture=MSIL">
+      <HintPath>..\..\VisLabProjects\packages\PropertyChanged.Fody.2.6.1\lib\netstandard1.0\PropertyChanged.dll</HintPath>
+    </Reference>
     <Reference Include="SharpDX, Version=4.0.1.0, Culture=neutral, PublicKeyToken=b4dcf0f35e5521f1, processorArchitecture=MSIL">
       <HintPath>..\packages\SharpDX.4.0.1\lib\net45\SharpDX.dll</HintPath>
       <Private>True</Private>
@@ -113,9 +119,15 @@
       <Private>True</Private>
     </Reference>
     <Reference Include="System" />
+    <Reference Include="System.ComponentModel.Composition" />
     <Reference Include="System.Core" />
     <Reference Include="System.Drawing" />
     <Reference Include="System.IO.Compression" />
+    <Reference Include="System.Net.Http" />
+    <Reference Include="System.Numerics" />
+    <Reference Include="System.Runtime.InteropServices.RuntimeInformation, Version=4.0.1.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\..\VisLabProjects\packages\System.Runtime.InteropServices.RuntimeInformation.4.3.0\lib\net45\System.Runtime.InteropServices.RuntimeInformation.dll</HintPath>
+    </Reference>
     <Reference Include="System.ServiceModel" />
     <Reference Include="System.Windows" />
     <Reference Include="System.Windows.Forms" />
@@ -256,7 +268,9 @@
     <Compile Include="Engine\Common\Commands\CrashServer.cs" />
     <Compile Include="Engine\Common\AtomAttribute.cs" />
     <Compile Include="Engine\Common\UserInterface.Internal.cs" />
-    <Compile Include="Engine\Frames2\Components\ClippingFlags.cs" />
+    <Compile Include="Engine\Frames2\Containers\AnchorBox.cs" />
+    <Compile Include="Engine\Frames2\Events\UIEventsHolder.cs" />
+    <Compile Include="Engine\Frames2\Managing\ClippingFlags.cs" />
     <Compile Include="Engine\Frames2\Components\Image.cs" />
     <Compile Include="Engine\Frames2\Components\Border.cs" />
     <Compile Include="Engine\Frames2\Containers\Flexbox.cs" />
@@ -267,15 +281,16 @@
     <Compile Include="Engine\Frames2\Controllers\RadioButtonGroupController.cs" />
     <Compile Include="Engine\Frames2\Controllers\TextBoxController.cs" />
     <Compile Include="Engine\Frames2\Managing\EditionSceneManager.cs" />
-    <Compile Include="Engine\Frames2\Managing\Events.cs" />
     <Compile Include="Engine\Frames2\Managing\UIHelper.cs" />
+    <Compile Include="Engine\Frames2\IUIDrawable.cs" />
+    <Compile Include="Engine\Frames2\UISlot.cs" />
     <Compile Include="Engine\Frames2\UIComponent.cs" />
-    <Compile Include="Engine\Frames2\UIController.cs" />
-    <Compile Include="Engine\Frames2\IUIMouseAware.cs" />
+    <Compile Include="Engine\Frames2\Controllers\UIController.cs" />
+    <Compile Include="Engine\Frames2\Events\IUIInputAware.cs" />
     <Compile Include="Engine\Frames2\Components\Label.cs" />
     <Compile Include="Engine\Frames2\Managing\UIAnimator.cs" />
     <Compile Include="Engine\Frames2\UIContainer.cs" />
-    <Compile Include="Engine\Frames2\Managing\UIEventProcessor.cs" />
+    <Compile Include="Engine\Frames2\Events\UIEventProcessor.cs" />
     <Compile Include="Engine\Frames2\Managing\UIManager.cs" />
     <Compile Include="Engine\Frames2\Controllers\ButtonController.cs" />
     <Compile Include="Engine\Frames\Abstract\DrawFrameItem.cs" />
@@ -721,4 +736,12 @@
   </Target>
   -->
   <Import Project="..\FusionFramework.targets" />
+  <Import Project="..\..\VisLabProjects\packages\Fody.4.2.1\build\Fody.targets" Condition="Exists('..\..\VisLabProjects\packages\Fody.4.2.1\build\Fody.targets')" />
+  <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
+    <PropertyGroup>
+      <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
+    </PropertyGroup>
+    <Error Condition="!Exists('..\..\VisLabProjects\packages\Fody.4.2.1\build\Fody.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\..\VisLabProjects\packages\Fody.4.2.1\build\Fody.targets'))" />
+    <Error Condition="!Exists('..\..\VisLabProjects\packages\PropertyChanged.Fody.2.6.1\build\PropertyChanged.Fody.props')" Text="$([System.String]::Format('$(ErrorText)', '..\..\VisLabProjects\packages\PropertyChanged.Fody.2.6.1\build\PropertyChanged.Fody.props'))" />
+  </Target>
 </Project>

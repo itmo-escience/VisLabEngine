@@ -86,11 +86,13 @@
     <Compile Include="ChildWindows\SlotDetailsWindow.xaml.cs">
       <DependentUpon>SlotDetailsWindow.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Commands\SlotPropertyChangeCommand.cs" />
     <Compile Include="FrameSelection\SelectionManager.cs" />
     <Compile Include="DialogWindows\SceneConfigWindow.xaml.cs">
       <DependentUpon>SceneConfigWindow.xaml</DependentUpon>
     </Compile>
     <Compile Include="Commands\SelectFrameCommand.cs" />
+    <Compile Include="Commands\TransformChangeCommand.cs" />
     <Compile Include="Utility\CustomTreeViewAdorner.cs" />
     <Compile Include="Utility\IMVVMProperty.cs" />
     <Compile Include="Utility\MVVMControllerData.cs" />
@@ -122,7 +124,7 @@
     <Compile Include="Commands\CommandGroup.cs" />
     <Compile Include="Commands\CommandManager.cs" />
     <Compile Include="Commands\IEditorCommand.cs" />
-    <Compile Include="Commands\PropertyChangeCommand.cs" />
+    <Compile Include="Commands\UIComponentPropertyChangeCommand.cs" />
     <Compile Include="WPFConverters\TextBoxConverter.cs" />
     <Compile Include="WPFConverters\TransformValueConverter.cs" />
     <Compile Include="WPFSelectionUILayer.xaml.cs">

@@ -81,13 +81,13 @@ namespace Fusion.Core.Utils
 			{
 				frameTypes.Add(src.GetType());
 			}
-			if (src is UIContainer container)
+			/*if (src is UIContainer container)
             {
                 foreach (var child in container.Children)
                 {
                     GetChildTypes(child);
                 }
-            }
+            }*/
 		}
 
 		public static void GetChildTypes(UIComponent src, SerializableDictionary<string, string> list )
@@ -96,13 +96,13 @@ namespace Fusion.Core.Utils
 			{
 				list.Add(src.GetType().FullName, Assembly.GetAssembly(src.GetType()).FullName);
 			}
-            if (src is UIContainer container)
+            /*if (src is UIContainer container)
             {
                 foreach (var child in container.Children)
                 {
                     GetChildTypes(child, list);
                 }
-            }
+            }*/
 		}
 
 		public static UIComponent Read(string filename, out UIComponent destination )
@@ -114,10 +114,10 @@ namespace Fusion.Core.Utils
 			{
 				var holder = (SeralizableObjectHolder)formatter.Deserialize(fs);
 				destination = holder.SerializableFrame;
-                if (destination is UIContainer container)
+                /*if (destination is UIContainer container)
                 {
                     container.RestoreParents();
-                }
+                }*/
 			}
 			return destination;
 		}
@@ -131,10 +131,10 @@ namespace Fusion.Core.Utils
 			{
 				var holder = (SeralizableObjectHolder)formatter.Deserialize(sr);
 				destination = holder.SerializableFrame;
-                if (destination is UIContainer container)
+                /*if (destination is UIContainer container)
                 {
                     container.RestoreParents();
-                }
+                }*/
             }
 			return destination;
 		}

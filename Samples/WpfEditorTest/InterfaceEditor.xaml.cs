@@ -76,13 +76,16 @@ namespace WpfEditorTest
 		private readonly FramePalette _palette;
 		private readonly FrameTreeView _treeView;
 		private readonly ConsoleWindow _consoleWindow;
+		private WPFSelectionUILayer SelectionLayer;
 
 		private Binding _childrenBinding;
-		private readonly Game _engine;
 
-		public UIContainer DragFieldFrame;
-		public UIContainer SceneFrame;
-		public UIContainer RootFrame;
+		private readonly Game _engine;
+		private UIManager _uiManager;
+
+		public FreePlacement DragFieldFrame;
+		public FreePlacement SceneFrame;
+		public FreePlacement RootFrame;
 		private List<Type> customUIComponentTypes;
 		private string _currentSceneFile;
 		private string _sceneChangedIndicator;
@@ -95,14 +98,17 @@ namespace WpfEditorTest
 			get => _currentScene;
 			set
 			{
-				if (_currentScene != null && RootFrame.Children.Contains(_currentScene.Scene))
+				if (_currentScene != null && RootFrame.Slots.Contains(_currentScene.Scene.Placement))
 				{
 					_currentScene.SceneSelection = SelectionManager.Instance.SelectedFrames;
 					_currentScene.SceneZoom = ZoomerSlider.Value;
 					_currentScene.SceneSize = new Size(SelectionLayer.Width, SelectionLayer.Height);
 
 					SelectionManager.Instance.SelectFrame(new List<UIComponent> { });
-					RootFrame.Remove(_currentScene.Scene);
+					CommandManager.Instance.ExecuteWithoutMemorising(
+						new UIComponentParentChangeCommand(_currentScene.Scene, null, _currentScene.Scene.Parent() as IUIModifiableContainer<ISlot>)
+					);
+					//RootFrame.Remove(_currentScene.Scene);
 					CurrentScene.ChangedDirty -= UpdateSceneIndicator;
 					foreach (var panel in SelectionLayer.FrameSelectionPanelList.Values)
 					{
@@ -113,11 +119,14 @@ namespace WpfEditorTest
 				_currentScene = value;
 				CommandManager.Instance.ObservableScene = _currentScene;
 				CurrentScene.ChangedDirty += UpdateSceneIndicator;
-				RootFrame.Add(_currentScene.Scene);
+				CommandManager.Instance.ExecuteWithoutMemorising(
+					new UIComponentParentChangeCommand(_currentScene.Scene, RootFrame, _currentScene.Scene.Parent() as IUIModifiableContainer<ISlot>)
+				);
+				//RootFrame.Add(_currentScene.Scene);
 				SceneFrame = _currentScene.Scene;
 				ZoomerSlider.Value = _currentScene.SceneZoom;
-				SelectionLayer.Width = SceneFrame.Width;
-				SelectionLayer.Height = SceneFrame.Height;
+				SelectionLayer.Width = SceneFrame.DesiredWidth;
+				SelectionLayer.Height = SceneFrame.DesiredHeight;
 
 				CommandManager.Instance.CheckForCommandStacks();
 			}
@@ -154,7 +163,7 @@ namespace WpfEditorTest
 			_engine.Mouse = new DummyMouse(_engine);
 			_engine.Keyboard = new DummyKeyboard(_engine);
 			_engine.Touch = new DummyTouch(_engine);
-
+			
 
 			OpenFileDialog openFileDialog1 = new OpenFileDialog();
 
@@ -220,10 +229,6 @@ namespace WpfEditorTest
 			}
 			Directory.SetCurrentDirectory(Path.GetDirectoryName(fileName));
 
-
-			//_engine.GameServer = new CustomGameServer(_engine);
-			//_engine.GameClient = new CustomGameClient(_engine);
-			//_engine.GameInterface = new CustomGameInterface(_engine);
 			_engine.LoadConfiguration("Config.ini");
 
 			DefaultSceneWidth = int.Parse(ConfigurationManager.AppSettings.Get("SceneSizeWidth"));
@@ -292,70 +297,92 @@ namespace WpfEditorTest
 
 			LoadPalettes();
 
-			//var templates = new List<UIComponent>();
-			//foreach (var type in this.customUIComponentTypes)
-			//{
-			//	templates.Add(Activator.CreateInstance(type) as UIComponent);
-			//}
-			//templates.Add(Activator.CreateInstance(typeof(Fusion.Engine.Frames2.Components.Image)) as UIComponent);
-
 
 			_palette.AvailableComponents.ItemsSource = customUIComponentTypes;
 
 
 
 			_palette.BaseComponents.ItemsSource = Assembly.GetAssembly(typeof(UIComponent)).GetTypes()
-				.Where(t => t.IsSubclassOf(typeof(UIComponent)) && !t.IsAbstract && t != typeof(StartClippingFlag) && t != typeof(EndClippingFlag));
+				.Where(t => t.GetInterfaces().Contains(typeof(UIComponent)) && !t.IsAbstract/* && !t.IsAbstract*//* && t != typeof(StartClippingFlag) && t != typeof(EndClippingFlag)*/);
 
-			//var templates = Directory.GetFiles(ApplicationConfig.TemplatesPath, "*.xml").ToList();
-			//_palette.AvailablePrefabs.ItemsSource = templates.Select(t => t.Split('\\').Last().Split('.').First());
 
-			SelectionLayer.Window = this;
-			SelectionLayer.PaletteWindow = _palette;
+
 
 
 			_engine.OnInitialized += () =>
 			{
 				Application.Current.Dispatcher.InvokeAsync(() =>
 				{
-					RootFrame = (_engine.GameInterface as ICustomizableUI)?.GetUIRoot();
+					_uiManager = (_engine.GameInterface as ICustomizableUI)?.GetUIManager();
+
+					#region SelectionLayer
+					SelectionLayer = new WPFSelectionUILayer(_uiManager);
+					Zoomer.Child = SelectionLayer;
+					SelectionLayer.Window = this;
+					SelectionLayer.PaletteWindow = _palette;
+					SelectionLayer.FrameSelected += ( s, selection ) =>
+					{
+						_details.SetSelectFrame(selection.Frame);
+						_treeView.SelectedFrame = selection.Frame;
+					};
+					SelectionLayer.FramesDeselected += ( s, e ) =>
+					{
+						_details.FrameDetailsControls.ItemsSource = null;
+					};
+					SelectionLayer.SizeChanged += ( s, e ) =>
+					{
+						this.DefaultSceneWidth = e.NewSize.Width;
+						this.DefaultSceneHeight = e.NewSize.Height;
+						if (SceneFrame != null)
+						{
+							SceneFrame.DesiredWidth = (float)e.NewSize.Width;
+							SceneFrame.DesiredHeight = (float)e.NewSize.Height;
+
+							DragFieldFrame.DesiredWidth = (float)e.NewSize.Width;
+							DragFieldFrame.DesiredHeight = (float)e.NewSize.Height;
+						}
+						ZoomScene(1);
+					};
+
+					var loadedGridSize = ConfigurationManager.AppSettings.Get("GridSize");
+
+					foreach (RadioButton item in GridSizeMenuItem.Items)
+					{
+						if (item.Tag.ToString() == loadedGridSize)
+						{
+							item.IsChecked = true;
+							break;
+						}
+					}
+					#endregion
+
+
+					RootFrame = _uiManager.Root;
 					if (RootFrame == null) {
 						throw new Exception("RootFrame is null, looks like GameInterface is not implementing ICustomizableUI");
 					}
-
-					var rootChildren = new List<UIComponent>(RootFrame.Children);
-					var startScene = new SceneDataContainer(RootFrame.Width, RootFrame.Height);
-					SceneFrame = startScene.Scene;//RootFrame.Children.FirstOrDefault() as UIContainer;
+					var startScene = new SceneDataContainer(RootFrame.Placement.Width, RootFrame.Placement.Height);
+					SceneFrame = startScene.Scene;
 					SceneFrame.Name = "SceneFrame";
-					foreach (var child in rootChildren)
+					foreach (var child in RootFrame.Slots.Select(s=>s.Component))
 					{
 						RootFrame.Remove(child);
-						SceneFrame.Add(child);
+						SceneFrame.Insert(child,int.MaxValue);
 					}
-					DragFieldFrame = new FreePlacement(0, 0, RootFrame.Width, RootFrame.Height) { Name = "DRAG_FIELD" };
-					DragFieldFrame.Name = "DragFieldFrame";
+					DragFieldFrame = new FreePlacement() { Name = "DRAG_FIELD" };
 
-					//RootFrame.Add(SceneFrame);
-					RootFrame.Add(DragFieldFrame);
+					RootFrame.Add(DragFieldFrame,0,0, RootFrame.Placement.Width, RootFrame.Placement.Height);
 
 					LoadedScenes.Add(startScene);
 					LoadedScenesTabs.SelectedIndex = LoadedScenes.IndexOf(startScene);
 
-
-
 					SelectionLayer.DxElem.Renderer = _engine;
+					SelectionLayer.DxElem.HandleInput(this);
 
-					var uiManager = (_engine.GameInterface as ICustomizableUI)?.GetUIManager();
-					uiManager.Mode = UIManager.DisplayMode.Edit;
-
-					//var binding = new Binding("Children")
-					//{
-					//	Source = SceneFrame,
-					//};
-					//_treeView.ElementHierarchyView.SetBinding(TreeView.ItemsSourceProperty, binding);
-					//_treeView.AttachScene(SceneFrame);
 					UndoButton.DataContext = CommandManager.Instance;
 					RedoButton.DataContext = CommandManager.Instance;
+
+					RearrangeWorkspaceSize();
 				});
 			};
 
@@ -363,42 +390,8 @@ namespace WpfEditorTest
 			SaveTemplateButton.DataContext = SelectionManager.Instance;
 			LoadedScenesTabs.DataContext = LoadedScenes;
 
-			SelectionLayer.FrameSelected += ( s, selection ) =>
-			{
-				_details.SetSelectFrame(selection.Frame);
-				_treeView.SelectedFrame = selection.Frame;
-			};
-			SelectionLayer.FramesDeselected += ( s, e ) =>
-			{
-				_details.FrameDetailsControls.ItemsSource = null;
-			};
-			SelectionLayer.SizeChanged += ( s, e ) =>
-			{
-				this.DefaultSceneWidth = e.NewSize.Width;
-				this.DefaultSceneHeight = e.NewSize.Height;
-				if (SceneFrame != null)
-				{
-					SceneFrame.Width = (float)e.NewSize.Width;
-					SceneFrame.Height = (float)e.NewSize.Height;
 
-					DragFieldFrame.Width = (float)e.NewSize.Width;
-					DragFieldFrame.Height = (float)e.NewSize.Height;
-				}
-				ZoomScene(1);
-			};
 			this.UpdateTitle();
-
-
-			var loadedGridSize = ConfigurationManager.AppSettings.Get("GridSize");
-
-			foreach (RadioButton item in GridSizeMenuItem.Items)
-			{
-				if (item.Tag.ToString() == loadedGridSize)
-				{
-					item.IsChecked = true;
-					break;
-				}
-			}
 
 			fusionThread.Start();
 		}
@@ -406,7 +399,7 @@ namespace WpfEditorTest
 		protected override void OnSourceInitialized( EventArgs e )
 		{
 			base.OnSourceInitialized(e);
-			SelectionLayer.DxElem.HandleInput(this);
+			//SelectionLayer.DxElem.HandleInput(this);
 		}
 
 		private void UpdateTitle()
@@ -422,7 +415,7 @@ namespace WpfEditorTest
                 group.Append(new SelectFrameCommand());
 				foreach (var frame in SelectionLayer.FrameSelectionPanelList.Keys)
 				{
-					group.Append(new FrameParentChangeCommand(frame, null));
+					group.Append(new UIComponentParentChangeCommand(frame, null));
 				}
 				CommandManager.Instance.Execute(group);
 			}
@@ -432,8 +425,6 @@ namespace WpfEditorTest
 
 		internal void TryLoadSceneAsTemplate()
 		{
-			//if (!this.CheckForChanges())
-			//	return;
 
 			var startPath = Path.GetFullPath(Path.Combine(ApplicationConfig.TemplatesPath, ".."));
 			var filter = "XML files(*.xml)| *.xml";
@@ -442,72 +433,30 @@ namespace WpfEditorTest
 				if (openDialog.ShowDialog() != System.Windows.Forms.DialogResult.OK) return;
 
 				var createdFrame = CreateFrameFromFile(openDialog.FileName);
-				if (createdFrame != null && createdFrame.GetType().BaseType == typeof(UIContainer))
+				if (createdFrame != null && createdFrame.GetType().BaseType == typeof(FreePlacement))
 				{
-					//SelectionManager.Instance.SelectFrame(new List<UIComponent> { });
-					//RootFrame.Remove(SceneFrame);
-					//foreach (var panel in SelectionLayer.FrameSelectionPanelList.Values)
-					//{
-					//	var commands = SelectionLayer.ResetSelectedFrame(new Point(0, 0), panel);
-					//	var command = new CommandGroup(commands.ToArray());
-					//	CommandManager.Instance.ExecuteWithoutMemorising(command);
-					//}
-
-					var loadedScene = new SceneDataContainer(createdFrame as UIContainer) { SceneFileFullPath = openDialog.FileName, SceneName = openDialog.FileName.Split('\\').Last().Split('.').First() };
+					var loadedScene = new SceneDataContainer(createdFrame as FreePlacement) { SceneFileFullPath = openDialog.FileName, SceneName = openDialog.FileName.Split('\\').Last().Split('.').First() };
 
 					SceneFrame = loadedScene.Scene;
-					//RootFrame.Add(SceneFrame);
-					//_treeView.AttachScene(SceneFrame);
 					LoadedScenes.Add(loadedScene);
-					//DragFieldFrame.ZOrder = 1000000;
 					LoadedScenesTabs.SelectedIndex = LoadedScenes.IndexOf(loadedScene);
 
-					//_childrenBinding = new Binding("Children")
-					//{
-					//	Source = SceneFrame,
-					//};
-					//_treeView.ElementHierarchyView.SetBinding(TreeView.ItemsSourceProperty, _childrenBinding);
-
-					//this.CurrentSceneFile = openDialog.FileName;
 					CommandManager.Instance.SetNotDirty();
 					CommandManager.Instance.Reset();
-
-					//SelectionLayer.Width = SceneFrame.Width;
-					//SelectionLayer.Height = SceneFrame.Height;
 				}
 			}
 		}
 
 		private void TrySetNewScene()
 		{
-			//if (!this.CheckForChanges())
-			//	return;
-			//SelectionManager.Instance.SelectFrame(new List<UIComponent> { });
-			//RootFrame.Remove(SceneFrame);
-			//foreach (var panel in SelectionLayer.FrameSelectionPanelList.Values)
-			//{
-			//	var commands = SelectionLayer.ResetSelectedFrame(new Point(0, 0), panel);
-			//	var command = new CommandGroup(commands.ToArray());
-			//	CommandManager.Instance.ExecuteWithoutMemorising(command);
-			//}
-			var newScene = new SceneDataContainer(RootFrame.Width, RootFrame.Height);
+
+			var newScene = new SceneDataContainer(RootFrame.Placement.Width, RootFrame.Placement.Height);
 
 			SceneFrame = newScene.Scene;
-
-			//new FusionUI.UI.ScalableFrame(0, 0, this.RootFrame.UnitWidth, this.RootFrame.UnitHeight, "Scene", Fusion.Core.Mathematics.Color.Zero) { Anchor = FrameAnchor.All };
-			//RootFrame.Add(SceneFrame);
-			//_treeView.AttachScene(SceneFrame);
 			LoadedScenes.Add(newScene);
-			//DragFieldFrame.ZOrder = 1000000;
 
 			LoadedScenesTabs.SelectedIndex = LoadedScenes.IndexOf(newScene);
 
-			//_childrenBinding = new Binding("Children")
-			//{
-			//	Source = SceneFrame,
-			//};
-			//_treeView.ElementHierarchyView.SetBinding(TreeView.ItemsSourceProperty, _childrenBinding);
-			//this.CurrentSceneFile = null;
 			CommandManager.Instance.SetNotDirty();
 			CommandManager.Instance.Reset();
 		}
@@ -558,19 +507,19 @@ namespace WpfEditorTest
 
 		internal CommandGroup AddFrameToScene( UIComponent createdFrame, Point point )
 		{
-			var hoveredFrame = SelectionLayer.GetHoveredFrameOnScene(point, false) ?? SceneFrame;
+			var hoveredFrame = SelectionLayer.GetHoveredFrameOnScene(point, false,false) ?? SceneFrame;
 
-			if (!(hoveredFrame is UIContainer))
+			if (!(hoveredFrame is IUIModifiableContainer<ISlot>))
 			{
-				hoveredFrame = hoveredFrame.Parent;
+				hoveredFrame = hoveredFrame.Parent() as IUIModifiableContainer<ISlot>;
 			}
 
-			UIContainer container = hoveredFrame as UIContainer;
+			IUIModifiableContainer<ISlot> container = hoveredFrame as IUIModifiableContainer<ISlot>;
 
 			var commands = new CommandGroup(
-				new FrameParentChangeCommand(createdFrame, container),
-				new FramePropertyChangeCommand(createdFrame, "X", (int)point.X - hoveredFrame.BoundingBox.X),
-				new FramePropertyChangeCommand(createdFrame, "Y", (int)point.Y - hoveredFrame.BoundingBox.Y)
+				new UIComponentParentChangeCommand(createdFrame, container),
+				new SlotPropertyChangeCommand(createdFrame, "X", (int)point.X - _uiManager.BoundingBox(hoveredFrame.Placement).X),
+				new SlotPropertyChangeCommand(createdFrame, "Y", (int)point.Y - _uiManager.BoundingBox(hoveredFrame.Placement).Y)
 			);
 
 			UIManager.MakeComponentNameValid(createdFrame, SceneFrame);
@@ -700,8 +649,8 @@ namespace WpfEditorTest
 				foreach (UIComponent frame in SelectionLayer.FrameSelectionPanelList.Keys)
 				{
 					group.Append(new CommandGroup(
-						new FramePropertyChangeCommand(frame, "X", frame.X + (int)delta.X * step),
-						new FramePropertyChangeCommand(frame, "Y", frame.Y + (int)delta.Y * step))
+						new SlotPropertyChangeCommand(frame, "X", frame.Placement.X + (int)delta.X * step),
+						new SlotPropertyChangeCommand(frame, "Y", frame.Placement.Y + (int)delta.Y * step))
 					);
 				}
 				CommandManager.Instance.Execute(group);
@@ -736,43 +685,43 @@ namespace WpfEditorTest
 
 			var frames = SelectionLayer.FrameSelectionPanelList.Keys;
 			int minX, maxX, minY, maxY;
-			minX = int.MaxValue; /*SelectionLayer.FrameSelectionPanelList.First().Key.X;*/
-			minY = int.MaxValue; /*SelectionLayer.FrameSelectionPanelList.First().Key.Y;*/
-			maxX = int.MinValue; /*minX + SelectionLayer.FrameSelectionPanelList.First().Key.Width;*/
-			maxY = int.MinValue; /*minY + SelectionLayer.FrameSelectionPanelList.First().Key.Height;*/
+			minX = int.MaxValue;
+			minY = int.MaxValue;
+			maxX = int.MinValue;
+			maxY = int.MinValue;
 
 			switch (e.Parameter.ToString())
 			{
 				case "up":
 					{
-						minY = (int)(frames.Select(f => f.Y).Min() + 0.5f);
+						minY = (int)(frames.Select(f => f.Placement.Y).Min() + 0.5f);
 						break;
 					}
 				case "down":
 					{
-						maxY = (int)(frames.Select(f => f.Y + f.Height).Max() + 0.5f);
+						maxY = (int)(frames.Select(f => f.Placement.Y + f.Placement.Height).Max() + 0.5f);
 						break;
 					}
 				case "left":
 					{
-						minX = (int)(frames.Select(f => f.X).Min() + 0.5f);
+						minX = (int)(frames.Select(f => f.Placement.X).Min() + 0.5f);
 						break;
 					}
 				case "right":
 					{
-						maxX = (int)(frames.Select(f => f.X + f.Width).Max() + 0.5f);
+						maxX = (int)(frames.Select(f => f.Placement.X + f.Placement.Width).Max() + 0.5f);
 						break;
 					}
 				case "horizontal":
 					{
-						minX = (int)(frames.Select(f => f.X).Min() + 0.5f);
-						maxX = (int)(frames.Select(f => f.X + f.Width).Max() + 0.5f);
+						minX = (int)(frames.Select(f => f.Placement.X).Min() + 0.5f);
+						maxX = (int)(frames.Select(f => f.Placement.X + f.Placement.Width).Max() + 0.5f);
 						break;
 					}
 				case "vertical":
 					{
-						minY = (int)(frames.Select(f => f.Y).Min() + 0.5f);
-						maxY = (int)(frames.Select(f => f.Y + f.Height).Max() + 0.5f);
+						minY = (int)(frames.Select(f => f.Placement.Y).Min() + 0.5f);
+						maxY = (int)(frames.Select(f => f.Placement.Y + f.Placement.Height).Max() + 0.5f);
 						break;
 					}
 			}
@@ -784,32 +733,32 @@ namespace WpfEditorTest
 				{
 					case "up":
 						{
-							commands.Append(new FramePropertyChangeCommand(frame, "Y", minY));
+							commands.Append(new SlotPropertyChangeCommand(frame, "Y", minY));
 							break;
 						}
 					case "down":
 						{
-							commands.Append(new FramePropertyChangeCommand(frame, "Y", maxY - frame.Height));
+							commands.Append(new SlotPropertyChangeCommand(frame, "Y", maxY - frame.Placement.Height));
 							break;
 						}
 					case "left":
 						{
-							commands.Append(new FramePropertyChangeCommand(frame, "X", minX));
+							commands.Append(new SlotPropertyChangeCommand(frame, "X", minX));
 							break;
 						}
 					case "right":
 						{
-							commands.Append(new FramePropertyChangeCommand(frame, "X", maxX - frame.Width));
+							commands.Append(new SlotPropertyChangeCommand(frame, "X", maxX - frame.Placement.Width));
 							break;
 						}
 					case "horizontal":
 						{
-							commands.Append(new FramePropertyChangeCommand(frame, "X", (minX + maxX - frame.Width) / 2));
+							commands.Append(new SlotPropertyChangeCommand(frame, "X", (minX + maxX - frame.Placement.Width) / 2));
 							break;
 						}
 					case "vertical":
 						{
-							commands.Append(new FramePropertyChangeCommand(frame, "Y", (minY + maxY - frame.Height) / 2));
+							commands.Append(new SlotPropertyChangeCommand(frame, "Y", (minY + maxY - frame.Placement.Height) / 2));
 							break;
 						}
 				}
@@ -823,23 +772,13 @@ namespace WpfEditorTest
 		{
 			_xmlComponentsBuffer.Clear();
 			_componentsOffsetBuffer.Clear();
-			Point selectionLayerOffset = new Point(SelectionLayer._frameDragsPanel.RenderTransform.Value.OffsetX,
-												   SelectionLayer._frameDragsPanel.RenderTransform.Value.OffsetY);
+			Point selectionLayerOffset = new Point(SelectionLayer.FrameDragsPanel.RenderTransform.Value.OffsetX,
+												   SelectionLayer.FrameDragsPanel.RenderTransform.Value.OffsetY);
 			foreach (UIComponent component in SelectionLayer.FrameSelectionPanelList.Keys)
 			{
 				_xmlComponentsBuffer.Add(Fusion.Core.Utils.UIComponentSerializer.WriteToString(component));
-				_componentsOffsetBuffer.Add(new Point(component.GlobalTransform.M31, component.GlobalTransform.M32) - selectionLayerOffset);
-
-				/*var upperLeft = this.PointToScreen(new Point(component.X, component.Y));
-                var lowerRight = this.PointToScreen(new Point(component.X + component.Width, component.Y + component.Height));
-
-                var img = this.CopyScreen(
-                    (int)upperLeft.X,
-                    (int)upperLeft.Y + (int)SystemParameters.WindowCaptionHeight + 9,
-                    (int)lowerRight.X,
-                    (int)lowerRight.Y + (int)SystemParameters.WindowCaptionHeight + 9
-                    );
-                Clipboard.SetData(DataFormats.Bitmap, (Object)img);*/
+				var globalTransform = _uiManager.GlobalTransform(component.Placement);
+				_componentsOffsetBuffer.Add(new Point(globalTransform.M31,globalTransform.M32) - selectionLayerOffset);
 			}
 		}
 
@@ -1135,6 +1074,13 @@ namespace WpfEditorTest
 
 		private void Window_Loaded( object sender, RoutedEventArgs e )
 		{
+
+
+            Activate();
+        }
+
+		private void RearrangeWorkspaceSize()
+		{
 			Height = double.Parse(ConfigurationManager.AppSettings.Get("MainWindowHeight"));
 			Width = double.Parse(ConfigurationManager.AppSettings.Get("MainWindowWidth"));
 
@@ -1152,9 +1098,7 @@ namespace WpfEditorTest
 			Zoomer.Height = SelectionLayer.Height;
 			Zoomer.Stretch = Stretch.Uniform;
 			ZoomerSlider.Value = double.Parse(ConfigurationManager.AppSettings.Get("SceneZoom"));
-
-            Activate();
-        }
+		}
 
 		private void Window_PreviewMouseWheel( object sender, MouseWheelEventArgs e )
 		{
@@ -1187,7 +1131,7 @@ namespace WpfEditorTest
             MouseX = Math.Round(e.GetPosition(SelectionLayer).X);
             MouseY = Math.Round(e.GetPosition(SelectionLayer).Y);
 
-            if (SelectionLayer.IsScrollExpected)
+            if (SelectionLayer!=null && SelectionLayer.IsScrollExpected)
             {
                 Point mousePosition = e.GetPosition(ZoomerScroll);
                 if (mousePosition.X < 0)
@@ -1268,12 +1212,12 @@ namespace WpfEditorTest
 
 					this.CurrentSceneFile = CurrentScene.SceneFileFullPath;
 
-					_childrenBinding = new Binding("Children")
+					_childrenBinding = new Binding(nameof(CurrentScene.Scene.Slots))
 					{
 						Source = CurrentScene.Scene,
 					};
 					_treeView.ElementHierarchyView.SetBinding(TreeView.ItemsSourceProperty, _childrenBinding);
-				    BindingOperations.EnableCollectionSynchronization(CurrentScene.Scene.Children,
+				    BindingOperations.EnableCollectionSynchronization(CurrentScene.Scene.Slots,
 				        CurrentScene.Scene.ChildrenAccessLock);
 					_treeView.AttachScene(SceneFrame);
 					SelectionManager.Instance.SelectFrame(CurrentScene.SceneSelection);

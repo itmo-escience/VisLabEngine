@@ -1,4 +1,5 @@
-﻿using System;
+﻿using PropertyChanged;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -26,6 +27,7 @@ namespace Fusion.Core.Utils
     /// same as <see cref="ObservableCollection{T}"/>.
     /// </summary>
     [Serializable, DebuggerDisplay("Count = {Count}")]
+	[DoNotNotify]
     public sealed class AsyncObservableCollection<T> : IList<T>, IReadOnlyList<T>, IList, INotifyCollectionChanged, INotifyPropertyChanged, ISerializable
     {
 		// we implement IReadOnlyList<T> because ObservableCollection<T> does, and we want to mostly keep API compatability...

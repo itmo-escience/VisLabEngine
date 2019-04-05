@@ -16,20 +16,20 @@
         MaxWidth="350" MaxHeight="950" KeyDown="Window_KeyDown">
     <Window.Resources>
         <conv:EnumerateConverter x:Key="enumConverter"/>
-        <HierarchicalDataTemplate x:Key="tvContainerTemplate" ItemsSource="{Binding Path=Children}">
-            <TextBlock Text="{Binding Name}" Tag="{Binding}"
+        <HierarchicalDataTemplate x:Key="tvContainerTemplate" ItemsSource="{Binding Path=Component.Slots}">
+            <TextBlock Text="{Binding Component.Name}" Tag="{Binding Component}"
                                MouseDown="TextBlock_MouseDown" DragOver="TextBlock_PreviewDragOver" Drop="TextBlock_PreviewDrop"
                                PreviewDragLeave="TextBlock_PreviewDragLeave" PreviewDragEnter="TextBlock_PreviewDragEnter"
                                />
         </HierarchicalDataTemplate>
-        <HierarchicalDataTemplate x:Key="tvControllerTemplate" ItemsSource="{Binding Path=Slots}">
-            <TextBlock Text="{Binding Name}" Tag="{Binding}"
+        <HierarchicalDataTemplate x:Key="tvControllerTemplate" ItemsSource="{Binding Path=Component.Slots}">
+            <TextBlock Text="{Binding Component.Name}" Tag="{Binding Component}"
                                MouseDown="TextBlock_MouseDown" DragOver="TextBlock_PreviewDragOver" Drop="TextBlock_PreviewDrop"
                                PreviewDragLeave="TextBlock_PreviewDragLeave" PreviewDragEnter="TextBlock_PreviewDragEnter"
                                 FontStyle="Italic"/>
         </HierarchicalDataTemplate>
         <HierarchicalDataTemplate x:Key="tvComponentTemplate" ItemsSource="{Binding Path=Component, Converter={StaticResource enumConverter}}">
-            <TextBlock Text="{Binding Name}" Tag="{Binding}"
+            <TextBlock Text="{Binding Component.Name}" Tag="{Binding Component}"
                                MouseDown="TextBlock_MouseDown" DragOver="TextBlock_PreviewDragOver" Drop="TextBlock_PreviewDrop"
                                PreviewDragLeave="TextBlock_PreviewDragLeave" PreviewDragEnter="TextBlock_PreviewDragEnter"
                                FontStyle="Italic" Foreground="Purple"/>

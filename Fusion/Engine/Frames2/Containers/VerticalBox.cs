@@ -1,92 +1,251 @@
-﻿using Fusion.Core.Mathematics;
+﻿using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Linq;
+using Fusion.Core.Mathematics;
+using Fusion.Core.Utils;
+using Fusion.Engine.Common;
+using Fusion.Engine.Frames2.Events;
+using Fusion.Engine.Frames2.Managing;
 using Fusion.Engine.Graphics.SpritesD2D;
 
 namespace Fusion.Engine.Frames2.Containers
 {
-    public enum VerticalAlignment
+    public class VerticalBoxSlot : PropertyChangedHelper, ISlotAttachable
+    {
+        internal VerticalBoxSlot(VerticalBox holder, float x, float y, float width, float height)
+        {
+            InternalHolder = holder;
+            _x = x;
+            _y = y;
+            _width = width;
+            _height = height;
+        }
+
+        #region ISlot
+        private float _x;
+        public float X
+        {
+            get => _x;
+            set => SetAndNotify(ref _x, value);
+        }
+
+        private float _y;
+        public float Y
+        {
+            get => _y;
+            set => SetAndNotify(ref _y, value);
+        }
+
+        private float _angle;
+        public float Angle
+        {
+            get => _angle;
+            set => SetAndNotify(ref _angle, value);
+        }
+
+        private float _width;
+        public float Width
+        {
+            get => _width;
+            internal set => SetAndNotify(ref _width, value);
+        }
+
+        private float _height;
+        public float Height
+        {
+            get => _height;
+            internal set => SetAndNotify(ref _height, value);
+        }
+
+        public float AvailableWidth => MathUtil.Clamp(Parent.Placement.Width - X, 0, float.MaxValue);
+        public float AvailableHeight => MathUtil.Clamp(Parent.Placement.Height - Y, 0, float.MaxValue);
+
+        private Matrix3x2 _transform = Matrix3x2.Identity;
+        public Matrix3x2 Transform
+        {
+            get => _transform;
+            set => SetAndNotify(ref _transform, value);
+        }
+
+        private bool _clip = true;
+        public bool Clip
+        {
+            get => _clip;
+            set => SetAndNotify(ref _clip, value);
+        }
+
+        private bool _visible = true;
+        public bool Visible
+        {
+            get => _visible;
+            set => SetAndNotify(ref _visible, value);
+        }
+
+        internal IUIModifiableContainer<VerticalBoxSlot> InternalHolder { get; }
+        public IUIContainer<ISlot> Parent => InternalHolder;
+
+        private UIComponent _component;
+        public UIComponent Component
+        {
+            get => _component;
+            private set => SetAndNotify(ref _component, value);
+        }
+
+        public SolidBrushD2D DebugBrush => new SolidBrushD2D(new Color4(0, 1.0f, 0, 1.0f));
+        public TextFormatD2D DebugTextFormat => new TextFormatD2D("Calibri", 10);
+        public void DebugDraw(SpriteLayerD2D layer) { }
+        #endregion
+
+        #region ISlotAttachable
+
+        public virtual void Attach(UIComponent newComponent)
+        {
+            var old = Component;
+
+            Component = newComponent;
+            newComponent.Placement = this;
+
+            ComponentAttached?.Invoke(this,
+                new SlotAttachmentChangedEventArgs(old, newComponent)
+            );
+        }
+
+        public event EventHandler<SlotAttachmentChangedEventArgs> ComponentAttached;
+
+        #endregion
+
+        public override string ToString() => $"VerticalBoxSlot with {Component}";
+    }
+
+    public enum HorizontalAlignment
     {
         Left, Center, Right
     }
 
-    public class VerticalBox : UIContainer
+    public class VerticalBox : PropertyChangedHelper, IUIModifiableContainer<VerticalBoxSlot>
     {
-        private VerticalAlignment _alignment;
-        public VerticalAlignment Alignment {
+        private readonly AsyncObservableCollection<VerticalBoxSlot> _slots = new AsyncObservableCollection<VerticalBoxSlot>();
+        public IEnumerable<VerticalBoxSlot> Slots => _slots;
+
+        public ISlot Placement { get; set; }
+        public UIEventsHolder Events { get; } = new UIEventsHolder();
+
+        public float DesiredWidth { get; set; } = -1;
+        public float DesiredHeight { get; set; } = -1;
+
+        public object Tag { get; set; }
+        public string Name { get; set; }
+
+		private readonly object _childrenAccessLock = new object();
+		public object ChildrenAccessLock => _childrenAccessLock;
+
+		private HorizontalAlignment _alignment;
+        public HorizontalAlignment Alignment
+        {
             get => _alignment;
-            set {
-                SetAndNotify(ref _alignment, value);
-            }
+            set => SetAndNotify(ref _alignment, value);
         }
 
-        protected override void UpdateChildrenLayout()
+        public void Update(GameTime gameTime)
         {
             float bottomBorder = 0;
             float maxChildWidth = 0;
-            foreach (var child in Children)
+            foreach (var slot in Slots)
             {
-                child.Y += bottomBorder - child.LocalBoundingBox.Y;
-                bottomBorder += child.LocalBoundingBox.Height;
+                slot.Width = slot.Component.DesiredWidth;
+                slot.Height = slot.Component.DesiredHeight;
 
-                if (maxChildWidth < child.LocalBoundingBox.Width) maxChildWidth = child.LocalBoundingBox.Width;
+                slot.Y = bottomBorder;
+                bottomBorder += slot.Height;
+
+                if (maxChildWidth < slot.Width) maxChildWidth = slot.Width;
             }
 
-            Width = maxChildWidth;
-            Height = bottomBorder;
+            DesiredWidth = maxChildWidth;
+            DesiredHeight = bottomBorder;
 
             float deltaXMultiplier = 0;
             switch (Alignment)
             {
-                case VerticalAlignment.Left:
+                case HorizontalAlignment.Left:
                     deltaXMultiplier = 0;
                     break;
-                case VerticalAlignment.Center:
+                case HorizontalAlignment.Center:
                     deltaXMultiplier = 0.5f;
                     break;
-                case VerticalAlignment.Right:
+                case HorizontalAlignment.Right:
                     deltaXMultiplier = 1;
                     break;
             }
 
-            foreach (var child in Children)
+            foreach (var slot in Slots)
             {
-                child.X += deltaXMultiplier * (maxChildWidth - child.LocalBoundingBox.Width) - child.LocalBoundingBox.X;
+                slot.X = deltaXMultiplier * (DesiredWidth - slot.Width);
             }
         }
 
-        protected override SolidBrushD2D DebugBrush { get; } = new SolidBrushD2D(new Color4(0, 1, 1, 1));
-        protected override TextFormatD2D DebugTextFormat { get; } = new TextFormatD2D("Consolas", 14);
+        public void Draw(SpriteLayerD2D layer) { }
 
-        public VerticalBox() : base() {
-            Alignment = VerticalAlignment.Left;
-        }
-
-        public VerticalBox(float x, float y, float width, float height, VerticalAlignment alignment = VerticalAlignment.Left, bool needClipping = false) : base(x, y, width, height, needClipping)
+        public int IndexOf(UIComponent child)
         {
-            DebugBrush = new SolidBrushD2D(new Color4(0, 1, 1, 1));
-            DebugTextFormat = new TextFormatD2D("Consolas", 14);
-            Alignment = alignment;
-        }
-
-        public override void DefaultInit()
-        {
-            Width = 100;
-            Height = 100;
-            Alignment = VerticalAlignment.Left;
-        }
-
-        public override void DebugDraw(SpriteLayerD2D layer)
-        {
-            base.DebugDraw(layer);
-            layer.Draw(new TransformCommand(GlobalTransform));
-
-            layer.Draw(new Rect(0, 0, Width, Height, DebugBrush));
-
-            float bottomBorder = 0;
-            foreach (var child in Children)
+            var idx = 0;
+            foreach (var slot in _slots)
             {
-                bottomBorder += child.LocalBoundingBox.Height;
-                layer.Draw(new Line(new Vector2(0, bottomBorder), new Vector2(Width, bottomBorder), DebugBrush));
+                if (slot.Component == child)
+                    return idx;
+                idx++;
             }
+
+            return idx;
         }
-    }
+
+        public bool Contains(UIComponent component) => _slots.Any(slot => slot.Component == component);
+
+		public VerticalBoxSlot Insert( UIComponent child, int index )
+		{
+			return Insert(child, index, 0, 0, 100, 100);
+		}
+
+		public VerticalBoxSlot Insert( UIComponent child, int index, float x, float y, float width, float height )
+		{
+			var slot = new VerticalBoxSlot(this, x, y, width, height);
+			slot.Attach(child);
+
+			lock (ChildrenAccessLock)
+			{
+				if (index < _slots.Count)
+					_slots.Insert(index, slot);
+				else
+					_slots.Add(slot);
+			}
+			return slot;
+		}
+
+		public VerticalBoxSlot Add( UIComponent child )
+		{
+			return Insert(child, int.MaxValue);
+		}
+
+		public VerticalBoxSlot Add( UIComponent child, float x, float y, float width, float height )
+		{
+			return Insert(child, int.MaxValue, x, y, width, height);
+		}
+
+		public bool Remove(UIComponent child)
+        {
+            var slot = _slots.FirstOrDefault(s => s.Component == child);
+            if (slot == null)
+                return false;
+
+            slot.Attach(null);
+
+            return true;
+        }
+
+		public void DefaultInit()
+		{
+			Name = this.GetType().Name;
+		}
+	}
 }

@@ -4,68 +4,63 @@ using System.Threading;
 
 namespace WpfEditorTest.Commands
 {
-	internal class FrameParentChangeCommand: IEditorCommand
+	internal class UIComponentParentChangeCommand: IEditorCommand
 	{
 		private readonly AutoResetEvent _asyncThreadChangesDoneEvent = new AutoResetEvent(false);
-
 		public bool IsDirty => true;
 
 		private readonly UIComponent _frame;
-		private readonly UIContainer _newParent;
-		private readonly UIContainer _oldParent;
+		private readonly IUIModifiableContainer<ISlot> _newParent;
+		private readonly IUIModifiableContainer<ISlot> _oldParent;
 		private readonly int _index;
 
-		public FrameParentChangeCommand( UIComponent frame, UIContainer newParent )
+		public UIComponentParentChangeCommand( UIComponent frame, IUIModifiableContainer<ISlot> newParent )
 		{
 			this._frame = frame;
 			this._newParent = newParent;
-			this._oldParent = _frame.Parent;
+			this._oldParent = _frame.Parent() as IUIModifiableContainer<ISlot>;
 			this._index = int.MaxValue;
 		}
 
-		public FrameParentChangeCommand( UIComponent frame, UIContainer newParent, int index ) : this(frame, newParent)
+		public UIComponentParentChangeCommand( UIComponent frame, IUIModifiableContainer<ISlot> newParent, int index ) : this(frame, newParent)
 		{
 			this._index = index;
 		}
 
-		public FrameParentChangeCommand( UIComponent frame, UIContainer newParent, UIContainer oldParent ) : this(frame, newParent)
+		public UIComponentParentChangeCommand( UIComponent frame, IUIModifiableContainer<ISlot> newParent, IUIModifiableContainer<ISlot> oldParent ) : this(frame, newParent)
 		{
 			this._oldParent = oldParent;
 		}
 
-		public FrameParentChangeCommand( UIComponent frame, UIContainer newParent, UIContainer oldParent, int index ) : this(frame, newParent, oldParent)
+		public UIComponentParentChangeCommand( UIComponent frame, IUIModifiableContainer<ISlot> newParent, IUIModifiableContainer<ISlot> oldParent, int index ) : this(frame, newParent, oldParent)
 		{
 			this._index = index;
 		}
 
 		public void Do()
 		{
-			//_asyncThreadChangesDoneEvent.Reset();
-
+			_asyncThreadChangesDoneEvent.Reset();
 			Game.ResourceWorker.Post(r => {
                 r.ProcessQueue.Post(t => {
                     _oldParent?.Remove(_frame);
-                    _newParent?.AddAt(_frame, _index);
-					//_asyncThreadChangesDoneEvent.Set();
+                    _newParent?.Insert(_frame, _index);
+					_asyncThreadChangesDoneEvent.Set();
 				}, null, int.MaxValue);
             }, null, int.MaxValue);
-
-			//_asyncThreadChangesDoneEvent.WaitOne();
+			_asyncThreadChangesDoneEvent.WaitOne();
 		}
 
 		public void Undo()
 		{
-			//_asyncThreadChangesDoneEvent.Reset();
-
+			_asyncThreadChangesDoneEvent.Reset();
 			Game.ResourceWorker.Post(r => {
                 r.ProcessQueue.Post(t => {
                     _newParent?.Remove(_frame);
-                    _oldParent?.AddAt(_frame, _index);
-					//_asyncThreadChangesDoneEvent.Set();
+                    _oldParent?.Insert(_frame, _index);
+					_asyncThreadChangesDoneEvent.Set();
 				}, null, int.MaxValue);
             }, null, int.MaxValue);
-
-			//_asyncThreadChangesDoneEvent.WaitOne();
+			_asyncThreadChangesDoneEvent.WaitOne();
 		}
 	}
 }

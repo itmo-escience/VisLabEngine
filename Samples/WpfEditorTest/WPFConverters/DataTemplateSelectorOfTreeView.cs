@@ -1,5 +1,6 @@
 ﻿using Fusion.Core.Mathematics;
 using Fusion.Engine.Frames2;
+using Fusion.Engine.Frames2.Controllers;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -20,18 +21,19 @@ namespace WpfEditorTest.WPFConverters
 
 		public override DataTemplate SelectTemplate( object item, DependencyObject container )
 		{
-			if (item.GetType().IsSubclassOf(typeof(UIController)))
+			var content = (item as ISlot).Component;
+			if (content.GetType().IsSubclassOf(typeof(UIController<IControllerSlot>)))
 				return tvControllerTemplate;
 
-		    if (item is UIController.Slot)
+			if (content is IUIModifiableContainer<ISlot> ctr)
+			{
+				BindingOperations.EnableCollectionSynchronization(ctr.Slots, ctr.ChildrenAccessLock);
+				return tvContainerTemplate;
+			}
+
+			//if (content is ISlot)
 				return tvComponentTemplate;
 
-		    if (item is UIContainer ctr)
-		    {
-                BindingOperations.EnableCollectionSynchronization(ctr.Children, ctr.ChildrenAccessLock);
-		    }
-
-			return tvContainerTemplate;
 		}
 	}
 }

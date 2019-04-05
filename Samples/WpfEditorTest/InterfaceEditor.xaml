@@ -211,8 +211,8 @@
                 <KeyBinding Command="{x:Static local:InterfaceEditor.MoveFrameCmd}" CommandParameter="right" Key="Right"/>
             </ScrollViewer.InputBindings>
             <Viewbox Name="Zoomer" HorizontalAlignment="Center" VerticalAlignment="Center">
-                <local:WPFSelectionUILayer x:Name="SelectionLayer">
-                </local:WPFSelectionUILayer>
+                <!--<local:WPFSelectionUILayer x:Name="SelectionLayer">
+                </local:WPFSelectionUILayer>-->
             </Viewbox>
         </ScrollViewer>
     </Grid>

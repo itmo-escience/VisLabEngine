@@ -97,7 +97,9 @@ namespace WpfEditorTest.WPFConverters
 						break;
 					}
 			}
-			elementToUpdate.Transform = new Matrix3x2(propertyToChange.ToArray());
+			//TODO
+			//Getting Transform?
+			//elementToUpdate.Placement.Transform() = new Matrix3x2(propertyToChange.ToArray());
 			return propertyToChange;
 		}
 	}
