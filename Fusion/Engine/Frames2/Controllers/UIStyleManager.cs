@@ -110,10 +110,11 @@ namespace Fusion.Engine.Frames2.Controllers
                 result = textWriter.ToString();
             }
             Console.WriteLine(result);
-            
+
+            IUIStyle styleCopy;
             using(var textReader= new StringReader(result))
             {
-                style = (IUIStyle)styleSerializer.Deserialize(textReader);
+                styleCopy = (IUIStyle)styleSerializer.Deserialize(textReader);
             }
 
             int i = 0;
@@ -253,11 +254,12 @@ namespace Fusion.Engine.Frames2.Controllers
         public void ReadXml(XmlReader reader)
         {
             Name = reader.GetAttribute("Name");
-            reader.ReadStartElement("Property");
 
             var typeName = reader.GetAttribute("Type");
             Type = Type.GetType(typeName);
             var valueSerializer = new XmlSerializer(Type);
+
+            reader.ReadStartElement("Property");
 
             if (reader.IsEmptyElement)
                 return;
