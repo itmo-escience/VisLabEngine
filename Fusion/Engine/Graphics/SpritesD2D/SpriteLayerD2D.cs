@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using Fusion.Core;
 using Fusion.Core.Mathematics;
 using Fusion.Drivers.Graphics;
@@ -31,8 +32,8 @@ namespace Fusion.Engine.Graphics.SpritesD2D
 
         private void CreateTargets(SharpDX.Direct2D1.Factory factory)
         {
-            var w = _rs.DisplayBounds.Width;
-            var h = _rs.DisplayBounds.Height;
+            var w = Math.Max(_rs.DisplayBounds.Width, 1);
+            var h = Math.Max(_rs.DisplayBounds.Height, 1);
 
             _renderTargetFusion = new RenderTarget2D(_rs.Device, ColorFormat.Bgra8, w, h, false, false, true);
 

@@ -268,6 +268,8 @@
     <Compile Include="Engine\Common\Commands\CrashServer.cs" />
     <Compile Include="Engine\Common\AtomAttribute.cs" />
     <Compile Include="Engine\Common\UserInterface.Internal.cs" />
+    <Compile Include="Engine\Frames2\Controllers\RadioButtonController.cs" />
+    <Compile Include="Engine\Frames2\Controllers\RadioButtonGroup.cs" />
     <Compile Include="Engine\Frames2\Containers\AnchorBox.cs" />
     <Compile Include="Engine\Frames2\Events\UIEventsHolder.cs" />
     <Compile Include="Engine\Frames2\Managing\ClippingFlags.cs" />
@@ -277,12 +279,12 @@
     <Compile Include="Engine\Frames2\Containers\FreePlacement.cs" />
     <Compile Include="Engine\Frames2\Containers\VerticalBox.cs" />
     <Compile Include="Engine\Frames2\Controllers\DialogBoxController.cs" />
-    <Compile Include="Engine\Frames2\Controllers\RadioButtonController.cs" />
     <Compile Include="Engine\Frames2\Controllers\RadioButtonGroupController.cs" />
     <Compile Include="Engine\Frames2\Controllers\TextBoxController.cs" />
     <Compile Include="Engine\Frames2\Managing\EditionSceneManager.cs" />
     <Compile Include="Engine\Frames2\Managing\UIHelper.cs" />
     <Compile Include="Engine\Frames2\IUIDrawable.cs" />
+    <Compile Include="Engine\Frames2\Controllers\UIStyleManager.cs" />
     <Compile Include="Engine\Frames2\UISlot.cs" />
     <Compile Include="Engine\Frames2\UIComponent.cs" />
     <Compile Include="Engine\Frames2\Controllers\UIController.cs" />

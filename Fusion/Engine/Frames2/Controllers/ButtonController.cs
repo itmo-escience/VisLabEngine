@@ -20,9 +20,9 @@ namespace Fusion.Engine.Frames2.Controllers
         public float AvailableWidth => Width;
         public float AvailableHeight => Height;
         public bool Clip => true;
-        public bool Visible { get; set; } = false;
+        public bool Visible { get; set; } = true;
 
-        public IUIContainer<ISlot> Parent { get; }
+        public IUIContainer Parent { get; }
         public UIComponent Component { get; private set; }
         public SolidBrushD2D DebugBrush => new SolidBrushD2D(Color4.White);
         public TextFormatD2D DebugTextFormat => new TextFormatD2D("Calibri", 10);
@@ -49,7 +49,7 @@ namespace Fusion.Engine.Frames2.Controllers
                 }
                 else
                 {
-                    Log.Error("Attempt to attach component from unmodifiable");
+                    Log.Error("Attempt to attach component from unmodifiable slot");
                     return;
                 }
             }
@@ -72,17 +72,20 @@ namespace Fusion.Engine.Frames2.Controllers
 
     public class ButtonController : UIController<ButtonSlot>
     {
-        public static State Pressed = new State("Pressed");
-        protected override IEnumerable<State> NonDefaultStates => new List<State> { Pressed };
+        public static ControllerState Pressed = new ControllerState("Pressed");
+        protected override IEnumerable<ControllerState> NonDefaultStates => new List<ControllerState> { Pressed };
 
         private readonly List<ButtonSlot> _slots;
-        public override IEnumerable<ButtonSlot> Slots => _slots;
+        protected override IEnumerable<IControllerSlot> MainControllerSlots => _slots;
+        protected override IEnumerable<IControllerSlot> AdditionalControllerSlots { get; } = new List<IControllerSlot>();
 
         public ButtonSlot Foreground { get; }
         public ButtonSlot Background { get; }
 
-        public ButtonController()
+        public ButtonController(string styleName = UIStyleManager.DefaultStyle)
         {
+            Style = UIStyleManager.Instance.GetStyle(this.GetType(), styleName);
+
             Foreground = new ButtonSlot("Foreground", this);
             Background = new ButtonSlot("Background", this);
 			Foreground.Attach(new Label("Button", "Calibri", 12));
@@ -99,24 +102,27 @@ namespace Fusion.Engine.Frames2.Controllers
             ButtonClick += (sender, args) => { };
         }
 
-        private void OnMouseUpOutside(UIComponent sender, ClickEventArgs e)
+		public ButtonController():this(UIStyleManager.DefaultStyle) { }
+
+
+		private void OnMouseUpOutside(UIComponent sender, ClickEventArgs e)
         {
-            ChangeState(State.Default);
+            ChangeState(ControllerState.Default);
         }
 
         private void OnEnter(UIComponent sender)
         {
-            if (CurrentState == State.Default)
+            if (CurrentState == ControllerState.Default)
             {
-                ChangeState(State.Hovered);
+                ChangeState(ControllerState.Hovered);
             }
         }
 
         private void OnLeave(UIComponent sender)
         {
-            if (CurrentState == State.Hovered)
+            if (CurrentState == ControllerState.Hovered)
             {
-                ChangeState(State.Default);
+                ChangeState(ControllerState.Default);
             }
         }
 
@@ -133,7 +139,7 @@ namespace Fusion.Engine.Frames2.Controllers
             if(CurrentState == Pressed)
                 ButtonClick?.Invoke(this, new ButtonClickEventArgs(this));
 
-            ChangeState(State.Hovered);
+            ChangeState(ControllerState.Hovered);
         }
 
         public event EventHandler<ButtonClickEventArgs> ButtonClick;

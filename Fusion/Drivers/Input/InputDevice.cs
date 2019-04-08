@@ -153,7 +153,7 @@ namespace Fusion.Drivers.Input {
 			Device.MouseInput		-= MouseHandler;
 
 			SetCursorVisibility(true);
-			Forms.Cursor.Clip		=	new Drawing.Rectangle();
+		    Forms.Cursor.Clip = new Drawing.Rectangle();
 
 			base.Dispose(disposing);
 		}

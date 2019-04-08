@@ -26,14 +26,14 @@
             <TextBlock Text="{Binding Component.Name}" Tag="{Binding Component}"
                                MouseDown="TextBlock_MouseDown" DragOver="TextBlock_PreviewDragOver" Drop="TextBlock_PreviewDrop"
                                PreviewDragLeave="TextBlock_PreviewDragLeave" PreviewDragEnter="TextBlock_PreviewDragEnter"
-                                FontStyle="Italic"/>
+                                FontStyle="Italic" Foreground="Purple"/>
         </HierarchicalDataTemplate>
-        <HierarchicalDataTemplate x:Key="tvComponentTemplate" ItemsSource="{Binding Path=Component, Converter={StaticResource enumConverter}}">
+        <DataTemplate x:Key="tvComponentTemplate">
             <TextBlock Text="{Binding Component.Name}" Tag="{Binding Component}"
                                MouseDown="TextBlock_MouseDown" DragOver="TextBlock_PreviewDragOver" Drop="TextBlock_PreviewDrop"
                                PreviewDragLeave="TextBlock_PreviewDragLeave" PreviewDragEnter="TextBlock_PreviewDragEnter"
-                               FontStyle="Italic" Foreground="Purple"/>
-        </HierarchicalDataTemplate>
+                               FontStyle="Italic"/>
+        </DataTemplate>
     </Window.Resources>
     <ScrollViewer Height="auto" Width="auto" Background="LightGray" PreviewMouseWheel="ScrollViewer_PreviewMouseWheel">
         <AdornerDecorator>

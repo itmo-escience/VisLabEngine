@@ -103,6 +103,8 @@ namespace Fusion.Engine.Frames2.Components
             _isDirtyLayout = true;
         }
 
+        public bool IsInside(Vector2 point) => Placement.IsInside(point);
+
         public void Update(GameTime gameTime)
         {
             if (!_isDirtyLayout) return;

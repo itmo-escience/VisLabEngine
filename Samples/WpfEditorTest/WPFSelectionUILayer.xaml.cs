@@ -907,9 +907,6 @@ namespace WpfEditorTest
 		        if (dataType != null)
 		        {
 		            createdFrame = Activator.CreateInstance(dataType) as UIComponent;
-					//TODO
-					//Return default initialization from creating via System.Type
-		            createdFrame?.DefaultInit();
 		        }
 		    }
 

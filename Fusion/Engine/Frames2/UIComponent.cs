@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using Fusion.Core.Mathematics;
 using Fusion.Engine.Common;
 using Fusion.Engine.Frames2.Events;
 
@@ -15,16 +16,17 @@ namespace Fusion.Engine.Frames2
         float DesiredWidth { get; set; }
         float DesiredHeight { get; set; }
 
+        bool IsInside(Vector2 point);
+
         object Tag { get; set; }
         string Name { get; set; }
 
         void Update(GameTime gameTime);
-		void DefaultInit();
 	}
 
     public static class UIComponentExtensions
     {
-        public static IUIContainer<ISlot> Parent(this UIComponent component) => component.Placement?.Parent;
+        public static IUIContainer Parent(this UIComponent component) => component.Placement?.Parent;
     }
 
     public static class UINameManager

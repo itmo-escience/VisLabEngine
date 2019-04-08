@@ -1,30 +1,32 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.ComponentModel;
 using System.Linq;
+using Fusion.Core.Mathematics;
 using Fusion.Engine.Common;
 using Fusion.Engine.Frames2.Events;
+using Fusion.Engine.Frames2.Managing;
 using Fusion.Engine.Graphics.SpritesD2D;
 
 namespace Fusion.Engine.Frames2.Controllers
 {
     public interface IControllerSlot : ISlot
     {
-        ObservableCollection<PropertyValueStates> Properties { get; }
+        string Name { get; }
     }
 
-    public abstract class UIController<T> : IUIContainer<T> where T : IControllerSlot
+    public abstract class UIController<T> : PropertyChangedHelper, IUIContainer where T : IControllerSlot
     {
-        public State CurrentState { get; protected set; } = State.Default;
+        public IUIStyle Style { get; protected set; }
 
-        public IEnumerable<State> States
+        public ControllerState CurrentState { get; protected set; } = ControllerState.Default;
+
+        public IEnumerable<ControllerState> States
         {
             get
             {
-                yield return State.Default;
-                yield return State.Hovered;
-                yield return State.Disabled;
+                yield return ControllerState.Default;
+                yield return ControllerState.Hovered;
+                yield return ControllerState.Disabled;
 
                 foreach (var state in NonDefaultStates)
                 {
@@ -33,22 +35,36 @@ namespace Fusion.Engine.Frames2.Controllers
             }
         }
 
-        protected virtual IEnumerable<State> NonDefaultStates => new List<State>();
+        protected virtual IEnumerable<ControllerState> NonDefaultStates => new List<ControllerState>();
 
-        public abstract IEnumerable<T> Slots { get; }
+        public IEnumerable<ISlot> Slots => AllSlots;
+        private IEnumerable<IControllerSlot> AllSlots => MainControllerSlots.Concat(AdditionalControllerSlots);
 
-        public void ChangeState(State newState)
+        protected abstract IEnumerable<IControllerSlot> MainControllerSlots { get; }
+        protected abstract IEnumerable<IControllerSlot> AdditionalControllerSlots { get; }
+
+        protected void ChangeState(ControllerState newState)
         {
             if (!States.Contains(newState)) return;
 
-            foreach (var slot in Slots)
+            CurrentState = newState;
+            Log.Debug($"{this} Changed state to {CurrentState}");
+
+            if (Style == null)
+            {
+                Log.Debug($"{this}.Style is empty");
+                return;
+            }
+
+            foreach (var slot in AllSlots)
             {
                 var component = slot.Component;
 				if (component == null)
 					continue;
 
                 var type = component.GetType();
-                foreach (var propertyValue in slot.Properties)
+
+                foreach (var propertyValue in Style[slot.Name])
                 {
                     var info = type.GetProperty(propertyValue.Name);
                     if (info == null) continue;
@@ -56,17 +72,12 @@ namespace Fusion.Engine.Frames2.Controllers
                     info.SetValue(
                         component,
                         Convert.ChangeType(
-                            propertyValue[newState],
+                            propertyValue[CurrentState],
                             info.PropertyType),
                         null
                     );
                 }
             }
-
-
-            CurrentState = newState;
-
-            Log.Verbose(CurrentState);
         }
 
 		public void DefaultInit()
@@ -77,7 +88,7 @@ namespace Fusion.Engine.Frames2.Controllers
 		private bool _initialized = false;
         private void Initialize()
         {
-            ChangeState(State.Default);
+            ChangeState(ControllerState.Default);
             _initialized = true;
         }
 
@@ -88,7 +99,9 @@ namespace Fusion.Engine.Frames2.Controllers
         public object Tag { get; set; }
         public string Name { get; set; }
 
-        public void Update(GameTime gameTime)
+        public bool IsInside(Vector2 point) => Placement.IsInside(point);
+
+        public virtual void Update(GameTime gameTime)
         {
             if (!_initialized)
                 Initialize();
@@ -102,33 +115,31 @@ namespace Fusion.Engine.Frames2.Controllers
         }
 
         public bool Contains(UIComponent component) => Slots.Any(slot => slot.Component == component);
-
-        public event PropertyChangedEventHandler PropertyChanged;
     }
 
-    public struct State : IEquatable<State>
+    public struct ControllerState : IEquatable<ControllerState>
     {
         public readonly string Name;
-        public State(string name)
+        public ControllerState(string name)
         {
             Name = name;
         }
 
-        public static State Default = new State("Default");
-        public static State Hovered = new State("Hovered");
-        public static State Disabled = new State("Disabled");
+        public static ControllerState Default = new ControllerState("Default");
+        public static ControllerState Hovered = new ControllerState("Hovered");
+        public static ControllerState Disabled = new ControllerState("Disabled");
 
-        public static bool operator ==(State self, State other)
+        public static bool operator ==(ControllerState self, ControllerState other)
         {
             return self.Equals(other);
         }
 
-        public static bool operator !=(State self, State other)
+        public static bool operator !=(ControllerState self, ControllerState other)
         {
             return !self.Equals(other);
         }
 
-        public bool Equals(State other)
+        public bool Equals(ControllerState other)
         {
             return string.Equals(Name, other.Name);
         }
@@ -136,7 +147,7 @@ namespace Fusion.Engine.Frames2.Controllers
         public override bool Equals(object obj)
         {
             if (ReferenceEquals(null, obj)) return false;
-            return obj is State other && Equals(other);
+            return obj is ControllerState other && Equals(other);
         }
 
         public override int GetHashCode()
@@ -149,36 +160,6 @@ namespace Fusion.Engine.Frames2.Controllers
             return $"State: {Name}";
         }
 
-        public static implicit operator string(State s) => s.ToString();
-    }
-
-    public class PropertyValueStates
-    {
-        public string Name { get; }
-        public object Default { get; }
-
-
-        private readonly Dictionary<State, object> _storedValues = new Dictionary<State, object>();
-
-        public PropertyValueStates(string name, object defaultValue)
-        {
-            Name = name;
-            Default = defaultValue;
-
-            _storedValues[State.Default] = Default;
-        }
-
-        public object this[State s]
-        {
-            get
-            {
-                if (!_storedValues.TryGetValue(s, out var result))
-                    result = Default;
-                return result;
-            }
-            set => _storedValues[s] = value;
-        }
-
-        public override string ToString() => Name;
+        public static implicit operator string(ControllerState s) => s.Name;
     }
 }

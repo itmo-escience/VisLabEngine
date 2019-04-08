@@ -32,7 +32,7 @@ namespace Fusion.Core.Development {
 
 			//	force visible cursor!
 			Cursor.Show();
-		    Cursor.Clip = new Rectangle();
+			Cursor.Clip	= new Rectangle();
 		}
 
 

@@ -41,7 +41,7 @@ namespace Fusion.Engine.Frames2.Containers
 		public bool Visible { get; set; } = true;
 
 		internal IUIModifiableContainer<FreePlacementSlot> InternalHolder { get; }
-        public IUIContainer<ISlot> Parent => InternalHolder;
+        public IUIContainer Parent => InternalHolder;
 
         public UIComponent Component { get; private set; }
 
@@ -84,7 +84,7 @@ namespace Fusion.Engine.Frames2.Containers
     public class FreePlacement : IUIModifiableContainer<FreePlacementSlot>
     {
         private readonly AsyncObservableCollection<FreePlacementSlot> _slots = new AsyncObservableCollection<FreePlacementSlot>();
-        public IEnumerable<FreePlacementSlot> Slots => _slots;
+        public IEnumerable<ISlot> Slots => _slots;
 
         public event PropertyChangedEventHandler PropertyChanged;
         public ISlot Placement { get; set; }
@@ -98,10 +98,11 @@ namespace Fusion.Engine.Frames2.Containers
 
 		private readonly object _childrenAccessLock = new object();
 		public object ChildrenAccessLock => _childrenAccessLock;
+        public bool IsInside(Vector2 point) => Placement.IsInside(point);
 
-		public void Update(GameTime gameTime)
+		public void Update( GameTime gameTime )
         {
-            foreach (var slot in Slots)
+            foreach (var slot in _slots)
             {
                 // If it's not changed than it's strictly equal
                 // ReSharper disable once CompareOfFloatsByEqualityOperator
@@ -174,10 +175,5 @@ namespace Fusion.Engine.Frames2.Containers
 
 			return true;
         }
-
-		public void DefaultInit()
-		{
-			Name = this.GetType().Name;
-		}
 	}
 }

@@ -269,16 +269,18 @@ namespace Fusion.Engine.Graphics.SpritesD2D
     {
         private PathGeometryD2D _geometry;
         private IBrushD2D _brush;
+        private float _strokeWidth;
 
-        public DrawPath(PathGeometryD2D geometry, IBrushD2D brush)
+        public DrawPath(PathGeometryD2D geometry, IBrushD2D brush, float strokeWidth = 1)
         {
             _geometry = geometry;
             _brush = brush;
+            _strokeWidth = strokeWidth;
         }
 
         public void Apply(RenderTargetD2D target)
         {
-            target.DrawPathGeometry(_geometry, _brush);
+            target.DrawPathGeometry(_geometry, _brush, _strokeWidth);
         }
     }
 

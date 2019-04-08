@@ -43,35 +43,19 @@ namespace WpfEditorTest.ChildWindows
 				ControllerDetailsControls.ItemsSource = null;
 				return;
 			}
-			//List<UIController.State> states = new List<UIController.State>(controller?.States);
 			selectedController = controller;
-			var data = new MVVMControllerData(controller);
-			//var propsies = (
-			//	from property in publicProperties
-			//	where property.GetMethod != null && property.SetMethod != null && !property.CustomAttributes.Any(ca => ca.AttributeType.Name == "XmlIgnoreAttribute")
-			//	select new MVVMFrameProperty(property, slot)
-			//).ToList();
+			//var data = new MVVMControllerData(controller);
 
-			//ListCollectionView lcv = new ListCollectionView(slots);
-			//lcv.GroupDescriptions.Add(new PropertyGroupDescription("Category"));
 
-			//var binding = new Binding(nameof(data.States))
-			//{
-			//	Source = data,
-			//	UpdateSourceTrigger = UpdateSourceTrigger.PropertyChanged,
-			//	Mode = BindingMode.OneWay
-			//};
-			//ControllerDetailsControls.SetBinding(TreeView.ItemsSourceProperty, binding);
-
-			ControllerDetailsControls.ItemsSource = data.Slots; //slots?.OrderBy(p => p.Name).ToList();
+			//ControllerDetailsControls.ItemsSource = data.Slots;
 
 		}
 
 		private void ButtonRemove_Click( object sender, RoutedEventArgs e )
 		{
-			ControllerSlotProperty MVVMSlot = (sender as Button).Tag as ControllerSlotProperty;
+			//ControllerSlotProperty MVVMSlot = (sender as Button).Tag as ControllerSlotProperty;
 
-			MVVMSlot.Slot.Properties.Remove(MVVMSlot.Slot.Properties.Where(p => p.Name == MVVMSlot.PropertyValue.Name).FirstOrDefault());
+			//MVVMSlot.Slot.Properties.Remove(MVVMSlot.Slot.Properties.Where(p => p.Name == MVVMSlot.PropertyValue.Name).FirstOrDefault());
 		}
 
 		private void ButtonAdd_Click( object sender, RoutedEventArgs e )
@@ -86,7 +70,7 @@ namespace WpfEditorTest.ChildWindows
 			if (prop!=null)
 			{
 				var value = prop.GetValue(slot.Component);
-				slot.Properties.Add(new PropertyValueStates(box.Text, value));
+				//slot.Properties.Add(new PropertyValueStates(box.Text, value));
 			}
 		}
 	}

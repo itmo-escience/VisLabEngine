@@ -505,7 +505,7 @@ namespace WpfEditorTest
 			}
 		}
 
-		internal CommandGroup AddFrameToScene( UIComponent createdFrame, Point point )
+		internal CommandGroup AddFrameToScene( UIComponent createdFrame, Point point, bool dropDeeper = false )
 		{
 			var hoveredFrame = SelectionLayer.GetHoveredFrameOnScene(point, false,false) ?? SceneFrame;
 
