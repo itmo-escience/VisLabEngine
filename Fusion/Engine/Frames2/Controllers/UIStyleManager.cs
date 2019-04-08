@@ -98,28 +98,96 @@ namespace Fusion.Engine.Frames2.Controllers
                 }
             };
             AddStyle(rbStyle);
+        }
 
-            #region StyleSerializationTesting
+        /// <summary>
+        /// Write all current styles with XmlWriter.
+        /// </summary>
+        /// <param name="writer"></param>
+        /// <example>
+        /// <code>
+        /// string xmlString;
+        /// using (var textWriter = new StringWriter())
+        /// {
+        ///     using (var writer = XmlWriter.Create(textWriter, new XmlWriterSettings() {Indent = true}))
+        ///     {
+        ///         WriteStyles(writer);
+        ///     }
+        ///     xmlString = textWriter.ToString();
+        /// }
+        /// </code>
+        /// </example>
+        public void WriteStyles(XmlWriter writer) 
+        {
+            writer.WriteStartElement("Styles");
 
-            string result;
-            var style = _styles[typeof(RadioButtonController)][DefaultStyle];
-            var styleSerializer = new XmlSerializer(style.GetType());
-            using(var textWriter = new StringWriter())
+            foreach (var controller in _styles.Keys)
             {
-                styleSerializer.Serialize(textWriter, style);
-                result = textWriter.ToString();
-            }
-            Console.WriteLine(result);
+                writer.WriteStartElement("Controller");
+                writer.WriteAttributeString("Type", controller.FullName);
 
-            IUIStyle styleCopy;
-            using(var textReader= new StringReader(result))
+                var controllerStyles = _styles[controller];
+                foreach (var style in controllerStyles.Values)
+                {
+                    new XmlSerializer(style.GetType()).Serialize(writer, style);
+                }
+
+                writer.WriteEndElement();
+            }
+
+            writer.WriteEndElement();
+        }
+
+        /// <summary>
+        /// Read new styles with XmlReader.
+        /// </summary>
+        /// <param name="reader"></param>
+        /// <example>
+        /// <code>
+        /// using(var textReader= new StringReader(xmlString))
+        /// {
+        ///     using (var reader = XmlReader.Create(textReader))
+        ///     {
+        ///         ReadStyles(reader);
+        ///     }
+        /// }
+        /// </code>
+        /// </example>
+        public void ReadStyles(XmlReader reader)
+        {
+            _styles.Clear();
+
+            reader.ReadStartElement("Styles");
+
+            bool wasEmpty = reader.IsEmptyElement;
+
+            if (wasEmpty)
+                return;
+            reader.MoveToContent();
+
+            while (reader.NodeType != XmlNodeType.EndElement)
             {
-                styleCopy = (IUIStyle)styleSerializer.Deserialize(textReader);
+                var type = Type.GetType(reader.GetAttribute("Type"));
+                reader.ReadStartElement("Controller");
+                reader.MoveToContent();
+
+                var controllerStyles = new SerializableDictionary<string, IUIStyle>();
+                while (reader.NodeType != XmlNodeType.EndElement)
+                {
+                    var styleType = Type.GetType(reader.GetAttribute("Type"));
+                    var styleSerializer = new XmlSerializer(styleType);
+                    var style = (IUIStyle) styleSerializer.Deserialize(reader);
+                    controllerStyles.Add(style.Name, style);
+                    reader.MoveToContent();
+                }
+
+                _styles.Add(type, controllerStyles);
+
+                reader.ReadEndElement();
+                reader.MoveToContent();
             }
 
-            int i = 0;
-
-            #endregion
+            reader.ReadEndElement();
         }
     }
 
@@ -166,16 +234,16 @@ namespace Fusion.Engine.Frames2.Controllers
             Name = reader.GetAttribute("Name");
             ControllerType = Type.GetType(reader.GetAttribute("ControllerType"));
 
-            bool wasEmpty = reader.IsEmptyElement;
-            reader.Read();
+            if (reader.IsEmptyElement) return;
 
-            if (wasEmpty)
-                return;
+            reader.Read();
+            reader.MoveToContent();
 
             while (reader.NodeType != XmlNodeType.EndElement)
             {
                 var slotName = reader.GetAttribute("Name");
                 reader.ReadStartElement("Slot");
+                reader.MoveToContent();
 
                 _slots[slotName] = new List<PropertyValueStates>();
                 while (reader.NodeType != XmlNodeType.EndElement)
@@ -194,6 +262,7 @@ namespace Fusion.Engine.Frames2.Controllers
         {
             var propertySerializer = new XmlSerializer(typeof(PropertyValueStates));
 
+            writer.WriteAttributeString("Type", GetType().FullName);
             writer.WriteAttributeString("Name", Name);
             writer.WriteAttributeString("ControllerType", ControllerType.FullName);
 
@@ -260,6 +329,7 @@ namespace Fusion.Engine.Frames2.Controllers
             var valueSerializer = new XmlSerializer(Type);
 
             reader.ReadStartElement("Property");
+            reader.MoveToContent();
 
             if (reader.IsEmptyElement)
                 return;
@@ -268,8 +338,10 @@ namespace Fusion.Engine.Frames2.Controllers
             {
                 var stateName = reader.GetAttribute("Name");
                 reader.ReadStartElement("State");
+                reader.MoveToContent();
 
                 var value = Convert.ChangeType(valueSerializer.Deserialize(reader), Type);
+                reader.MoveToContent();
                 _storedValues[stateName] = value;
 
                 if (stateName == ControllerState.Default.Name)
