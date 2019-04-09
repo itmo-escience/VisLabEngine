@@ -14,7 +14,7 @@ namespace Fusion.Core.Utils
 {
 	public class UIComponentSerializer
 	{
-		public const string SerializerVersion = "1.5";
+		public const string SerializerVersion = "1.6";
 
 		public static List<Type> frameTypes = new List<Type>();
 
@@ -68,21 +68,6 @@ namespace Fusion.Core.Utils
             }*/
 		}
 
-		public static void GetChildTypes(UIComponent src, SerializableDictionary<string, string> list )
-		{
-			if (!list.Keys.Contains(src.GetType().FullName))
-			{
-				list.Add(src.GetType().FullName, Assembly.GetAssembly(src.GetType()).FullName);
-			}
-            /*if (src is UIContainer container)
-            {
-                foreach (var child in container.Children)
-                {
-                    GetChildTypes(child, list);
-                }
-            }*/
-		}
-
 		public static UIComponent Read(string filename, out UIComponent destination )
 		{
 			destination = null;
@@ -124,12 +109,14 @@ namespace Fusion.Core.Utils
 		public string Version { get; set; } = UIComponentSerializer.SerializerVersion;
 		public UIComponent SerializableFrame { get; set; }
 
-		public SerializableDictionary<string,string> FrameTypes = new SerializableDictionary<string, string>();
+		public string FrameTypeName;
+        public string FrameAssemblyName;
 
 		public SeralizableObjectHolder(UIComponent frame)
 		{
 			this.SerializableFrame = frame;
-			UIComponentSerializer.GetChildTypes(frame, FrameTypes);
+            FrameTypeName = frame.GetType().FullName;
+            FrameAssemblyName = Assembly.GetAssembly(frame.GetType()).FullName;
 		}
 
 		public SeralizableObjectHolder() { }
@@ -141,8 +128,7 @@ namespace Fusion.Core.Utils
 
 		public void ReadXml( XmlReader reader )
 		{
-			var typesSerializer = new XmlSerializer(typeof(SerializableDictionary<string, string>));
-			var versionSerializer = new XmlSerializer(typeof(string));
+			var stringSerializer = new XmlSerializer(typeof(string));
 
 			var wasEmpty = reader.IsEmptyElement;
 			reader.Read();
@@ -150,7 +136,7 @@ namespace Fusion.Core.Utils
 			if (wasEmpty)
 				return;
 
-		    var version = (string)versionSerializer.Deserialize(reader);
+		    var version = (string)stringSerializer.Deserialize(reader);
 			Version = version;
 
 			if (version != UIComponentSerializer.SerializerVersion) {
@@ -158,17 +144,13 @@ namespace Fusion.Core.Utils
 				return;
 			}
 
-			var types = (SerializableDictionary<string, string>)typesSerializer.Deserialize(reader);
-			FrameTypes = types;
+            FrameTypeName = (string)stringSerializer.Deserialize(reader);
+            FrameAssemblyName = (string)stringSerializer.Deserialize(reader);
 
-			var frameTypes = new List<Type>();
-			foreach (var keyValuePair in types)
-			{
-				var assembly = Assembly.Load(keyValuePair.Value);
-				frameTypes.Add(assembly.GetType(keyValuePair.Key));
-			}
+			var assembly = Assembly.Load(FrameAssemblyName);
+			var frameType = assembly.GetType(FrameTypeName);
 
-			var frameSerializer = new XmlSerializer(typeof(UIComponent), frameTypes.ToArray());
+			var frameSerializer = new XmlSerializer(frameType);
 
 			var frame = (UIComponent)frameSerializer.Deserialize(reader);
 			SerializableFrame = frame;
@@ -176,20 +158,16 @@ namespace Fusion.Core.Utils
 
 		public void WriteXml( XmlWriter writer )
 		{
-			List<Type> frameTypes = new List<Type>();
-			foreach (var keyValuePair in FrameTypes)
-			{
-				var assembly = Assembly.Load(keyValuePair.Value);
-				frameTypes.Add(assembly.GetType(keyValuePair.Key));
-			}
+			var assembly = Assembly.Load(FrameAssemblyName);
+            var frameType = assembly.GetType(FrameTypeName);
 
-			XmlSerializer typesSerializer = new XmlSerializer(typeof(SerializableDictionary<string, string>));
-			XmlSerializer frameSerializer = new XmlSerializer(typeof(UIComponent), frameTypes.ToArray());
-			XmlSerializer versionSerializer = new XmlSerializer(typeof(string));
+			XmlSerializer frameSerializer = new XmlSerializer(frameType);
+			XmlSerializer stringSerializer = new XmlSerializer(typeof(string));
 
-			versionSerializer.Serialize(writer, this.Version);
-			typesSerializer.Serialize(writer, this.FrameTypes);
-			frameSerializer.Serialize(writer, this.SerializableFrame);
+            stringSerializer.Serialize(writer, Version);
+            stringSerializer.Serialize(writer, FrameTypeName);
+            stringSerializer.Serialize(writer, FrameAssemblyName);
+			frameSerializer.Serialize(writer, SerializableFrame, new XmlSerializerNamespaces(new []{ XmlQualifiedName.Empty }));
 		}
 	}
 
