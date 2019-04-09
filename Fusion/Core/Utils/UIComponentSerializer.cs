@@ -101,6 +101,18 @@ namespace Fusion.Core.Utils
             }
 			return destination;
 		}
+
+        public static void WriteValue(XmlWriter writer, object value)
+        {
+            var serializer = new XmlSerializer(value.GetType());
+            serializer.Serialize(writer, value, new XmlSerializerNamespaces(new []{ XmlQualifiedName.Empty }));
+        }
+
+        public static T ReadValue<T>(XmlReader writer)
+        {
+            var serializer = new XmlSerializer(typeof(T));
+            return (T)serializer.Deserialize(writer);
+        }
 	}
 
 	public class SeralizableObjectHolder : IXmlSerializable

@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel;
+using System.Xml.Serialization;
 using Fusion.Core.Mathematics;
 using Fusion.Drivers.Graphics;
 using Fusion.Engine.Common;
@@ -9,6 +10,7 @@ namespace Fusion.Engine.Frames2.Components
 {
     public sealed class Image : UIComponent
     {
+        [XmlIgnore]
         public ISlot Placement { get; set; }
 
         public UIEventsHolder Events { get; } = new UIEventsHolder();
@@ -30,6 +32,7 @@ namespace Fusion.Engine.Frames2.Components
         }
 
         private Texture2D _texture;
+        [XmlIgnore]
         public Texture2D Texture {
             get => _texture;
             set

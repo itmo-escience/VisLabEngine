@@ -11,6 +11,7 @@ using Fusion.Engine.Graphics.GIS;
 using Fusion.Engine.Frames;
 using Fusion;
 using Fusion.Core.Shell;
+using Fusion.Core.Utils;
 using FusionUI;
 using FusionUI.UI;
 using Fusion.Engine.Frames2.Components;
@@ -164,24 +165,30 @@ namespace GISTest
             img1 = new Image(image);
             img2 = new Image(image);
 
-            var imgVerticalBox = new VerticalBox()
+            /*var imgVerticalBox = new VerticalBox()
             {
                 Name = "ImageVerticalBox",
                 DesiredWidth = 500,
                 DesiredHeight = 800,
                 Alignment = HorizontalAlignment.Center
+            };*/
+            var imgFreePlacement = new FreePlacement()
+            {
+                Name = "ImageFreePlacement",
+                DesiredWidth = 500,
+                DesiredHeight = 800
             };
 
-            var imgFpSlot = UIManager.Root.Insert(imgVerticalBox, 0);
+            var imgFpSlot = UIManager.Root.Insert(imgFreePlacement, 0);
             imgFpSlot.X = 50;
             imgFpSlot.Y = 50;
 
-            var slot = imgVerticalBox.Insert(img1, 0);
+            var slot = imgFreePlacement.Insert(img1, 0);
             img1.DesiredWidth = 250;
             img1.DesiredHeight = 50;
 
 
-            var slot2 = imgVerticalBox.Insert(img2, 0);
+            var slot2 = imgFreePlacement.Insert(img2, 0);
             img2.DesiredWidth = 450;
             img2.DesiredHeight = 250;
 
@@ -234,6 +241,10 @@ namespace GISTest
             //imgVerticalBox.Events.Click += (sender, args) => Log.Message("Image Container click");
 		    labelFreePlacement.Events.Click += (sender, args) => Log.Message("Label Container click");
 			//----------
+
+            string str = UIComponentSerializer.WriteToString(imgFreePlacement);
+            var comp = UIComponentSerializer.ReadFromString(str);
+
 			#endregion
 
             #region Styles
