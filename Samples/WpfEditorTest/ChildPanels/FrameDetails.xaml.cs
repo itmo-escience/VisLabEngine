@@ -32,13 +32,22 @@ namespace WpfEditorTest.ChildPanels
 	    {
 	        var publicProperties = frame.GetType().GetProperties(BindingFlags.Public | BindingFlags.Instance);
 
-	        var propsies = (
-	            from property in publicProperties
-	            where property.GetMethod != null && property.SetMethod != null && !property.CustomAttributes.Any(ca => ca.AttributeType.Name == "XmlIgnoreAttribute")
-	            select new MVVMFrameProperty(property, frame)
-	        ).ToList();
+			var propsies = (
+				from property in publicProperties
+				where property.GetMethod != null && property.SetMethod != null && !property.CustomAttributes.Any(ca => ca.AttributeType.Name == "XmlIgnoreAttribute")
+				select new MVVMComponentProperty(property, frame)
+			).ToList();
 
-	        FrameDetailsControls.ItemsSource = propsies.OrderBy(p => p.PropName).ToList();
+			publicProperties = frame.Placement.GetType().GetProperties(BindingFlags.Public | BindingFlags.Instance);
+
+			propsies.AddRange((
+				from property in publicProperties
+				where property.GetMethod != null && property.SetMethod != null && !property.CustomAttributes.Any(ca => ca.AttributeType.Name == "XmlIgnoreAttribute")
+				select new MVVMComponentProperty(property, frame.Placement)
+			).ToList());
+
+
+			FrameDetailsControls.ItemsSource = propsies.OrderBy(p => p.PropName).ToList();
         }
 	}
 }

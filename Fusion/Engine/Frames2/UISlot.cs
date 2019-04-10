@@ -78,63 +78,56 @@ namespace Fusion.Engine.Frames2
         }
     }
 
-    public class SimpleControllerSlot : PropertyChangedHelper, IControllerSlot, ISlotAttachable
+    public class SimpleControllerSlot : IControllerSlot, ISlotAttachable
     {
-        private float _x;
         public float X
-        {
-            get => _x;
-            internal set => SetAndNotify(ref _x, value);
-        }
+		{
+			get;
+			internal set;
+		}
 
-        private float _y;
         public float Y
-        {
-            get => _y;
-            internal set => SetAndNotify(ref _y, value);
-        }
+		{
+			get;
+			internal set;
+		}
 
-        private float _angle;
         public float Angle
-        {
-            get => _angle;
-            internal set => SetAndNotify(ref _angle, value);
-        }
+		{
+			get;
+			internal set;
+		}
 
-        private float _width;
         public float Width
-        {
-            get => _width;
-            internal set => SetAndNotify(ref _width, value);
-        }
+		{
+			get;
+			internal set;
+		}
 
-        private float _height;
         public float Height
-        {
-            get => _height;
-            internal set => SetAndNotify(ref _height, value);
-        }
+		{
+			get;
+			internal set;
+		}
 
-        public float AvailableWidth => MathUtil.Clamp(Parent.Placement.Width - X, 0, float.MaxValue);
+		public float AvailableWidth => MathUtil.Clamp(Parent.Placement.Width - X, 0, float.MaxValue);
         public float AvailableHeight => MathUtil.Clamp(Parent.Placement.Height - Y, 0, float.MaxValue);
 
         public string Name { get; }
 
-        private bool _clip = true;
-        public bool Clip
-        {
-            get => _clip;
-            set => SetAndNotify(ref _clip, value);
-        }
+		public bool Clip
+		{
+			get;
+			set;
+		} = true;
 
-        private bool _visible = true;
-        public bool Visible
-        {
-            get => _visible;
-            set => SetAndNotify(ref _visible, value);
-        }
+		public bool Visible
+		{
+			get;
+			set;
+		} = true;
 
-        public IUIContainer Parent { get; }
+		public IUIContainer Parent { get; }
         public UIComponent Component { get; private set; }
 
         public SolidBrushD2D DebugBrush => new SolidBrushD2D(Color4.White);

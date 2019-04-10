@@ -119,6 +119,7 @@
     <Compile Include="WPFConverters\DataTemplateSelectorOfTreeView.cs" />
     <Compile Include="WPFConverters\DataTemplateSelectorOfProperty.cs" />
     <Compile Include="Commands\ParentChangeCommand.cs" />
+    <Compile Include="WPFConverters\FixatorsValueConverter.cs" />
     <Compile Include="WPFConverters\PropertyValueConverter.cs" />
     <Compile Include="ApplicationConfig.cs" />
     <Compile Include="Commands\CommandGroup.cs" />

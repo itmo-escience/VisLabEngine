@@ -60,7 +60,7 @@ namespace WpfEditorTest.Commands
 			}
 			else
 			{
-				throw new Exception($"Slot property {_propertyToChange.Name} does not have setter.");
+				//throw new Exception($"Slot property {_propertyToChange.Name} does not have setter.");
 			}
 		}
 
@@ -88,7 +88,7 @@ namespace WpfEditorTest.Commands
 			}
 			else
 			{
-				throw new Exception($"Property {_propertyToChange.Name} does not have setter.");
+				//throw new Exception($"Property {_propertyToChange.Name} does not have setter.");
 			}
 		}
 	}

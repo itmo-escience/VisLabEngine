@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using Fusion.Core.Mathematics;
 using Fusion.Engine.Common;
@@ -14,7 +15,7 @@ namespace Fusion.Engine.Frames2.Controllers
         string Name { get; }
     }
 
-    public abstract class UIController<T> : PropertyChangedHelper, IUIContainer where T : IControllerSlot
+    public abstract class UIController<T> : IUIContainer where T : IControllerSlot
     {
         public IUIStyle Style { get; protected set; }
 
@@ -86,7 +87,10 @@ namespace Fusion.Engine.Frames2.Controllers
 		}
 
 		private bool _initialized = false;
-        private void Initialize()
+
+		public event PropertyChangedEventHandler PropertyChanged;
+
+		private void Initialize()
         {
             ChangeState(ControllerState.Default);
             _initialized = true;

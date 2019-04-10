@@ -13,7 +13,7 @@ namespace WpfEditorTest.Utility
 	{
 		object Prop { get; set; }
 
-		UIComponent Obj { get; set; }
+		INotifyPropertyChanged Obj { get; set; }
 
 		PropertyInfo PropInfo { get; set; }
 		Type PropType { get; set; }

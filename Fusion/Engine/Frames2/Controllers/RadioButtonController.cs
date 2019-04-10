@@ -7,40 +7,37 @@ using Fusion.Engine.Frames2.Components;
 using Fusion.Engine.Graphics.SpritesD2D;
 using Fusion.Engine.Frames2.Managing;
 using Fusion.Engine.Frames2.Events;
+using System.ComponentModel;
 
 namespace Fusion.Engine.Frames2.Controllers
 {
-    public class RadioButtonSlot : PropertyChangedHelper, IControllerSlot, ISlotAttachable
+    public class RadioButtonSlot : IControllerSlot, ISlotAttachable
     {
-        private float _x;
         public float X
         {
-            get => _x;
-            internal set => SetAndNotify(ref _x, value);
+            get;
+            internal set;
         }
 
-        private float _y;
         public float Y
-        {
-            get => _y;
-            internal set => SetAndNotify(ref _y, value);
-        }
+		{
+			get;
+			internal set;
+		}
 
-        private float _width;
         public float Width
-        {
-            get => _width;
-            internal set => SetAndNotify(ref _width, value);
-        }
+		{
+			get;
+			internal set;
+		}
 
-        private float _height;
         public float Height
-        {
-            get => _height;
-            internal set => SetAndNotify(ref _height, value);
-        }
+		{
+			get;
+			internal set;
+		}
 
-        public float Angle => 0;
+		public float Angle => 0;
 
         public float AvailableWidth => MathUtil.Clamp(Parent.Placement.Width - X, 0, float.MaxValue);
         public float AvailableHeight => MathUtil.Clamp(Parent.Placement.Height - Y, 0, float.MaxValue);
@@ -50,19 +47,19 @@ namespace Fusion.Engine.Frames2.Controllers
 
         public IUIContainer Parent { get; }
 
-        private UIComponent _component;
         public UIComponent Component
-        {
-            get => _component;
-            private set => SetAndNotify(ref _component, value);
-        }
+		{
+			get;
+			private set;
+		}
 
-        public SolidBrushD2D DebugBrush => new SolidBrushD2D(new Color4(0, 1.0f, 0, 1.0f));
+		public SolidBrushD2D DebugBrush => new SolidBrushD2D(new Color4(0, 1.0f, 0, 1.0f));
         public TextFormatD2D DebugTextFormat => new TextFormatD2D("Calibri", 10);
 
         public event EventHandler<SlotAttachmentChangedEventArgs> ComponentAttached;
+		public event PropertyChangedEventHandler PropertyChanged;
 
-        public string Name { get; }
+		public string Name { get; }
 
         internal RadioButtonSlot(string name, RadioButtonController parent)
         {

@@ -92,6 +92,11 @@ namespace WpfEditorTest.ChildPanels
 				this.UpdateBoundingBox();
 			};
 
+			SelectionManager.Instance.UIComponentUpdated += ( s, e ) =>
+			{
+				this.UpdateBoundingBox();
+			};
+
 			SelectionManager.Instance.SlotUpdated += ( s, e ) =>
 			{
 				this.UpdateBoundingBox();
@@ -125,8 +130,12 @@ namespace WpfEditorTest.ChildPanels
 				SelectedGroupMaxY = _uiManager.BoundingBox(component.Placement).Y + _uiManager.BoundingBox(component.Placement).Height;
 
 				UIComponent frame = frames.First();
-				Width = frame.Placement.Width;
-				Height = frame.Placement.Height;
+
+				//if (frame.Placement.GetType().GetProperty(nameof(Width)).GetSetMethod()!=null)
+				//{
+					Width = frame.Placement.Width < 0 ? 0 : frame.Placement.Width;
+					Height = frame.Placement.Height < 0 ? 0 : frame.Placement.Height; 
+				//}
 
 				var globalTransform = _uiManager.GlobalTransform(frame.Placement);
 

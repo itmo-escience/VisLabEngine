@@ -21,9 +21,97 @@
     <Window.Resources>
         <conv:PropertyValueConverter x:Key="propValueConverter"/>
         <conv:TransformValueConverter x:Key="TransValueConverter"/>
+        <conv:FixatorsValueConverter x:Key="FixesValueConverter"/>
         <conv:DataTemplateSelectorOfProperty x:Key="propTemplateSelector"/>
         <conv:BoolToIndexConverter x:Key="boolToIndexConverter" />
 
+
+        <DataTemplate x:Key="FixatorsProp">
+            <DockPanel Height="auto" Width="auto">
+                <Border BorderThickness="1" BorderBrush="Gray" MinHeight="32" MinWidth="100">
+                    <TextBlock TextAlignment ="Left"
+			                             TextWrapping = "Wrap"
+			                             VerticalAlignment = "Center"
+                                            FontFamily="Times New Roman"
+                                      Text="{Binding PropName}"/>
+                </Border>
+                <Grid Height="auto" Width="auto">
+                    <Grid.RowDefinitions>
+                        <RowDefinition/>
+                        <RowDefinition/>
+                        <RowDefinition/>
+                        <RowDefinition/>
+                    </Grid.RowDefinitions>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="3*"/>
+                    </Grid.ColumnDefinitions>
+                    <Border BorderThickness="1" BorderBrush="Gray" MinHeight="32" MinWidth="20" Grid.Column="0" Grid.Row="0"
+                            Tag="{Binding Converter={StaticResource FixesValueConverter}}">
+                        <TextBlock TextAlignment ="Left"
+			                             TextWrapping = "Wrap"
+			                             VerticalAlignment = "Center"
+                                            FontFamily="Times New Roman"
+                                      Text="Top:"/>
+                    </Border>
+                    <Border BorderThickness="1" BorderBrush="Gray" MinHeight="32" Width="auto" Grid.Column="1" Grid.Row="0">
+                        <wpfTool:SingleUpDown TextAlignment ="Center"
+                        Increment=".25"
+			            VerticalAlignment = "Center"
+                        FontFamily="Times New Roman"
+                        Value="{Binding Path=Prop, Converter={StaticResource FixesValueConverter}, ConverterParameter=Top, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
+                        </wpfTool:SingleUpDown>
+                    </Border>
+                    <Border BorderThickness="1" BorderBrush="Gray" MinHeight="32" MinWidth="20" Grid.Column="0" Grid.Row="1">
+                        <TextBlock TextAlignment ="Left"
+			                             TextWrapping = "Wrap"
+			                             VerticalAlignment = "Center"
+                                            FontFamily="Times New Roman"
+                                      Text="Bottom:"/>
+                    </Border>
+                    <Border BorderThickness="1" BorderBrush="Gray" MinHeight="32" Width="auto" Grid.Column="1" Grid.Row="1">
+                        <wpfTool:SingleUpDown TextAlignment ="Center"
+                        Increment=".25"
+			            VerticalAlignment = "Center"
+                        FontFamily="Times New Roman"
+                        Value="{Binding Path=Prop, Converter={StaticResource FixesValueConverter}, ConverterParameter=Bottom, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
+                        </wpfTool:SingleUpDown>
+                    </Border>
+
+                    <Border BorderThickness="1" BorderBrush="Gray" MinHeight="32" MinWidth="20" Grid.Column="0" Grid.Row="2">
+                        <TextBlock TextAlignment ="Left"
+			                             TextWrapping = "Wrap"
+			                             VerticalAlignment = "Center"
+                                            FontFamily="Times New Roman"
+                                      Text="Left:"/>
+                    </Border>
+                    <Border BorderThickness="1" BorderBrush="Gray" MinHeight="32" Width="auto" Grid.Column="1" Grid.Row="2">
+                        <wpfTool:SingleUpDown TextAlignment ="Center"
+                        Increment=".25"
+			            VerticalAlignment = "Center"
+                        FontFamily="Times New Roman"
+                        Value="{Binding Path=Prop, Converter={StaticResource FixesValueConverter}, ConverterParameter=Left, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
+                        </wpfTool:SingleUpDown>
+                    </Border>
+                    <Border BorderThickness="1" BorderBrush="Gray" MinHeight="32" MinWidth="20" Grid.Column="0" Grid.Row="3">
+                        <TextBlock TextAlignment ="Left"
+			                             TextWrapping = "Wrap"
+			                             VerticalAlignment = "Center"
+                                            FontFamily="Times New Roman"
+                                      Text="Right:"/>
+                    </Border>
+                    <Border BorderThickness="1" BorderBrush="Gray" MinHeight="32" Width="auto" Grid.Column="1" Grid.Row="3">
+                        <wpfTool:SingleUpDown TextAlignment ="Center"
+                        Increment=".25"
+			            VerticalAlignment = "Center"
+                        FontFamily="Times New Roman"
+                        Value="{Binding Path=Prop, Converter={StaticResource FixesValueConverter}, ConverterParameter=Right, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
+                        </wpfTool:SingleUpDown>
+                    </Border>
+                </Grid>
+            </DockPanel>
+        </DataTemplate>
+        
         <DataTemplate x:Key="VectorProp">
             <DockPanel Height="auto" Width="auto">
                 <Border BorderThickness="1" BorderBrush="Gray" MinHeight="32" MinWidth="100">

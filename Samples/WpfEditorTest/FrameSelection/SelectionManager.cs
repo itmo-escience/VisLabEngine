@@ -50,6 +50,11 @@ namespace WpfEditorTest.FrameSelection
 
 		private void OnUIComponentUpdated( object frame, PropertyChangedEventArgs args)
 		{
+			if ((frame as UIComponent).Placement != null)
+			{
+				(frame as UIComponent).Placement.PropertyChanged += OnSlotUpdated;
+			}
+
 		    Application.Current.Dispatcher.InvokeAsync(() => UIComponentUpdated?.Invoke(this, (UIComponent)frame));
 		}
 

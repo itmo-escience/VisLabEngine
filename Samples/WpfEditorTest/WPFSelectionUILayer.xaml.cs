@@ -326,8 +326,38 @@ namespace WpfEditorTest
 			else
 				hoveredFrame = UIHelper.GetLowestComponentInHierarchy(_uiManager, SceneFrame, new Vector2((float)mousePos.X, (float)mousePos.Y));
 
+			if (ignoreScene)
+			{
+				if (hoveredFrame != SceneFrame) // if something is there and it's not SceneFrame
+				{
+					return hoveredFrame;
+				}
 
+				return null;
+			}
+			else
+			{
+				if (hoveredFrame != null) // if something is there
+				{
+					return hoveredFrame;
+				}
+				return null;
+			}
+		}
 
+		public UIComponent GetChildFrameOnScene( Point mousePos, bool ignoreScene, bool ignoreSelection )
+		{
+			UIComponent hoveredFrame;
+			if (ignoreSelection)
+			{
+				hoveredFrame = UIHelper.GetComponentInChildren(_uiManager, SceneFrame, new Vector2((float)mousePos.X, (float)mousePos.Y), SelectionManager.Instance.SelectedFrames);
+				if (hoveredFrame != null && SelectionManager.Instance.SelectedFrames.Contains(hoveredFrame))
+				{
+					hoveredFrame = hoveredFrame.Parent() as IUIModifiableContainer<ISlot>;
+				}
+			}
+			else
+				hoveredFrame = UIHelper.GetComponentInChildren(_uiManager, SceneFrame, new Vector2((float)mousePos.X, (float)mousePos.Y));
 
 			if (ignoreScene)
 			{
@@ -454,7 +484,13 @@ namespace WpfEditorTest
 
 		private void LocalGrid_MouseLeftButtonDown( object sender, MouseButtonEventArgs e )
 		{
-			var hovered = GetHoveredFrameOnScene(e.GetPosition(this), true, false);
+			UIComponent hovered;
+			if (DeepClick())
+				hovered = GetChildFrameOnScene(e.GetPosition(this), true, false);
+			else
+				hovered = GetHoveredFrameOnScene(e.GetPosition(this), true, false);
+
+
 			var enableSelection = true;
 			_initMousePosition = e.GetPosition(this);
 
@@ -493,7 +529,7 @@ namespace WpfEditorTest
 					}
 					else
 					{
-						if (!SelectionManager.Instance.SelectedFrames.Contains(hovered))
+						if (!SelectionManager.Instance.SelectedFrames.Contains(hovered) && !FrameSelectionPanelList.Any(fsp => fsp.Value.MousePressed))
 						{
 							if (hovered.Parent() is UIController<IControllerSlot>)
 								hovered = hovered.Parent();
@@ -506,7 +542,7 @@ namespace WpfEditorTest
 						CommandManager.Instance.ExecuteWithoutSettingDirty(command);
 					}
 				}
-				else
+				else if(!FrameSelectionPanelList.Any(fsp => fsp.Value.MousePressed))
 				{
 					if (!Keyboard.IsKeyDown(Key.LeftShift) && !Keyboard.IsKeyDown(Key.RightShift))
 					{
@@ -549,6 +585,8 @@ namespace WpfEditorTest
 			CaptureMouse();
             IsScrollExpected = true;
         }
+
+
 
 		private void LocalGrid_MouseLeftButtonUp( object sender, MouseButtonEventArgs e )
 		{
@@ -845,6 +883,16 @@ namespace WpfEditorTest
 		private bool NeedSnapping()
 		{
 			return!(Keyboard.IsKeyDown(Key.LeftAlt) || Keyboard.IsKeyDown(Key.RightAlt));
+		}
+
+		private bool DeepClick()
+		{
+			return !(Keyboard.IsKeyDown(Key.LeftCtrl) || Keyboard.IsKeyDown(Key.RightCtrl));
+		}
+
+		private bool NeedReparenting()
+		{
+			return !(Keyboard.IsKeyDown(Key.LeftAlt) || Keyboard.IsKeyDown(Key.RightAlt));
 		}
 
 		private void AreaSelectionEnd( List<UIComponent> selectedFrames )

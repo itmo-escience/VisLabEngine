@@ -12,6 +12,8 @@ namespace ZWpfLib
 {
 	public class DXImageSource : D3DImage, IDisposable
 	{
+		private int _messageCounter = 0;
+
 		public bool IsDisposed { get; protected set; }
 
 		private static int _activeClients;
@@ -91,11 +93,17 @@ namespace ZWpfLib
 
                 display.WaitRender();
 
-		        AddDirtyRect(new Int32Rect(0, 0, base.PixelWidth, base.PixelHeight));
+				if (_messageCounter>0)
+				{
+					Log.Debug($"DXImageSource: {_messageCounter} back buffers were skipped");
+					_messageCounter = 0; 
+				}
+				AddDirtyRect(new Int32Rect(0, 0, base.PixelWidth, base.PixelHeight));
 		    }
             else
             {
-                Log.Debug("DXImageSource: Couldn't lock to copy back buffer");
+				_messageCounter++;
+				
             }
 
 		    Unlock();

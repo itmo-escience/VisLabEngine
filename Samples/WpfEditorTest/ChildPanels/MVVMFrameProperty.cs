@@ -9,9 +9,9 @@ using WpfEditorTest.Utility;
 
 namespace WpfEditorTest.ChildPanels
 {
-	public class MVVMFrameProperty : IMVVMProperty
+	public class MVVMComponentProperty : IMVVMProperty
 	{
-		public MVVMFrameProperty( PropertyInfo prop, UIComponent obj )
+		public MVVMComponentProperty( PropertyInfo prop, INotifyPropertyChanged obj )
 		{
 			Obj = obj;
 			PropName = prop.Name;
@@ -39,17 +39,20 @@ namespace WpfEditorTest.ChildPanels
 				}
 			}
 
-			Obj.PropertyChanged += ( s, e ) => {
-				if (e.PropertyName == PropName)
+			Obj.PropertyChanged += ( s, e ) => ChangeProperty(e);
+		}
+
+		public void ChangeProperty( PropertyChangedEventArgs e )
+		{
+			if (e.PropertyName == PropName)
+			{
+				var val = PropInfo.GetValue(Obj);
+				if (Prop != null && !Prop.Equals(val))
 				{
-					var val = PropInfo.GetValue(Obj);
-					if (Prop!=null && !Prop.Equals(val))
-					{
-						_prop = PropInfo.GetValue(Obj);
-						OnPropertyChanged(nameof(Prop));
-					}
+					_prop = PropInfo.GetValue(Obj);
+					OnPropertyChanged(nameof(Prop));
 				}
-			};
+			}
 		}
 
 		private object _prop;
@@ -60,14 +63,23 @@ namespace WpfEditorTest.ChildPanels
 			{
 				var convertedValue = Convert.ChangeType(value, PropInfo.PropertyType);
 
-				var command = new UIComponentPropertyChangeCommand(Obj, PropName, value);
+				IEditorCommand command;
+				if (Obj.GetType().GetInterfaces().Contains(typeof(UIComponent)))
+				{
+					command = new UIComponentPropertyChangeCommand(Obj as UIComponent, PropName, value);
+				}
+				else
+				{
+					command = new SlotPropertyChangeCommand((Obj as ISlot).Component, PropName, value);
+				}
+				 
 				CommandManager.Instance.Execute(command);
 
 				//OnPropertyChanged();
 			}
 		}
 
-		public UIComponent Obj { get; set; }
+		public INotifyPropertyChanged Obj { get; set; }
 
 		public PropertyInfo PropInfo { get; set; }
 		public Type PropType { get; set; }

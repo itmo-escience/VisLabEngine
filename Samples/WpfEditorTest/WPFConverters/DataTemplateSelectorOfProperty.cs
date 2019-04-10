@@ -20,7 +20,9 @@ namespace WpfEditorTest.WPFConverters
 			if (element != null && item != null && item.GetType().GetInterfaces().Contains(typeof(IMVVMProperty)))
 			{
 				IMVVMProperty Prop = item as IMVVMProperty;
-
+				if (Prop.PropType == typeof(Fusion.Engine.Frames2.Containers.Fixators))
+					return
+						element.FindResource("FixatorsProp") as DataTemplate;
 				if (Prop.PropType == typeof(Fusion.Core.Mathematics.Color4))
 					return
 						element.FindResource("ColorProp") as DataTemplate;

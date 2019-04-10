@@ -1,5 +1,6 @@
 ﻿using Fusion.Core.Mathematics;
 using Fusion.Engine.Frames2;
+using Fusion.Engine.Frames2.Containers;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
@@ -11,10 +12,10 @@ using WpfEditorTest.Utility;
 
 namespace WpfEditorTest.WPFConverters
 {
-	public class TransformValueConverter : IValueConverter
+	public class FixatorsValueConverter : IValueConverter
 	{
 		object elementToUpdate;
-		Matrix3x2 propertyToChange;
+		Fixators propertyToChange;
 
 		public object Convert( object value, Type targetType, object parameter, CultureInfo culture )
 		{
@@ -29,33 +30,25 @@ namespace WpfEditorTest.WPFConverters
 				return null;
 			}
 
-			propertyToChange = (Matrix3x2)value;
+			propertyToChange = (Fixators)value;
 
 			switch (parameter)
 			{
-				case "M11":
+				case "Top":
 					{
-						return propertyToChange.M11;
+						return propertyToChange.Top;
 					}
-				case "M12":
+				case "Bottom":
 					{
-						return propertyToChange.M12;
+						return propertyToChange.Bottom;
 					}
-				case "M21":
+				case "Left":
 					{
-						return propertyToChange.M21;
+						return propertyToChange.Left;
 					}
-				case "M22":
+				case "Right":
 					{
-						return propertyToChange.M22;
-					}
-				case "M31":
-					{
-						return propertyToChange.M31;
-					}
-				case "M32":
-					{
-						return propertyToChange.M32;
+						return propertyToChange.Right;
 					}
 			}
 
@@ -66,35 +59,21 @@ namespace WpfEditorTest.WPFConverters
 		{
 			switch (parameter)
 			{
-				case "M11":
+				case "Top":
 					{
-						propertyToChange.M11 = (float)value;
-						break;
+						return propertyToChange.Top = (float)value;
 					}
-				case "M12":
+				case "Bottom":
 					{
-						propertyToChange.M12 = (float)value;
-						break;
+						return propertyToChange.Bottom = (float)value;
 					}
-				case "M21":
+				case "Left":
 					{
-						propertyToChange.M21 = (float)value;
-						break;
+						return propertyToChange.Left = (float)value;
 					}
-				case "M22":
+				case "Right":
 					{
-						propertyToChange.M22 = (float)value;
-						break;
-					}
-				case "M31":
-					{
-						propertyToChange.M31 = (float)value;
-						break;
-					}
-				case "M32":
-					{
-						propertyToChange.M32 = (float)value;
-						break;
+						return propertyToChange.Right = (float)value;
 					}
 			}
 			//TODO

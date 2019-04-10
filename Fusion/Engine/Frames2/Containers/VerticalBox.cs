@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
+using System.Reflection;
 using Fusion.Core.Mathematics;
 using Fusion.Core.Utils;
 using Fusion.Engine.Common;
@@ -11,85 +12,70 @@ using Fusion.Engine.Graphics.SpritesD2D;
 
 namespace Fusion.Engine.Frames2.Containers
 {
-    public class VerticalBoxSlot : PropertyChangedHelper, ISlotAttachable
+    public class VerticalBoxSlot : ISlotAttachable
     {
         internal VerticalBoxSlot(VerticalBox holder, float x, float y, float width, float height)
         {
             InternalHolder = holder;
-            _x = x;
-            _y = y;
-            _width = width;
-            _height = height;
+            X = x;
+            Y = y;
+            Width = width;
+            Height = height;
         }
 
         #region ISlot
-        private float _x;
         public float X
         {
-            get => _x;
-            internal set => SetAndNotify(ref _x, value);
+            get;
+            internal set;
         }
 
-        private float _y;
         public float Y
-        {
-            get => _y;
-            internal set => SetAndNotify(ref _y, value);
-        }
+		{
+			get;
+			internal set;
+		}
 
-        private float _angle;
         public float Angle
-        {
-            get => _angle;
-            internal set => SetAndNotify(ref _angle, value);
-        }
+		{
+			get;
+			internal set;
+		}
 
-        private float _width;
         public float Width
-        {
-            get => _width;
-            internal set => SetAndNotify(ref _width, value);
-        }
+		{
+			get;
+			internal set;
+		}
 
-        private float _height;
         public float Height
-        {
-            get => _height;
-            internal set => SetAndNotify(ref _height, value);
-        }
+		{
+			get;
+			internal set;
+		}
 
-        public float AvailableWidth => MathUtil.Clamp(Parent.Placement.Width - X, 0, float.MaxValue);
+		public float AvailableWidth => MathUtil.Clamp(Parent.Placement.Width - X, 0, float.MaxValue);
         public float AvailableHeight => MathUtil.Clamp(Parent.Placement.Height - Y, 0, float.MaxValue);
 
-        private Matrix3x2 _transform = Matrix3x2.Identity;
-        public Matrix3x2 Transform
-        {
-            get => _transform;
-            set => SetAndNotify(ref _transform, value);
-        }
+		public bool Clip
+		{
+			get;
+			set;
+		} = true;
 
-        private bool _clip = true;
-        public bool Clip
-        {
-            get => _clip;
-            set => SetAndNotify(ref _clip, value);
-        }
-
-        private bool _visible = true;
-        public bool Visible
-        {
-            get => _visible;
-            set => SetAndNotify(ref _visible, value);
-        }
+		public bool Visible
+		{
+			get;
+			set;
+		} = true;
 
         internal IUIModifiableContainer<VerticalBoxSlot> InternalHolder { get; }
         public IUIContainer Parent => InternalHolder;
 
-        private UIComponent _component;
         public UIComponent Component
         {
-            get => _component;
-            private set => SetAndNotify(ref _component, value);
+            get;
+            private set;
         }
 
         public SolidBrushD2D DebugBrush => new SolidBrushD2D(new Color4(0, 1.0f, 0, 1.0f));
@@ -112,10 +98,11 @@ namespace Fusion.Engine.Frames2.Containers
         }
 
         public event EventHandler<SlotAttachmentChangedEventArgs> ComponentAttached;
+		public event PropertyChangedEventHandler PropertyChanged;
 
-        #endregion
+		#endregion
 
-        public override string ToString() => $"VerticalBoxSlot with {Component}";
+		public override string ToString() => $"VerticalBoxSlot with {Component}";
     }
 
     public enum HorizontalAlignment
@@ -123,7 +110,7 @@ namespace Fusion.Engine.Frames2.Containers
         Left, Center, Right
     }
 
-    public class VerticalBox : PropertyChangedHelper, IUIModifiableContainer<VerticalBoxSlot>
+    public class VerticalBox : IUIModifiableContainer<VerticalBoxSlot>
     {
         private readonly AsyncObservableCollection<VerticalBoxSlot> _slots = new AsyncObservableCollection<VerticalBoxSlot>();
         public IEnumerable<ISlot> Slots => _slots;
@@ -140,11 +127,13 @@ namespace Fusion.Engine.Frames2.Containers
 		private readonly object _childrenAccessLock = new object();
 		public object ChildrenAccessLock => _childrenAccessLock;
 
-		private HorizontalAlignment _alignment;
-        public HorizontalAlignment Alignment
+
+		public event PropertyChangedEventHandler PropertyChanged;
+
+		public HorizontalAlignment Alignment
         {
-            get => _alignment;
-            set => SetAndNotify(ref _alignment, value);
+            get;
+            set;
         }
 
         public bool IsInside(Vector2 point) => Placement.IsInside(point);
@@ -240,9 +229,24 @@ namespace Fusion.Engine.Frames2.Containers
             if (slot == null)
                 return false;
 
-            slot.Attach(null);
+			_slots.Remove(slot);
+			slot.Component.Placement = null;
 
-            return true;
+			var handler = slot.GetType().GetField("PropertyChanged", BindingFlags.NonPublic | BindingFlags.Instance).GetValue(slot) as Delegate;
+			if (handler == null)
+			{
+				//no subscribers
+			}
+			else
+			{
+				foreach (var subscriber in handler.GetInvocationList())
+				{
+					slot.PropertyChanged -= subscriber as PropertyChangedEventHandler;
+				}
+				//now you have the subscribers
+			}
+
+			return true;
         }
 
 		public void DefaultInit()

@@ -22,7 +22,7 @@ namespace WpfEditorTest.WPFConverters
 		public override DataTemplate SelectTemplate( object item, DependencyObject container )
 		{
 			var content = (item as ISlot).Component;
-			if (content.GetType().IsSubclassOf(typeof(UIController<IControllerSlot>)))
+			if (GenericHelper.IsSubclassOfRawGeneric(typeof(UIController<IControllerSlot>), content.GetType()))
 				return tvControllerTemplate;
 
 			if (content is IUIModifiableContainer<ISlot> ctr)
@@ -34,6 +34,23 @@ namespace WpfEditorTest.WPFConverters
 			//if (content is ISlot)
 				return tvComponentTemplate;
 
+		}
+
+		public static class GenericHelper
+		{
+			internal static bool IsSubclassOfRawGeneric( Type generic, Type toCheck )
+			{
+				while (toCheck != null && toCheck != typeof(object))
+				{
+					var cur = toCheck.IsGenericType ? toCheck.GenericTypeArguments.FirstOrDefault() : toCheck;
+					if (cur != null && cur.GetInterfaces().Contains(typeof(IControllerSlot)))
+					{
+						return true;
+					}
+					toCheck = toCheck.BaseType;
+				}
+				return false;
+			}
 		}
 	}
 }

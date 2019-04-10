@@ -10,6 +10,7 @@ using Fusion.Engine.Frames;
 using Matrix3x2 = Fusion.Core.Mathematics.Matrix3x2;
 using Fusion.Engine.Frames2.Managing;
 using Fusion.Engine.Frames2.Containers;
+using WpfEditorTest.FrameSelection;
 
 namespace WpfEditorTest.ChildPanels
 {
@@ -34,8 +35,8 @@ namespace WpfEditorTest.ChildPanels
 			set
 			{
 				if (_selectedFrame != null)
-				{ 
-					_selectedFrame.PropertyChanged -= ComponentDimensionsChange;
+				{
+					SelectionManager.Instance.UIComponentUpdated -= ComponentDimensionsChange;
 					_selectedFrame.Placement.PropertyChanged -= SlotDimensionsChange;
 				}
 
@@ -59,82 +60,29 @@ namespace WpfEditorTest.ChildPanels
 
 				//UpdateVisualAnchors(_selectedFrame.Anchor);
 
-				_selectedFrame.PropertyChanged += ComponentDimensionsChange;
+				SelectionManager.Instance.UIComponentUpdated += ComponentDimensionsChange;
 				_selectedFrame.Placement.PropertyChanged += SlotDimensionsChange;
 			}
 		}
 
-		private void ComponentDimensionsChange( object sender, PropertyChangedEventArgs args )
+		private void ComponentDimensionsChange( object sender, UIComponent component )
 		{
-		    var selected = _selectedFrame;
-            if (_locked || selected == null) return;
+			var selected = _selectedFrame;
+			if (_locked || selected == null) return;
 
-		    Application.Current.Dispatcher.InvokeAsync(() =>
-		    {
+			Application.Current.Dispatcher.InvokeAsync(() =>
+			{
 				var globalTransform = _uiManager.GlobalTransform(selected.Placement);
 
-				switch (args.PropertyName)
-		        {
-		            //case "Width":
-		            //{
-		            //    WidthBuffer = selected.Placement.Width * Math.Sign(globalTransform.M11);
-		            //    break;
-		            //}
-		            //case "Height":
-		            //{
-		            //    HeightBuffer = selected.Placement.Height * Math.Sign(globalTransform.M22);
-		            //    break;
-		            //}
-		            case "Parent":
-		            {
-                        var transform = new MatrixTransform(globalTransform.M11, globalTransform.M12,
-															globalTransform.M21, globalTransform.M22,
-															globalTransform.M31, globalTransform.M32);
-                        RenderTransform = transform;
+				var transform = new MatrixTransform(globalTransform.M11, globalTransform.M12,
+													globalTransform.M21, globalTransform.M22,
+													globalTransform.M31, globalTransform.M32);
+				RenderTransform = transform;
 
-                        _oldX = RenderTransform.Value.OffsetX;
-		                _oldY = RenderTransform.Value.OffsetY;
-		                break;
-		            }
-     //               case "Angle":
-     //               {
-     //                   var transform = new MatrixTransform(globalTransform.M11, globalTransform.M12,
-					//										globalTransform.M21, globalTransform.M22,
-					//										globalTransform.M31, globalTransform.M32);
-     //                   RenderTransform = transform;
-     //                   _oldX = RenderTransform.Value.OffsetX;
-     //                   _oldY = RenderTransform.Value.OffsetY;
-     //                   break;
-     //               }
-					//case "Transform":
-					//	{
-					//		var transform = new MatrixTransform(globalTransform.M11, globalTransform.M12,
-					//											globalTransform.M21, globalTransform.M22,
-					//											globalTransform.M31, globalTransform.M32);
-					//		RenderTransform = transform;
-					//		_oldX = RenderTransform.Value.OffsetX;
-					//		_oldY = RenderTransform.Value.OffsetY;
-					//		break;
-					//	}
-					//case "X":
-     //               case "Y":
-     //               {
-     //                   var transform = new TransformGroup();
-     //                   var transformDelta = new TranslateTransform(globalTransform.M31 - RenderTransform.Value.OffsetX, globalTransform.M32 - RenderTransform.Value.OffsetY);
-     //                   transform.Children.Add(RenderTransform);
-     //                   transform.Children.Add(transformDelta);
-     //                   RenderTransform = transform;
-     //                   _oldX = RenderTransform.Value.OffsetX;
-     //                   _oldY = RenderTransform.Value.OffsetY;
-     //                   break;
-     //               }
-		            case "Anchor":
-		            {
-		                //UpdateVisualAnchors(selected.Anchor);
-		                break;
-		            }
-		        }
-		    });
+				_oldX = RenderTransform.Value.OffsetX;
+				_oldY = RenderTransform.Value.OffsetY;
+
+			});
 		}
 
 		private void SlotDimensionsChange( object sender, PropertyChangedEventArgs args )
@@ -146,56 +94,24 @@ namespace WpfEditorTest.ChildPanels
 			{
 				var globalTransform = _uiManager.GlobalTransform(selected.Placement);
 
-				switch (args.PropertyName)
-				{
-					case "Width":
-						{
-							WidthBuffer = selected.Placement.Width * Math.Sign(globalTransform.M11);
-							break;
-						}
-					case "Height":
-						{
-							HeightBuffer = selected.Placement.Height * Math.Sign(globalTransform.M22);
-							break;
-						}
-					case "Angle":
-						{
-							var transform = new MatrixTransform(globalTransform.M11, globalTransform.M12,
-																globalTransform.M21, globalTransform.M22,
-																globalTransform.M31, globalTransform.M32);
-							RenderTransform = transform;
-							_oldX = RenderTransform.Value.OffsetX;
-							_oldY = RenderTransform.Value.OffsetY;
-							break;
-						}
-					case "Transform":
-						{
-							var transform = new MatrixTransform(globalTransform.M11, globalTransform.M12,
-																globalTransform.M21, globalTransform.M22,
-																globalTransform.M31, globalTransform.M32);
-							RenderTransform = transform;
-							_oldX = RenderTransform.Value.OffsetX;
-							_oldY = RenderTransform.Value.OffsetY;
-							break;
-						}
-					case "X":
-					case "Y":
-						{
-							var transform = new TransformGroup();
-							var transformDelta = new TranslateTransform(globalTransform.M31 - RenderTransform.Value.OffsetX, globalTransform.M32 - RenderTransform.Value.OffsetY);
-							transform.Children.Add(RenderTransform);
-							transform.Children.Add(transformDelta);
-							RenderTransform = transform;
-							_oldX = RenderTransform.Value.OffsetX;
-							_oldY = RenderTransform.Value.OffsetY;
-							break;
-						}
-					case "Anchor":
-						{
-							//UpdateVisualAnchors(selected.Anchor);
-							break;
-						}
-				}
+				WidthBuffer = selected.Placement.Width * Math.Sign(globalTransform.M11);
+				HeightBuffer = selected.Placement.Height * Math.Sign(globalTransform.M22);
+
+				var transform = new MatrixTransform(globalTransform.M11, globalTransform.M12,
+													globalTransform.M21, globalTransform.M22,
+													globalTransform.M31, globalTransform.M32);
+				RenderTransform = transform;
+				_oldX = RenderTransform.Value.OffsetX;
+				_oldY = RenderTransform.Value.OffsetY;
+
+				////var transform = new TransformGroup();
+				////var transformDelta = new TranslateTransform(globalTransform.M31 - RenderTransform.Value.OffsetX, globalTransform.M32 - RenderTransform.Value.OffsetY);
+				////transform.Children.Add(RenderTransform);
+				////transform.Children.Add(transformDelta);
+				//RenderTransform = transform;
+				//_oldX = RenderTransform.Value.OffsetX;
+				//_oldY = RenderTransform.Value.OffsetY;
+
 			});
 		}
 

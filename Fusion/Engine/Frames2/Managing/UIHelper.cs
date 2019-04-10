@@ -6,36 +6,36 @@ using System.Runtime.CompilerServices;
 
 namespace Fusion.Engine.Frames2.Managing
 {
-    public abstract class PropertyChangedHelper
-    {
-        #region PropertyChaged implementation
-        public event PropertyChangedEventHandler PropertyChanged;
+    //public abstract class PropertyChangedHelper
+    //{
+    //    #region PropertyChaged implementation
+    //    public event PropertyChangedEventHandler PropertyChanged;
 
-        /// <summary>
-        /// Sets field with new value and fires <seealso cref="PropertyChanged"/> event if provided value is different from the old one.
-        /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="field">Private field to set.</param>
-        /// <param name="value">New value.</param>
-        /// <param name="propertyName">Name that will be passed in a PropertyChanged event.</param>
-        /// <returns>True if new value is different and PropertyChanged event was fired, false otherwise.</returns>
-        protected bool SetAndNotify<T>(ref T field, T value, [CallerMemberName] string propertyName = null)
-        {
-            if (EqualityComparer<T>.Default.Equals(field, value))
-                return false;
+    //    /// <summary>
+    //    /// Sets field with new value and fires <seealso cref="PropertyChanged"/> event if provided value is different from the old one.
+    //    /// </summary>
+    //    /// <typeparam name="T"></typeparam>
+    //    /// <param name="field">Private field to set.</param>
+    //    /// <param name="value">New value.</param>
+    //    /// <param name="propertyName">Name that will be passed in a PropertyChanged event.</param>
+    //    /// <returns>True if new value is different and PropertyChanged event was fired, false otherwise.</returns>
+    //    protected bool SetAndNotify<T>(ref T field, T value, [CallerMemberName] string propertyName = null)
+    //    {
+    //        if (EqualityComparer<T>.Default.Equals(field, value))
+    //            return false;
 
-            field = value;
-            NotifyPropertyChanged(propertyName);
+    //        field = value;
+    //        NotifyPropertyChanged(propertyName);
 
-            return true;
-        }
+    //        return true;
+    //    }
 
-        protected void NotifyPropertyChanged([CallerMemberName] string propertyName = null)
-        {
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
-        }
-        #endregion
-    }
+    //    protected void NotifyPropertyChanged([CallerMemberName] string propertyName = null)
+    //    {
+    //        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+    //    }
+    //    #endregion
+    //}
 
     public static class UIHelper
     {
@@ -150,7 +150,24 @@ namespace Fusion.Engine.Frames2.Managing
             }
         }
 
-        public static IEnumerable<IUIContainer> Ancestors(UIComponent component)
+		public static UIComponent GetComponentInChildren( UIManager manager, IUIContainer root, Vector2 innerPoint )
+		{
+			return GetComponentInChildren(manager, root, innerPoint, new List<UIComponent>());
+		}
+
+		public static UIComponent GetComponentInChildren( UIManager manager, IUIContainer root, Vector2 innerPoint, List<UIComponent> ignoreComponents )
+		{
+			if (!InsideComponent(manager, root, innerPoint)) return null;
+
+			var container = root;
+			var component = container.Slots.Where(c => !ignoreComponents.Contains(c.Component))
+				.FirstOrDefault(c => InsideComponent(manager, c.Component, innerPoint))?
+				.Component;
+
+				return component;
+		}
+
+		public static IEnumerable<IUIContainer> Ancestors(UIComponent component)
         {
             if(component == null)
                 yield break;

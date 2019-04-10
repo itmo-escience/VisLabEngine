@@ -8,103 +8,80 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 
 namespace Fusion.Engine.Frames2.Containers
 {
-	public class AnchorBoxSlot : PropertyChangedHelper, ISlotAttachable
+	public class AnchorBoxSlot : ISlotAttachable
 	{
 		internal AnchorBoxSlot( AnchorBox holder, float x, float y, float width, float height )
 		{
 			InternalHolder = holder;
-			_x = x;
-			_y = y;
-			_width = width;
-			_height = height;
+			X = x;
+			Y = y;
+			Width = width;
+			Height = height;
 		}
 
-		public enum Fixator
-		{
-			Left,Top,Right,Bottom
-		}
-
-		public Dictionary<Fixator, float> Fixators = new Dictionary<Fixator, float>()
-		{
-			{ Fixator.Left, -1 },
-			{ Fixator.Top, -1 },
-			{ Fixator.Right, -1 },
-			{ Fixator.Bottom, -1 },
-		};
+		public Fixators Fixators { get; set; } = new Fixators();
 
 		#region ISlot
-		private float _x;
 		public float X
 		{
-			get => _x;
-			set => SetAndNotify(ref _x, value);
+			get;
+			set;
 		}
 
-		private float _y;
 		public float Y
 		{
-			get => _y;
-			set => SetAndNotify(ref _y, value);
+			get;
+			set;
 		}
 
-		private float _angle;
 		public float Angle
 		{
-			get => _angle;
-			set => SetAndNotify(ref _angle, value);
+			get;
+			set;
 		}
 
-		private float _width;
 		public float Width
 		{
-			get => _width;
-			internal set => SetAndNotify(ref _width, value);
+			get;
+			internal set;
 		}
 
-		private float _height;
 		public float Height
 		{
-			get => _height;
-			internal set => SetAndNotify(ref _height, value);
+			get;
+			internal set;
 		}
 
 		public float AvailableWidth => MathUtil.Clamp(Parent.Placement.Width - X, 0, float.MaxValue);
 		public float AvailableHeight => MathUtil.Clamp(Parent.Placement.Height - Y, 0, float.MaxValue);
 
 		private Matrix3x2 _transform = Matrix3x2.Identity;
-		public Matrix3x2 Transform
-		{
-			get => _transform;
-			set => SetAndNotify(ref _transform, value);
-		}
 
-		private bool _clip = true;
 		public bool Clip
 		{
-			get => _clip;
-			set => SetAndNotify(ref _clip, value);
-		}
+			get;
+			set;
+		} = true;
 
-		private bool _visible = true;
 		public bool Visible
 		{
-			get => _visible;
-			set => SetAndNotify(ref _visible, value);
-		}
+			get;
+			set;
+		} = true;
 
 		internal IUIModifiableContainer<AnchorBoxSlot> InternalHolder { get; }
 		public IUIContainer Parent => InternalHolder;
 
-		private UIComponent _component;
 		public UIComponent Component
 		{
-			get => _component;
-			private set => SetAndNotify(ref _component, value);
+			get;
+			private set;
 		}
 
 		public SolidBrushD2D DebugBrush => new SolidBrushD2D(new Color4(0, 1.0f, 0, 1.0f));
@@ -127,11 +104,20 @@ namespace Fusion.Engine.Frames2.Containers
 		}
 
 		public event EventHandler<SlotAttachmentChangedEventArgs> ComponentAttached;
+		public event PropertyChangedEventHandler PropertyChanged;
 
 		#endregion
 
-		public override string ToString() => $"FreePlacementSlot with {Component}";
+		public override string ToString() => $"AnchorSlot with {Component}";
 	}
+
+	public class Fixators
+	{
+		public float Left = -1;
+		public float Top = -1;
+		public float Right = -1;
+		public float Bottom = -1;
+	};
 
 	public class AnchorBox : IUIModifiableContainer<AnchorBoxSlot>
 	{
@@ -156,43 +142,43 @@ namespace Fusion.Engine.Frames2.Containers
 		{
 			foreach (var slot in _slots)
 			{
-				if (slot.Fixators[AnchorBoxSlot.Fixator.Left] >= 0)
+				if (slot.Fixators.Left >= 0)
 				{
-					slot.X = slot.Fixators[AnchorBoxSlot.Fixator.Left];
-					if (slot.Fixators[AnchorBoxSlot.Fixator.Right] >= 0)
-						slot.Width = DesiredWidth - slot.Fixators[AnchorBoxSlot.Fixator.Left] - slot.Fixators[AnchorBoxSlot.Fixator.Right];
+					slot.X = slot.Fixators.Left;
+					if (slot.Fixators.Right >= 0)
+						slot.Width = DesiredWidth - slot.Fixators.Left - slot.Fixators.Right;
 					else
 						slot.Width = slot.Component.DesiredWidth;
 				}
 				else
 				{
-					if (slot.Fixators[AnchorBoxSlot.Fixator.Right] >= 0)
-						slot.X = DesiredWidth - slot.Fixators[AnchorBoxSlot.Fixator.Right] - slot.Component.DesiredWidth;
+					if (slot.Fixators.Right >= 0)
+						slot.X = DesiredWidth - slot.Fixators.Right - slot.Component.DesiredWidth;
 					else
 					{
-						slot.Fixators[AnchorBoxSlot.Fixator.Left] = 0;
-						slot.X = slot.Fixators[AnchorBoxSlot.Fixator.Left];
+						slot.Fixators.Left = 0;
+						slot.X = slot.Fixators.Left;
 					}
 					slot.Width = slot.Component.DesiredWidth;
 				}
 
 
-				if (slot.Fixators[AnchorBoxSlot.Fixator.Top] >= 0)
+				if (slot.Fixators.Top >= 0)
 				{
-					slot.Y = slot.Fixators[AnchorBoxSlot.Fixator.Top];
-					if (slot.Fixators[AnchorBoxSlot.Fixator.Bottom] >= 0)
-						slot.Height = DesiredHeight - slot.Fixators[AnchorBoxSlot.Fixator.Top] - slot.Fixators[AnchorBoxSlot.Fixator.Bottom];
+					slot.Y = slot.Fixators.Top;
+					if (slot.Fixators.Bottom >= 0)
+						slot.Height = DesiredHeight - slot.Fixators.Top - slot.Fixators.Bottom;
 					else
 						slot.Height = slot.Component.DesiredHeight;
 				}
 				else
 				{
-					if (slot.Fixators[AnchorBoxSlot.Fixator.Bottom] >= 0)
-						slot.Y = DesiredHeight - slot.Fixators[AnchorBoxSlot.Fixator.Bottom] - slot.Component.DesiredHeight;
+					if (slot.Fixators.Bottom >= 0)
+						slot.Y = DesiredHeight - slot.Fixators.Bottom - slot.Component.DesiredHeight;
 					else
 					{
-						slot.Fixators[AnchorBoxSlot.Fixator.Top] = 0;
-						slot.X = slot.Fixators[AnchorBoxSlot.Fixator.Top];
+						slot.Fixators.Top = 0;
+						slot.X = slot.Fixators.Top;
 					}
 					slot.Height = slot.Component.DesiredHeight;
 				}
@@ -258,7 +244,22 @@ namespace Fusion.Engine.Frames2.Containers
 			if (slot == null)
 				return false;
 
-			slot.Attach(null);
+			_slots.Remove(slot);
+			slot.Component.Placement = null;
+
+			var handler = slot.GetType().GetField("PropertyChanged", BindingFlags.NonPublic | BindingFlags.Instance).GetValue(slot) as Delegate;
+			if (handler == null)
+			{
+				//no subscribers
+			}
+			else
+			{
+				foreach (var subscriber in handler.GetInvocationList())
+				{
+					slot.PropertyChanged -= subscriber as PropertyChangedEventHandler;
+				}
+				//now you have the subscribers
+			}
 
 			return true;
 		}
