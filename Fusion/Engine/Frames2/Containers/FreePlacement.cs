@@ -202,6 +202,8 @@ namespace Fusion.Engine.Frames2.Containers
         public void ReadXml(XmlReader reader)
         {
             Name = reader.GetAttribute("Name");
+            DesiredWidth = float.Parse(reader.GetAttribute("DesiredWidth"));
+            DesiredHeight = float.Parse(reader.GetAttribute("DesiredHeight"));
             reader.ReadStartElement("FreePlacement");
             reader.ReadStartElement("Slots");
 
@@ -237,6 +239,8 @@ namespace Fusion.Engine.Frames2.Containers
         public void WriteXml(XmlWriter writer)
         {
             writer.WriteAttributeString("Name", Name);
+            writer.WriteAttributeString("DesiredWidth", DesiredWidth.ToString());
+            writer.WriteAttributeString("DesiredHeight", DesiredHeight.ToString());
             writer.WriteStartElement("Slots");
 
             foreach (var slot in _slots)
