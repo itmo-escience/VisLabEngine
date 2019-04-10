@@ -170,7 +170,7 @@ namespace GISTest
                 Name = "ImageVerticalBox",
                 DesiredWidth = 500,
                 DesiredHeight = 800,
-                Alignment = HorizontalAlignment.Center
+                Alignment = Fusion.Engine.Frames2.Containers.HorizontalAlignment.Center
             };
 
             var imgFpSlot = UIManager.Root.Insert(imgVerticalBox, 0);
@@ -197,6 +197,7 @@ namespace GISTest
 		    labelFpSlot.Angle = 0.3f;
 
             var text = new Label("Hello, world!", "Calibri", 50);
+            text.TextColor = new Color4(new Vector3(1, 0, 1));
 		    var textSlot = labelFreePlacement.Insert(text, 0);
 		    textSlot.X = 10;
 		    textSlot.Y = 200;
@@ -276,7 +277,7 @@ namespace GISTest
 		    btn.DesiredWidth = 100;
 		    btn.DesiredHeight = 100;
 			btn.Background.Attach(new Border() {DesiredWidth = 100, DesiredHeight = 100});
-            btn.Foreground.Attach(new Label("Button", new TextFormatD2D("Calibry", 15)));
+            btn.Foreground.Attach(new Label("Button", new TextFormatD2D("Calibry", 15, VertialAlignment.Center, Fusion.Engine.Graphics.SpritesD2D.HorizontalAlignment.Center)));
 
             var btnSlot = UIManager.Root.Insert(btn, 0);
 		    btnSlot.X = 100;
@@ -296,7 +297,7 @@ namespace GISTest
                 Name = "RadioButtonsVerticalBox",
                 DesiredWidth = 100,
                 DesiredHeight = 100,
-                Alignment = HorizontalAlignment.Left
+                Alignment = Fusion.Engine.Frames2.Containers.HorizontalAlignment.Left
             };
 
             rbVerticalBox.Insert(rb1, 0);

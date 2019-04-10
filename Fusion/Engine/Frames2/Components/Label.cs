@@ -39,7 +39,11 @@ namespace Fusion.Engine.Frames2.Components
         public bool AutoSize
         {
             get => _autoSize;
-            set => _autoSize = value;
+            set
+            {
+                _autoSize = value;
+                _isDirtyLayout = true;
+            }
         }
 
         private float _desiredWidth = -1;
@@ -89,6 +93,17 @@ namespace Fusion.Engine.Frames2.Components
             }
         }
 
+        private Color4 _textColor = Color4.White;
+        public Color4 TextColor
+        {
+            get => _textColor;
+            set
+            {
+                _textColor = value;
+                _isDirtyLayout = true;
+            }
+        }
+
         private LayoutedText _textCommand;
 
         private bool _isDirtyLayout;
@@ -122,7 +137,7 @@ namespace Fusion.Engine.Frames2.Components
                 _textLayout = new TextLayoutD2D(_text, _textFormat, Placement.Width, Placement.Height);
             }
 
-            _textCommand = new LayoutedText(new Vector2(), _textLayout, new SolidBrushD2D(Color4.White));
+            _textCommand = new LayoutedText(new Vector2(), _textLayout, new SolidBrushD2D(TextColor));
 
             _isDirtyLayout = false;
         }
