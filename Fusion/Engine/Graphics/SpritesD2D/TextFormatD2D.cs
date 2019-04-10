@@ -1,13 +1,16 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Xml;
+using System.Xml.Schema;
+using System.Xml.Serialization;
 using SharpDX.DirectWrite;
 
 namespace Fusion.Engine.Graphics.SpritesD2D
 {
-    public class TextFormatD2D : IEquatable<TextFormatD2D>
+    public class TextFormatD2D : IEquatable<TextFormatD2D>, IXmlSerializable
     {
-        public string FontFamily { get; }
-        public float Size { get; }
+        public string FontFamily { get; private set; }
+        public float Size { get; private set; }
 
         public TextFormatD2D() { }
 
@@ -38,6 +41,23 @@ namespace Fusion.Engine.Graphics.SpritesD2D
             {
                 return ((FontFamily != null ? FontFamily.GetHashCode() : 0) * 397) ^ Size.GetHashCode();
             }
+        }
+
+        public XmlSchema GetSchema()
+        {
+            return null;
+        }
+
+        public void ReadXml(XmlReader reader)
+        {
+            FontFamily = reader.GetAttribute("FontFamily");
+            Size = float.Parse(reader.GetAttribute("Size"));
+        }
+
+        public void WriteXml(XmlWriter writer)
+        {
+            writer.WriteAttributeString("FontFamily", FontFamily);
+            writer.WriteAttributeString("Size", Size.ToString());
         }
     }
 

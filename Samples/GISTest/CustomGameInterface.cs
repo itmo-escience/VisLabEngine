@@ -165,30 +165,24 @@ namespace GISTest
             img1 = new Image(image);
             img2 = new Image(image);
 
-            /*var imgVerticalBox = new VerticalBox()
+            var imgVerticalBox = new VerticalBox()
             {
                 Name = "ImageVerticalBox",
                 DesiredWidth = 500,
                 DesiredHeight = 800,
                 Alignment = HorizontalAlignment.Center
-            };*/
-            var imgFreePlacement = new FreePlacement()
-            {
-                Name = "ImageFreePlacement",
-                DesiredWidth = 500,
-                DesiredHeight = 800
             };
 
-            var imgFpSlot = UIManager.Root.Insert(imgFreePlacement, 0);
+            var imgFpSlot = UIManager.Root.Insert(imgVerticalBox, 0);
             imgFpSlot.X = 50;
             imgFpSlot.Y = 50;
 
-            var slot = imgFreePlacement.Insert(img1, 0);
+            var slot = imgVerticalBox.Insert(img1, 0);
             img1.DesiredWidth = 250;
             img1.DesiredHeight = 50;
 
 
-            var slot2 = imgFreePlacement.Insert(img2, 0);
+            var slot2 = imgVerticalBox.Insert(img2, 0);
             img2.DesiredWidth = 450;
             img2.DesiredHeight = 250;
 
@@ -242,8 +236,34 @@ namespace GISTest
 		    labelFreePlacement.Events.Click += (sender, args) => Log.Message("Label Container click");
 			//----------
 
-            string str = UIComponentSerializer.WriteToString(imgFreePlacement);
+            #region UISerializationTesting
+
+            var testFreePlasement = new FreePlacement()
+            {
+                Name = "TestFreePlasement",
+                DesiredWidth = 500,
+                DesiredHeight = 500,
+            };
+
+            var testImage = new Image(image);
+            var testText = new Label("TestText", "Calibri", 14);
+            var testBorder = new Border();
+
+            var testImageSlot = testFreePlasement.Insert(testImage, 0);
+            var testTextSlot = testFreePlasement.Insert(testText, 1);
+            var testBorderSlot = testFreePlasement.Insert(testBorder, 2);
+
+            testImageSlot.X = 10;
+            testImageSlot.Y = 10;
+            testTextSlot.X = 20;
+            testTextSlot.Y = 20;
+            testBorderSlot.X = 30;
+            testBorderSlot.Y = 30;
+
+            string str = UIComponentSerializer.WriteToString(testFreePlasement);
             var comp = UIComponentSerializer.ReadFromString(str);
+
+            #endregion
 
 			#endregion
 
