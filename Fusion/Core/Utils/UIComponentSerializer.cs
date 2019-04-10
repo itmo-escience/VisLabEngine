@@ -17,6 +17,7 @@ namespace Fusion.Core.Utils
 		public const string SerializerVersion = "1.6";
 
 		public static List<Type> frameTypes = new List<Type>();
+        public static Dictionary<Type, XmlSerializer> Serializers = new Dictionary<Type, XmlSerializer>();
 
 		public static void Write(UIComponent src, string filename )
 		{
@@ -104,13 +105,25 @@ namespace Fusion.Core.Utils
 
         public static void WriteValue(XmlWriter writer, object value)
         {
-            var serializer = new XmlSerializer(value.GetType());
+            var type = value.GetType();
+            if (!Serializers.ContainsKey(type))
+            {
+                Serializers.Add(type, new XmlSerializer(type));
+            }
+
+            var serializer = Serializers[type];
             serializer.Serialize(writer, value, new XmlSerializerNamespaces(new []{ XmlQualifiedName.Empty }));
         }
 
         public static T ReadValue<T>(XmlReader writer)
         {
-            var serializer = new XmlSerializer(typeof(T));
+            var type = typeof(T);
+            if (!Serializers.ContainsKey(type))
+            {
+                Serializers.Add(type, new XmlSerializer(type));
+            }
+
+            var serializer = Serializers[type];
             return (T)serializer.Deserialize(writer);
         }
 	}
