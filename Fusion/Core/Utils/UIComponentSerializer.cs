@@ -17,7 +17,8 @@ namespace Fusion.Core.Utils
 		public const string SerializerVersion = "1.6";
 
 		public static List<Type> frameTypes = new List<Type>();
-        public static Dictionary<Type, XmlSerializer> Serializers = new Dictionary<Type, XmlSerializer>();
+
+        private static XmlSerializer _formatter = SerializersStorage.GetSerializer(typeof(SeralizableObjectHolder));
 
 		public static void Write(UIComponent src, string filename )
 		{
@@ -25,13 +26,10 @@ namespace Fusion.Core.Utils
 
 			SeralizableObjectHolder holder = new SeralizableObjectHolder(src);
 
-			// передаем в конструктор тип класса
-			XmlSerializer formatter = new XmlSerializer(typeof(SeralizableObjectHolder));
-
 			// получаем поток, куда будем записывать сериализованный объект
 			using (FileStream fs = new FileStream(filename, FileMode.Create, FileAccess.Write))
 			{
-				formatter.Serialize(fs, holder);
+				_formatter.Serialize(fs, holder);
 				Console.WriteLine("Объект сериализован");
 			}
 		}
@@ -42,13 +40,10 @@ namespace Fusion.Core.Utils
 
 			SeralizableObjectHolder holder = new SeralizableObjectHolder(src);
 
-			// передаем в конструктор тип класса
-			XmlSerializer formatter = new XmlSerializer(typeof(SeralizableObjectHolder));
-
 			// получаем поток, куда будем записывать сериализованный объект
 			using (StringWriter sw = new StringWriter())
 			{
-				formatter.Serialize(sw, holder);
+				_formatter.Serialize(sw, holder);
 				Console.WriteLine("Объект сериализован в строку");
 				return sw.ToString();
 			}
@@ -72,11 +67,10 @@ namespace Fusion.Core.Utils
 		public static UIComponent Read(string filename, out UIComponent destination )
 		{
 			destination = null;
-			XmlSerializer formatter = new XmlSerializer(typeof(SeralizableObjectHolder));
 			// десериализация
 			using (FileStream fs = new FileStream(filename, FileMode.OpenOrCreate))
 			{
-				var holder = (SeralizableObjectHolder)formatter.Deserialize(fs);
+				var holder = (SeralizableObjectHolder)_formatter.Deserialize(fs);
 				destination = holder.SerializableFrame;
                 /*if (destination is UIContainer container)
                 {
@@ -89,11 +83,10 @@ namespace Fusion.Core.Utils
 		public static UIComponent ReadFromString(string xmlFrame)
 		{
             UIComponent destination = null;
-			XmlSerializer formatter = new XmlSerializer(typeof(SeralizableObjectHolder));
 			// десериализация
 			using (StringReader sr = new StringReader(xmlFrame))
 			{
-				var holder = (SeralizableObjectHolder)formatter.Deserialize(sr);
+				var holder = (SeralizableObjectHolder)_formatter.Deserialize(sr);
 				destination = holder.SerializableFrame;
                 /*if (destination is UIContainer container)
                 {
@@ -105,25 +98,13 @@ namespace Fusion.Core.Utils
 
         public static void WriteValue(XmlWriter writer, object value)
         {
-            var type = value.GetType();
-            if (!Serializers.ContainsKey(type))
-            {
-                Serializers.Add(type, new XmlSerializer(type));
-            }
-
-            var serializer = Serializers[type];
+            var serializer = SerializersStorage.GetSerializer(value.GetType());
             serializer.Serialize(writer, value, new XmlSerializerNamespaces(new []{ XmlQualifiedName.Empty }));
         }
 
         public static T ReadValue<T>(XmlReader writer)
         {
-            var type = typeof(T);
-            if (!Serializers.ContainsKey(type))
-            {
-                Serializers.Add(type, new XmlSerializer(type));
-            }
-
-            var serializer = Serializers[type];
+            var serializer = SerializersStorage.GetSerializer(typeof(T));
             return (T)serializer.Deserialize(writer);
         }
 	}
@@ -153,7 +134,7 @@ namespace Fusion.Core.Utils
 
 		public void ReadXml( XmlReader reader )
 		{
-			var stringSerializer = new XmlSerializer(typeof(string));
+			var stringSerializer = SerializersStorage.GetSerializer(typeof(string));
 			reader.ReadStartElement("SeralizableObjectHolder");
 
 		    var version = (string)stringSerializer.Deserialize(reader);
@@ -170,7 +151,7 @@ namespace Fusion.Core.Utils
 			var assembly = Assembly.Load(FrameAssemblyName);
 			var frameType = assembly.GetType(FrameTypeName);
 
-			var frameSerializer = new XmlSerializer(frameType);
+			var frameSerializer = SerializersStorage.GetSerializer(frameType);
 
 			var frame = (UIComponent)frameSerializer.Deserialize(reader);
 			SerializableFrame = frame;
@@ -183,8 +164,8 @@ namespace Fusion.Core.Utils
 			var assembly = Assembly.Load(FrameAssemblyName);
             var frameType = assembly.GetType(FrameTypeName);
 
-			XmlSerializer frameSerializer = new XmlSerializer(frameType);
-			XmlSerializer stringSerializer = new XmlSerializer(typeof(string));
+			XmlSerializer frameSerializer = SerializersStorage.GetSerializer(frameType);
+			XmlSerializer stringSerializer = SerializersStorage.GetSerializer(typeof(string));
 
             stringSerializer.Serialize(writer, Version);
             stringSerializer.Serialize(writer, FrameTypeName);
@@ -203,8 +184,8 @@ namespace Fusion.Core.Utils
 
 		public void ReadXml( System.Xml.XmlReader reader )
 		{
-			XmlSerializer keySerializer = new XmlSerializer(typeof(TKey));
-			XmlSerializer valueSerializer = new XmlSerializer(typeof(TValue));
+			XmlSerializer keySerializer = SerializersStorage.GetSerializer(typeof(TKey));
+			XmlSerializer valueSerializer = SerializersStorage.GetSerializer(typeof(TValue));
 
 			bool wasEmpty = reader.IsEmptyElement;
 			reader.Read();
@@ -234,8 +215,8 @@ namespace Fusion.Core.Utils
 
 		public void WriteXml( System.Xml.XmlWriter writer )
 		{
-			XmlSerializer keySerializer = new XmlSerializer(typeof(TKey));
-			XmlSerializer valueSerializer = new XmlSerializer(typeof(TValue));
+			XmlSerializer keySerializer = SerializersStorage.GetSerializer(typeof(TKey));
+			XmlSerializer valueSerializer = SerializersStorage.GetSerializer(typeof(TValue));
 
 			foreach (TKey key in this.Keys)
 			{
@@ -254,4 +235,19 @@ namespace Fusion.Core.Utils
 			}
 		}
 	}
+
+    public class SerializersStorage
+    {
+        private static readonly Dictionary<Type, XmlSerializer> _serializers = new Dictionary<Type, XmlSerializer>();
+
+        public static XmlSerializer GetSerializer(Type type)
+        {
+            if (!_serializers.ContainsKey(type))
+            {
+                _serializers.Add(type, new XmlSerializer(type));
+            }
+
+            return _serializers[type];
+        }
+    }
 }

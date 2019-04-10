@@ -120,7 +120,7 @@ namespace Fusion.Core.Utils
             if (wasEmpty)
                 return;
 
-            XmlSerializer typesSerializer = new XmlSerializer(typeof(SerializableDictionary<string, string>));
+            XmlSerializer typesSerializer = SerializersStorage.GetSerializer(typeof(SerializableDictionary<string, string>));
             var types = (SerializableDictionary<string, string>)typesSerializer.Deserialize(reader);
 
             var frameTypes = new List<Type>();
@@ -153,7 +153,7 @@ namespace Fusion.Core.Utils
                 }
             }
 
-            XmlSerializer typesSerializer = new XmlSerializer(typeof(SerializableDictionary<string, string>));
+            XmlSerializer typesSerializer = SerializersStorage.GetSerializer(typeof(SerializableDictionary<string, string>));
             typesSerializer.Serialize(writer, typeList);
 
             List<Type> frameTypes = new List<Type>();

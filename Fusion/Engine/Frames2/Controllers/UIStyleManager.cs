@@ -129,7 +129,8 @@ namespace Fusion.Engine.Frames2.Controllers
                 var controllerStyles = _styles[controller];
                 foreach (var style in controllerStyles.Values)
                 {
-                    new XmlSerializer(style.GetType()).Serialize(writer, style);
+                    var styleSerializer = SerializersStorage.GetSerializer(style.GetType());
+                    styleSerializer.Serialize(writer, style);
                 }
 
                 writer.WriteEndElement();
@@ -175,7 +176,7 @@ namespace Fusion.Engine.Frames2.Controllers
                 while (reader.NodeType != XmlNodeType.EndElement)
                 {
                     var styleType = Type.GetType(reader.GetAttribute("Type"));
-                    var styleSerializer = new XmlSerializer(styleType);
+                    var styleSerializer = SerializersStorage.GetSerializer(styleType);
                     var style = (IUIStyle) styleSerializer.Deserialize(reader);
                     controllerStyles.Add(style.Name, style);
                     reader.MoveToContent();
@@ -229,7 +230,7 @@ namespace Fusion.Engine.Frames2.Controllers
 
         public void ReadXml(XmlReader reader)
         {
-            var propertySerializer = new XmlSerializer(typeof(PropertyValueStates));
+            var propertySerializer = SerializersStorage.GetSerializer(typeof(PropertyValueStates));
 
             Name = reader.GetAttribute("Name");
             ControllerType = Type.GetType(reader.GetAttribute("ControllerType"));
@@ -260,7 +261,7 @@ namespace Fusion.Engine.Frames2.Controllers
 
         public void WriteXml(XmlWriter writer)
         {
-            var propertySerializer = new XmlSerializer(typeof(PropertyValueStates));
+            var propertySerializer = SerializersStorage.GetSerializer(typeof(PropertyValueStates));
 
             writer.WriteAttributeString("Type", GetType().FullName);
             writer.WriteAttributeString("Name", Name);
@@ -326,7 +327,7 @@ namespace Fusion.Engine.Frames2.Controllers
 
             var typeName = reader.GetAttribute("Type");
             Type = Type.GetType(typeName);
-            var valueSerializer = new XmlSerializer(Type);
+            var valueSerializer = SerializersStorage.GetSerializer(Type);
 
             reader.ReadStartElement("Property");
             reader.MoveToContent();
@@ -366,7 +367,7 @@ namespace Fusion.Engine.Frames2.Controllers
                 writer.WriteAttributeString("Name", state);
 
                 var value = _storedValues[state];
-                var valueSerializer = new XmlSerializer(Type);
+                var valueSerializer = SerializersStorage.GetSerializer(Type);
                 valueSerializer.Serialize(writer, value, new XmlSerializerNamespaces(new []{ XmlQualifiedName.Empty }));
 
                 writer.WriteEndElement();
