@@ -61,13 +61,6 @@ namespace Fusion.Engine.Frames2.Containers
         public float AvailableWidth => MathUtil.Clamp(Parent.Placement.Width - X, 0, float.MaxValue);
         public float AvailableHeight => MathUtil.Clamp(Parent.Placement.Height - Y, 0, float.MaxValue);
 
-        private Matrix3x2 _transform = Matrix3x2.Identity;
-        public Matrix3x2 Transform
-        {
-            get => _transform;
-            set => SetAndNotify(ref _transform, value);
-        }
-
         private bool _clip = true;
         public bool Clip
         {
