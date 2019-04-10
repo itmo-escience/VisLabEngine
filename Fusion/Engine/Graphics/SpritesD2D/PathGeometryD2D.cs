@@ -45,6 +45,14 @@ namespace Fusion.Engine.Graphics.SpritesD2D
             EndFigure(geometryDesc.FigureEndD2D);
         }
 
+        public PathGeometryD2D(Vector2 startPoint, ArcD2D arc, PathGeometryD2DDesc geometryDesc, SpriteLayerD2D layer) : this(layer)
+        {
+            SetFillMode(geometryDesc.FillModeD2D);
+            BeginFigure(startPoint, geometryDesc.FigureBeginD2D);
+            AddArc(arc);
+            EndFigure(geometryDesc.FigureEndD2D);
+        }
+
         public void BeginFigure(Vector2 startPoint, FigureBeginD2D figureBegin) =>
             _sink.BeginFigure(startPoint.ToRawVector2(), figureBegin == FigureBeginD2D.Filled ? FigureBegin.Filled : FigureBegin.Hollow);
 
