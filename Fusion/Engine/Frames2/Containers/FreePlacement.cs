@@ -166,7 +166,7 @@ namespace Fusion.Engine.Frames2.Containers
 
         public FreePlacementSlot Insert(UIComponent child, int index)
         {
-            var slot = new FreePlacementSlot(this, 0, 0, 100, 100);
+            var slot = new FreePlacementSlot(this, 0, 0, child.DesiredWidth, child.DesiredHeight);
             slot.Attach(child);
 
             _slots.Insert(index, slot);
