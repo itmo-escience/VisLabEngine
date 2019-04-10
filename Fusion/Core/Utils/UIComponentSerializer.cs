@@ -154,12 +154,7 @@ namespace Fusion.Core.Utils
 		public void ReadXml( XmlReader reader )
 		{
 			var stringSerializer = new XmlSerializer(typeof(string));
-
-			var wasEmpty = reader.IsEmptyElement;
-			reader.Read();
-
-			if (wasEmpty)
-				return;
+			reader.ReadStartElement("SeralizableObjectHolder");
 
 		    var version = (string)stringSerializer.Deserialize(reader);
 			Version = version;
@@ -179,6 +174,8 @@ namespace Fusion.Core.Utils
 
 			var frame = (UIComponent)frameSerializer.Deserialize(reader);
 			SerializableFrame = frame;
+
+            reader.ReadEndElement();
 		}
 
 		public void WriteXml( XmlWriter writer )
