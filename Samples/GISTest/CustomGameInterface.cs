@@ -170,7 +170,7 @@ namespace GISTest
                 Name = "ImageVerticalBox",
                 DesiredWidth = 500,
                 DesiredHeight = 800,
-                Alignment = Fusion.Engine.Frames2.Containers.HorizontalAlignment.Center
+                Alignment = VerticalBox.HorizontalAlignment.Center
             };
 
             var imgFpSlot = UIManager.Root.Insert(imgVerticalBox, 0);
@@ -277,7 +277,8 @@ namespace GISTest
 		    btn.DesiredWidth = 100;
 		    btn.DesiredHeight = 100;
 			btn.Background.Attach(new Border() {DesiredWidth = 100, DesiredHeight = 100});
-            btn.Foreground.Attach(new Label("Button", new TextFormatD2D("Calibry", 15, VertialAlignment.Center, Fusion.Engine.Graphics.SpritesD2D.HorizontalAlignment.Center)));
+            btn.Foreground.Attach(new Label("Button", new TextFormatD2D("Calibry", 15, 
+                TextFormatD2D.TextVertialAlignment.Center, TextFormatD2D.TextHorizontalAlignment.Center)));
 
             var btnSlot = UIManager.Root.Insert(btn, 0);
 		    btnSlot.X = 100;
@@ -297,7 +298,7 @@ namespace GISTest
                 Name = "RadioButtonsVerticalBox",
                 DesiredWidth = 100,
                 DesiredHeight = 100,
-                Alignment = Fusion.Engine.Frames2.Containers.HorizontalAlignment.Left
+                Alignment = VerticalBox.HorizontalAlignment.Left
             };
 
             rbVerticalBox.Insert(rb1, 0);
