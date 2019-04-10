@@ -211,7 +211,6 @@ namespace Fusion.Engine.Frames2.Containers
                     var slot = new FreePlacementSlot(this, x, y, width, height)
                     {
                         Angle = UIComponentSerializer.ReadValue<float>(reader),
-                        Transform = UIComponentSerializer.ReadValue<Matrix3x2>(reader),
                         Clip = UIComponentSerializer.ReadValue<bool>(reader),
                         Visible = UIComponentSerializer.ReadValue<bool>(reader)
                     };
@@ -240,7 +239,6 @@ namespace Fusion.Engine.Frames2.Containers
                 UIComponentSerializer.WriteValue(writer, slot.Width);
                 UIComponentSerializer.WriteValue(writer, slot.Height);
                 UIComponentSerializer.WriteValue(writer, slot.Angle);
-                UIComponentSerializer.WriteValue(writer, slot.Transform);
                 UIComponentSerializer.WriteValue(writer, slot.Clip);
                 UIComponentSerializer.WriteValue(writer, slot.Visible);
                 UIComponentSerializer.WriteValue(writer, new SeralizableObjectHolder(slot.Component));
