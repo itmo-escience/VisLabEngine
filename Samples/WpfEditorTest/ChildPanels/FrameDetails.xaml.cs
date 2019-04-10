@@ -34,7 +34,7 @@ namespace WpfEditorTest.ChildPanels
 
 			var propsies = (
 				from property in publicProperties
-				where property.GetMethod != null && property.SetMethod != null && !property.CustomAttributes.Any(ca => ca.AttributeType.Name == "XmlIgnoreAttribute")
+				where property.GetMethod != null && property.SetMethod != null && property.SetMethod.IsPublic && !property.CustomAttributes.Any(ca => ca.AttributeType.Name == "XmlIgnoreAttribute")
 				select new MVVMComponentProperty(property, frame)
 			).ToList();
 
@@ -42,7 +42,7 @@ namespace WpfEditorTest.ChildPanels
 
 			propsies.AddRange((
 				from property in publicProperties
-				where property.GetMethod != null && property.SetMethod != null && !property.CustomAttributes.Any(ca => ca.AttributeType.Name == "XmlIgnoreAttribute")
+				where property.GetMethod != null && property.SetMethod != null && property.SetMethod.IsPublic && !property.CustomAttributes.Any(ca => ca.AttributeType.Name == "XmlIgnoreAttribute")
 				select new MVVMComponentProperty(property, frame.Placement)
 			).ToList());
 

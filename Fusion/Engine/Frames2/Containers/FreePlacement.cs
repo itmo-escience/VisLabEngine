@@ -139,7 +139,7 @@ namespace Fusion.Engine.Frames2.Containers
 
         public FreePlacementSlot Insert(UIComponent child, int index)
         {
-			return Insert(child, index, 0, 0, 100, 100);
+			return Insert(child, index, 0, 0, child.DesiredWidth, child.DesiredHeight);
 		}
 
 		public FreePlacementSlot Insert( UIComponent child, int index, float x, float y, float width, float height )

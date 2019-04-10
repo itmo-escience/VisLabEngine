@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Xml;
 using System.Xml.Schema;
 using System.Xml.Serialization;
+using Fusion.Core.Utils;
 using SharpDX.DirectWrite;
 
 namespace Fusion.Engine.Graphics.SpritesD2D
@@ -11,13 +12,18 @@ namespace Fusion.Engine.Graphics.SpritesD2D
     {
         public string FontFamily { get; private set; }
         public float Size { get; private set; }
+        public VertialAlignment VertialAlignment { get; private set; }
+        public HorizontalAlignment HorizontalAlignment { get; private set; }
 
         public TextFormatD2D() { }
 
-        public TextFormatD2D(string fontFamilyName, float fontSize)
+        public TextFormatD2D(string fontFamilyName, float fontSize, 
+            VertialAlignment vertialAlignment = VertialAlignment.Up, HorizontalAlignment horizontalAlignment = HorizontalAlignment.Left)
         {
             FontFamily = fontFamilyName;
             Size = fontSize;
+            VertialAlignment = vertialAlignment;
+            HorizontalAlignment = horizontalAlignment;
         }
 
         public bool Equals(TextFormatD2D other)
@@ -50,15 +56,31 @@ namespace Fusion.Engine.Graphics.SpritesD2D
 
         public void ReadXml(XmlReader reader)
         {
-            FontFamily = reader.GetAttribute("FontFamily");
-            Size = float.Parse(reader.GetAttribute("Size"));
+            reader.ReadStartElement();
+            FontFamily = UIComponentSerializer.ReadValue<string>(reader);
+            Size = UIComponentSerializer.ReadValue<float>(reader);
+            VertialAlignment = UIComponentSerializer.ReadValue<VertialAlignment>(reader);
+            HorizontalAlignment = UIComponentSerializer.ReadValue<HorizontalAlignment>(reader);
+            reader.ReadEndElement();
         }
 
         public void WriteXml(XmlWriter writer)
         {
-            writer.WriteAttributeString("FontFamily", FontFamily);
-            writer.WriteAttributeString("Size", Size.ToString());
+            UIComponentSerializer.WriteValue(writer, FontFamily);
+            UIComponentSerializer.WriteValue(writer, Size);
+            UIComponentSerializer.WriteValue(writer, VertialAlignment);
+            UIComponentSerializer.WriteValue(writer, HorizontalAlignment);
         }
+    }
+
+    public enum VertialAlignment
+    {
+        Up, Center, Down
+    }
+
+    public enum HorizontalAlignment
+    {
+        Left, Center, Right
     }
 
     internal class TextFormatFactory
@@ -76,6 +98,30 @@ namespace Fusion.Engine.Graphics.SpritesD2D
             if (!_cache.TryGetValue(format, out var result))
             {
                 result = new TextFormat(_factory, format.FontFamily, format.Size);
+                switch (format.VertialAlignment)
+                {
+                    case VertialAlignment.Up:
+                        result.ParagraphAlignment = ParagraphAlignment.Near;
+                        break;
+                    case VertialAlignment.Center:
+                        result.ParagraphAlignment = ParagraphAlignment.Center;
+                        break;
+                    case VertialAlignment.Down:
+                        result.ParagraphAlignment = ParagraphAlignment.Far;
+                        break;
+                }
+                switch (format.HorizontalAlignment)
+                {
+                    case HorizontalAlignment.Left:
+                        result.TextAlignment = TextAlignment.Leading;
+                        break;
+                    case HorizontalAlignment.Center:
+                        result.TextAlignment = TextAlignment.Center;
+                        break;
+                    case HorizontalAlignment.Right:
+                        result.TextAlignment = TextAlignment.Trailing;
+                        break;
+                }
                 _cache[format] = result;
             }
             return result;
