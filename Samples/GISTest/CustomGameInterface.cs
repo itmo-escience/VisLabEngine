@@ -11,6 +11,7 @@ using Fusion.Engine.Graphics.GIS;
 using Fusion.Engine.Frames;
 using Fusion;
 using Fusion.Core.Shell;
+using Fusion.Core.Utils;
 using FusionUI;
 using FusionUI.UI;
 using Fusion.Engine.Frames2.Components;
@@ -163,6 +164,36 @@ namespace GISTest
 
 			
 			//----------
+
+            #region UISerializationTesting
+
+            var testFreePlasement = new FreePlacement()
+            {
+                Name = "TestFreePlasement",
+                DesiredWidth = 500,
+                DesiredHeight = 500,
+            };
+
+            //var testImage = new Image(image);
+            var testText = new Label("TestText", "Calibri", 14);
+            var testBorder = new Border();
+
+            //var testImageSlot = testFreePlasement.Insert(testImage, 0);
+            var testTextSlot = testFreePlasement.Insert(testText, 1);
+            var testBorderSlot = testFreePlasement.Insert(testBorder, 2);
+
+            //testImageSlot.X = 10;
+            //testImageSlot.Y = 10;
+            testTextSlot.X = 20;
+            testTextSlot.Y = 20;
+            testBorderSlot.X = 30;
+            testBorderSlot.Y = 30;
+
+            string str = UIComponentSerializer.WriteToString(testFreePlasement);
+            var comp = UIComponentSerializer.ReadFromString(str);
+
+            #endregion
+
 			#endregion
 
 

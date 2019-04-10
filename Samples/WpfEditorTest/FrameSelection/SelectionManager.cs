@@ -11,6 +11,7 @@ namespace WpfEditorTest.FrameSelection
 {
 	internal class SelectionManager : INotifyPropertyChanged
 	{
+
 		public static SelectionManager Instance { get; } = new SelectionManager();
 
 		private SelectionManager() { }
@@ -24,6 +25,7 @@ namespace WpfEditorTest.FrameSelection
 		public event EventHandler<List<UIComponent>> FrameSelected;
 
 		public event EventHandler<UIComponent> UIComponentUpdated;
+		public event EventHandler<UIComponent> PlacementRecreated;
 		public event EventHandler<ISlot> SlotUpdated;
 
 		public void SelectFrame( List<UIComponent> frame )
@@ -53,6 +55,11 @@ namespace WpfEditorTest.FrameSelection
 			if ((frame as UIComponent).Placement != null)
 			{
 				(frame as UIComponent).Placement.PropertyChanged += OnSlotUpdated;
+
+				if (args.PropertyName == "Placement")
+				{
+					Application.Current.Dispatcher.InvokeAsync(() => PlacementRecreated?.Invoke(this, (UIComponent)frame)); 
+				}
 			}
 
 		    Application.Current.Dispatcher.InvokeAsync(() => UIComponentUpdated?.Invoke(this, (UIComponent)frame));

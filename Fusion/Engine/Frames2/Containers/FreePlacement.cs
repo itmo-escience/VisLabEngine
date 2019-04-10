@@ -3,6 +3,9 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
 using System.Reflection;
+using System.Xml;
+using System.Xml.Schema;
+using System.Xml.Serialization;
 using Fusion.Core.Mathematics;
 using Fusion.Core.Utils;
 using Fusion.Engine.Common;
@@ -82,7 +85,7 @@ namespace Fusion.Engine.Frames2.Containers
         public override string ToString() => $"FreePlacementSlot with {Component}";
     }
 
-    public class FreePlacement : IUIModifiableContainer<FreePlacementSlot>
+    public class FreePlacement : IUIModifiableContainer<FreePlacementSlot>, IXmlSerializable
     {
         private readonly AsyncObservableCollection<FreePlacementSlot> _slots = new AsyncObservableCollection<FreePlacementSlot>();
         public IEnumerable<ISlot> Slots => _slots;
@@ -190,5 +193,69 @@ namespace Fusion.Engine.Frames2.Containers
 
 			return true;
         }
-	}
+
+        public XmlSchema GetSchema()
+        {
+            return null;
+        }
+
+        public void ReadXml(XmlReader reader)
+        {
+            Name = reader.GetAttribute("Name");
+            reader.ReadStartElement("FreePlacement");
+            reader.ReadStartElement("Slots");
+
+            reader.MoveToContent();
+            if (!reader.IsEmptyElement)
+            {
+                while (reader.NodeType != XmlNodeType.EndElement)
+                {
+                    reader.ReadStartElement("Slot");
+
+                    var x = UIComponentSerializer.ReadValue<float>(reader);
+                    var y = UIComponentSerializer.ReadValue<float>(reader);
+                    var width = UIComponentSerializer.ReadValue<float>(reader);
+                    var height = UIComponentSerializer.ReadValue<float>(reader);
+
+                    var slot = new FreePlacementSlot(this, x, y, width, height)
+                    {
+                        Angle = UIComponentSerializer.ReadValue<float>(reader),
+                        Clip = UIComponentSerializer.ReadValue<bool>(reader),
+                        Visible = UIComponentSerializer.ReadValue<bool>(reader)
+                    };
+                    slot.Attach(UIComponentSerializer.ReadValue<SeralizableObjectHolder>(reader).SerializableFrame);
+                    _slots.Add(slot);
+
+                    reader.ReadEndElement();
+                    reader.MoveToContent();
+                }
+            }
+
+            reader.ReadEndElement();
+        }
+
+        public void WriteXml(XmlWriter writer)
+        {
+            writer.WriteAttributeString("Name", Name);
+            writer.WriteStartElement("Slots");
+
+            foreach (var slot in _slots)
+            {
+                writer.WriteStartElement("Slot");
+
+                UIComponentSerializer.WriteValue(writer, slot.X);
+                UIComponentSerializer.WriteValue(writer, slot.Y);
+                UIComponentSerializer.WriteValue(writer, slot.Width);
+                UIComponentSerializer.WriteValue(writer, slot.Height);
+                UIComponentSerializer.WriteValue(writer, slot.Angle);
+                UIComponentSerializer.WriteValue(writer, slot.Clip);
+                UIComponentSerializer.WriteValue(writer, slot.Visible);
+                UIComponentSerializer.WriteValue(writer, new SeralizableObjectHolder(slot.Component));
+
+                writer.WriteEndElement();
+            }
+
+            writer.WriteEndElement();
+        }
+    }
 }

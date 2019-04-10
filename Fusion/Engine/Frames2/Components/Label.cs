@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel;
+using System.Xml.Serialization;
 using Fusion.Core.Mathematics;
 using Fusion.Engine.Common;
 using Fusion.Engine.Frames2.Events;
@@ -9,6 +10,7 @@ namespace Fusion.Engine.Frames2.Components
     public sealed class Label : UIComponent
     {
         private ISlot _placement;
+        [XmlIgnore]
         public ISlot Placement
         {
             get => _placement;

@@ -325,6 +325,10 @@ namespace WpfEditorTest
 						_details.SetSelectFrame(selection.Frame);
 						_treeView.SelectedFrame = selection.Frame;
 					};
+					SelectionManager.Instance.PlacementRecreated += ( s, component ) =>
+					{
+						_details.SetSelectFrame(component);
+					};
 					SelectionLayer.FramesDeselected += ( s, e ) =>
 					{
 						_details.FrameDetailsControls.ItemsSource = null;
