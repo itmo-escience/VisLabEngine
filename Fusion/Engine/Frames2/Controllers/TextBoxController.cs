@@ -1,48 +1,116 @@
-﻿/*using System;
+﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.ComponentModel;
+using Fusion.Core.Mathematics;
 using Fusion.Engine.Frames2.Components;
+using Fusion.Engine.Frames2.Events;
 using Fusion.Engine.Frames2.Managing;
 using Fusion.Engine.Graphics.SpritesD2D;
 using Label = Fusion.Engine.Frames2.Components.Label;
 
 namespace Fusion.Engine.Frames2.Controllers
 {
-
-    public class TextBoxController : UIController
+    public class TextBoxSlot : IControllerSlot, ISlotAttachable
     {
-        public static State Editing = new State("Editing");
-        protected override IEnumerable<State> NonDefaultStates => new List<State> { Editing };
+        public event PropertyChangedEventHandler PropertyChanged;
+        public float X => 0;
+        public float Y => 0;
+        public float Angle => 0;
+        public float Width => Parent.Placement.Width;
+        public float Height => Parent.Placement.Width;
+        public float AvailableWidth => Width;
+        public float AvailableHeight => Height;
+        public bool Clip => true;
+        public bool Visible { get; set; } = true;
 
-        public Slot Background { get; }
-        public Slot Text { get; }
+        public IUIContainer Parent { get; }
+        public UIComponent Component { get; private set; }
+        public SolidBrushD2D DebugBrush => new SolidBrushD2D(Color4.White);
+        public TextFormatD2D DebugTextFormat => new TextFormatD2D("Calibri", 10);
+
+        public string Name { get; }
+
+        internal TextBoxSlot(string name, TextBoxController parent)
+        {
+            Parent = parent;
+            Name = name;
+        }
+
+        public void DebugDraw(SpriteLayerD2D layer) { }
+
+        public void Attach(UIComponent component)
+        {
+            var s = component.Placement;
+
+            if (s != null)
+            {
+                if (s is ISlotAttachable sa)
+                {
+                    sa.Detach();
+                }
+                else
+                {
+                    Log.Error("Attempt to attach component from unmodifiable slot");
+                    return;
+                }
+            }
+
+            UIComponent old = null;
+            if (Component != null)
+            {
+                old = Component;
+                Component.Placement = null;
+            }
+
+            component.Placement = this;
+            Component = component;
+            ComponentAttached?.Invoke(this, new SlotAttachmentChangedEventArgs(old, component));
+        }
+
+        public event EventHandler<SlotAttachmentChangedEventArgs> ComponentAttached;
+        public ObservableCollection<PropertyValueStates> Properties { get; } = new ObservableCollection<PropertyValueStates>();
+    }
+    
+    public class TextBoxController : UIController<TextBoxSlot>
+    {
+        public static ControllerState Editing = new ControllerState("Editing");
+        protected override IEnumerable<ControllerState> NonDefaultStates => new List<ControllerState> { Editing };
+
+        private readonly List<TextBoxSlot> _slots;
+        protected override IEnumerable<IControllerSlot> MainControllerSlots => _slots;
+        protected override IEnumerable<IControllerSlot> AdditionalControllerSlots { get; } = new List<IControllerSlot>();
+
+        public TextBoxSlot Text { get; }
+        public TextBoxSlot Background { get; }
 
         private Label _label;
 
-        public TextBoxController() : this(0, 0, 0, 0)
+        public TextBoxController(string styleName = UIStyleManager.DefaultStyle)
         {
-            _label.Text = "";
-        }
+            _label = new Label("Label", new TextFormatD2D("Calibri", 12));
 
-        public TextBoxController(float x, float y, float width, float height) : base(x, y, width, height)
-        {
-            _label = new Label("Label", new TextFormatD2D("Calibri", 12), 0, 0, width, height);
+            Style = UIStyleManager.Instance.GetStyle(GetType(), styleName);
 
-            Background = new Slot("Background");
-            Text = new Slot("Text");
-
-            SlotsInternal.Add(Background);
-            SlotsInternal.Add(Text);
-
+            Background = new TextBoxSlot("Background", this);
+            Text = new TextBoxSlot("Text", this);
+            Background.Attach(new Border());
             Text.Attach(_label);
 
-            Enter += OnEnter;
-            Leave += OnLeave;
-            MouseDownOutside += OnMouseDownOutside;
-            MouseDown += OnMouseDown;
-            KeyPress += OnKeyPress;
+            _slots = new List<TextBoxSlot> { Background, Text };
+
+            Events.Enter += OnEnter;
+            Events.Leave += OnLeave;
+            Events.MouseDownOutside += OnMouseDownOutside;
+            Events.MouseDown += OnMouseDown;
+            Events.KeyPress += OnKeyPress;
+
+            Input += (sender, args) => { };
         }
 
-        public override void DefaultInit()
+        public TextBoxController():this(UIStyleManager.DefaultStyle) { }
+
+        /*public override void DefaultInit()
         {
             Width = 100;
             Height = 100;
@@ -54,7 +122,7 @@ namespace Fusion.Engine.Frames2.Controllers
             _label.Text = "TextBox";
 
             Background.Attach(new Border(0, 0, Width, Height));
-        }
+        }*/
 
         public event EventHandler<InputEventArgs> Input;
 
@@ -81,7 +149,7 @@ namespace Fusion.Engine.Frames2.Controllers
                 case BackspaceCharCode:
                     _label.Text = _label.Text.Substring(0, _label.Text.Length - 1); break;
                 case EscapeCharCode:
-                    ChangeState(State.Default);
+                    ChangeState(ControllerState.Default);
                     return;
                 default: _label.Text += e.KeyChar; break;
             }
@@ -91,33 +159,26 @@ namespace Fusion.Engine.Frames2.Controllers
 
         private void OnMouseDown(UIComponent sender, ClickEventArgs e)
         {
-            if(CurrentState != State.Disabled)
+            if(CurrentState != ControllerState.Disabled)
                 ChangeState(Editing);
         }
 
         private void OnMouseDownOutside(UIComponent sender, ClickEventArgs e)
         {
             if(CurrentState == Editing)
-                ChangeState(State.Default);
+                ChangeState(ControllerState.Default);
         }
 
         private void OnEnter(UIComponent sender)
         {
-            if (CurrentState == State.Default)
-                ChangeState(State.Hovered);
+            if (CurrentState == ControllerState.Default)
+                ChangeState(ControllerState.Hovered);
         }
 
         private void OnLeave(UIComponent sender)
         {
-            if(CurrentState == State.Hovered)
-                ChangeState(State.Default);
-        }
-
-        public override void Draw(SpriteLayerD2D layer)
-        {
-            base.Draw(layer);
-
+            if(CurrentState == ControllerState.Hovered)
+                ChangeState(ControllerState.Default);
         }
     }
 }
-*/
