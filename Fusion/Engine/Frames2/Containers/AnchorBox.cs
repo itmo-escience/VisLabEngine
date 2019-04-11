@@ -285,12 +285,10 @@ namespace Fusion.Engine.Frames2.Containers
                 {
                     reader.ReadStartElement("Slot");
 
-                    var x = UIComponentSerializer.ReadValue<float>(reader);
-                    var y = UIComponentSerializer.ReadValue<float>(reader);
                     var width = UIComponentSerializer.ReadValue<float>(reader);
                     var height = UIComponentSerializer.ReadValue<float>(reader);
 
-                    var slot = new AnchorBoxSlot(this, x, y, width, height)
+                    var slot = new AnchorBoxSlot(this, 0, 0, width, height)
                     {
                         Angle = UIComponentSerializer.ReadValue<float>(reader),
                         Clip = UIComponentSerializer.ReadValue<bool>(reader),
@@ -319,8 +317,6 @@ namespace Fusion.Engine.Frames2.Containers
             {
                 writer.WriteStartElement("Slot");
 
-                UIComponentSerializer.WriteValue(writer, slot.X);
-                UIComponentSerializer.WriteValue(writer, slot.Y);
                 UIComponentSerializer.WriteValue(writer, slot.Width);
                 UIComponentSerializer.WriteValue(writer, slot.Height);
                 UIComponentSerializer.WriteValue(writer, slot.Angle);
