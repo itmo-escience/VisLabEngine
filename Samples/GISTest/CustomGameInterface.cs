@@ -167,7 +167,7 @@ namespace GISTest
 
             #region UISerializationTesting
 
-            var testFreePlasement = new FreePlacement()
+            var testAnchorBox = new AnchorBox()
             {
                 Name = "TestFreePlasement",
                 DesiredWidth = 500,
@@ -179,8 +179,8 @@ namespace GISTest
             var testBorder = new Border();
 
             //var testImageSlot = testFreePlasement.Insert(testImage, 0);
-            var testTextSlot = testFreePlasement.Insert(testText, 1);
-            var testBorderSlot = testFreePlasement.Insert(testBorder, 2);
+            var testTextSlot = testAnchorBox.Insert(testText, 1);
+            var testBorderSlot = testAnchorBox.Insert(testBorder, 2);
 
             //testImageSlot.X = 10;
             //testImageSlot.Y = 10;
@@ -188,8 +188,9 @@ namespace GISTest
             testTextSlot.Y = 20;
             testBorderSlot.X = 30;
             testBorderSlot.Y = 30;
+            testTextSlot.Fixators.Left = 0;
 
-            string str = UIComponentSerializer.WriteToString(testFreePlasement);
+            string str = UIComponentSerializer.WriteToString(testAnchorBox);
             var comp = UIComponentSerializer.ReadFromString(str);
 
             #endregion
