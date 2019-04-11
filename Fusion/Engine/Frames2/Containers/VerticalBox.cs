@@ -105,11 +105,6 @@ namespace Fusion.Engine.Frames2.Containers
 		public override string ToString() => $"VerticalBoxSlot with {Component}";
     }
 
-    public enum HorizontalAlignment
-    {
-        Left, Center, Right
-    }
-
     public class VerticalBox : IUIModifiableContainer<VerticalBoxSlot>
     {
         private readonly AsyncObservableCollection<VerticalBoxSlot> _slots = new AsyncObservableCollection<VerticalBoxSlot>();
@@ -134,6 +129,11 @@ namespace Fusion.Engine.Frames2.Containers
         {
             get;
             set;
+        }
+        
+        public enum HorizontalAlignment
+        {
+            Left, Center, Right
         }
 
         public bool IsInside(Vector2 point) => Placement.IsInside(point);
