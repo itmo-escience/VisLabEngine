@@ -1,8 +1,10 @@
-﻿using Fusion.Core.Mathematics;
+﻿using System;
+using Fusion.Core.Mathematics;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
 using System.Runtime.CompilerServices;
+using Fusion.Core.Utils;
 
 namespace Fusion.Engine.Frames2.Managing
 {
@@ -43,13 +45,14 @@ namespace Fusion.Engine.Frames2.Managing
         {
             var queue = new Queue<UIComponent>();
             queue.Enqueue(root);
+            var result = new List<UIComponent>();
 
             while (queue.Any())
             {
                 var c = queue.Dequeue();
 
 				if(c != null)
-					yield return c;
+                    result.Add(c);
 
                 if (c is IUIContainer container)
                 {
@@ -59,6 +62,8 @@ namespace Fusion.Engine.Frames2.Managing
                     }
                 }
             }
+
+            return result;
         }
 
         public static IEnumerable<UIComponent> BFSTraverseForPoint(UIManager manager, UIComponent root, Vector2 point)
@@ -114,12 +119,46 @@ namespace Fusion.Engine.Frames2.Managing
                 }
             }
 
+            var result = new List<UIComponent>();
             while (stack2.Any())
             {
                 var c = stack2.Pop();
 				if(c != null)
-					yield return c;
+                    result.Add(c);
             }
+
+            return result;
+        }
+
+        public static IEnumerable<UIComponent> DFSTraverse(UIComponent root, Predicate<IUIContainer> shouldGoDeeper)
+        {
+            var stack = new Stack<UIComponent>();
+            var stack2 = new Stack<UIComponent>();
+            stack.Push(root);
+
+            while (stack.Any())
+            {
+                var c = stack.Pop();
+                stack2.Push(c);
+
+                if (c is IUIContainer container && shouldGoDeeper(container))
+                {
+                    foreach (var child in container.Slots)
+                    {
+                        stack.Push(child.Component);
+                    }
+                }
+            }
+
+            var result = new List<UIComponent>();
+            while (stack2.Any())
+            {
+                var c = stack2.Pop();
+                if(c != null)
+                    result.Add(c);
+            }
+
+            return result;
         }
 
 		public static UIComponent GetLowestComponentInHierarchy( UIManager manager, IUIContainer root, Vector2 innerPoint)
