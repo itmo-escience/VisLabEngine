@@ -7,7 +7,7 @@ using System.Reflection;
 using WpfEditorTest.Commands;
 using WpfEditorTest.Utility;
 
-namespace WpfEditorTest.ChildPanels
+namespace WpfEditorTest.Utility
 {
 	public class MVVMComponentProperty : IMVVMProperty
 	{

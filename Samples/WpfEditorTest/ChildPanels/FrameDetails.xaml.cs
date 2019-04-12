@@ -6,7 +6,7 @@ using System.Windows;
 using System.Windows.Media;
 using Fusion.Engine.Frames2;
 
-namespace WpfEditorTest.ChildPanels
+namespace WpfEditorTest.Utility
 {
 	/// <summary>
 	/// Interaction logic for FrameDetails.xaml
@@ -28,26 +28,28 @@ namespace WpfEditorTest.ChildPanels
             Closing += (s, e) => {this.Hide(); e.Cancel = true; };
 		}
 
-	    public void SetSelectFrame(UIComponent frame)
+	    public void SetSelectFrame(UIComponent component)
 	    {
-	        var publicProperties = frame.GetType().GetProperties(BindingFlags.Public | BindingFlags.Instance);
+			//      var publicProperties = frame.GetType().GetProperties(BindingFlags.Public | BindingFlags.Instance);
 
-			var propsies = (
-				from property in publicProperties
-				where property.GetMethod != null && property.SetMethod != null && property.SetMethod.IsPublic && !property.CustomAttributes.Any(ca => ca.AttributeType.Name == "XmlIgnoreAttribute")
-				select new MVVMComponentProperty(property, frame)
-			).ToList();
+			//var propsies = (
+			//	from property in publicProperties
+			//	where property.GetMethod != null && property.SetMethod != null && property.SetMethod.IsPublic && !property.CustomAttributes.Any(ca => ca.AttributeType.Name == "XmlIgnoreAttribute")
+			//	select new MVVMComponentProperty(property, frame)
+			//).ToList();
 
-			publicProperties = frame.Placement.GetType().GetProperties(BindingFlags.Public | BindingFlags.Instance);
+			//publicProperties = frame.Placement.GetType().GetProperties(BindingFlags.Public | BindingFlags.Instance);
 
-			propsies.AddRange((
-				from property in publicProperties
-				where property.GetMethod != null && property.SetMethod != null && property.SetMethod.IsPublic && !property.CustomAttributes.Any(ca => ca.AttributeType.Name == "XmlIgnoreAttribute")
-				select new MVVMComponentProperty(property, frame.Placement)
-			).ToList());
+			//propsies.AddRange((
+			//	from property in publicProperties
+			//	where property.GetMethod != null && property.SetMethod != null && property.SetMethod.IsPublic && !property.CustomAttributes.Any(ca => ca.AttributeType.Name == "XmlIgnoreAttribute")
+			//	select new MVVMComponentProperty(property, frame.Placement)
+			//).ToList());
 
 
-			FrameDetailsControls.ItemsSource = propsies.OrderBy(p => p.PropName).ToList();
-        }
+			DetailsScroll.DataContext = new MVVMComponentDetails(component);
+			DetailsScroll.Visibility = Visibility.Visible;
+
+		}
 	}
 }

@@ -25,7 +25,7 @@ using Fusion.Engine.Frames2.Components;
 using Fusion.Engine.Frames2.Containers;
 using Fusion.Engine.Frames2.Managing;
 using FusionUI;
-using WpfEditorTest.ChildPanels;
+using WpfEditorTest.Utility;
 using WpfEditorTest.ChildWindows;
 using WpfEditorTest.Commands;
 using WpfEditorTest.DialogWindows;
@@ -331,7 +331,8 @@ namespace WpfEditorTest
 					};
 					SelectionLayer.FramesDeselected += ( s, e ) =>
 					{
-						_details.FrameDetailsControls.ItemsSource = null;
+						_details.DetailsScroll.DataContext = null;
+						_details.DetailsScroll.Visibility = Visibility.Collapsed;
 					};
 					SelectionLayer.SizeChanged += ( s, e ) =>
 					{

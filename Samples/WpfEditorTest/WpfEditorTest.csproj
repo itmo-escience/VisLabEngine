@@ -79,7 +79,8 @@
     <Compile Include="ChildPanels\FrameDragsPanel.xaml.cs">
       <DependentUpon>FrameDragsPanel.xaml</DependentUpon>
     </Compile>
-    <Compile Include="ChildPanels\MVVMFrameProperty.cs" />
+    <Compile Include="Utility\MVVMComponentDetails.cs" />
+    <Compile Include="Utility\MVVMFrameProperty.cs" />
     <Compile Include="ChildWindows\ConsoleWindow.xaml.cs">
       <DependentUpon>ConsoleWindow.xaml</DependentUpon>
     </Compile>
@@ -114,6 +115,7 @@
     <Compile Include="ChildPanels\ParentHighlightPanel.xaml.cs">
       <DependentUpon>ParentHighlightPanel.xaml</DependentUpon>
     </Compile>
+    <Compile Include="WPFConverters\DictionaryConverter.cs" />
     <Compile Include="WPFConverters\EnumerateConverter.cs" />
     <Compile Include="WPFConverters\ButtonEnableConverter.cs" />
     <Compile Include="WPFConverters\DataTemplateSelectorOfTreeView.cs" />

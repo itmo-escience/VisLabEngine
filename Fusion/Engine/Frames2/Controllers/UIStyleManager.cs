@@ -37,7 +37,19 @@ namespace Fusion.Engine.Frames2.Controllers
             return result;
         }
 
-        public void AddStyle(IUIStyle style)
+		public Dictionary<string, IUIStyle> GetStyles(Type type)
+		{
+			if (_styles.ContainsKey(type))
+			{
+				return _styles[type];
+			}
+			else
+			{
+				return new Dictionary<string, IUIStyle>();
+			}
+		}
+
+		public void AddStyle(IUIStyle style)
         {
             if(!_styles.ContainsKey(style.ControllerType))
                 _styles[style.ControllerType] = new SerializableDictionary<string, IUIStyle>();

@@ -14,7 +14,7 @@ using Vector2 = Fusion.Core.Mathematics.Vector2;
 using Matrix3x2 = Fusion.Core.Mathematics.Matrix3x2;
 using Fusion.Engine.Frames2.Managing;
 
-namespace WpfEditorTest.ChildPanels
+namespace WpfEditorTest.Utility
 {
 	/// <summary>
 	/// Interaction logic for FrameDragsPanel.xaml

@@ -14,7 +14,7 @@ using WpfEditorTest.Commands;
 using WpfEditorTest.Utility;
 using CommandManager = WpfEditorTest.Commands.CommandManager;
 
-namespace WpfEditorTest.ChildPanels
+namespace WpfEditorTest.Utility
 {
     /// <summary>
     /// Interaction logic for FrameTreeView.xaml

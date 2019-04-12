@@ -12,7 +12,28 @@
 
 //namespace WpfEditorTest.Utility
 //{
-//    public class MVVMControllerData : INotifyPropertyChanged
+//	public class MVVMStyleData : INotifyPropertyChanged
+//	{
+//		public List<IUIStyle> Styles { get; set; } = new List<IUIStyle>();
+
+//		public MVVMStyleData( UIController<IControllerSlot> controller )
+//		{
+//			foreach (var state in controller.States)
+//			{
+//				var style = UIStyleManager.Instance.GetStyle(controller.GetType(), state.Name);
+//				Styles.Add(style);
+//			}
+//		}
+
+//		public event PropertyChangedEventHandler PropertyChanged;
+
+//		protected void OnPropertyChanged( [System.Runtime.CompilerServices.CallerMemberName] string changedProperty = "" )
+//		{
+//			PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(changedProperty));
+//		}
+//	}
+
+//	public class MVVMControllerData : INotifyPropertyChanged
 //	{
 //		public List<ControllerSlotData> Slots { get; set; } = new List<ControllerSlotData>();
 //		public List<IControllerSlot> SlotValues = new List<IControllerSlot>();
@@ -53,11 +74,12 @@
 //				Properties.Add(propertyData);
 //			}
 
-//			Slot.Properties.CollectionChanged += (s, e) =>{
+//			Slot.Properties.CollectionChanged += ( s, e ) =>
+//			{
 //				Properties.Clear();
 //				foreach (var property in Slot.Properties)
 //				{
-//					var propertyData = new ControllerSlotProperty(Slot, property, controller,state);
+//					var propertyData = new ControllerSlotProperty(Slot, property, controller, state);
 //					Properties.Add(propertyData);
 //				}
 //			};
@@ -130,7 +152,8 @@
 
 //			RecalculatePublicProperties();
 
-//			Slot.Properties.CollectionChanged += ( s, e ) => {
+//			Slot.Properties.CollectionChanged += ( s, e ) =>
+//			{
 //				RecalculatePublicProperties();
 //				OnPropertyChanged(nameof(AvailableProperties));
 //			};
@@ -156,7 +179,7 @@
 //		}
 //	}
 
-//	public class MVVMControllerSlotProperty : MVVMFrameProperty
+//	public class MVVMControllerSlotProperty : MVVMComponentProperty
 //	{
 //		public MVVMControllerSlotProperty( PropertyInfo prop, UIComponent obj, IControllerSlot slot, ControllerState state ) : base(prop, obj)
 //		{

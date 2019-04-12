@@ -11,7 +11,7 @@ using Fusion.Engine.Common;
 using Fusion.Engine.Frames2;
 using Fusion.Engine.Frames2.Managing;
 using WpfEditorTest.FrameSelection;
-using WpfEditorTest.ChildPanels;
+using WpfEditorTest.Utility;
 using WpfEditorTest.Commands;
 using WpfEditorTest.Utility;
 using CommandManager = WpfEditorTest.Commands.CommandManager;
@@ -661,10 +661,7 @@ namespace WpfEditorTest
 		public void PrepareStickingCoords()
 		{
 			ForgetStickingCoords();
-			foreach (var item in UIHelper.DFSTraverse(SceneFrame))
-			{
-				RememberStickingCoords(item);
-			}
+				RememberStickingCoords(SceneFrame);
 
 
 		}
@@ -699,6 +696,14 @@ namespace WpfEditorTest
 				{
 					ActiveChanged = DrawStickLine,
 				});
+
+				if (frame is IUIContainer container)
+				{
+					foreach (var slot in container.Slots)
+					{
+						RememberStickingCoords(slot.Component);
+					} 
+				}
 			}
 		}
 
