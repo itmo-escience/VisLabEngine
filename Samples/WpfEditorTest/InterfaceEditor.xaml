@@ -7,7 +7,7 @@
         xmlns:ZWpfLib="clr-namespace:ZWpfLib;assembly=ZWpfLib"
         xmlns:system ="clr-namespace:System;assembly=mscorlib"
         xmlns:math ="clr-namespace:Fusion.Core.Mathematics;assembly=Fusion"
-        xmlns:panels ="clr-namespace:WpfEditorTest.ChildPanels"
+        xmlns:panels ="clr-namespace:WpfEditorTest.Utility"
         xmlns:conv="clr-namespace:WpfEditorTest.WPFConverters"
         xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
         mc:Ignorable="d"

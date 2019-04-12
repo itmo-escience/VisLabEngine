@@ -3,7 +3,7 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-             xmlns:local="clr-namespace:WpfEditorTest.ChildPanels"
+             xmlns:local="clr-namespace:WpfEditorTest.Utility"
              xmlns:conv="clr-namespace:WpfEditorTest.WPFConverters"
              xmlns:system ="clr-namespace:System;assembly=mscorlib"
              xmlns:math ="clr-namespace:Fusion.Core.Mathematics;assembly=Fusion"
@@ -293,32 +293,16 @@
             <DataTemplate>
                 <Border BorderThickness="1" BorderBrush="Gray" MinHeight="32" MinWidth="100">
                 <Expander Header="{Binding Name}" VerticalAlignment="Center">
-                    <StackPanel Height="auto" Width="auto" Orientation="Vertical">
-                    <!--<Border BorderThickness="1" BorderBrush="Gray" MinHeight="32" MinWidth="100">
-                            <TextBlock TextAlignment ="Left"
-			                TextWrapping = "Wrap"
-			                VerticalAlignment = "Center"
-                            FontFamily="Times New Roman"
-                            Text="{Binding Name}" FontWeight="Bold" FontSize="18"/>
-                        </Border>-->
-                        <ContentPresenter Content="{Binding}" 
+                        <StackPanel Height="auto" Width="auto" Orientation="Vertical">
+                            <ContentPresenter Content="{Binding}"
                         ContentTemplate="{StaticResource BaseClass2}"/>
-                        <ItemsControl ItemsSource="{Binding States}">
-                            <!--ItemTemplateSelector="{StaticResource propTemplateSelector}"-->
-                            <ItemsControl.ItemTemplate>
+                            <ItemsControl ItemsSource="{Binding States}">
+                                <ItemsControl.ItemTemplate>
                                 <DataTemplate>
                                         <Expander Header="{Binding Name}">
-                                    <StackPanel Height="auto" Width="auto" Orientation="Vertical">
-                                        <!--<Border BorderThickness="1" BorderBrush="Gray" MinHeight="32" MinWidth="100">
-                                            <TextBlock TextAlignment ="Left"
-			                                TextWrapping = "Wrap"
-			                                VerticalAlignment = "Center"
-                                            FontFamily="Times New Roman"
-                                            Text="{Binding Name}" FontStyle="Italic"/>
-                                        </Border>-->
-                                        <ItemsControl ItemsSource="{Binding Properties}">
-                                            <!--ItemTemplateSelector="{StaticResource propTemplateSelector}"-->
-                                            <ItemsControl.ItemTemplate>
+                                            <StackPanel Height="auto" Width="auto" Orientation="Vertical">
+                                                <ItemsControl ItemsSource="{Binding Properties}">
+                                                    <ItemsControl.ItemTemplate>
                                                 <DataTemplate>
                                                     <StackPanel Height="auto" Width="auto" Orientation="Vertical">
                                                         <ContentPresenter Content="{Binding}" 

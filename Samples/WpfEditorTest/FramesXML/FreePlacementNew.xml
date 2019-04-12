@@ -1,0 +1,9 @@
+<?xml version="1.0"?>
+<SeralizableObjectHolder>
+  <string>1.6</string>
+  <string>Fusion.Engine.Frames2.Containers.FreePlacement</string>
+  <string>Fusion, Version=0.2.7040.22159, Culture=neutral, PublicKeyToken=null</string>
+  <FreePlacement Name="FreePlacementNew" DesiredWidth="100" DesiredHeight="100">
+    <Slots />
+  </FreePlacement>
+</SeralizableObjectHolder>

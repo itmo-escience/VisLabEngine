@@ -12,7 +12,7 @@ using Fusion.Engine.Frames2.Managing;
 using Fusion.Engine.Frames2.Containers;
 using WpfEditorTest.FrameSelection;
 
-namespace WpfEditorTest.ChildPanels
+namespace WpfEditorTest.Utility
 {
 	/// <summary>
 	/// Interaction logic for SelectedFramePanel.xaml

@@ -3,6 +3,9 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
 using System.Reflection;
+using System.Xml;
+using System.Xml.Schema;
+using System.Xml.Serialization;
 using Fusion.Core.Mathematics;
 using Fusion.Core.Utils;
 using Fusion.Engine.Common;
@@ -14,13 +17,9 @@ namespace Fusion.Engine.Frames2.Containers
 {
     public class VerticalBoxSlot : ISlotAttachable
     {
-        internal VerticalBoxSlot(VerticalBox holder, float x, float y, float width, float height)
+        internal VerticalBoxSlot(VerticalBox holder)
         {
             InternalHolder = holder;
-            X = x;
-            Y = y;
-            Width = width;
-            Height = height;
         }
 
         #region ISlot
@@ -105,7 +104,7 @@ namespace Fusion.Engine.Frames2.Containers
 		public override string ToString() => $"VerticalBoxSlot with {Component}";
     }
 
-    public class VerticalBox : IUIModifiableContainer<VerticalBoxSlot>
+    public class VerticalBox : IUIModifiableContainer<VerticalBoxSlot>, IXmlSerializable
     {
         private readonly AsyncObservableCollection<VerticalBoxSlot> _slots = new AsyncObservableCollection<VerticalBoxSlot>();
         public IEnumerable<ISlot> Slots => _slots;
@@ -195,32 +194,22 @@ namespace Fusion.Engine.Frames2.Containers
 
 		public VerticalBoxSlot Insert( UIComponent child, int index )
 		{
-			return Insert(child, index, 0, 0, 100, 100);
-		}
+            var slot = new VerticalBoxSlot(this);
+            slot.Attach(child);
 
-		public VerticalBoxSlot Insert( UIComponent child, int index, float x, float y, float width, float height )
-		{
-			var slot = new VerticalBoxSlot(this, x, y, width, height);
-			slot.Attach(child);
-
-			lock (ChildrenAccessLock)
-			{
-				if (index < _slots.Count)
-					_slots.Insert(index, slot);
-				else
-					_slots.Add(slot);
-			}
-			return slot;
+            lock (ChildrenAccessLock)
+            {
+                if (index < _slots.Count)
+                    _slots.Insert(index, slot);
+                else
+                    _slots.Add(slot);
+            }
+            return slot;
 		}
 
 		public VerticalBoxSlot Add( UIComponent child )
 		{
 			return Insert(child, int.MaxValue);
-		}
-
-		public VerticalBoxSlot Add( UIComponent child, float x, float y, float width, float height )
-		{
-			return Insert(child, int.MaxValue, x, y, width, height);
 		}
 
 		public bool Remove(UIComponent child)
@@ -253,5 +242,66 @@ namespace Fusion.Engine.Frames2.Containers
 		{
 			Name = this.GetType().Name;
 		}
+
+        public XmlSchema GetSchema()
+        {
+            return null;
+        }
+
+        public void ReadXml(XmlReader reader)
+        {
+            Name = reader.GetAttribute("Name");
+            DesiredWidth = float.Parse(reader.GetAttribute("DesiredWidth"));
+            DesiredHeight = float.Parse(reader.GetAttribute("DesiredHeight"));
+            Alignment = (HorizontalAlignment) Enum.Parse(typeof(HorizontalAlignment), reader.GetAttribute("Alignment"));
+            reader.ReadStartElement("VerticalBox");
+            reader.ReadStartElement("Slots");
+
+            reader.MoveToContent();
+            if (!reader.IsEmptyElement)
+            {
+                while (reader.NodeType != XmlNodeType.EndElement)
+                {
+                    reader.ReadStartElement("Slot");
+
+                    var slot = new VerticalBoxSlot(this)
+                    {
+                        Angle = UIComponentSerializer.ReadValue<float>(reader),
+                        Clip = UIComponentSerializer.ReadValue<bool>(reader),
+                        Visible = UIComponentSerializer.ReadValue<bool>(reader)
+                    };
+                    slot.Attach(UIComponentSerializer.ReadValue<SeralizableObjectHolder>(reader).SerializableFrame);
+                    _slots.Add(slot);
+
+                    reader.ReadEndElement();
+                    reader.MoveToContent();
+                }
+            }
+
+            reader.ReadEndElement();
+        }
+
+        public void WriteXml(XmlWriter writer)
+        {
+            writer.WriteAttributeString("Name", Name);
+            writer.WriteAttributeString("DesiredWidth", DesiredWidth.ToString());
+            writer.WriteAttributeString("DesiredHeight", DesiredHeight.ToString());
+            writer.WriteAttributeString("Alignment", Alignment.ToString());
+            writer.WriteStartElement("Slots");
+
+            foreach (var slot in _slots)
+            {
+                writer.WriteStartElement("Slot");
+
+                UIComponentSerializer.WriteValue(writer, slot.Angle);
+                UIComponentSerializer.WriteValue(writer, slot.Clip);
+                UIComponentSerializer.WriteValue(writer, slot.Visible);
+                UIComponentSerializer.WriteValue(writer, new SeralizableObjectHolder(slot.Component));
+
+                writer.WriteEndElement();
+            }
+
+            writer.WriteEndElement();
+        }
 	}
 }

@@ -15,7 +15,7 @@ using System.Windows.Shapes;
 using Fusion.Engine.Frames2;
 using Fusion.Engine.Frames2.Managing;
 
-namespace WpfEditorTest.ChildPanels
+namespace WpfEditorTest.Utility
 {
 	/// <summary>
 	/// Interaction logic for ParentHighlightPanel.xaml
