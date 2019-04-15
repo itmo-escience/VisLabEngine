@@ -18,7 +18,7 @@ namespace WpfEditorTest.ChildWindows
 	/// </summary>
 	public partial class SlotDetailsWindow : Window
 	{
-		private UIController<IControllerSlot> selectedController;
+		private UIController selectedController;
 
 		public SlotDetailsWindow()
 		{
@@ -35,7 +35,7 @@ namespace WpfEditorTest.ChildWindows
             Closing += (s, e) => {this.Hide(); e.Cancel = true; };
 		}
 
-		public void SetSelectFrame( UIController<IControllerSlot> controller )
+		public void SetSelectFrame( UIController controller )
 		{
 			if (controller==null)
 			{

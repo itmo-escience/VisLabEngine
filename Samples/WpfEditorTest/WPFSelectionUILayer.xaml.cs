@@ -421,7 +421,7 @@ namespace WpfEditorTest
 							hoveredFrame = hoveredFrame.Parent();
 						}
 
-						if (hoveredFrame is UIController<IControllerSlot>)
+						if (hoveredFrame is UIController)
 						{
 							hoveredFrame = SceneFrame;
 						}
@@ -531,7 +531,7 @@ namespace WpfEditorTest
 					{
 						if (!SelectionManager.Instance.SelectedFrames.Contains(hovered) && !FrameSelectionPanelList.Any(fsp => fsp.Value.MousePressed))
 						{
-							if (hovered.Parent() is UIController<IControllerSlot>)
+							if (hovered.Parent() is UIController)
 								hovered = hovered.Parent();
 
 							command = new SelectFrameCommand(hovered);
