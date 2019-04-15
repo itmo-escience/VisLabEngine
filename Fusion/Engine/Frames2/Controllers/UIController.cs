@@ -15,7 +15,7 @@ namespace Fusion.Engine.Frames2.Controllers
         string Name { get; }
     }
 
-    public abstract class UIController<T> : IUIContainer where T : IControllerSlot
+    public abstract class UIController : IUIContainer
     {
         public IUIStyle Style { get; protected set; }
 

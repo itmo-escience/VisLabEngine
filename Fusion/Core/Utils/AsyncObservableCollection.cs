@@ -64,19 +64,15 @@ namespace Fusion.Core.Utils
         /// </summary>
         private sealed class ThreadView
         {
-            private struct VersionedEventArgs
-            {
-                public EventArgs Args;
-                public int Version; //
-            }
             // These fields will always be accessed from the correct thread, so no sync issues
             public readonly List<EventArgs> waitingEvents = new List<EventArgs>();    // events waiting to be dispatched
             public bool dissalowReenterancy;                                          // don't allow write methods to be called on the thread that's executing events
 
             // Private stuff all used for snapshot/enumerator
-            private readonly int _threadId;                                           // id of the current thread
+            public readonly int ThreadId;                                           // id of the current thread
             private readonly AsyncObservableCollection<T> _owner;                     // the collection
             private readonly WeakReference<List<T>> _snapshot;                        // cache of the most recent snapshot
+            private List<T> _snapshotReuseHolder;
             private int _listVersion;                                                 // version at which the snapshot was taken
             private int _snapshotId;                                                  // incremented every time a new snapshot is created
             private int _enumeratingCurrentSnapshot;                                  // # enumerating snapshot with current ID; reset when a snapshot is created
@@ -84,7 +80,7 @@ namespace Fusion.Core.Utils
             public ThreadView(AsyncObservableCollection<T> owner)
             {
                 _owner = owner;
-                _threadId = Thread.CurrentThread.ManagedThreadId;
+                ThreadId = Thread.CurrentThread.ManagedThreadId;
                 _snapshot = new WeakReference<List<T>>(null);
             }
 
@@ -94,35 +90,47 @@ namespace Fusion.Core.Utils
             /// </summary>
             public List<T> getSnapshot()
             {
-                Debug.Assert(Thread.CurrentThread.ManagedThreadId == _threadId);
+                Debug.Assert(Thread.CurrentThread.ManagedThreadId == ThreadId);
                 List<T> list;
-                // if we have a cached snapshot that's up to date, just use that one
-                if(!_snapshot.TryGetTarget(out list) || _listVersion != _owner._version)
-                {
-                    // need to create a new snapshot
-                    // if nothing is using the old snapshot, we can clear and reuse the existing list instead
-                    // of allocating a brand new list. yay for eco-friendly solutions!
-                    int enumCount = _enumeratingCurrentSnapshot;
-                    _snapshotId++;
-                    _enumeratingCurrentSnapshot = 0;
 
+                // if we have a cached snapshot that's up to date, just use that one
+                if (_listVersion == _owner._version && _snapshot.TryGetTarget(out list))
+                    return list;
+
+                // release snapshot as it's not valid anymore
+                _snapshotReuseHolder = null;
+                _snapshot.TryGetTarget(out list);
+                // need to create a new snapshot
+                // if nothing is using the old snapshot, we can clear and reuse the existing list instead
+                // of allocating a brand new list. yay for eco-friendly solutions!
+                int enumCount = _enumeratingCurrentSnapshot;
+                _snapshotId++;
+                _enumeratingCurrentSnapshot = 0;
+
+                if (list == null || enumCount > 0)
+                {
                     _owner._lock.EnterReadLock();
                     try
                     {
                         _listVersion = _owner._version;
-                        if(list == null || enumCount > 0)
-                        {
-                            // if enumCount > 0 here that means something is currently using the instance of list. we create a new list
-                            // here and "strand" the old list so the enumerator can finish enumerating it in peace.
-                            list = new List<T>(_owner._collection);
-                            _snapshot.SetTarget(list);
-                        }
-                        else
-                        {
-                            // clear & reuse the old list
-                            list.Clear();
-                            list.AddRange(_owner._collection);
-                        }
+                        list = new List<T>(_owner._collection);
+                        _snapshot.SetTarget(list);
+                    }
+                    finally
+                    {
+                        _owner._lock.ExitReadLock();
+                    }
+                }
+                else
+                {
+                    _owner._lock.EnterReadLock();
+                    try
+                    {
+                        _listVersion = _owner._version;
+
+                        // clear & reuse the old list
+                        list.Clear();
+                        list.AddRange(_owner._collection);
                     }
                     finally
                     {
@@ -139,7 +147,7 @@ namespace Fusion.Core.Utils
             /// <returns>The ID to pass into <see cref="exitEnumerator"/>.</returns>
             public int enterEnumerator()
             {
-                Debug.Assert(Thread.CurrentThread.ManagedThreadId == _threadId);
+                Debug.Assert(Thread.CurrentThread.ManagedThreadId == ThreadId);
                 _enumeratingCurrentSnapshot++;
                 return _snapshotId;
             }
@@ -153,10 +161,15 @@ namespace Fusion.Core.Utils
                 // if the enumerator is being disposed from a different thread than the one that creatd it, there's no way
                 // to garuntee the atomicity of this operation. if this (EXTREMELY rare) case happens, we'll ditch the list next
                 // time we need to make a new snapshot. this can never happen with a regular foreach()
-                if(Thread.CurrentThread.ManagedThreadId == _threadId)
+                if(Thread.CurrentThread.ManagedThreadId == ThreadId)
                 {
-                    if(_snapshotId == oldId)
+                    if (_snapshotId == oldId)
+                    {
                         _enumeratingCurrentSnapshot--;
+
+                        // hold snapshot a bit more
+                        _snapshot.TryGetTarget(out _snapshotReuseHolder);
+                    }
                 }
             }
         }
@@ -442,11 +455,19 @@ namespace Fusion.Core.Utils
         }
         #endregion
 
+        private ThreadView _lastUsedView;
         #region GetEnumerator and related methods that work on snapshots
         public IEnumerator<T> GetEnumerator()
         {
-            ThreadView view = _threadView.Value;
-            return new EnumeratorImpl(view.getSnapshot(), view);
+            var last = _lastUsedView;
+            if (last != null && last.ThreadId == Thread.CurrentThread.ManagedThreadId)
+            {
+                return new EnumeratorImpl(last.getSnapshot(), last);
+            }
+
+            last = _threadView.Value;
+            _lastUsedView = last;
+            return new EnumeratorImpl(last.getSnapshot(), last);
         }
 
         public void CopyTo(T[] array, int arrayIndex)

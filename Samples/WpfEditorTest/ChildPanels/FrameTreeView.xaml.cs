@@ -35,7 +35,7 @@ namespace WpfEditorTest.Utility
         }
 
         public EventHandler<UIComponent> SelectedFrameChangedInUI;
-		public EventHandler<UIController<IControllerSlot>> ControllerSlotSelected;
+		public EventHandler<UIController> ControllerSlotSelected;
 		public EventHandler RequestFrameDeletionInUI;
 
 		private TextBlock initTreeViewItemHolder;
@@ -81,9 +81,9 @@ namespace WpfEditorTest.Utility
 				//ControllerSlotSelected?.Invoke(this, objectChecking as UIController.Slot);
 				return;
 			}
-			else if (objectChecking is UIController<IControllerSlot>)
+			else if (objectChecking is UIController)
 			{
-				ControllerSlotSelected?.Invoke(this, objectChecking as UIController<IControllerSlot>);
+				ControllerSlotSelected?.Invoke(this, objectChecking as UIController);
 			}
 			else
 			{
@@ -120,9 +120,9 @@ namespace WpfEditorTest.Utility
 
 			while (currentFrame.Parent() != null && currentFrame.Parent() != _scene)
 			{
-				if (currentFrame.Parent() is UIController<IControllerSlot>)
+				if (currentFrame.Parent() is UIController)
 				{
-					components.Add((currentFrame.Parent() as UIController<IControllerSlot>).Slots.Where(s => s.Component == currentFrame).FirstOrDefault());
+					components.Add((currentFrame.Parent() as UIController).Slots.Where(s => s.Component == currentFrame).FirstOrDefault());
 					currentFrame = currentFrame.Parent();
 					components.Add(currentFrame);
 				}
@@ -193,7 +193,7 @@ namespace WpfEditorTest.Utility
 				customAdorner.Visibility = Visibility.Visible;
 				var toAncestor = (treeViewItemHolder.TransformToAncestor(ElementHierarchyView) as Transform);
 
-				if (treeViewItemHolder.Tag is IUIModifiableContainer<ISlot> && !(treeViewItemHolder.Tag is UIController<IControllerSlot>))
+				if (treeViewItemHolder.Tag is IUIModifiableContainer<ISlot> && !(treeViewItemHolder.Tag is UIController))
 				{
 					e.Effects = DragDropEffects.Copy | DragDropEffects.Move;
 					treeViewItemHolder.Background = ApplicationConfig.TreeViewItemHolderAllowedHoveredColor;
@@ -263,7 +263,7 @@ namespace WpfEditorTest.Utility
 							}
 						case 0:
 							{
-								if (treeViewItemHolder.Tag is IUIModifiableContainer<ISlot> && !(treeViewItemHolder.Tag is UIController<IControllerSlot>))
+								if (treeViewItemHolder.Tag is IUIModifiableContainer<ISlot> && !(treeViewItemHolder.Tag is UIController))
 									command = new UIComponentParentChangeCommand(dataComponent, treeViewItemHolder.Tag as IUIModifiableContainer<ISlot>, dataComponent.Parent() as IUIModifiableContainer<ISlot>);
 								break;
 							}

@@ -189,7 +189,9 @@ namespace GISTest
             testBorderSlot.X = 30;
             testBorderSlot.Y = 30;*/
 
-            string str = UIComponentSerializer.WriteToString(testcontainer);
+            var button = new ButtonController();
+
+            string str = UIComponentSerializer.WriteToString(button);
             var comp = UIComponentSerializer.ReadFromString(str);
 
             #endregion

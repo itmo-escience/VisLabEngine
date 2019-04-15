@@ -124,6 +124,9 @@ namespace Fusion.Engine.Frames2.Components
 
         public void Update(GameTime gameTime)
         {
+            if ((_textLayout != null) && ((_textLayout.MaxWidth != Placement.AvailableWidth) || (_textLayout.MaxHeight != Placement.AvailableHeight))) 
+                _isDirtyLayout = true;
+
             if (!_isDirtyLayout) return;
 
             if (AutoSize)

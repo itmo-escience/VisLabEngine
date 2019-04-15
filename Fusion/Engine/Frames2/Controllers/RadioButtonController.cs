@@ -82,7 +82,7 @@ namespace Fusion.Engine.Frames2.Controllers
         public void DebugDraw(SpriteLayerD2D layer) {}
     }
 
-    public class RadioButtonController : UIController<RadioButtonSlot>
+    public class RadioButtonController : UIController
     {
         protected override IEnumerable<IControllerSlot> MainControllerSlots => new List<IControllerSlot>() { Background, RadioButton, Body };
         protected override IEnumerable<IControllerSlot> AdditionalControllerSlots => Enumerable.Empty<IControllerSlot>();

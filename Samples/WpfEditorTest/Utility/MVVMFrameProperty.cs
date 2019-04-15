@@ -60,7 +60,9 @@ namespace WpfEditorTest.Utility
 		{
 			get => _prop;
 			set
-			{
+            {
+                if (value == null) return;
+
 				var convertedValue = Convert.ChangeType(value, PropInfo.PropertyType);
 
 				IEditorCommand command;
@@ -72,7 +74,7 @@ namespace WpfEditorTest.Utility
 				{
 					command = new SlotPropertyChangeCommand((Obj as ISlot).Component, PropName, value);
 				}
-				 
+
 				CommandManager.Instance.Execute(command);
 
 				//OnPropertyChanged();

@@ -9,11 +9,13 @@ using Fusion.Engine.Frames2.Events;
 using Fusion.Engine.Graphics;
 using Fusion.Engine.Graphics.SpritesD2D;
 using System.Text.RegularExpressions;
+using Fusion.Core.Utils;
 using Fusion.Engine.Frames2.Controllers;
+using System.Linq;
 
 namespace Fusion.Engine.Frames2.Managing
 {
-    internal class RootSlot : ISlot
+    internal class RootSlot : ISlotAttachable
     {
         public float X => 0;
         public float Y => 0;
@@ -27,7 +29,7 @@ namespace Fusion.Engine.Frames2.Managing
         public bool Clip => false;
         public bool Visible => true;
         public IUIContainer Parent => null;
-        public UIComponent Component { get; }
+        public UIComponent Component { get; private set; }
 
         public SolidBrushD2D DebugBrush => new SolidBrushD2D(Color4.White);
         public TextFormatD2D DebugTextFormat => new TextFormatD2D("Calibri", 10);
@@ -43,15 +45,45 @@ namespace Fusion.Engine.Frames2.Managing
 
         // This object is immutable
         public event PropertyChangedEventHandler PropertyChanged;
+        public event EventHandler<SlotAttachmentChangedEventArgs> ComponentAttached;
+
+        public void Attach(UIComponent component)
+        {
+            var s = component.Placement;
+
+            if (s != null)
+            {
+                if (s is ISlotAttachable sa)
+                {
+                    sa.Detach();
+                }
+                else
+                {
+                    Log.Error("Attempt to attach component from unmodifiable");
+                    return;
+                }
+            }
+
+            UIComponent old = null;
+            if (Component != null)
+            {
+                old = Component;
+                Component.Placement = null;
+            }
+
+            component.Placement = this;
+            Component = component;
+            ComponentAttached?.Invoke(this, new SlotAttachmentChangedEventArgs(old, component));
+        }
     }
 
     public class UIManager
     {
-        public UIEventProcessor UIEventProcessor { get; }
+        public UIEventProcessor UIEventProcessor { get; private set; }
         public UIStyleManager StyleManager => UIStyleManager.Instance;
 
         private readonly RootSlot _rootSlot;
-        public FreePlacement Root { get; }
+        public FreePlacement Root => (FreePlacement)_rootSlot.Component;
 
         public bool DebugEnabled { get; set; }
 
@@ -61,10 +93,10 @@ namespace Fusion.Engine.Frames2.Managing
 
         public UIManager(RenderSystem rs)
         {
-            Root = new FreePlacement();
-            Root.Name = "Root";
+            var root = new FreePlacement();
+            root.Name = "Root";
 
-            _rootSlot = new RootSlot(rs.DisplayBounds.Width, rs.DisplayBounds.Height, Root);
+            _rootSlot = new RootSlot(rs.DisplayBounds.Width, rs.DisplayBounds.Height, root);
             var t = _rootSlot.Transform();
             _localTransforms[_rootSlot] = t;
             _globalTransforms[_rootSlot] = Matrix3x2.Identity;
@@ -78,11 +110,19 @@ namespace Fusion.Engine.Frames2.Managing
                 _rootSlot.Height = rs.DisplayBounds.Height;
             };
         }
+        
+        public void LoadRootFromFile(string filePath)
+        {
+            UIComponentSerializer.Read(filePath, out UIComponent root);
+            _rootSlot.Attach(root);
+            UIEventProcessor.Root = (IUIContainer)root;
+        }
+
+        public UIComponent GetComponentByName(string name) => UIHelper.BFSTraverse(Root).Where(child => child.Name == name).FirstOrDefault();
 
         public void Update(GameTime gameTime)
         {
             UIEventProcessor.Update(gameTime);
-            RecalculateAllTransforms();
 
             foreach (var c in UIHelper.DFSTraverse(Root))
             {
@@ -132,7 +172,7 @@ namespace Fusion.Engine.Frames2.Managing
 
 		private void InvalidateTransformsDown(ISlot slot)
         {
-            foreach (var component in UIHelper.DFSTraverse(slot.Component))
+            foreach (var component in UIHelper.DFSTraverse(slot.Component, c => !_dirtyTransforms.GetOrDefault(c.Placement, false)))
             {
                 _dirtyTransforms[component.Placement] = true;
             }
@@ -175,14 +215,13 @@ namespace Fusion.Engine.Frames2.Managing
                 }
 
                 var parent = slot.Parent.Placement;
-#if DEBUG
-                // at this point transforms for holder must be already calculated
+                // at this point transforms for parent must be already calculated
                 Debug.Assert(!_dirtyTransforms.GetOrDefault(parent, true));
                 Debug.Assert(_globalTransforms.ContainsKey(parent));
-#endif
 
-                _localTransforms[slot] = slot.Transform();
-                _globalTransforms[slot] = _globalTransforms[parent] * _localTransforms[slot];
+                var transform = slot.Transform();
+                _localTransforms[slot] = transform;
+                _globalTransforms[slot] = _globalTransforms[parent] * transform;
                 _dirtyTransforms[slot] = false;
             }
         }
@@ -276,7 +315,8 @@ namespace Fusion.Engine.Frames2.Managing
             layer.Draw(new Rect(b.X, b.Y, b.Width, b.Height, slot.DebugBrush));
 
             var debugText = $"{slot.Component.Name} X:{b.X:0.00} Y:{b.Y:0.00} W:{b.Width:0.00} H:{b.Height:0.00}";
-            layer.Draw(new Text(debugText, new RectangleF(b.X, b.Y - 10, b.Width, 10), slot.DebugTextFormat, slot.DebugBrush));
+            var symbolSize = slot.DebugTextFormat.Size;
+            layer.Draw(new Text(debugText, new RectangleF(b.X, b.Y - symbolSize, symbolSize * debugText.Length, symbolSize), slot.DebugTextFormat, slot.DebugBrush));
         }
 
         public static bool IsComponentNameValid(string name, UIComponent root, UIComponent ignoredComponent = null)
