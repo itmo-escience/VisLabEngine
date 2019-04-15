@@ -15,7 +15,7 @@ using System.Linq;
 
 namespace Fusion.Engine.Frames2.Managing
 {
-    internal class RootSlot : ISlot
+    internal class RootSlot : ISlotAttachable
     {
         public float X => 0;
         public float Y => 0;
@@ -29,7 +29,7 @@ namespace Fusion.Engine.Frames2.Managing
         public bool Clip => false;
         public bool Visible => true;
         public IUIContainer Parent => null;
-        public UIComponent Component { get; }
+        public UIComponent Component { get; private set; }
 
         public SolidBrushD2D DebugBrush => new SolidBrushD2D(Color4.White);
         public TextFormatD2D DebugTextFormat => new TextFormatD2D("Calibri", 10);
@@ -45,6 +45,36 @@ namespace Fusion.Engine.Frames2.Managing
 
         // This object is immutable
         public event PropertyChangedEventHandler PropertyChanged;
+        public event EventHandler<SlotAttachmentChangedEventArgs> ComponentAttached;
+
+        public void Attach(UIComponent component)
+        {
+            var s = component.Placement;
+
+            if (s != null)
+            {
+                if (s is ISlotAttachable sa)
+                {
+                    sa.Detach();
+                }
+                else
+                {
+                    Log.Error("Attempt to attach component from unmodifiable");
+                    return;
+                }
+            }
+
+            UIComponent old = null;
+            if (Component != null)
+            {
+                old = Component;
+                Component.Placement = null;
+            }
+
+            component.Placement = this;
+            Component = component;
+            ComponentAttached?.Invoke(this, new SlotAttachmentChangedEventArgs(old, component));
+        }
     }
 
     public class UIManager
@@ -53,7 +83,7 @@ namespace Fusion.Engine.Frames2.Managing
         public UIStyleManager StyleManager => UIStyleManager.Instance;
 
         private readonly RootSlot _rootSlot;
-        public FreePlacement Root { get; private set; }
+        public FreePlacement Root => (FreePlacement)_rootSlot.Component;
 
         public bool DebugEnabled { get; set; }
 
@@ -63,10 +93,10 @@ namespace Fusion.Engine.Frames2.Managing
 
         public UIManager(RenderSystem rs)
         {
-            Root = new FreePlacement();
-            Root.Name = "Root";
+            var root = new FreePlacement();
+            root.Name = "Root";
 
-            _rootSlot = new RootSlot(rs.DisplayBounds.Width, rs.DisplayBounds.Height, Root);
+            _rootSlot = new RootSlot(rs.DisplayBounds.Width, rs.DisplayBounds.Height, root);
             var t = _rootSlot.Transform();
             _localTransforms[_rootSlot] = t;
             _globalTransforms[_rootSlot] = Matrix3x2.Identity;
@@ -84,16 +114,11 @@ namespace Fusion.Engine.Frames2.Managing
         public void LoadRootFromFile(string filePath)
         {
             UIComponentSerializer.Read(filePath, out UIComponent root);
-            Root = (FreePlacement)root;
-            Root.Placement = _rootSlot;
-            UIEventProcessor = new UIEventProcessor(this, Root);
+            _rootSlot.Attach(root);
+            UIEventProcessor.Root = (IUIContainer)root;
         }
 
-        public static bool GetComponentByName(IUIContainer sourceContainer, string name, out UIComponent component )
-        {
-            component = UIHelper.BFSTraverse(sourceContainer).Where(child => child.Name == name).FirstOrDefault();
-            return component != null;
-        }
+        public UIComponent GetComponentByName(string name) => UIHelper.BFSTraverse(Root).Where(child => child.Name == name).FirstOrDefault();
 
         public void Update(GameTime gameTime)
         {

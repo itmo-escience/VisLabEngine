@@ -10,7 +10,7 @@ namespace Fusion.Engine.Frames2.Events
     public class UIEventProcessor
     {
         private readonly Game _game;
-        private readonly IUIContainer _root;
+        public IUIContainer Root { get; internal set; }
         private readonly UIManager _manager;
 
         private UIComponent _focusComponent;
@@ -27,7 +27,7 @@ namespace Fusion.Engine.Frames2.Events
 
         internal UIEventProcessor(UIManager manager, IUIContainer root)
         {
-            _root = root;
+            Root = root;
             _game = Game.Instance;
             _manager = manager;
             _focusComponent = root;
@@ -90,7 +90,7 @@ namespace Fusion.Engine.Frames2.Events
                 var mouseArgs = (MoveEventArgs) args;
 
                 UIComponent s = null;
-                foreach (var c in UIHelper.BFSTraverseForPoint(_manager, _root, mousePosition).Reverse())
+                foreach (var c in UIHelper.BFSTraverseForPoint(_manager, Root, mousePosition).Reverse())
                 {
                     if (s == null)
                         s = c;
@@ -109,7 +109,7 @@ namespace Fusion.Engine.Frames2.Events
                 var dragArgs = new DragEventArgs(_lastMouseKey, args);
 
                 UIComponent s = null;
-                foreach (var c in UIHelper.BFSTraverseForPoint(_manager, _root, mousePosition).Reverse())
+                foreach (var c in UIHelper.BFSTraverseForPoint(_manager, Root, mousePosition).Reverse())
                 {
                     if (s == null) s = c;
 
@@ -128,7 +128,7 @@ namespace Fusion.Engine.Frames2.Events
                 var clickArgs = new ClickEventArgs(args.Key, mousePosition);
 
                 UIComponent s = null;
-                foreach (var c in UIHelper.BFSTraverseForPoint(_manager, _root, mousePosition).Reverse())
+                foreach (var c in UIHelper.BFSTraverseForPoint(_manager, Root, mousePosition).Reverse())
                 {
                     if (s == null) s = c;
                     if (!clickArgs.ShouldPropagate)
@@ -137,14 +137,14 @@ namespace Fusion.Engine.Frames2.Events
                     c.Events.InvokeMouseDown(s, clickArgs);
                 }
 
-                foreach (var c in UIHelper.DFSTraverse(_root))
+                foreach (var c in UIHelper.DFSTraverse(Root))
                 {
                     if (!_manager.IsInsideSlotInternal(c.Placement, mousePosition))
                         c.Events.InvokeMouseDownOutside(s, clickArgs);
                 }
 
                 _lastMouseKey = args.Key;
-                _lastMouseDownComponent = UIHelper.GetLowestComponentInHierarchy(_manager, _root, mousePosition);
+                _lastMouseDownComponent = UIHelper.GetLowestComponentInHierarchy(_manager, Root, mousePosition);
                 _focusComponent = _lastMouseDownComponent;
             };
 
@@ -156,7 +156,7 @@ namespace Fusion.Engine.Frames2.Events
                 var mousePosition = _game.Mouse.Position;
                 var clickArgs = new ClickEventArgs(args.Key, mousePosition);
                 UIComponent s = null;
-                foreach (var c in UIHelper.BFSTraverseForPoint(_manager, _root, mousePosition).Reverse())
+                foreach (var c in UIHelper.BFSTraverseForPoint(_manager, Root, mousePosition).Reverse())
                 {
                     if (s == null) s = c;
                     if (!clickArgs.ShouldPropagate)
@@ -164,7 +164,7 @@ namespace Fusion.Engine.Frames2.Events
                     c.Events.InvokeMouseUp(s, clickArgs);
                 }
 
-                foreach (var c in UIHelper.DFSTraverse(_root))
+                foreach (var c in UIHelper.DFSTraverse(Root))
                 {
                     if (!_manager.IsInsideSlotInternal(c.Placement, mousePosition))
                         c.Events.InvokeMouseUpOutside(s, clickArgs);
@@ -177,11 +177,11 @@ namespace Fusion.Engine.Frames2.Events
                 if (args.Key != _lastMouseKey) return;
 
                 var mousePosition = _game.Mouse.Position;
-                var currentComponent = UIHelper.GetLowestComponentInHierarchy(_manager, _root, mousePosition);
+                var currentComponent = UIHelper.GetLowestComponentInHierarchy(_manager, Root, mousePosition);
                 if (currentComponent != _lastMouseDownComponent) return;
 
                 var clickArgs = new ClickEventArgs(args.Key, mousePosition);
-                foreach (var c in UIHelper.BFSTraverseForPoint(_manager, _root, mousePosition).Reverse())
+                foreach (var c in UIHelper.BFSTraverseForPoint(_manager, Root, mousePosition).Reverse())
                 {
                     if (!clickArgs.ShouldPropagate)
                         break;
@@ -194,7 +194,7 @@ namespace Fusion.Engine.Frames2.Events
                     if (_clickStopwatch.ElapsedMilliseconds < ClickDelay)
                     {
                         clickArgs = new ClickEventArgs(args.Key, mousePosition);
-                        foreach (var c in UIHelper.BFSTraverseForPoint(_manager, _root, mousePosition).Reverse())
+                        foreach (var c in UIHelper.BFSTraverseForPoint(_manager, Root, mousePosition).Reverse())
                         {
                             if (!clickArgs.ShouldPropagate)
                                 break;
@@ -281,7 +281,7 @@ namespace Fusion.Engine.Frames2.Events
 
         private void InvokeEnterAndLeaveComponentsEvents()
         {
-            var newComponentsWithMouse = UIHelper.BFSTraverseForPoint(_manager, _root, _game.Mouse.Position).ToList();
+            var newComponentsWithMouse = UIHelper.BFSTraverseForPoint(_manager, Root, _game.Mouse.Position).ToList();
             foreach (var c in newComponentsWithMouse.Except(_componentsWithMouse))
             {
                 c.Events.InvokeEnter(c);
