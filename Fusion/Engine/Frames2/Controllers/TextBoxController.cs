@@ -144,6 +144,8 @@ namespace Fusion.Engine.Frames2.Controllers
             Background = ParentFillingSlot.ReadFromXml(reader, this);
             Text = ParentFillingSlot.ReadFromXml(reader, this);
             reader.ReadEndElement();
+
+            _label = (Label)Text.Component;
         }
 
         public void WriteXml(XmlWriter writer)
