@@ -276,7 +276,8 @@ namespace Fusion.Engine.Frames2.Managing
             layer.Draw(new Rect(b.X, b.Y, b.Width, b.Height, slot.DebugBrush));
 
             var debugText = $"{slot.Component.Name} X:{b.X:0.00} Y:{b.Y:0.00} W:{b.Width:0.00} H:{b.Height:0.00}";
-            layer.Draw(new Text(debugText, new RectangleF(b.X, b.Y - 10, b.Width, 10), slot.DebugTextFormat, slot.DebugBrush));
+            var symbolSize = slot.DebugTextFormat.Size;
+            layer.Draw(new Text(debugText, new RectangleF(b.X, b.Y - symbolSize, symbolSize * debugText.Length, symbolSize), slot.DebugTextFormat, slot.DebugBrush));
         }
 
         public static bool IsComponentNameValid(string name, UIComponent root, UIComponent ignoredComponent = null)
