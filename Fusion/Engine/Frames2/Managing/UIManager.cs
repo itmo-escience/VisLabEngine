@@ -9,7 +9,9 @@ using Fusion.Engine.Frames2.Events;
 using Fusion.Engine.Graphics;
 using Fusion.Engine.Graphics.SpritesD2D;
 using System.Text.RegularExpressions;
+using Fusion.Core.Utils;
 using Fusion.Engine.Frames2.Controllers;
+using System.Linq;
 
 namespace Fusion.Engine.Frames2.Managing
 {
@@ -47,11 +49,11 @@ namespace Fusion.Engine.Frames2.Managing
 
     public class UIManager
     {
-        public UIEventProcessor UIEventProcessor { get; }
+        public UIEventProcessor UIEventProcessor { get; private set; }
         public UIStyleManager StyleManager => UIStyleManager.Instance;
 
         private readonly RootSlot _rootSlot;
-        public FreePlacement Root { get; }
+        public FreePlacement Root { get; private set; }
 
         public bool DebugEnabled { get; set; }
 
@@ -77,6 +79,20 @@ namespace Fusion.Engine.Frames2.Managing
                 _rootSlot.Width = rs.DisplayBounds.Width;
                 _rootSlot.Height = rs.DisplayBounds.Height;
             };
+        }
+        
+        public void LoadRootFromFile(string filePath)
+        {
+            UIComponentSerializer.Read(filePath, out UIComponent root);
+            Root = (FreePlacement)root;
+            Root.Placement = _rootSlot;
+            UIEventProcessor = new UIEventProcessor(this, Root);
+        }
+
+        public static bool GetComponentByName(IUIContainer sourceContainer, string name, out UIComponent component )
+        {
+            component = UIHelper.BFSTraverse(sourceContainer).Where(child => child.Name == name).FirstOrDefault();
+            return component != null;
         }
 
         public void Update(GameTime gameTime)
