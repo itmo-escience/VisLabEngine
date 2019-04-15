@@ -6,10 +6,13 @@ using Fusion.Core.Mathematics;
 using Fusion.Engine.Frames2.Events;
 using Fusion.Engine.Frames2.Components;
 using Fusion.Engine.Graphics.SpritesD2D;
+using System.Xml;
+using System.Xml.Schema;
+using System.Xml.Serialization;
 
 namespace Fusion.Engine.Frames2.Controllers
 {
-    public class ButtonController : UIController
+    public class ButtonController : UIController, IXmlSerializable
     {
         public static ControllerState Pressed = new ControllerState("Pressed");
         protected override IEnumerable<ControllerState> NonDefaultStates => new List<ControllerState> { Pressed };
@@ -18,8 +21,8 @@ namespace Fusion.Engine.Frames2.Controllers
         protected override IEnumerable<IControllerSlot> MainControllerSlots => _slots;
         protected override IEnumerable<IControllerSlot> AdditionalControllerSlots { get; } = new List<IControllerSlot>();
 
-        public ParentFillingSlot Foreground { get; }
-        public ParentFillingSlot Background { get; }
+        public ParentFillingSlot Foreground { get; private set; }
+        public ParentFillingSlot Background { get; private set; }
 
         public ButtonController(string styleName = UIStyleManager.DefaultStyle)
         {
@@ -43,6 +46,7 @@ namespace Fusion.Engine.Frames2.Controllers
 
 		public ButtonController():this(UIStyleManager.DefaultStyle) { }
 
+        #region Events
 
 		private void OnMouseUpOutside(UIComponent sender, ClickEventArgs e)
         {
@@ -91,6 +95,37 @@ namespace Fusion.Engine.Frames2.Controllers
             {
                 Button = ctrl;
             }
+        }
+
+        #endregion
+
+        public XmlSchema GetSchema()
+        {
+            return null;
+        }
+
+        public void ReadXml(XmlReader reader)
+        {
+            Name = reader.GetAttribute("Name");
+            var styleName = reader.GetAttribute("StyleName");
+            Style = UIStyleManager.Instance.GetStyle(GetType(), styleName);
+            reader.ReadStartElement("ButtonController");
+
+            reader.ReadStartElement("Slots");
+            Background = ParentFillingSlot.ReadFromXml(reader, this);
+            Foreground = ParentFillingSlot.ReadFromXml(reader, this);
+            reader.ReadEndElement();
+        }
+
+        public void WriteXml(XmlWriter writer)
+        {
+            writer.WriteAttributeString("Name", Name);
+            writer.WriteAttributeString("StyleName", Style.Name);
+
+            writer.WriteStartElement("Slots");
+            Background.WriteToXml(writer);
+            Foreground.WriteToXml(writer);
+            writer.WriteEndElement();
         }
     }
 }
