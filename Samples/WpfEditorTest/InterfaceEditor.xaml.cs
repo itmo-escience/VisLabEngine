@@ -314,6 +314,7 @@ namespace WpfEditorTest
 				Application.Current.Dispatcher.InvokeAsync(() =>
 				{
 					_uiManager = (_engine.GameInterface as ICustomizableUI)?.GetUIManager();
+					DebugCheckBox.IsChecked = _uiManager.DebugEnabled;
 
 					#region SelectionLayer
 					SelectionLayer = new WPFSelectionUILayer(_uiManager);
@@ -1222,8 +1223,7 @@ namespace WpfEditorTest
 						Source = CurrentScene.Scene,
 					};
 					_treeView.ElementHierarchyView.SetBinding(TreeView.ItemsSourceProperty, _childrenBinding);
-				    BindingOperations.EnableCollectionSynchronization(CurrentScene.Scene.Slots,
-				        CurrentScene.Scene.ChildrenAccessLock);
+					BindingOperations.EnableCollectionSynchronization(CurrentScene.Scene.Slots, CurrentScene.Scene.ChildrenAccessLock);
 					_treeView.AttachScene(SceneFrame);
 					SelectionManager.Instance.SelectFrame(CurrentScene.SceneSelection);
 				}
@@ -1240,6 +1240,25 @@ namespace WpfEditorTest
 			Button btn = sender as Button;
 			SceneDataContainer sceneData = btn.Tag as SceneDataContainer;
 			TryUnloadScene(sceneData);
+		}
+
+		private void DebugCheckBox_Checked( object sender, RoutedEventArgs e )
+		{
+			var chbx = sender as CheckBox;
+
+			EnableDebug((chbx.IsChecked != null && chbx.IsChecked == true) ? true : false);
+		}
+
+		private void DebugCheckBox_Unchecked( object sender, RoutedEventArgs e )
+		{
+			var chbx = sender as CheckBox;
+
+			EnableDebug((chbx.IsChecked != null && chbx.IsChecked == true) ? true : false);
+		}
+
+		private void EnableDebug( bool isEnabled )
+		{
+			_uiManager.DebugEnabled = isEnabled;
 		}
 	}
 }

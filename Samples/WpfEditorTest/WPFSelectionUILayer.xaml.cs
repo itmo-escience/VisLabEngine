@@ -661,9 +661,7 @@ namespace WpfEditorTest
 		public void PrepareStickingCoords()
 		{
 			ForgetStickingCoords();
-				RememberStickingCoords(SceneFrame);
-
-
+			RememberStickingCoords(SceneFrame);
 		}
 
 		private void RememberStickingCoords( UIComponent frame )

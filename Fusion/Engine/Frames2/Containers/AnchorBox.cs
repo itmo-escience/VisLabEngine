@@ -34,19 +34,19 @@ namespace Fusion.Engine.Frames2.Containers
 		public float X
 		{
 			get;
-			set;
+			internal set;
 		}
 
 		public float Y
 		{
 			get;
-			set;
+			internal set;
 		}
 
 		public float Angle
 		{
 			get;
-			set;
+			internal set;
 		}
 
 		public float Width
