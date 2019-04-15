@@ -107,6 +107,8 @@ namespace Fusion.Engine.Frames2.Controllers
         public void ReadXml(XmlReader reader)
         {
             Name = reader.GetAttribute("Name");
+            DesiredWidth = float.Parse(reader.GetAttribute("DesiredWidth"));
+            DesiredHeight = float.Parse(reader.GetAttribute("DesiredHeight"));
             var styleName = reader.GetAttribute("StyleName");
             Style = UIStyleManager.Instance.GetStyle(GetType(), styleName);
             reader.ReadStartElement("ButtonController");
@@ -120,6 +122,8 @@ namespace Fusion.Engine.Frames2.Controllers
         public void WriteXml(XmlWriter writer)
         {
             writer.WriteAttributeString("Name", Name);
+            writer.WriteAttributeString("DesiredWidth", DesiredWidth.ToString());
+            writer.WriteAttributeString("DesiredHeight", DesiredHeight.ToString());
             writer.WriteAttributeString("StyleName", Style.Name);
 
             writer.WriteStartElement("Slots");
