@@ -2,7 +2,11 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.Xml;
+using System.Xml.Schema;
+using System.Xml.Serialization;
 using Fusion.Core.Mathematics;
+using Fusion.Core.Utils;
 using Fusion.Engine.Frames2.Components;
 using Fusion.Engine.Frames2.Events;
 using Fusion.Engine.Frames2.Managing;
@@ -72,7 +76,7 @@ namespace Fusion.Engine.Frames2.Controllers
         public ObservableCollection<PropertyValueStates> Properties { get; } = new ObservableCollection<PropertyValueStates>();
     }
     
-    public class TextBoxController : UIController<TextBoxSlot>
+    public class TextBoxController : UIController<TextBoxSlot>, IXmlSerializable
     {
         public static ControllerState Editing = new ControllerState("Editing");
         protected override IEnumerable<ControllerState> NonDefaultStates => new List<ControllerState> { Editing };
@@ -81,8 +85,8 @@ namespace Fusion.Engine.Frames2.Controllers
         protected override IEnumerable<IControllerSlot> MainControllerSlots => _slots;
         protected override IEnumerable<IControllerSlot> AdditionalControllerSlots { get; } = new List<IControllerSlot>();
 
-        public TextBoxSlot Text { get; }
-        public TextBoxSlot Background { get; }
+        public TextBoxSlot Text { get; private set; }
+        public TextBoxSlot Background { get; private set; }
 
         private Label _label;
 
@@ -123,6 +127,8 @@ namespace Fusion.Engine.Frames2.Controllers
 
             Background.Attach(new Border(0, 0, Width, Height));
         }*/
+
+        #region Events
 
         public event EventHandler<InputEventArgs> Input;
 
@@ -179,6 +185,61 @@ namespace Fusion.Engine.Frames2.Controllers
         {
             if(CurrentState == ControllerState.Hovered)
                 ChangeState(ControllerState.Default);
+        }
+
+        #endregion
+
+        public XmlSchema GetSchema()
+        {
+            return null;
+        }
+
+        public void ReadXml(XmlReader reader)
+        {
+            Name = reader.GetAttribute("Name");
+            var styleName = reader.GetAttribute("StyleName");
+            Style = UIStyleManager.Instance.GetStyle(GetType(), styleName);
+            reader.ReadStartElement("TextBoxController");
+            reader.ReadStartElement("Slots");
+
+            reader.ReadStartElement("Background");
+            Background = new TextBoxSlot("Background", this)
+            {
+                Visible = UIComponentSerializer.ReadValue<bool>(reader)
+            };
+            Background.Attach(UIComponentSerializer.ReadValue<SeralizableObjectHolder>(reader).SerializableFrame);
+            //_slots.Add(Background);
+            reader.ReadEndElement();
+
+            reader.ReadStartElement("Text");
+            Text = new TextBoxSlot("Text", this)
+            {
+                Visible = UIComponentSerializer.ReadValue<bool>(reader)
+            };
+            Text.Attach(UIComponentSerializer.ReadValue<SeralizableObjectHolder>(reader).SerializableFrame);
+            //_slots.Add(Text);
+            reader.ReadEndElement();
+
+            reader.ReadEndElement();
+        }
+
+        public void WriteXml(XmlWriter writer)
+        {
+            writer.WriteAttributeString("Name", Name);
+            writer.WriteAttributeString("StyleName", Style.Name);
+            writer.WriteStartElement("Slots");
+
+            writer.WriteStartElement("Background");
+            UIComponentSerializer.WriteValue(writer, Background.Visible);
+            UIComponentSerializer.WriteValue(writer, new SeralizableObjectHolder(Background.Component));
+            writer.WriteEndElement();
+
+            writer.WriteStartElement("Text");
+            UIComponentSerializer.WriteValue(writer, Text.Visible);
+            UIComponentSerializer.WriteValue(writer, new SeralizableObjectHolder(Text.Component));
+            writer.WriteEndElement();
+
+            writer.WriteEndElement();
         }
     }
 }
