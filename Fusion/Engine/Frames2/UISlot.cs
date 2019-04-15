@@ -56,7 +56,7 @@ namespace Fusion.Engine.Frames2
 
     public static class SlotExtensions
     {
-        public static Matrix3x2 Transform(this ISlot slot) => Matrix3x2.Transformation(1.0f, 1.0f, slot.Angle, slot.X, slot.Y);
+        public static Matrix3x2 Transform(this ISlot slot) => Matrix3x2.Rotation(slot.Angle) * Matrix3x2.Translation(slot.X, slot.Y);
 
         //public static RectangleF BoundingBox(this ISlot slot)
         //{

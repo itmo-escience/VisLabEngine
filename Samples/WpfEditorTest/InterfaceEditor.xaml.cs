@@ -438,7 +438,7 @@ namespace WpfEditorTest
 				if (openDialog.ShowDialog() != System.Windows.Forms.DialogResult.OK) return;
 
 				var createdFrame = CreateFrameFromFile(openDialog.FileName);
-				if (createdFrame != null && createdFrame.GetType().BaseType == typeof(FreePlacement))
+				if (createdFrame != null && createdFrame.GetType() == typeof(FreePlacement))
 				{
 					var loadedScene = new SceneDataContainer(createdFrame as FreePlacement) { SceneFileFullPath = openDialog.FileName, SceneName = openDialog.FileName.Split('\\').Last().Split('.').First() };
 

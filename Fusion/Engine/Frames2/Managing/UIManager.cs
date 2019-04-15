@@ -98,7 +98,6 @@ namespace Fusion.Engine.Frames2.Managing
         public void Update(GameTime gameTime)
         {
             UIEventProcessor.Update(gameTime);
-            RecalculateAllTransforms();
 
             foreach (var c in UIHelper.DFSTraverse(Root))
             {
@@ -148,7 +147,7 @@ namespace Fusion.Engine.Frames2.Managing
 
 		private void InvalidateTransformsDown(ISlot slot)
         {
-            foreach (var component in UIHelper.DFSTraverse(slot.Component))
+            foreach (var component in UIHelper.DFSTraverse(slot.Component, c => !_dirtyTransforms.GetOrDefault(c.Placement, false)))
             {
                 _dirtyTransforms[component.Placement] = true;
             }
@@ -191,14 +190,13 @@ namespace Fusion.Engine.Frames2.Managing
                 }
 
                 var parent = slot.Parent.Placement;
-#if DEBUG
-                // at this point transforms for holder must be already calculated
+                // at this point transforms for parent must be already calculated
                 Debug.Assert(!_dirtyTransforms.GetOrDefault(parent, true));
                 Debug.Assert(_globalTransforms.ContainsKey(parent));
-#endif
 
-                _localTransforms[slot] = slot.Transform();
-                _globalTransforms[slot] = _globalTransforms[parent] * _localTransforms[slot];
+                var transform = slot.Transform();
+                _localTransforms[slot] = transform;
+                _globalTransforms[slot] = _globalTransforms[parent] * transform;
                 _dirtyTransforms[slot] = false;
             }
         }

@@ -56,25 +56,31 @@ namespace WpfEditorTest.WPFConverters
 		}
 
 		public object ConvertBack( object value, Type targetType, object parameter, CultureInfo culture )
-		{
+        {
+            if (value == null) return propertyToChange;
+
 			switch (parameter)
 			{
 				case "Top":
 					{
-						return propertyToChange.Top = (float)value;
-					}
+						propertyToChange.Top = (float)value;
+                        break;
+                    }
 				case "Bottom":
 					{
-						return propertyToChange.Bottom = (float)value;
-					}
+						propertyToChange.Bottom = (float)value;
+                        break;
+                    }
 				case "Left":
 					{
-						return propertyToChange.Left = (float)value;
-					}
+						propertyToChange.Left = (float)value;
+                        break;
+                    }
 				case "Right":
 					{
-						return propertyToChange.Right = (float)value;
-					}
+						propertyToChange.Right = (float)value;
+                        break;
+                    }
 			}
 			//TODO
 			//Getting Transform?
