@@ -15,78 +15,17 @@ using Label = Fusion.Engine.Frames2.Components.Label;
 
 namespace Fusion.Engine.Frames2.Controllers
 {
-    public class TextBoxSlot : IControllerSlot, ISlotAttachable
-    {
-        public event PropertyChangedEventHandler PropertyChanged;
-        public float X => 0;
-        public float Y => 0;
-        public float Angle => 0;
-        public float Width => Parent.Placement.Width;
-        public float Height => Parent.Placement.Width;
-        public float AvailableWidth => Width;
-        public float AvailableHeight => Height;
-        public bool Clip => true;
-        public bool Visible { get; set; } = true;
-
-        public IUIContainer Parent { get; }
-        public UIComponent Component { get; private set; }
-        public SolidBrushD2D DebugBrush => new SolidBrushD2D(Color4.White);
-        public TextFormatD2D DebugTextFormat => new TextFormatD2D("Calibri", 10);
-
-        public string Name { get; }
-
-        internal TextBoxSlot(string name, TextBoxController parent)
-        {
-            Parent = parent;
-            Name = name;
-        }
-
-        public void DebugDraw(SpriteLayerD2D layer) { }
-
-        public void Attach(UIComponent component)
-        {
-            var s = component.Placement;
-
-            if (s != null)
-            {
-                if (s is ISlotAttachable sa)
-                {
-                    sa.Detach();
-                }
-                else
-                {
-                    Log.Error("Attempt to attach component from unmodifiable slot");
-                    return;
-                }
-            }
-
-            UIComponent old = null;
-            if (Component != null)
-            {
-                old = Component;
-                Component.Placement = null;
-            }
-
-            component.Placement = this;
-            Component = component;
-            ComponentAttached?.Invoke(this, new SlotAttachmentChangedEventArgs(old, component));
-        }
-
-        public event EventHandler<SlotAttachmentChangedEventArgs> ComponentAttached;
-        public ObservableCollection<PropertyValueStates> Properties { get; } = new ObservableCollection<PropertyValueStates>();
-    }
-    
-    public class TextBoxController : UIController<TextBoxSlot>, IXmlSerializable
+    public class TextBoxController : UIController, IXmlSerializable
     {
         public static ControllerState Editing = new ControllerState("Editing");
         protected override IEnumerable<ControllerState> NonDefaultStates => new List<ControllerState> { Editing };
 
-        private readonly List<TextBoxSlot> _slots;
+        private readonly List<ParentFillingSlot> _slots;
         protected override IEnumerable<IControllerSlot> MainControllerSlots => _slots;
         protected override IEnumerable<IControllerSlot> AdditionalControllerSlots { get; } = new List<IControllerSlot>();
 
-        public TextBoxSlot Text { get; private set; }
-        public TextBoxSlot Background { get; private set; }
+        public ParentFillingSlot Text { get; private set; }
+        public ParentFillingSlot Background { get; private set; }
 
         private Label _label;
 
@@ -96,12 +35,12 @@ namespace Fusion.Engine.Frames2.Controllers
 
             Style = UIStyleManager.Instance.GetStyle(GetType(), styleName);
 
-            Background = new TextBoxSlot("Background", this);
-            Text = new TextBoxSlot("Text", this);
+            Background = new ParentFillingSlot("Background", this);
+            Text = new ParentFillingSlot("Text", this);
             Background.Attach(new Border());
             Text.Attach(_label);
 
-            _slots = new List<TextBoxSlot> { Background, Text };
+            _slots = new List<ParentFillingSlot> { Background, Text };
 
             Events.Enter += OnEnter;
             Events.Leave += OnLeave;
@@ -200,26 +139,10 @@ namespace Fusion.Engine.Frames2.Controllers
             var styleName = reader.GetAttribute("StyleName");
             Style = UIStyleManager.Instance.GetStyle(GetType(), styleName);
             reader.ReadStartElement("TextBoxController");
+
             reader.ReadStartElement("Slots");
-
-            reader.ReadStartElement("Background");
-            Background = new TextBoxSlot("Background", this)
-            {
-                Visible = UIComponentSerializer.ReadValue<bool>(reader)
-            };
-            Background.Attach(UIComponentSerializer.ReadValue<SeralizableObjectHolder>(reader).SerializableFrame);
-            //_slots.Add(Background);
-            reader.ReadEndElement();
-
-            reader.ReadStartElement("Text");
-            Text = new TextBoxSlot("Text", this)
-            {
-                Visible = UIComponentSerializer.ReadValue<bool>(reader)
-            };
-            Text.Attach(UIComponentSerializer.ReadValue<SeralizableObjectHolder>(reader).SerializableFrame);
-            //_slots.Add(Text);
-            reader.ReadEndElement();
-
+            Background = ParentFillingSlot.ReadFromXml(reader, this);
+            Text = ParentFillingSlot.ReadFromXml(reader, this);
             reader.ReadEndElement();
         }
 
@@ -227,18 +150,10 @@ namespace Fusion.Engine.Frames2.Controllers
         {
             writer.WriteAttributeString("Name", Name);
             writer.WriteAttributeString("StyleName", Style.Name);
+
             writer.WriteStartElement("Slots");
-
-            writer.WriteStartElement("Background");
-            UIComponentSerializer.WriteValue(writer, Background.Visible);
-            UIComponentSerializer.WriteValue(writer, new SeralizableObjectHolder(Background.Component));
-            writer.WriteEndElement();
-
-            writer.WriteStartElement("Text");
-            UIComponentSerializer.WriteValue(writer, Text.Visible);
-            UIComponentSerializer.WriteValue(writer, new SeralizableObjectHolder(Text.Component));
-            writer.WriteEndElement();
-
+            Background.WriteToXml(writer);
+            Text.WriteToXml(writer);
             writer.WriteEndElement();
         }
     }
