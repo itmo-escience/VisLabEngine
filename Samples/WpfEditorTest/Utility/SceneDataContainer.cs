@@ -58,7 +58,7 @@ namespace WpfEditorTest.Utility
 		public SceneDataContainer( FreePlacement scene ) : this()
 		{
 			Scene = scene;
-			SceneSize = new Size(Scene.Placement.Width, Scene.Placement.Height);
+			SceneSize = new Size(Scene.DesiredWidth, Scene.DesiredHeight);
 		}
 
 		protected void OnPropertyChanged( [System.Runtime.CompilerServices.CallerMemberName] string changedProperty = "" )
