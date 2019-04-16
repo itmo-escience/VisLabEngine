@@ -15,7 +15,7 @@ using Fusion.Core.Utils;
 
 namespace Fusion.Engine.Frames2.Controllers
 {
-    public class RadioButtonSlot : IControllerSlot, ISlotAttachable
+    public class RadioButtonSlot : IControllerSlot, ISlotAttachable, ISlotSerializable
     {
         public float X
         {
@@ -63,7 +63,7 @@ namespace Fusion.Engine.Frames2.Controllers
         public event EventHandler<SlotAttachmentChangedEventArgs> ComponentAttached;
 		public event PropertyChangedEventHandler PropertyChanged;
 
-		public string Name { get; }
+		public string Name { get; private set; }
 
         internal RadioButtonSlot(string name, RadioButtonController parent)
         {
@@ -96,21 +96,16 @@ namespace Fusion.Engine.Frames2.Controllers
             writer.WriteEndElement();
         }
 
-        public static RadioButtonSlot ReadFromXml(XmlReader reader, IUIContainer parent)
+        public void ReadFromXml(XmlReader reader)
         {
-            var slotName = reader.Name;
-            reader.ReadStartElement(slotName);
-            var slot = new RadioButtonSlot(slotName, (RadioButtonController)parent)
-            {
-                X = UIComponentSerializer.ReadValue<float>(reader),
-                Y = UIComponentSerializer.ReadValue<float>(reader),
-                Width = UIComponentSerializer.ReadValue<float>(reader),
-                Height = UIComponentSerializer.ReadValue<float>(reader),
-            };
-            slot.Attach(UIComponentSerializer.ReadValue<SeralizableObjectHolder>(reader).SerializableFrame);
+            Name = reader.Name;
+            reader.ReadStartElement();
+            X = UIComponentSerializer.ReadValue<float>(reader);
+            Y = UIComponentSerializer.ReadValue<float>(reader);
+            Width = UIComponentSerializer.ReadValue<float>(reader);
+            Height = UIComponentSerializer.ReadValue<float>(reader);
+            Attach(UIComponentSerializer.ReadValue<SeralizableObjectHolder>(reader).SerializableFrame);
             reader.ReadEndElement();
-
-            return slot;
         }
     }
 
@@ -309,9 +304,9 @@ namespace Fusion.Engine.Frames2.Controllers
             reader.ReadStartElement("RadioButtonController");
 
             reader.ReadStartElement("Slots");
-            Background = SimpleControllerSlot.ReadFromXml(reader, this);
-            Body = SimpleControllerSlot.ReadFromXml(reader, this);
-            RadioButton = RadioButtonSlot.ReadFromXml(reader, this);
+            Background.ReadFromXml(reader);
+            Body.ReadFromXml(reader);
+            RadioButton.ReadFromXml(reader);
             reader.ReadEndElement();
         }
 

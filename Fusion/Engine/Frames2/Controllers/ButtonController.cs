@@ -114,8 +114,8 @@ namespace Fusion.Engine.Frames2.Controllers
             reader.ReadStartElement("ButtonController");
 
             reader.ReadStartElement("Slots");
-            Background = ParentFillingSlot.ReadFromXml(reader, this);
-            Foreground = ParentFillingSlot.ReadFromXml(reader, this);
+            Background.ReadFromXml(reader);
+            Foreground.ReadFromXml(reader);
             reader.ReadEndElement();
         }
 
