@@ -17,30 +17,29 @@ using System.Xml.Serialization;
 
 namespace Fusion.Engine.Frames2.Containers
 {
-	public class AnchorBoxSlot : ISlotAttachable
+	public class AnchorBoxSlot : ISlotAttachable, ISlotSerializable
 	{
-		internal AnchorBoxSlot( AnchorBox holder, float x, float y, float width, float height )
+		internal AnchorBoxSlot( AnchorBox holder, Fixators fixators)
 		{
 			InternalHolder = holder;
-			X = x;
-			Y = y;
-			Width = width;
-			Height = height;
-		}
+            Fixators = fixators;
+        }
 
-		public Fixators Fixators { get; set; } = new Fixators();
+        internal AnchorBoxSlot(AnchorBox holder) : this(holder, new Fixators()) {}
+
+		public Fixators Fixators { get; set; }
 
 		#region ISlot
 		public float X
 		{
 			get;
-			set;
+            internal set;
 		}
 
 		public float Y
 		{
 			get;
-			set;
+            internal set;
 		}
 
 		public float Angle
@@ -110,6 +109,28 @@ namespace Fusion.Engine.Frames2.Containers
 		#endregion
 
 		public override string ToString() => $"AnchorSlot with {Component}";
+
+        public void WriteToXml(XmlWriter writer)
+        {
+            writer.WriteStartElement("AnchorBoxSlot");
+            UIComponentSerializer.WriteValue(writer, Angle);
+            UIComponentSerializer.WriteValue(writer, Fixators);
+            UIComponentSerializer.WriteValue(writer, Clip);
+            UIComponentSerializer.WriteValue(writer, Visible);
+            UIComponentSerializer.WriteValue(writer, new SeralizableObjectHolder(Component));
+            writer.WriteEndElement();
+        }
+
+        public void ReadFromXml(XmlReader reader)
+        {
+            reader.ReadStartElement("AnchorBoxSlot");
+            Angle = UIComponentSerializer.ReadValue<float>(reader);
+            Fixators = UIComponentSerializer.ReadValue<Fixators>(reader);
+            Clip = UIComponentSerializer.ReadValue<bool>(reader);
+            Visible = UIComponentSerializer.ReadValue<bool>(reader);
+            Attach(UIComponentSerializer.ReadValue<SeralizableObjectHolder>(reader).SerializableFrame);
+            reader.ReadEndElement();
+        }
 	}
 
 	public class Fixators
@@ -118,7 +139,7 @@ namespace Fusion.Engine.Frames2.Containers
 		public float Top = -1;
 		public float Right = -1;
 		public float Bottom = -1;
-	};
+    };
 
 	public class AnchorBox : IUIModifiableContainer<AnchorBoxSlot>, IXmlSerializable
 	{
@@ -209,14 +230,9 @@ namespace Fusion.Engine.Frames2.Containers
 
 		public bool Contains( UIComponent component ) => _slots.Any(slot => slot.Component == component);
 
-		public AnchorBoxSlot Insert( UIComponent child, int index )
+		public AnchorBoxSlot Insert( UIComponent child, int index)
 		{
-			return Insert(child, index, 0, 0, 100, 100);
-		}
-
-		public AnchorBoxSlot Insert( UIComponent child, int index, float x, float y, float width, float height )
-		{
-			var slot = new AnchorBoxSlot(this, x, y, width, height);
+			var slot = new AnchorBoxSlot(this);
 			slot.Attach(child);
 
 			lock (ChildrenAccessLock)
@@ -232,11 +248,6 @@ namespace Fusion.Engine.Frames2.Containers
 		public AnchorBoxSlot Add( UIComponent child )
 		{
 			return Insert(child, int.MaxValue);
-		}
-
-		public AnchorBoxSlot Add( UIComponent child, float x, float y, float width, float height )
-		{
-			return Insert(child, int.MaxValue, x, y, width, height);
 		}
 
 		public bool Remove( UIComponent child )
@@ -283,23 +294,9 @@ namespace Fusion.Engine.Frames2.Containers
             {
                 while (reader.NodeType != XmlNodeType.EndElement)
                 {
-                    reader.ReadStartElement("Slot");
-
-                    var width = UIComponentSerializer.ReadValue<float>(reader);
-                    var height = UIComponentSerializer.ReadValue<float>(reader);
-
-                    var slot = new AnchorBoxSlot(this, 0, 0, width, height)
-                    {
-                        Angle = UIComponentSerializer.ReadValue<float>(reader),
-                        Clip = UIComponentSerializer.ReadValue<bool>(reader),
-                        Visible = UIComponentSerializer.ReadValue<bool>(reader),
-                        Fixators = UIComponentSerializer.ReadValue<Fixators>(reader)
-                    };
-                    slot.Attach(UIComponentSerializer.ReadValue<SeralizableObjectHolder>(reader).SerializableFrame);
+                    var slot = new AnchorBoxSlot(this);
+                    slot.ReadFromXml(reader);
                     _slots.Add(slot);
-
-                    reader.ReadEndElement();
-                    reader.MoveToContent();
                 }
             }
 
@@ -315,17 +312,7 @@ namespace Fusion.Engine.Frames2.Containers
 
             foreach (var slot in _slots)
             {
-                writer.WriteStartElement("Slot");
-
-                UIComponentSerializer.WriteValue(writer, slot.Width);
-                UIComponentSerializer.WriteValue(writer, slot.Height);
-                UIComponentSerializer.WriteValue(writer, slot.Angle);
-                UIComponentSerializer.WriteValue(writer, slot.Clip);
-                UIComponentSerializer.WriteValue(writer, slot.Visible);
-                UIComponentSerializer.WriteValue(writer, slot.Fixators);
-                UIComponentSerializer.WriteValue(writer, new SeralizableObjectHolder(slot.Component));
-
-                writer.WriteEndElement();
+                slot.WriteToXml(writer);
             }
 
             writer.WriteEndElement();
