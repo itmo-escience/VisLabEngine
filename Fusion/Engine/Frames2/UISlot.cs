@@ -178,6 +178,40 @@ namespace Fusion.Engine.Frames2
         public void DebugDraw(SpriteLayerD2D layer)
         {
         }
+
+        public void WriteToXml(XmlWriter writer)
+        {
+            writer.WriteStartElement(Name);
+            UIComponentSerializer.WriteValue(writer, X);
+            UIComponentSerializer.WriteValue(writer, Y);
+            UIComponentSerializer.WriteValue(writer, Width);
+            UIComponentSerializer.WriteValue(writer, Height);
+            UIComponentSerializer.WriteValue(writer, Angle);
+            UIComponentSerializer.WriteValue(writer, Clip);
+            UIComponentSerializer.WriteValue(writer, Visible);
+            UIComponentSerializer.WriteValue(writer, new SeralizableObjectHolder(Component));
+            writer.WriteEndElement();
+        }
+
+        public static SimpleControllerSlot ReadFromXml(XmlReader reader, IUIContainer parent)
+        {
+            var slotName = reader.Name;
+            reader.ReadStartElement(slotName);
+            var slot = new SimpleControllerSlot(slotName, parent)
+            {
+                X = UIComponentSerializer.ReadValue<float>(reader),
+                Y = UIComponentSerializer.ReadValue<float>(reader),
+                Width = UIComponentSerializer.ReadValue<float>(reader),
+                Height = UIComponentSerializer.ReadValue<float>(reader),
+                Angle = UIComponentSerializer.ReadValue<float>(reader),
+                Clip = UIComponentSerializer.ReadValue<bool>(reader),
+                Visible = UIComponentSerializer.ReadValue<bool>(reader)
+            };
+            slot.Attach(UIComponentSerializer.ReadValue<SeralizableObjectHolder>(reader).SerializableFrame);
+            reader.ReadEndElement();
+
+            return slot;
+        }
     }
 
     public class ParentFillingSlot : IControllerSlot, ISlotAttachable

@@ -189,7 +189,7 @@ namespace GISTest
             testBorderSlot.X = 30;
             testBorderSlot.Y = 30;*/
 
-            var button = new ButtonController();
+            var button = new RadioButtonController(new Border(), RadioButtonManager.CreateNewGroup("TestGroup"));
 
             string str = UIComponentSerializer.WriteToString(button);
             var comp = UIComponentSerializer.ReadFromString(str);
