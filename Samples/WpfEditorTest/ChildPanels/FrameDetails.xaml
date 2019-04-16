@@ -425,7 +425,7 @@
                 <RowDefinition/>
             </Grid.RowDefinitions>
             <Border BorderThickness="5" BorderBrush="Gray" Grid.Row="0" DataContext="{Binding}">
-                <Expander Header="SlotProperties" VerticalAlignment="Center" DataContext="{Binding}">
+                <Expander Header="{Binding SlotName}" VerticalAlignment="Center" DataContext="{Binding}">
                     <ItemsControl ItemsSource="{Binding SlotProps}" ItemTemplateSelector="{StaticResource propTemplateSelector}" 
                               VirtualizingStackPanel.IsVirtualizing="True">
                         <ItemsControl.ItemsPanel>

@@ -84,6 +84,8 @@ namespace WpfEditorTest.Utility
 				DragDrop.DoDragDrop(templateHolder,
 									 dataObject,
 									 DragDropEffects.Move);
+
+				this.SelectedFrameTemplate = null;
 			}
 		}
 
@@ -102,6 +104,8 @@ namespace WpfEditorTest.Utility
 				DragDrop.DoDragDrop(templateHolder,
 									 dataObject,
 									 DragDropEffects.Move);
+
+				this.SelectedFrameTemplate = null;
 			}
 		}
 

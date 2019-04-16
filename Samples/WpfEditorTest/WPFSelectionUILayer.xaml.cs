@@ -958,6 +958,10 @@ namespace WpfEditorTest
 		        if (dataType != null)
 		        {
 		            createdFrame = Activator.CreateInstance(dataType) as UIComponent;
+					if (createdFrame is UIController controller)
+					{
+						controller.DefaultInit(); 
+					}
 		        }
 		    }
 
@@ -973,7 +977,6 @@ namespace WpfEditorTest
 		            UIManager.MakeComponentNameValid(component, SceneFrame, component);
 		        }
 		    }
-		    PaletteWindow.SelectedFrameTemplate = null;
 		    _parentHighlightPanel.SelectedFrame = null;
 		}
     }

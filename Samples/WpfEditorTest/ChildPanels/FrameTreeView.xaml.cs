@@ -10,6 +10,7 @@ using System.Windows.Input;
 using System.Windows.Media;
 using Fusion.Engine.Frames2;
 using Fusion.Engine.Frames2.Controllers;
+using Fusion.Engine.Frames2.Managing;
 using WpfEditorTest.Commands;
 using WpfEditorTest.Utility;
 using CommandManager = WpfEditorTest.Commands.CommandManager;
@@ -186,9 +187,9 @@ namespace WpfEditorTest.Utility
 
 			e.Effects = DragDropEffects.None;
 
-			UIComponent dataComponent = (UIComponent)e.Data.GetData(DataFormats.FileDrop);
+			UIComponent component = CreateComponentFromDrop(e.Data);
 
-			if (dataComponent != null && treeViewItemHolder != this.initTreeViewItemHolder)
+			if (component != null && treeViewItemHolder != this.initTreeViewItemHolder)
 			{
 				customAdorner.Visibility = Visibility.Visible;
 				var toAncestor = (treeViewItemHolder.TransformToAncestor(ElementHierarchyView) as Transform);
@@ -241,11 +242,10 @@ namespace WpfEditorTest.Utility
 		{
 			e.Handled = true;
 			var treeViewItemHolder = sender as TextBlock;
-			// If the DataObject contains string data, extract it.
-			if (e.Data.GetDataPresent(DataFormats.FileDrop))
-			{
-				UIComponent dataComponent = (UIComponent)e.Data.GetData(DataFormats.FileDrop);
-				if (dataComponent !=null && treeViewItemHolder != this.initTreeViewItemHolder && treeViewItemHolder.Tag is UIComponent)
+
+			UIComponent component = CreateComponentFromDrop(e.Data);
+
+				if (component != null && treeViewItemHolder != this.initTreeViewItemHolder && treeViewItemHolder.Tag is UIComponent)
 				{
 					IEditorCommand command = null;
 					int index = (treeViewItemHolder.Tag as UIComponent).Parent().IndexOf((treeViewItemHolder.Tag as UIComponent));
@@ -253,26 +253,31 @@ namespace WpfEditorTest.Utility
 					{
 						case -1:
 							{
-								command = new UIComponentParentChangeCommand(dataComponent, (treeViewItemHolder.Tag as UIComponent).Parent() as IUIModifiableContainer<ISlot>, dataComponent.Parent() as IUIModifiableContainer<ISlot>, index);
+								command = new UIComponentParentChangeCommand(component, (treeViewItemHolder.Tag as UIComponent).Parent() as IUIModifiableContainer<ISlot>, component.Parent() as IUIModifiableContainer<ISlot>, index);
 								break;
 							}
 						case 1:
 							{
-								command = new UIComponentParentChangeCommand(dataComponent, (treeViewItemHolder.Tag as UIComponent).Parent() as IUIModifiableContainer<ISlot>, dataComponent.Parent() as IUIModifiableContainer<ISlot>, index+1);
+								command = new UIComponentParentChangeCommand(component, (treeViewItemHolder.Tag as UIComponent).Parent() as IUIModifiableContainer<ISlot>, component.Parent() as IUIModifiableContainer<ISlot>, index+1);
 								break;
 							}
 						case 0:
 							{
 								if (treeViewItemHolder.Tag is IUIModifiableContainer<ISlot> && !(treeViewItemHolder.Tag is UIController))
-									command = new UIComponentParentChangeCommand(dataComponent, treeViewItemHolder.Tag as IUIModifiableContainer<ISlot>, dataComponent.Parent() as IUIModifiableContainer<ISlot>);
+									command = new UIComponentParentChangeCommand(component, treeViewItemHolder.Tag as IUIModifiableContainer<ISlot>, component.Parent() as IUIModifiableContainer<ISlot>);
 								break;
 							}
 					}
 					if (command!=null)
 					{
 						CommandManager.Instance.Execute(command);
+
+					foreach (UIComponent child in UIHelper.BFSTraverse(component))
+					{
+						UIManager.MakeComponentNameValid(child, _scene, child);
 					}
 				}
+				this.initTreeViewItemHolder = null;
 			}
 			treeViewItemHolder.Background = treeViewItemHolderInitColor;
 			customAdorner.Visibility = Visibility.Hidden;
@@ -292,16 +297,79 @@ namespace WpfEditorTest.Utility
 
 		private void ElementHierarchyView_Drop( object sender, DragEventArgs e )
 		{
-			if (e.Data.GetDataPresent(DataFormats.FileDrop))
+
+			IEditorCommand command;
+			UIComponent component = CreateComponentFromDrop(e.Data);
+
+			if (component != null)
 			{
-				UIComponent dataComponent = (UIComponent)e.Data.GetData(DataFormats.FileDrop);
-				if (dataComponent != null)
+				command = new UIComponentParentChangeCommand(component, _scene, component.Parent() as IUIModifiableContainer<ISlot>);
+				CommandManager.Instance.Execute(command);
+
+				foreach (UIComponent child in UIHelper.BFSTraverse(component))
 				{
-					var command = new UIComponentParentChangeCommand(dataComponent, _scene, dataComponent.Parent() as IUIModifiableContainer<ISlot>);
-					CommandManager.Instance.Execute(command);
+					UIManager.MakeComponentNameValid(child, _scene, child);
 				}
 			}
+
 			customAdorner.Visibility = Visibility.Hidden;
+		}
+
+		private UIComponent CreateComponentFromDrop( IDataObject data )
+		{
+			if (data.GetDataPresent(DataFormats.StringFormat))
+			{
+				string dataString = (string)data.GetData(DataFormats.StringFormat);
+				if (!string.IsNullOrEmpty(dataString))
+				{
+					return CreateFrameFromFile(System.IO.Path.Combine(ApplicationConfig.TemplatesPath, dataString) + ".xml");
+				}
+				else
+				{
+					return null;
+				}
+			}
+			else
+			{
+				if (data.GetData(DataFormats.FileDrop) is UIComponent)
+				{
+					return data.GetData(DataFormats.FileDrop) as UIComponent;
+				}
+				else
+				{
+					var component =
+					 Activator.CreateInstance(data.GetData(DataFormats.FileDrop) as Type) as UIComponent;
+					if (component is UIController controller)
+					{
+						controller.DefaultInit();
+					}
+					return component;
+				}
+			}
+
+
+			//TODO
+			//PaletteWindow.SelectedFrameTemplate = null;
+			//_parentHighlightPanel.SelectedFrame = null;
+		}
+
+		public UIComponent CreateFrameFromFile( string filePath )
+		{
+			UIComponent createdFrame = null;
+			try
+			{
+				Fusion.Core.Utils.UIComponentSerializer.Read(filePath, out createdFrame);
+			}
+			catch (Exception ex)
+			{
+				Fusion.Log.Error($"---------------ERROR---------------");
+				Fusion.Log.Error($"Could not deserialize file \"{filePath}\".\n");
+				Fusion.Log.Error($"Next exception is thrown:\n{ex.Message}\n");
+				Fusion.Log.Error($"Exception stack trace:\n{ex.StackTrace}");
+				Fusion.Log.Error($"---------------ERROR---------------\n");
+			}
+
+			return createdFrame;
 		}
 
 		private void ScrollViewer_PreviewMouseWheel( object sender, MouseWheelEventArgs e )

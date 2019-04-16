@@ -22,12 +22,12 @@ namespace WpfEditorTest.WPFConverters
 		public override DataTemplate SelectTemplate( object item, DependencyObject container )
 		{
 			var content = (item as ISlot).Component;
-			if (GenericHelper.IsSubclassOfRawGeneric(typeof(UIController), content.GetType()))
+			if (content is UIController)
 				return tvControllerTemplate;
 
 			if (content is IUIModifiableContainer<ISlot> ctr)
 			{
-				BindingOperations.EnableCollectionSynchronization(ctr.Slots, ctr.ChildrenAccessLock);
+				//BindingOperations.EnableCollectionSynchronization(ctr.Slots, ctr.ChildrenAccessLock);
 				return tvContainerTemplate;
 			}
 
