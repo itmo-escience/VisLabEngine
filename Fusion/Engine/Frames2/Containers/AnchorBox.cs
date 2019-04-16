@@ -289,15 +289,21 @@ namespace Fusion.Engine.Frames2.Containers
             reader.ReadStartElement("AnchorBox");
             reader.ReadStartElement("Slots");
 
-            reader.MoveToContent();
+            _slots.Clear();
             if (!reader.IsEmptyElement)
             {
+                reader.ReadStartElement("Slots");
                 while (reader.NodeType != XmlNodeType.EndElement)
                 {
                     var slot = new AnchorBoxSlot(this);
                     slot.ReadFromXml(reader);
                     _slots.Add(slot);
                 }
+                reader.ReadEndElement();
+            }
+            else
+            {
+                reader.ReadStartElement("Slots");
             }
 
             reader.ReadEndElement();

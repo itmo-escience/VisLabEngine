@@ -229,17 +229,22 @@ namespace Fusion.Engine.Frames2.Containers
             DesiredWidth = float.Parse(reader.GetAttribute("DesiredWidth"));
             DesiredHeight = float.Parse(reader.GetAttribute("DesiredHeight"));
             reader.ReadStartElement("FreePlacement");
-            reader.ReadStartElement("Slots");
 
-            reader.MoveToContent();
+            _slots.Clear();
             if (!reader.IsEmptyElement)
             {
+                reader.ReadStartElement("Slots");
                 while (reader.NodeType != XmlNodeType.EndElement)
                 {
                     var slot = new FreePlacementSlot(this);
                     slot.ReadFromXml(reader);
                     _slots.Add(slot);
                 }
+                reader.ReadEndElement();
+            }
+            else
+            {
+                reader.ReadStartElement("Slots");
             }
 
             reader.ReadEndElement();
