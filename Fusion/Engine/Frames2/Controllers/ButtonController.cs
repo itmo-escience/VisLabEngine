@@ -46,6 +46,13 @@ namespace Fusion.Engine.Frames2.Controllers
 
 		public ButtonController():this(UIStyleManager.DefaultStyle) { }
 
+        public override void DefaultInit()
+        {
+            base.DefaultInit();
+            DesiredWidth = 50;
+            DesiredHeight = 50;
+        }
+
         #region Events
 
 		private void OnMouseUpOutside(UIComponent sender, ClickEventArgs e)

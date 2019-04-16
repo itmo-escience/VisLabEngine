@@ -81,7 +81,7 @@ namespace Fusion.Engine.Frames2.Controllers
             }
         }
 
-		public void DefaultInit()
+		public virtual void DefaultInit()
 		{
 			Name = this.GetType().Name;
 		}

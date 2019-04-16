@@ -53,19 +53,19 @@ namespace Fusion.Engine.Frames2.Controllers
 
         public TextBoxController():this(UIStyleManager.DefaultStyle) { }
 
-        /*public override void DefaultInit()
+        public override void DefaultInit()
         {
-            Width = 100;
-            Height = 100;
+            base.DefaultInit();
 
-            _label.MaxWidth = Width;
-            _label.MaxHeight = Height;
-            _label.Width = Width;
-            _label.Height = Height;
+            DesiredWidth = 100;
+            DesiredHeight = 25;
+
+            _label.DesiredWidth = 100;
+            _label.DesiredHeight = 25;
             _label.Text = "TextBox";
 
-            Background.Attach(new Border(0, 0, Width, Height));
-        }*/
+            Background.Attach(new Border());
+        }
 
         #region Events
 

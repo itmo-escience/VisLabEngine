@@ -376,7 +376,7 @@ namespace WpfEditorTest
 					}
 					DragFieldFrame = new FreePlacement() { Name = "DRAG_FIELD" };
 
-					RootFrame.Add(DragFieldFrame,0,0, RootFrame.Placement.Width, RootFrame.Placement.Height);
+					RootFrame.Add(DragFieldFrame);
 
 					LoadedScenes.Add(startScene);
 					LoadedScenesTabs.SelectedIndex = LoadedScenes.IndexOf(startScene);
