@@ -15,7 +15,7 @@ using Fusion.Engine.Graphics.SpritesD2D;
 
 namespace Fusion.Engine.Frames2.Containers
 {
-    public class VerticalBoxSlot : ISlotAttachable
+    public class VerticalBoxSlot : ISlotAttachable, ISlotSerializable
     {
         internal VerticalBoxSlot(VerticalBox holder)
         {
@@ -38,7 +38,7 @@ namespace Fusion.Engine.Frames2.Containers
         public float Angle
 		{
 			get;
-			internal set;
+			set;
 		}
 
         public float Width
@@ -102,6 +102,26 @@ namespace Fusion.Engine.Frames2.Containers
 		#endregion
 
 		public override string ToString() => $"VerticalBoxSlot with {Component}";
+
+        public void WriteToXml(XmlWriter writer)
+        {
+            writer.WriteStartElement("VerticalBoxSlot");
+            UIComponentSerializer.WriteValue(writer, Angle);
+            UIComponentSerializer.WriteValue(writer, Clip);
+            UIComponentSerializer.WriteValue(writer, Visible);
+            UIComponentSerializer.WriteValue(writer, new SeralizableObjectHolder(Component));
+            writer.WriteEndElement();
+        }
+
+        public void ReadFromXml(XmlReader reader)
+        {
+            reader.ReadStartElement("VerticalBoxSlot");
+            Angle = UIComponentSerializer.ReadValue<float>(reader);
+            Clip = UIComponentSerializer.ReadValue<bool>(reader);
+            Visible = UIComponentSerializer.ReadValue<bool>(reader);
+            Attach(UIComponentSerializer.ReadValue<SeralizableObjectHolder>(reader).SerializableFrame);
+            reader.ReadEndElement();
+        }
     }
 
     public class VerticalBox : IUIModifiableContainer<VerticalBoxSlot>, IXmlSerializable
@@ -257,25 +277,21 @@ namespace Fusion.Engine.Frames2.Containers
             reader.ReadStartElement("VerticalBox");
             reader.ReadStartElement("Slots");
 
-            reader.MoveToContent();
+            _slots.Clear();
             if (!reader.IsEmptyElement)
             {
+                reader.ReadStartElement("Slots");
                 while (reader.NodeType != XmlNodeType.EndElement)
                 {
-                    reader.ReadStartElement("Slot");
-
-                    var slot = new VerticalBoxSlot(this)
-                    {
-                        Angle = UIComponentSerializer.ReadValue<float>(reader),
-                        Clip = UIComponentSerializer.ReadValue<bool>(reader),
-                        Visible = UIComponentSerializer.ReadValue<bool>(reader)
-                    };
-                    slot.Attach(UIComponentSerializer.ReadValue<SeralizableObjectHolder>(reader).SerializableFrame);
+                    var slot = new VerticalBoxSlot(this);
+                    slot.ReadFromXml(reader);
                     _slots.Add(slot);
-
-                    reader.ReadEndElement();
-                    reader.MoveToContent();
                 }
+                reader.ReadEndElement();
+            }
+            else
+            {
+                reader.ReadStartElement("Slots");
             }
 
             reader.ReadEndElement();
@@ -291,14 +307,7 @@ namespace Fusion.Engine.Frames2.Containers
 
             foreach (var slot in _slots)
             {
-                writer.WriteStartElement("Slot");
-
-                UIComponentSerializer.WriteValue(writer, slot.Angle);
-                UIComponentSerializer.WriteValue(writer, slot.Clip);
-                UIComponentSerializer.WriteValue(writer, slot.Visible);
-                UIComponentSerializer.WriteValue(writer, new SeralizableObjectHolder(slot.Component));
-
-                writer.WriteEndElement();
+                slot.WriteToXml(writer);
             }
 
             writer.WriteEndElement();

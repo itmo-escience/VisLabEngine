@@ -54,6 +54,12 @@ namespace Fusion.Engine.Frames2
         }
     }
 
+    public interface ISlotSerializable : ISlot
+    {
+        void WriteToXml(XmlWriter writer);
+        void ReadFromXml(XmlReader reader);
+    }
+
     public static class SlotExtensions
     {
         public static Matrix3x2 Transform(this ISlot slot) => Matrix3x2.Rotation(slot.Angle) * Matrix3x2.Translation(slot.X, slot.Y);
@@ -80,7 +86,7 @@ namespace Fusion.Engine.Frames2
         }
     }
 
-    public class SimpleControllerSlot : IControllerSlot, ISlotAttachable
+    public class SimpleControllerSlot : IControllerSlot, ISlotAttachable, ISlotSerializable
     {
         public float X
 		{
@@ -115,7 +121,7 @@ namespace Fusion.Engine.Frames2
 		public float AvailableWidth => MathUtil.Clamp(Parent.Placement.Width - X, 0, float.MaxValue);
         public float AvailableHeight => MathUtil.Clamp(Parent.Placement.Height - Y, 0, float.MaxValue);
 
-        public string Name { get; }
+        public string Name { get; private set; }
 
 		public bool Clip
 		{
@@ -178,9 +184,38 @@ namespace Fusion.Engine.Frames2
         public void DebugDraw(SpriteLayerD2D layer)
         {
         }
+
+        public void WriteToXml(XmlWriter writer)
+        {
+            writer.WriteStartElement(Name);
+            UIComponentSerializer.WriteValue(writer, X);
+            UIComponentSerializer.WriteValue(writer, Y);
+            UIComponentSerializer.WriteValue(writer, Width);
+            UIComponentSerializer.WriteValue(writer, Height);
+            UIComponentSerializer.WriteValue(writer, Angle);
+            UIComponentSerializer.WriteValue(writer, Clip);
+            UIComponentSerializer.WriteValue(writer, Visible);
+            UIComponentSerializer.WriteValue(writer, new SeralizableObjectHolder(Component));
+            writer.WriteEndElement();
+        }
+
+        public void ReadFromXml(XmlReader reader)
+        {
+            Name = reader.Name;
+            reader.ReadStartElement();
+            X = UIComponentSerializer.ReadValue<float>(reader);
+            Y = UIComponentSerializer.ReadValue<float>(reader);
+            Width = UIComponentSerializer.ReadValue<float>(reader);
+            Height = UIComponentSerializer.ReadValue<float>(reader);
+            Angle = UIComponentSerializer.ReadValue<float>(reader);
+            Clip = UIComponentSerializer.ReadValue<bool>(reader);
+            Visible = UIComponentSerializer.ReadValue<bool>(reader);
+            Attach(UIComponentSerializer.ReadValue<SeralizableObjectHolder>(reader).SerializableFrame);
+            reader.ReadEndElement();
+        }
     }
 
-    public class ParentFillingSlot : IControllerSlot, ISlotAttachable
+    public class ParentFillingSlot : IControllerSlot, ISlotAttachable, ISlotSerializable
     {
         public event PropertyChangedEventHandler PropertyChanged;
         public float X => 0;
@@ -198,7 +233,7 @@ namespace Fusion.Engine.Frames2
         public SolidBrushD2D DebugBrush => new SolidBrushD2D(Color4.White);
         public TextFormatD2D DebugTextFormat => new TextFormatD2D("Calibri", 10);
 
-        public string Name { get; }
+        public string Name { get; private set; }
 
         internal ParentFillingSlot(string name, IUIContainer parent)
         {
@@ -248,18 +283,13 @@ namespace Fusion.Engine.Frames2
             writer.WriteEndElement();
         }
 
-        public static ParentFillingSlot ReadFromXml(XmlReader reader, IUIContainer parent)
+        public void ReadFromXml(XmlReader reader)
         {
-            var slotName = reader.Name;
-            reader.ReadStartElement(slotName);
-            var slot = new ParentFillingSlot(slotName, parent)
-            {
-                Visible = UIComponentSerializer.ReadValue<bool>(reader)
-            };
-            slot.Attach(UIComponentSerializer.ReadValue<SeralizableObjectHolder>(reader).SerializableFrame);
+            Name = reader.Name;
+            reader.ReadStartElement();
+            Visible = UIComponentSerializer.ReadValue<bool>(reader);
+            Attach(UIComponentSerializer.ReadValue<SeralizableObjectHolder>(reader).SerializableFrame);
             reader.ReadEndElement();
-
-            return slot;
         }
     }
 }

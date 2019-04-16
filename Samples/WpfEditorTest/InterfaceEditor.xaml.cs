@@ -115,7 +115,10 @@ namespace WpfEditorTest
 						var command = SelectionLayer.ResetSelectedFrame(new Point(0, 0), panel);
 						CommandManager.Instance.ExecuteWithoutMemorising(command);
 					}
+					BindingOperations.DisableCollectionSynchronization(_currentScene.Scene.Slots);
 				}
+				
+
 				_currentScene = value;
 				CommandManager.Instance.ObservableScene = _currentScene;
 				CurrentScene.ChangedDirty += UpdateSceneIndicator;
@@ -375,7 +378,7 @@ namespace WpfEditorTest
 						RootFrame.Remove(child);
 						SceneFrame.Insert(child,int.MaxValue);
 					}
-					DragFieldFrame = new FreePlacement() { Name = "DRAG_FIELD" };
+					DragFieldFrame = new FreePlacement() { Name = "DRAG_FIELD", DesiredWidth = RootFrame.Placement.Width, DesiredHeight = RootFrame.Placement.Height };
 
 					RootFrame.Add(DragFieldFrame);
 

@@ -6,10 +6,10 @@ using System.Threading.Tasks;
 
 namespace Fusion.Engine.Frames2.Managing
 {
-    /*
+
 	public static class EditionSceneManager
 	{
-		public static bool ReadSceneFromFile(string filePath, out UIContainer scene)
+		public static bool ReadSceneFromFile( string filePath, out IUIModifiableContainer<ISlot> scene )
 		{
 			UIComponent readScene = null;
 			try
@@ -21,9 +21,9 @@ namespace Fusion.Engine.Frames2.Managing
 				throw;
 			}
 
-			if (readScene is UIContainer)
+			if (readScene is IUIModifiableContainer<ISlot>)
 			{
-				scene = readScene as UIContainer;
+				scene = readScene as IUIModifiableContainer<ISlot>;
 				return true;
 			}
 			else
@@ -33,7 +33,7 @@ namespace Fusion.Engine.Frames2.Managing
 			}
 		}
 
-		public static bool GetComponentByName(UIContainer sourceContainer, string name, out UIComponent component )
+		public static bool GetComponentByName( UIComponent sourceContainer, string name, out UIComponent component )
 		{
 			component = UIHelper.BFSTraverse(sourceContainer).Where(child => child.Name == name).FirstOrDefault();
 
@@ -47,5 +47,5 @@ namespace Fusion.Engine.Frames2.Managing
 			}
 		}
 	}
-    */
+
 }

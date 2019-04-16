@@ -8,10 +8,14 @@ using Fusion.Engine.Graphics.SpritesD2D;
 using Fusion.Engine.Frames2.Managing;
 using Fusion.Engine.Frames2.Events;
 using System.ComponentModel;
+using System.Xml.Serialization;
+using System.Xml;
+using System.Xml.Schema;
+using Fusion.Core.Utils;
 
 namespace Fusion.Engine.Frames2.Controllers
 {
-    public class RadioButtonSlot : IControllerSlot, ISlotAttachable
+    public class RadioButtonSlot : IControllerSlot, ISlotAttachable, ISlotSerializable
     {
         public float X
         {
@@ -59,7 +63,7 @@ namespace Fusion.Engine.Frames2.Controllers
         public event EventHandler<SlotAttachmentChangedEventArgs> ComponentAttached;
 		public event PropertyChangedEventHandler PropertyChanged;
 
-		public string Name { get; }
+		public string Name { get; private set; }
 
         internal RadioButtonSlot(string name, RadioButtonController parent)
         {
@@ -80,9 +84,32 @@ namespace Fusion.Engine.Frames2.Controllers
         }
 
         public void DebugDraw(SpriteLayerD2D layer) {}
+
+        public void WriteToXml(XmlWriter writer)
+        {
+            writer.WriteStartElement(Name);
+            UIComponentSerializer.WriteValue(writer, X);
+            UIComponentSerializer.WriteValue(writer, Y);
+            UIComponentSerializer.WriteValue(writer, Width);
+            UIComponentSerializer.WriteValue(writer, Height);
+            UIComponentSerializer.WriteValue(writer, new SeralizableObjectHolder(Component));
+            writer.WriteEndElement();
+        }
+
+        public void ReadFromXml(XmlReader reader)
+        {
+            Name = reader.Name;
+            reader.ReadStartElement();
+            X = UIComponentSerializer.ReadValue<float>(reader);
+            Y = UIComponentSerializer.ReadValue<float>(reader);
+            Width = UIComponentSerializer.ReadValue<float>(reader);
+            Height = UIComponentSerializer.ReadValue<float>(reader);
+            Attach(UIComponentSerializer.ReadValue<SeralizableObjectHolder>(reader).SerializableFrame);
+            reader.ReadEndElement();
+        }
     }
 
-    public class RadioButtonController : UIController
+    public class RadioButtonController : UIController, IXmlSerializable
     {
         protected override IEnumerable<IControllerSlot> MainControllerSlots => new List<IControllerSlot>() { Background, RadioButton, Body };
         protected override IEnumerable<IControllerSlot> AdditionalControllerSlots => Enumerable.Empty<IControllerSlot>();
@@ -94,11 +121,12 @@ namespace Fusion.Engine.Frames2.Controllers
         public static ControllerState CheckedDisabled = new ControllerState("DisabledChecked");
         protected override IEnumerable<ControllerState> NonDefaultStates { get; } = new[] { Pressed, Checked, CheckedHovered, CheckedDisabled };
 
-        public RadioButtonSlot RadioButton { get; }
-        public SimpleControllerSlot Body { get; }
-        public SimpleControllerSlot Background { get; }
+        public RadioButtonSlot RadioButton { get; private set; }
+        public SimpleControllerSlot Body { get; private set;}
+        public SimpleControllerSlot Background { get; private set;}
 
         private RadioButtonGroup _group;
+        [XmlIgnore]
         public RadioButtonGroup Group
         {
             get => _group;
@@ -138,6 +166,8 @@ namespace Fusion.Engine.Frames2.Controllers
 
             Group = group;
         }
+
+        public RadioButtonController():this(null) { }
 
         public RadioButtonController(UIComponent body, RadioButtonGroup group = null) : this(group)
         {
@@ -189,7 +219,9 @@ namespace Fusion.Engine.Frames2.Controllers
         private void RespondToStateChanges(object sender, RadioButtonGroup.CheckedRadioButtonChangeEventArgs args)
         {
             if (args.OldRadioButton == this) ChangeState(ControllerState.Default);
-        } 
+        }
+
+        #region Events
 
         private void OnEnter(UIComponent sender)
         {
@@ -260,6 +292,48 @@ namespace Fusion.Engine.Frames2.Controllers
             {
                 RadioButton = ctrl;
             }
+        }
+
+        #endregion
+
+        public XmlSchema GetSchema()
+        {
+            return null;
+        }
+
+        public void ReadXml(XmlReader reader)
+        {
+            Name = reader.GetAttribute("Name");
+            var groupName = reader.GetAttribute("GroupName");
+            var groupId = int.Parse(reader.GetAttribute("GroupId"));
+            Group = RadioButtonManager.GetGroupBy(groupName, groupId);
+            DesiredWidth = float.Parse(reader.GetAttribute("DesiredWidth"));
+            DesiredHeight = float.Parse(reader.GetAttribute("DesiredHeight"));
+            var styleName = reader.GetAttribute("StyleName");
+            Style = UIStyleManager.Instance.GetStyle(GetType(), styleName);
+            reader.ReadStartElement("RadioButtonController");
+
+            reader.ReadStartElement("Slots");
+            Background.ReadFromXml(reader);
+            Body.ReadFromXml(reader);
+            RadioButton.ReadFromXml(reader);
+            reader.ReadEndElement();
+        }
+
+        public void WriteXml(XmlWriter writer)
+        {
+            writer.WriteAttributeString("Name", Name);
+            writer.WriteAttributeString("GroupName", Group.Name);
+            writer.WriteAttributeString("GroupId", Group.Id.ToString());
+            writer.WriteAttributeString("DesiredWidth", DesiredWidth.ToString());
+            writer.WriteAttributeString("DesiredHeight", DesiredHeight.ToString());
+            writer.WriteAttributeString("StyleName", Style.Name);
+
+            writer.WriteStartElement("Slots");
+            Background.WriteToXml(writer);
+            Body.WriteToXml(writer);
+            RadioButton.WriteToXml(writer);
+            writer.WriteEndElement();
         }
     }
 }

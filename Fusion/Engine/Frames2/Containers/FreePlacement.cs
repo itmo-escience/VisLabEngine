@@ -15,16 +15,16 @@ using Fusion.Engine.Graphics.SpritesD2D;
 
 namespace Fusion.Engine.Frames2.Containers
 {
-    public sealed class FreePlacementSlot : ISlotAttachable
+    public sealed class FreePlacementSlot : ISlotAttachable, ISlotSerializable
     {
-        internal FreePlacementSlot(FreePlacement holder, float x, float y, float width, float height)
+        internal FreePlacementSlot(FreePlacement holder, float x, float y)
         {
             InternalHolder = holder;
             X = x;
             Y = y;
-            Width = width;
-            Height = height;
         }
+
+        internal FreePlacementSlot(FreePlacement holder) : this(holder, 0, 0) {}
 
         #region ISlot
         public float X { get; set; }
@@ -83,6 +83,30 @@ namespace Fusion.Engine.Frames2.Containers
 		}
 
         public override string ToString() => $"FreePlacementSlot with {Component}";
+
+        public void WriteToXml(XmlWriter writer)
+        {
+            writer.WriteStartElement("FreePlacementSlot");
+            UIComponentSerializer.WriteValue(writer, X);
+            UIComponentSerializer.WriteValue(writer, Y);
+            UIComponentSerializer.WriteValue(writer, Angle);
+            UIComponentSerializer.WriteValue(writer, Clip);
+            UIComponentSerializer.WriteValue(writer, Visible);
+            UIComponentSerializer.WriteValue(writer, new SeralizableObjectHolder(Component));
+            writer.WriteEndElement();
+        }
+
+        public void ReadFromXml(XmlReader reader)
+        {
+            reader.ReadStartElement("FreePlacementSlot");
+            X = UIComponentSerializer.ReadValue<float>(reader);
+            Y = UIComponentSerializer.ReadValue<float>(reader);
+            Angle = UIComponentSerializer.ReadValue<float>(reader);
+            Clip = UIComponentSerializer.ReadValue<bool>(reader);
+            Visible = UIComponentSerializer.ReadValue<bool>(reader);
+            Attach(UIComponentSerializer.ReadValue<SeralizableObjectHolder>(reader).SerializableFrame);
+            reader.ReadEndElement();
+        }
     }
 
     public class FreePlacement : IUIModifiableContainer<FreePlacementSlot>, IXmlSerializable
@@ -139,12 +163,12 @@ namespace Fusion.Engine.Frames2.Containers
 
         public FreePlacementSlot Insert(UIComponent child, int index)
         {
-			return Insert(child, index, 0, 0, child.DesiredWidth, child.DesiredHeight);
+			return Insert(child, index, 0, 0);
 		}
 
-		public FreePlacementSlot Insert( UIComponent child, int index, float x, float y, float width, float height )
+		public FreePlacementSlot Insert( UIComponent child, int index, float x, float y)
 		{
-			var slot = new FreePlacementSlot(this, x, y, width, height);
+			var slot = new FreePlacementSlot(this, x, y);
 			slot.Attach(child);
 
 			lock (ChildrenAccessLock)
@@ -162,9 +186,9 @@ namespace Fusion.Engine.Frames2.Containers
 			return Insert(child, int.MaxValue);
 		}
 
-		public FreePlacementSlot Add( UIComponent child, float x, float y, float width, float height )
+		public FreePlacementSlot Add( UIComponent child, float x, float y)
 		{
-			return Insert(child, int.MaxValue, x, y, width, height);
+			return Insert(child, int.MaxValue, x, y);
 		}
 
 
@@ -205,32 +229,22 @@ namespace Fusion.Engine.Frames2.Containers
             DesiredWidth = float.Parse(reader.GetAttribute("DesiredWidth"));
             DesiredHeight = float.Parse(reader.GetAttribute("DesiredHeight"));
             reader.ReadStartElement("FreePlacement");
-            reader.ReadStartElement("Slots");
 
-            reader.MoveToContent();
+            _slots.Clear();
             if (!reader.IsEmptyElement)
             {
+                reader.ReadStartElement("Slots");
                 while (reader.NodeType != XmlNodeType.EndElement)
                 {
-                    reader.ReadStartElement("Slot");
-
-                    var x = UIComponentSerializer.ReadValue<float>(reader);
-                    var y = UIComponentSerializer.ReadValue<float>(reader);
-                    var width = UIComponentSerializer.ReadValue<float>(reader);
-                    var height = UIComponentSerializer.ReadValue<float>(reader);
-
-                    var slot = new FreePlacementSlot(this, x, y, width, height)
-                    {
-                        Angle = UIComponentSerializer.ReadValue<float>(reader),
-                        Clip = UIComponentSerializer.ReadValue<bool>(reader),
-                        Visible = UIComponentSerializer.ReadValue<bool>(reader)
-                    };
-                    slot.Attach(UIComponentSerializer.ReadValue<SeralizableObjectHolder>(reader).SerializableFrame);
+                    var slot = new FreePlacementSlot(this);
+                    slot.ReadFromXml(reader);
                     _slots.Add(slot);
-
-                    reader.ReadEndElement();
-                    reader.MoveToContent();
                 }
+                reader.ReadEndElement();
+            }
+            else
+            {
+                reader.ReadStartElement("Slots");
             }
 
             reader.ReadEndElement();
@@ -245,18 +259,7 @@ namespace Fusion.Engine.Frames2.Containers
 
             foreach (var slot in _slots)
             {
-                writer.WriteStartElement("Slot");
-
-                UIComponentSerializer.WriteValue(writer, slot.X);
-                UIComponentSerializer.WriteValue(writer, slot.Y);
-                UIComponentSerializer.WriteValue(writer, slot.Width);
-                UIComponentSerializer.WriteValue(writer, slot.Height);
-                UIComponentSerializer.WriteValue(writer, slot.Angle);
-                UIComponentSerializer.WriteValue(writer, slot.Clip);
-                UIComponentSerializer.WriteValue(writer, slot.Visible);
-                UIComponentSerializer.WriteValue(writer, new SeralizableObjectHolder(slot.Component));
-
-                writer.WriteEndElement();
+                slot.WriteToXml(writer);
             }
 
             writer.WriteEndElement();

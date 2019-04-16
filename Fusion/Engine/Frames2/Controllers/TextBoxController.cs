@@ -143,8 +143,8 @@ namespace Fusion.Engine.Frames2.Controllers
             reader.ReadStartElement("TextBoxController");
 
             reader.ReadStartElement("Slots");
-            Background = ParentFillingSlot.ReadFromXml(reader, this);
-            Text = ParentFillingSlot.ReadFromXml(reader, this);
+            Background.ReadFromXml(reader);
+            Text.ReadFromXml(reader);
             reader.ReadEndElement();
 
             _label = (Label)Text.Component;

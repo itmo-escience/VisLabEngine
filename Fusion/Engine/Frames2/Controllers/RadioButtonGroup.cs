@@ -12,15 +12,55 @@ using Fusion.Engine.Graphics.SpritesD2D;
 
 namespace Fusion.Engine.Frames2.Controllers
 {
+    public class RadioButtonManager
+    {
+        private static int _lastId = 0;
+        internal static int GenerateId() => _lastId++;
+
+        private static List<RadioButtonGroup> _groups = new List<RadioButtonGroup>();
+
+        public static RadioButtonGroup CreateNewGroup(string groupName)
+        {
+            var group = new RadioButtonGroup(groupName);
+            _groups.Add(group);
+            return group;
+        }
+
+        internal static RadioButtonGroup CreateNewGroup(string groupName, int id)
+        {
+            var group = new RadioButtonGroup(groupName, id);
+            _groups.Add(group);
+            return group;
+        }
+
+        internal static RadioButtonGroup GetGroupBy(string groupName, int id)
+        {
+            if (!_groups.Exists(g => g.Id == id))
+            {
+                return CreateNewGroup(groupName);
+            };
+
+            return _groups.Find(g => g.Id == id);
+        }
+    }
+
     public class RadioButtonGroup
     {
         public string Name { get; set; }
+        public int Id { get; internal set; }
 
         public RadioButtonController CheckedRadioButton { get; private set; }
 
-        public RadioButtonGroup(string name)
+        internal RadioButtonGroup(string name)
         {
             Name = name;
+            Id = RadioButtonManager.GenerateId();
+        }
+
+        internal RadioButtonGroup(string name, int id)
+        {
+            Name = name;
+            Id = id;
         }
 
         internal void Add(RadioButtonController radioButton)
