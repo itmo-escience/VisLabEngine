@@ -148,6 +148,16 @@ namespace Fusion.Engine.Frames2.Controllers
             RadioButton.Attach(new Border(Color.Blue, Color.White) { DesiredWidth = 25, DesiredHeight = 25});
         }
 
+        public override void DefaultInit()
+        {
+            base.DefaultInit();
+            DesiredWidth = 100;
+            DesiredHeight = 25;
+            Background.Attach(new Border(Color.Gray, Color.White) { DesiredWidth = 100, DesiredHeight = 25});
+            Body.Attach(new Label(Name, "Calibri", 14) { DesiredWidth = 75, DesiredHeight = 25});
+            RadioButton.Attach(new Border(Color.Blue, Color.White) { DesiredWidth = 25, DesiredHeight = 25});
+        }
+
         public override void Update(GameTime gameTime)
         {
             base.Update(gameTime);
