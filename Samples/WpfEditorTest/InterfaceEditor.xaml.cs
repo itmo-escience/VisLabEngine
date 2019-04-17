@@ -117,11 +117,13 @@ namespace WpfEditorTest
 					}
 					BindingOperations.DisableCollectionSynchronization(_currentScene.Scene.Slots);
 				}
-				
+
 
 				_currentScene = value;
+
 				CommandManager.Instance.ObservableScene = _currentScene;
 				CurrentScene.ChangedDirty += UpdateSceneIndicator;
+
 				CommandManager.Instance.ExecuteWithoutMemorising(
 					new UIComponentParentChangeCommand(_currentScene.Scene, RootFrame, _currentScene.Scene.Parent() as IUIModifiableContainer<ISlot>)
 				);
@@ -130,6 +132,8 @@ namespace WpfEditorTest
 				ZoomerSlider.Value = _currentScene.SceneZoom;
 				SelectionLayer.Width = SceneFrame.DesiredWidth;
 				SelectionLayer.Height = SceneFrame.DesiredHeight;
+
+			    CurrentSceneFile = _currentScene.SceneFileFullPath;
 
 				CommandManager.Instance.CheckForCommandStacks();
 			}
@@ -166,7 +170,7 @@ namespace WpfEditorTest
 			_engine.Mouse = new DummyMouse(_engine);
 			_engine.Keyboard = new DummyKeyboard(_engine);
 			_engine.Touch = new DummyTouch(_engine);
-			
+
 
 			OpenFileDialog openFileDialog1 = new OpenFileDialog();
 
@@ -1212,22 +1216,25 @@ namespace WpfEditorTest
 
 		private void LoadedScenesTabs_SelectionChanged( object sender, SelectionChangedEventArgs e )
 		{
-			if (e.Source is TabControl)
+			if (e.Source is TabControl tc)
 			{
-				//do work when tab is changed
-				TabControl tc = sender as TabControl;
-				if (tc.SelectedIndex>=0)
+				if (tc.SelectedIndex >= 0)
 				{
 					CurrentScene = LoadedScenes[tc.SelectedIndex];
 
-					this.CurrentSceneFile = CurrentScene.SceneFileFullPath;
+				    if (_childrenBinding != null)
+				    {
+                        BindingOperations.ClearBinding(_treeView.ElementHierarchyView, TreeView.ItemsSourceProperty);
+				    }
 
-					_childrenBinding = new Binding(nameof(CurrentScene.Scene.Slots))
-					{
-						Source = CurrentScene.Scene,
-					};
-					_treeView.ElementHierarchyView.SetBinding(TreeView.ItemsSourceProperty, _childrenBinding);
-					BindingOperations.EnableCollectionSynchronization(CurrentScene.Scene.Slots, CurrentScene.Scene.ChildrenAccessLock);
+				    BindingOperations.EnableCollectionSynchronization(CurrentScene.Scene.Slots, CurrentScene.Scene.ChildrenAccessLock);
+
+				    _childrenBinding = new Binding(nameof(CurrentScene.Scene.Slots))
+				    {
+				        Source = CurrentScene.Scene,
+				    };
+				    _treeView.ElementHierarchyView.SetBinding(TreeView.ItemsSourceProperty, _childrenBinding);
+
 					_treeView.AttachScene(SceneFrame);
 					SelectionManager.Instance.SelectFrame(CurrentScene.SceneSelection);
 				}
@@ -1235,7 +1242,6 @@ namespace WpfEditorTest
 				{
 					TrySetNewScene();
 				}
-
 			}
 		}
 
