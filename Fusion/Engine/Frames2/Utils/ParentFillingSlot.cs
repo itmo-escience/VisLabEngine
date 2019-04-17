@@ -69,7 +69,6 @@ namespace Fusion.Engine.Frames2.Utils
         }
 
         public event EventHandler<SlotAttachmentChangedEventArgs> ComponentAttached;
-        public ObservableCollection<PropertyValueStates> Properties { get; } = new ObservableCollection<PropertyValueStates>();
 
         public void WriteToXml(XmlWriter writer)
         {

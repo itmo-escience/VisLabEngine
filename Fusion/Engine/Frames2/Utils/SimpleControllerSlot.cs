@@ -66,8 +66,6 @@ namespace Fusion.Engine.Frames2.Utils
         public SolidBrushD2D DebugBrush { get; } = new SolidBrushD2D(Color4.White);
         public TextFormatD2D DebugTextFormat => UIManager.DefaultDebugTextFormat;
 
-        public ObservableCollection<PropertyValueStates> Properties { get; } = new ObservableCollection<PropertyValueStates>();
-
         public event EventHandler<SlotAttachmentChangedEventArgs> ComponentAttached;
         public event PropertyChangedEventHandler PropertyChanged;
 
