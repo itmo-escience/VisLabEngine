@@ -17,100 +17,6 @@ using Fusion.Engine.Frames2.Containers;
 
 namespace Fusion.Engine.Frames2.Controllers
 {
-    public class RadioButtonSlot : IControllerSlot, ISlotAttachable, ISlotSerializable
-    {
-        public float X
-        {
-            get;
-            internal set;
-        }
-
-        public float Y
-		{
-			get;
-			internal set;
-		}
-
-        public float Width
-		{
-			get;
-			internal set;
-		}
-
-        public float Height
-		{
-			get;
-			internal set;
-		}
-
-		public float Angle => 0;
-
-        public float AvailableWidth => MathUtil.Clamp(Parent.Placement.Width - X, 0, float.MaxValue);
-        public float AvailableHeight => MathUtil.Clamp(Parent.Placement.Height - Y, 0, float.MaxValue);
-
-        public bool Clip => true;
-        public bool Visible => true;
-
-        public IUIContainer Parent { get; }
-
-        public IUIComponent Component
-		{
-			get;
-			private set;
-		}
-
-        public SolidBrushD2D DebugBrush => UIManager.ControllerSlotDebugBrush;
-        public TextFormatD2D DebugTextFormat => UIManager.DefaultDebugTextFormat;
-
-        public event EventHandler<SlotAttachmentChangedEventArgs> ComponentAttached;
-		public event PropertyChangedEventHandler PropertyChanged;
-
-		public string Name { get; private set; }
-
-        internal RadioButtonSlot(string name, RadioButtonController parent)
-        {
-            Parent = parent;
-            Name = name;
-        }
-
-        public void Attach(IUIComponent newComponent)
-        {
-            var old = Component;
-
-            Component = newComponent;
-            newComponent.Placement = this;
-
-            ComponentAttached?.Invoke(this,
-                new SlotAttachmentChangedEventArgs(old, newComponent)
-            );
-        }
-
-        public void DebugDraw(SpriteLayerD2D layer) {}
-
-        public void WriteToXml(XmlWriter writer)
-        {
-            writer.WriteStartElement(Name);
-            UIComponentSerializer.WriteValue(writer, X);
-            UIComponentSerializer.WriteValue(writer, Y);
-            UIComponentSerializer.WriteValue(writer, Width);
-            UIComponentSerializer.WriteValue(writer, Height);
-            UIComponentSerializer.WriteValue(writer, new SeralizableObjectHolder(Component));
-            writer.WriteEndElement();
-        }
-
-        public void ReadFromXml(XmlReader reader)
-        {
-            Name = reader.Name;
-            reader.ReadStartElement();
-            X = UIComponentSerializer.ReadValue<float>(reader);
-            Y = UIComponentSerializer.ReadValue<float>(reader);
-            Width = UIComponentSerializer.ReadValue<float>(reader);
-            Height = UIComponentSerializer.ReadValue<float>(reader);
-            Attach(UIComponentSerializer.ReadValue<SeralizableObjectHolder>(reader).SerializableFrame);
-            reader.ReadEndElement();
-        }
-    }
-
     public class RadioButtonController : UIController, IXmlSerializable
     {
         protected override IEnumerable<IControllerSlot> MainControllerSlots { get; }
@@ -123,7 +29,7 @@ namespace Fusion.Engine.Frames2.Controllers
         public static ControllerState CheckedDisabled = new ControllerState("DisabledChecked");
         protected override IReadOnlyCollection<ControllerState> NonDefaultStates { get; } = new[] { Pressed, Checked, CheckedHovered, CheckedDisabled };
 
-        public RadioButtonSlot RadioButton { get; private set; }
+        public SimpleControllerSlot RadioButton { get; private set; }
         public SimpleControllerSlot Body { get; private set;}
         public ParentFillingSlot Background { get; private set;}
 
@@ -152,7 +58,7 @@ namespace Fusion.Engine.Frames2.Controllers
 
         public RadioButtonController(RadioButtonGroup group = null)
         {
-            RadioButton = new RadioButtonSlot("RadioButton", this);
+            RadioButton = new SimpleControllerSlot("RadioButton", this);
             Body = new SimpleControllerSlot("Body", this);
             Background = new ParentFillingSlot("Background", this);
             MainControllerSlots = new List<IControllerSlot>() { Background, RadioButton, Body };
