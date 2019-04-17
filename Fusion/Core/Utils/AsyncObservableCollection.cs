@@ -682,8 +682,19 @@ namespace Fusion.Core.Utils
         bool IList.Contains(object value) { return Contains((T) value); }
         object ICollection.SyncRoot { get { throw new NotSupportedException("AsyncObservableCollection doesn't need external synchronization"); } }
         bool ICollection.IsSynchronized { get { return false; } }
-        void ICollection.CopyTo(Array array, int index) { CopyTo((T[]) array, index); }
-        int IList.IndexOf(object value)  { return IndexOf((T) value); }
+
+        void ICollection.CopyTo(Array array, int index)
+        {
+            var snapshot = _threadView.Value.getSnapshot();
+
+            for (var i = 0; i < snapshot.Count; i++)
+                array.SetValue(snapshot[i], index + i);
+        }
+
+        int IList.IndexOf(object value)
+        {
+            return IndexOf((T) value);
+        }
         #endregion
 
         #region Serialization
