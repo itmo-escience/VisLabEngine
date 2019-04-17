@@ -131,13 +131,6 @@ namespace Fusion.Engine.Frames2.Containers
 
 		public void Update( GameTime gameTime )
         {
-            if (_slots.Count == 0)
-            {
-                DesiredWidth = UIManager.DefaultContainerSize;
-                DesiredHeight = UIManager.DefaultContainerSize;
-                return;
-            }
-
             foreach (var slot in _slots)
             {
                 // If it's not changed than it's strictly equal
@@ -229,6 +222,8 @@ namespace Fusion.Engine.Frames2.Containers
         public void DefaultInit()
         {
             Name = this.GetType().Name;
+            DesiredWidth = UIManager.DefaultContainerSize;
+            DesiredHeight = UIManager.DefaultContainerSize;
         }
 
         public XmlSchema GetSchema()
