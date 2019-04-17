@@ -131,6 +131,7 @@
     <Reference Include="System.ServiceModel" />
     <Reference Include="System.Windows" />
     <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.Xaml" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
@@ -268,6 +269,7 @@
     <Compile Include="Engine\Common\Commands\CrashServer.cs" />
     <Compile Include="Engine\Common\AtomAttribute.cs" />
     <Compile Include="Engine\Common\UserInterface.Internal.cs" />
+    <Compile Include="Engine\Frames2\Controllers\CheckBoxController.cs" />
     <Compile Include="Engine\Frames2\Controllers\RadioButtonController.cs" />
     <Compile Include="Engine\Frames2\Controllers\RadioButtonGroup.cs" />
     <Compile Include="Engine\Frames2\Containers\AnchorBox.cs" />

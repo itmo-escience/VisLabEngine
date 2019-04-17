@@ -104,12 +104,40 @@ namespace Fusion.Engine.Frames2.Controllers
                         [ControllerState.Disabled] = new Color4(1.0f, 0.5f, 0.5f, 1.0f),
                         [RadioButtonController.Pressed] = new Color4(0.5f, 0.5f, 0.0f, 1.0f),
                         [RadioButtonController.Checked] = new Color4(0.0f, 1.0f, 0.0f, 1.0f),
+                        [RadioButtonController.CheckedPressed] = new Color4(0.5f, 0.5f, 0.0f, 1.0f),
                         [RadioButtonController.CheckedHovered] = new Color4(0.0f, 0.5f, 0.0f, 1.0f),
                         [RadioButtonController.CheckedDisabled] = new Color4(0.5f, 1.0f, 0.5f, 1.0f)
                     }
                 }
             };
             AddStyle(rbStyle);
+
+            var cbStyle = new UISimpleStyle(typeof(CheckBoxController))
+            {
+                ["Background"] = new[]
+                {
+                    new PropertyValueStates("BackgroundColor", Color.Gray.ToColor4())
+                    {
+                    },
+                    new PropertyValueStates("BorderColor", Color4.White)
+                    {
+                    }
+                },
+                ["CheckBox"] = new[]
+                {
+                    new PropertyValueStates("BackgroundColor", new Color4(1.0f, 0.0f, 0.0f, 1.0f))
+                    {
+                        [ControllerState.Hovered] = new Color4(0.5f, 0.0f, 0.0f, 1.0f),
+                        [ControllerState.Disabled] = new Color4(1.0f, 0.5f, 0.5f, 1.0f),
+                        [CheckBoxController.Pressed] = new Color4(0.5f, 0.5f, 0.0f, 1.0f),
+                        [CheckBoxController.Checked] = new Color4(0.0f, 1.0f, 0.0f, 1.0f),
+                        [CheckBoxController.CheckedPressed] = new Color4(0.5f, 0.5f, 0.0f, 1.0f),
+                        [CheckBoxController.CheckedHovered] = new Color4(0.0f, 0.5f, 0.0f, 1.0f),
+                        [CheckBoxController.CheckedDisabled] = new Color4(0.5f, 1.0f, 0.5f, 1.0f)
+                    }
+                }
+            };
+            AddStyle(cbStyle);
         }
 
         /// <summary>

@@ -205,9 +205,15 @@ namespace GISTest
             testBorderSlot.Y = 30;*/
 
             var button = new RadioButtonController(new Border(), RadioButtonManager.CreateNewGroup("TestGroup"));
+            var checkBox = new CheckBoxController();
+            checkBox.DefaultInit();
+            /*var checkBoxSlot = UIManager.Root.Add(checkBox);
+            checkBoxSlot.X = 200;
+            checkBoxSlot.Y = 200;*/
 
-            string str = UIComponentSerializer.WriteToString(testcontainer);
+            string str = UIComponentSerializer.WriteToString(checkBox);
             var comp = UIComponentSerializer.ReadFromString(str);
+
 
             #endregion
 
