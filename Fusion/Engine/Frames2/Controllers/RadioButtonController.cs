@@ -27,7 +27,7 @@ namespace Fusion.Engine.Frames2.Controllers
         public static ControllerState CheckedPressed = new ControllerState("PressedChecked");
         public static ControllerState CheckedHovered = new ControllerState("HoveredChecked");
         public static ControllerState CheckedDisabled = new ControllerState("DisabledChecked");
-        protected override IReadOnlyCollection<ControllerState> NonDefaultStates { get; } = new[] { Pressed, Checked, CheckedHovered, CheckedDisabled };
+        protected override IReadOnlyCollection<ControllerState> NonDefaultStates { get; } = new[] { Pressed, Checked, CheckedPressed, CheckedHovered, CheckedDisabled };
 
         public SimpleControllerSlot RadioButton { get; private set; }
         public SimpleControllerSlot Body { get; private set;}
@@ -209,8 +209,11 @@ namespace Fusion.Engine.Frames2.Controllers
         {
             Name = reader.GetAttribute("Name");
             var groupName = reader.GetAttribute("GroupName");
-            var groupId = int.Parse(reader.GetAttribute("GroupId"));
-            Group = RadioButtonManager.GetGroupBy(groupName, groupId);
+            if (groupName != null)
+            {
+                var groupId = int.Parse(reader.GetAttribute("GroupId"));
+                Group = RadioButtonManager.GetGroupBy(groupName, groupId);
+            }
             DesiredWidth = float.Parse(reader.GetAttribute("DesiredWidth"));
             DesiredHeight = float.Parse(reader.GetAttribute("DesiredHeight"));
             var styleName = reader.GetAttribute("StyleName");
@@ -227,8 +230,11 @@ namespace Fusion.Engine.Frames2.Controllers
         public void WriteXml(XmlWriter writer)
         {
             writer.WriteAttributeString("Name", Name);
-            writer.WriteAttributeString("GroupName", Group.Name);
-            writer.WriteAttributeString("GroupId", Group.Id.ToString());
+            if (Group != null)
+            {
+                writer.WriteAttributeString("GroupName", Group.Name);
+                writer.WriteAttributeString("GroupId", Group.Id.ToString());
+            }
             writer.WriteAttributeString("DesiredWidth", DesiredWidth.ToString());
             writer.WriteAttributeString("DesiredHeight", DesiredHeight.ToString());
             writer.WriteAttributeString("StyleName", Style.Name);
