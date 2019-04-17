@@ -31,8 +31,8 @@ namespace Fusion.Engine.Frames2.Managing
         public IUIContainer Parent => null;
         public UIComponent Component { get; private set; }
 
-        public SolidBrushD2D DebugBrush => new SolidBrushD2D(Color4.White);
-        public TextFormatD2D DebugTextFormat => new TextFormatD2D("Calibri", 10);
+        public SolidBrushD2D DebugBrush { get; } = new SolidBrushD2D(Color4.White);
+        public TextFormatD2D DebugTextFormat => UIManager.DefaultDebugTextFormat;
         public void DebugDraw(SpriteLayerD2D layer) {}
 
         internal RootSlot(float width, float height, IUIContainer rootContainer)
@@ -90,6 +90,9 @@ namespace Fusion.Engine.Frames2.Managing
         private readonly Dictionary<ISlot, Matrix3x2> _localTransforms = new Dictionary<ISlot, Matrix3x2>();
         private readonly Dictionary<ISlot, Matrix3x2> _globalTransforms = new Dictionary<ISlot, Matrix3x2>();
         private readonly Dictionary<ISlot, bool> _dirtyTransforms = new Dictionary<ISlot, bool>();
+
+        public static readonly SolidBrushD2D DefaultDebugBrush = new SolidBrushD2D(new Color4(0, 1.0f, 0, 1.0f));
+        public static readonly TextFormatD2D DefaultDebugTextFormat = new TextFormatD2D("Calibri", 10);
 
         public UIManager(RenderSystem rs)
         {

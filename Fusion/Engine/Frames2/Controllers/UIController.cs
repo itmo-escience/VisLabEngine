@@ -36,7 +36,7 @@ namespace Fusion.Engine.Frames2.Controllers
             }
         }
 
-        protected virtual IEnumerable<ControllerState> NonDefaultStates => new List<ControllerState>();
+        protected virtual IEnumerable<ControllerState> NonDefaultStates { get; } = new List<ControllerState>();
 
         public IEnumerable<ISlot> Slots => AllSlots;
         private IEnumerable<IControllerSlot> AllSlots => MainControllerSlots.Concat(AdditionalControllerSlots);

@@ -138,8 +138,8 @@ namespace Fusion.Engine.Frames2
 		public IUIContainer Parent { get; }
         public UIComponent Component { get; private set; }
 
-        public SolidBrushD2D DebugBrush => new SolidBrushD2D(Color4.White);
-        public TextFormatD2D DebugTextFormat => new TextFormatD2D("Calibri", 10);
+        public SolidBrushD2D DebugBrush { get; } = new SolidBrushD2D(Color4.White);
+        public TextFormatD2D DebugTextFormat => UIManager.DefaultDebugTextFormat;
 
         public ObservableCollection<PropertyValueStates> Properties { get; } = new ObservableCollection<PropertyValueStates>();
 
@@ -230,8 +230,8 @@ namespace Fusion.Engine.Frames2
 
         public IUIContainer Parent { get; }
         public UIComponent Component { get; private set; }
-        public SolidBrushD2D DebugBrush => new SolidBrushD2D(Color4.White);
-        public TextFormatD2D DebugTextFormat => new TextFormatD2D("Calibri", 10);
+        public SolidBrushD2D DebugBrush { get; } = new SolidBrushD2D(Color4.White);
+        public TextFormatD2D DebugTextFormat => UIManager.DefaultDebugTextFormat;
 
         public string Name { get; private set; }
 

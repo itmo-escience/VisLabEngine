@@ -15,7 +15,7 @@ namespace Fusion.Engine.Frames2.Controllers
     public class ButtonController : UIController, IXmlSerializable
     {
         public static ControllerState Pressed = new ControllerState("Pressed");
-        protected override IEnumerable<ControllerState> NonDefaultStates => new List<ControllerState> { Pressed };
+        protected override IEnumerable<ControllerState> NonDefaultStates { get; } = new List<ControllerState> { Pressed };
 
         private readonly List<ParentFillingSlot> _slots;
         protected override IEnumerable<IControllerSlot> MainControllerSlots => _slots;

@@ -84,8 +84,8 @@ namespace Fusion.Engine.Frames2.Containers
 			private set;
 		}
 
-		public SolidBrushD2D DebugBrush => new SolidBrushD2D(new Color4(0, 1.0f, 0, 1.0f));
-		public TextFormatD2D DebugTextFormat => new TextFormatD2D("Calibri", 10);
+		public SolidBrushD2D DebugBrush => UIManager.DefaultDebugBrush;
+		public TextFormatD2D DebugTextFormat => UIManager.DefaultDebugTextFormat;
 		public void DebugDraw( SpriteLayerD2D layer ) { }
 		#endregion
 

@@ -57,8 +57,8 @@ namespace Fusion.Engine.Frames2.Controllers
 			private set;
 		}
 
-		public SolidBrushD2D DebugBrush => new SolidBrushD2D(new Color4(0, 1.0f, 0, 1.0f));
-        public TextFormatD2D DebugTextFormat => new TextFormatD2D("Calibri", 10);
+        public SolidBrushD2D DebugBrush => UIManager.DefaultDebugBrush;
+        public TextFormatD2D DebugTextFormat => UIManager.DefaultDebugTextFormat;
 
         public event EventHandler<SlotAttachmentChangedEventArgs> ComponentAttached;
 		public event PropertyChangedEventHandler PropertyChanged;
@@ -111,8 +111,8 @@ namespace Fusion.Engine.Frames2.Controllers
 
     public class RadioButtonController : UIController, IXmlSerializable
     {
-        protected override IEnumerable<IControllerSlot> MainControllerSlots => new List<IControllerSlot>() { Background, RadioButton, Body };
-        protected override IEnumerable<IControllerSlot> AdditionalControllerSlots => Enumerable.Empty<IControllerSlot>();
+        protected override IEnumerable<IControllerSlot> MainControllerSlots { get; }
+        protected override IEnumerable<IControllerSlot> AdditionalControllerSlots { get; } = Enumerable.Empty<IControllerSlot>();
 
         public static ControllerState Pressed = new ControllerState("Pressed");
         public static ControllerState Checked = new ControllerState("Checked");
@@ -153,6 +153,7 @@ namespace Fusion.Engine.Frames2.Controllers
             RadioButton = new RadioButtonSlot("RadioButton", this);
             Body = new SimpleControllerSlot("Body", this);
             Background = new SimpleControllerSlot("Background", this);
+            MainControllerSlots = new List<IControllerSlot>() { Background, RadioButton, Body };
 
             Style = UIStyleManager.Instance.GetStyle(GetType());
 
