@@ -1,4 +1,6 @@
-﻿using System;
+﻿using Fusion.Engine.Frames2.Containers;
+using Fusion.Engine.Frames2.Utils;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -11,7 +13,7 @@ namespace Fusion.Engine.Frames2.Managing
 	{
 		public static bool ReadSceneFromFile( string filePath, out IUIModifiableContainer<ISlot> scene )
 		{
-			UIComponent readScene = null;
+			IUIComponent readScene = null;
 			try
 			{
 				Fusion.Core.Utils.UIComponentSerializer.Read(filePath, out readScene);
@@ -33,7 +35,7 @@ namespace Fusion.Engine.Frames2.Managing
 			}
 		}
 
-		public static bool GetComponentByName( UIComponent sourceContainer, string name, out UIComponent component )
+		public static bool GetComponentByName( IUIComponent sourceContainer, string name, out IUIComponent component )
 		{
 			component = UIHelper.BFSTraverse(sourceContainer).Where(child => child.Name == name).FirstOrDefault();
 

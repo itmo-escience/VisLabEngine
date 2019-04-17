@@ -12,6 +12,8 @@ using System.Xml.Serialization;
 using System.Xml;
 using System.Xml.Schema;
 using Fusion.Core.Utils;
+using Fusion.Engine.Frames2.Utils;
+using Fusion.Engine.Frames2.Containers;
 
 namespace Fusion.Engine.Frames2.Controllers
 {
@@ -51,7 +53,7 @@ namespace Fusion.Engine.Frames2.Controllers
 
         public IUIContainer Parent { get; }
 
-        public UIComponent Component
+        public IUIComponent Component
 		{
 			get;
 			private set;
@@ -71,7 +73,7 @@ namespace Fusion.Engine.Frames2.Controllers
             Name = name;
         }
 
-        public void Attach(UIComponent newComponent)
+        public void Attach(IUIComponent newComponent)
         {
             var old = Component;
 
@@ -170,7 +172,7 @@ namespace Fusion.Engine.Frames2.Controllers
 
         public RadioButtonController():this(null) { }
 
-        public RadioButtonController(UIComponent body, RadioButtonGroup group = null) : this(group)
+        public RadioButtonController(IUIComponent body, RadioButtonGroup group = null) : this(group)
         {
             DesiredWidth = 100;
             DesiredHeight = 25;
@@ -224,7 +226,7 @@ namespace Fusion.Engine.Frames2.Controllers
 
         #region Events
 
-        private void OnEnter(UIComponent sender)
+        private void OnEnter(IUIComponent sender)
         {
             if (CurrentState == ControllerState.Default)
             {
@@ -236,7 +238,7 @@ namespace Fusion.Engine.Frames2.Controllers
             }
         }
 
-        private void OnLeave(UIComponent sender)
+        private void OnLeave(IUIComponent sender)
         {
             if (CurrentState == ControllerState.Hovered)
             {
@@ -248,7 +250,7 @@ namespace Fusion.Engine.Frames2.Controllers
             }
         }
 
-        private void OnMouseDown(UIComponent sender, ClickEventArgs e)
+        private void OnMouseDown(IUIComponent sender, ClickEventArgs e)
         {
             if (CurrentState == ControllerState.Disabled || CurrentState == CheckedDisabled)
                 return;
@@ -265,7 +267,7 @@ namespace Fusion.Engine.Frames2.Controllers
             ChangeState(Pressed);
         }
 
-        private void OnMouseUp(UIComponent sender, ClickEventArgs e)
+        private void OnMouseUp(IUIComponent sender, ClickEventArgs e)
         {
             if (CurrentState == ControllerState.Disabled || CurrentState == CheckedDisabled)
                 return;
@@ -277,7 +279,7 @@ namespace Fusion.Engine.Frames2.Controllers
             }
         }
 
-        private void OnMouseUpOutside(UIComponent sender, ClickEventArgs e)
+        private void OnMouseUpOutside(IUIComponent sender, ClickEventArgs e)
         {
             if (CurrentState == Pressed)
                 ChangeState(ControllerState.Default);

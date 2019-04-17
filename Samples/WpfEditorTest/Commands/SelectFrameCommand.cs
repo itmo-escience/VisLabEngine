@@ -1,4 +1,5 @@
 ﻿using Fusion.Engine.Frames2;
+using Fusion.Engine.Frames2.Utils;
 using System.Collections.Generic;
 using System.Linq;
 using WpfEditorTest.FrameSelection;
@@ -9,12 +10,12 @@ namespace WpfEditorTest.Commands
 	{
 		public bool IsDirty => false;
 
-		private readonly List<UIComponent> _frames;
-		private readonly List<UIComponent> _oldFrames;
+		private readonly List<IUIComponent> _frames;
+		private readonly List<IUIComponent> _oldFrames;
 
-	    public SelectFrameCommand( params UIComponent[] frame ) : this(frame.ToList()) { }
+	    public SelectFrameCommand( params IUIComponent[] frame ) : this(frame.ToList()) { }
 
-		public SelectFrameCommand( List<UIComponent> frame )
+		public SelectFrameCommand( List<IUIComponent> frame )
 		{
 			this._frames = frame;
 			this._oldFrames = SelectionManager.Instance.SelectedFrames;

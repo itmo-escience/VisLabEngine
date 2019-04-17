@@ -1,5 +1,7 @@
 ﻿using Fusion.Engine.Common;
 using Fusion.Engine.Frames2;
+using Fusion.Engine.Frames2.Containers;
+using Fusion.Engine.Frames2.Utils;
 using System.Threading;
 
 namespace WpfEditorTest.Commands
@@ -9,12 +11,12 @@ namespace WpfEditorTest.Commands
 		private readonly AutoResetEvent _asyncThreadChangesDoneEvent = new AutoResetEvent(false);
 		public bool IsDirty => true;
 
-		private readonly UIComponent _frame;
+		private readonly IUIComponent _frame;
 		private readonly IUIModifiableContainer<ISlot> _newParent;
 		private readonly IUIModifiableContainer<ISlot> _oldParent;
 		private readonly int _index;
 
-		public UIComponentParentChangeCommand( UIComponent frame, IUIModifiableContainer<ISlot> newParent )
+		public UIComponentParentChangeCommand( IUIComponent frame, IUIModifiableContainer<ISlot> newParent )
 		{
 			this._frame = frame;
 			this._newParent = newParent;
@@ -22,17 +24,17 @@ namespace WpfEditorTest.Commands
 			this._index = int.MaxValue;
 		}
 
-		public UIComponentParentChangeCommand( UIComponent frame, IUIModifiableContainer<ISlot> newParent, int index ) : this(frame, newParent)
+		public UIComponentParentChangeCommand( IUIComponent frame, IUIModifiableContainer<ISlot> newParent, int index ) : this(frame, newParent)
 		{
 			this._index = index;
 		}
 
-		public UIComponentParentChangeCommand( UIComponent frame, IUIModifiableContainer<ISlot> newParent, IUIModifiableContainer<ISlot> oldParent ) : this(frame, newParent)
+		public UIComponentParentChangeCommand( IUIComponent frame, IUIModifiableContainer<ISlot> newParent, IUIModifiableContainer<ISlot> oldParent ) : this(frame, newParent)
 		{
 			this._oldParent = oldParent;
 		}
 
-		public UIComponentParentChangeCommand( UIComponent frame, IUIModifiableContainer<ISlot> newParent, IUIModifiableContainer<ISlot> oldParent, int index ) : this(frame, newParent, oldParent)
+		public UIComponentParentChangeCommand( IUIComponent frame, IUIModifiableContainer<ISlot> newParent, IUIModifiableContainer<ISlot> oldParent, int index ) : this(frame, newParent, oldParent)
 		{
 			this._index = index;
 		}

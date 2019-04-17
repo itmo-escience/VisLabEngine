@@ -1,22 +1,23 @@
-﻿using System.Collections.Generic;
+﻿using Fusion.Engine.Frames2.Utils;
+using System.Collections.Generic;
 using System.Linq;
 
-namespace Fusion.Engine.Frames2
+namespace Fusion.Engine.Frames2.Containers
 {
-    public interface IUIContainer : UIComponent
+    public interface IUIContainer : IUIComponent
     {
         IEnumerable<ISlot> Slots { get; }
 
-        int IndexOf(UIComponent child);
+        int IndexOf(IUIComponent child);
 
-        bool Contains(UIComponent component);
+        bool Contains(IUIComponent component);
     }
 
     public interface IUIModifiableContainer<out T> : IUIContainer where T : ISlot
     {
-        T Insert(UIComponent child, int index);
+        T Insert(IUIComponent child, int index);
 
-        bool Remove(UIComponent child);
+        bool Remove(IUIComponent child);
 
 		object ChildrenAccessLock { get; }
 		/*
@@ -75,7 +76,7 @@ namespace Fusion.Engine.Frames2
 
     public static class ContainerExtensions
     {
-        public static int IndexOf(this IUIContainer c, UIComponent child)
+        public static int IndexOf(this IUIContainer c, IUIComponent child)
         {
             var i = 0;
             foreach (var slot in c.Slots)
@@ -88,12 +89,12 @@ namespace Fusion.Engine.Frames2
             return -1;
         }
 
-        public static bool Contains(this IUIContainer c, UIComponent component)
+        public static bool Contains(this IUIContainer c, IUIComponent component)
         {
             return c.Slots.Any(slot => slot.Component == component);
         }
 
-        public static IEnumerable<UIComponent> GetChildren(this IUIContainer container)
+        public static IEnumerable<IUIComponent> GetChildren(this IUIContainer container)
         {
             return container.Slots.Select(slot => slot.Component);
         }

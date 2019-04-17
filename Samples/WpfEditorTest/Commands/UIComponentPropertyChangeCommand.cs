@@ -1,5 +1,6 @@
 ﻿using Fusion.Engine.Common;
 using Fusion.Engine.Frames2;
+using Fusion.Engine.Frames2.Utils;
 using System;
 using System.Reflection;
 using System.Threading;
@@ -9,7 +10,7 @@ namespace WpfEditorTest.Commands
 	internal class UIComponentPropertyChangeCommand : IEditorCommand
 	{
 		private readonly AutoResetEvent _asyncThreadChangesDoneEvent = new AutoResetEvent(false);
-	    private readonly UIComponent _component;
+	    private readonly IUIComponent _component;
 	    private readonly PropertyInfo _propertyToChange;
 	    private readonly object _valueToSet;
 	    private readonly object _previousValue;
@@ -17,7 +18,7 @@ namespace WpfEditorTest.Commands
 
 		public bool IsDirty => true;
 
-		public UIComponentPropertyChangeCommand( UIComponent frame, string propertyName, object valueToSet)
+		public UIComponentPropertyChangeCommand( IUIComponent frame, string propertyName, object valueToSet)
 		{
 			_component = frame;
 			_propertyToChange = _component.GetType().GetProperty(propertyName);
@@ -29,7 +30,7 @@ namespace WpfEditorTest.Commands
 			}
 		}
 
-		public UIComponentPropertyChangeCommand( UIComponent frame, string propertyName, object valueToSet, object forcedPreviousValue ) : this(frame, propertyName, valueToSet)
+		public UIComponentPropertyChangeCommand( IUIComponent frame, string propertyName, object valueToSet, object forcedPreviousValue ) : this(frame, propertyName, valueToSet)
 		{
 			_previousValue = forcedPreviousValue;
 		}

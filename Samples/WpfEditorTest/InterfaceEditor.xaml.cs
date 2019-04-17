@@ -47,6 +47,7 @@ using MouseEventArgs = System.Windows.Input.MouseEventArgs;
 using RadioButton = System.Windows.Controls.RadioButton;
 using TabControl = System.Windows.Controls.TabControl;
 using TreeView = System.Windows.Controls.TreeView;
+using Fusion.Engine.Frames2.Utils;
 
 namespace WpfEditorTest
 {
@@ -104,7 +105,7 @@ namespace WpfEditorTest
 					_currentScene.SceneZoom = ZoomerSlider.Value;
 					_currentScene.SceneSize = new Size(SelectionLayer.Width, SelectionLayer.Height);
 
-					SelectionManager.Instance.SelectFrame(new List<UIComponent> { });
+					SelectionManager.Instance.SelectFrame(new List<IUIComponent> { });
 					CommandManager.Instance.ExecuteWithoutMemorising(
 						new UIComponentParentChangeCommand(_currentScene.Scene, null, _currentScene.Scene.Parent() as IUIModifiableContainer<ISlot>)
 					);
@@ -309,8 +310,8 @@ namespace WpfEditorTest
 
 
 
-			_palette.BaseComponents.ItemsSource = Assembly.GetAssembly(typeof(UIComponent)).GetTypes()
-				.Where(t => t.GetInterfaces().Contains(typeof(UIComponent)) && !t.IsAbstract/* && !t.IsAbstract*//* && t != typeof(StartClippingFlag) && t != typeof(EndClippingFlag)*/);
+			_palette.BaseComponents.ItemsSource = Assembly.GetAssembly(typeof(IUIComponent)).GetTypes()
+				.Where(t => t.GetInterfaces().Contains(typeof(IUIComponent)) && !t.IsAbstract/* && !t.IsAbstract*//* && t != typeof(StartClippingFlag) && t != typeof(EndClippingFlag)*/);
 
 
 
@@ -518,7 +519,7 @@ namespace WpfEditorTest
 			}
 		}
 
-		internal CommandGroup AddFrameToScene( UIComponent createdFrame, Point point, bool dropDeeper = false )
+		internal CommandGroup AddFrameToScene( IUIComponent createdFrame, Point point, bool dropDeeper = false )
 		{
 			var hoveredFrame = SelectionLayer.GetHoveredFrameOnScene(point, false,false) ?? SceneFrame;
 
@@ -592,9 +593,9 @@ namespace WpfEditorTest
 			}
 		}
 
-		public UIComponent CreateFrameFromFile( string filePath )
+		public IUIComponent CreateFrameFromFile( string filePath )
 		{
-			UIComponent createdFrame = null;
+			IUIComponent createdFrame = null;
 			try
 			{
 			    Fusion.Core.Utils.UIComponentSerializer.Read(filePath, out createdFrame);
@@ -659,7 +660,7 @@ namespace WpfEditorTest
 				var step = SelectionLayer.VisualGrid.Visibility == Visibility.Visible ?
 					(int)(FusionUI.UI.ScalableFrame.ScaleMultiplier * SelectionLayer.GridSizeMultiplier) : 1;
 				var group = new CommandGroup();
-				foreach (UIComponent frame in SelectionLayer.FrameSelectionPanelList.Keys)
+				foreach (IUIComponent frame in SelectionLayer.FrameSelectionPanelList.Keys)
 				{
 					group.Append(new CommandGroup(
 						new SlotPropertyChangeCommand(frame, "X", frame.Placement.X + (int)delta.X * step),
@@ -740,7 +741,7 @@ namespace WpfEditorTest
 			}
 
 			var commands = new CommandGroup();
-			foreach (UIComponent frame in SelectionLayer.FrameSelectionPanelList.Keys)
+			foreach (IUIComponent frame in SelectionLayer.FrameSelectionPanelList.Keys)
 			{
 				switch (e.Parameter.ToString())
 				{
@@ -787,7 +788,7 @@ namespace WpfEditorTest
 			_componentsOffsetBuffer.Clear();
 			Point selectionLayerOffset = new Point(SelectionLayer.FrameDragsPanel.RenderTransform.Value.OffsetX,
 												   SelectionLayer.FrameDragsPanel.RenderTransform.Value.OffsetY);
-			foreach (UIComponent component in SelectionLayer.FrameSelectionPanelList.Keys)
+			foreach (IUIComponent component in SelectionLayer.FrameSelectionPanelList.Keys)
 			{
 				_xmlComponentsBuffer.Add(Fusion.Core.Utils.UIComponentSerializer.WriteToString(component));
 				var globalTransform = _uiManager.GlobalTransform(component.Placement);
@@ -803,7 +804,7 @@ namespace WpfEditorTest
 
 		private void ExecutedPasteFrameCmdCommand( object sender, ExecutedRoutedEventArgs e )
 		{
-			List<UIComponent> pastedComponents = new List<UIComponent>();
+			List<IUIComponent> pastedComponents = new List<IUIComponent>();
 
 			for (int i = 0; i < _xmlComponentsBuffer.Count; i++)
 			{
@@ -812,7 +813,7 @@ namespace WpfEditorTest
 
 				if (!string.IsNullOrEmpty(componentXml))
 				{
-					UIComponent component = null;
+					IUIComponent component = null;
 					try
 					{
 						component = Fusion.Core.Utils.UIComponentSerializer.ReadFromString(componentXml);
@@ -839,9 +840,9 @@ namespace WpfEditorTest
 
 			CommandManager.Instance.Execute(new SelectFrameCommand(pastedComponents));
 
-			foreach (UIComponent pasted in pastedComponents)
+			foreach (IUIComponent pasted in pastedComponents)
 			{
-				foreach (UIComponent component in UIHelper.BFSTraverse(pasted))
+				foreach (IUIComponent component in UIHelper.BFSTraverse(pasted))
 				{
 					UIManager.MakeComponentNameValid(component, SceneFrame, component);
 				}

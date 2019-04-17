@@ -4,8 +4,10 @@ using System.ComponentModel;
 using System.Linq;
 using Fusion.Core.Mathematics;
 using Fusion.Engine.Common;
+using Fusion.Engine.Frames2.Containers;
 using Fusion.Engine.Frames2.Events;
 using Fusion.Engine.Frames2.Managing;
+using Fusion.Engine.Frames2.Utils;
 using Fusion.Engine.Graphics.SpritesD2D;
 
 namespace Fusion.Engine.Frames2.Controllers
@@ -113,12 +115,12 @@ namespace Fusion.Engine.Frames2.Controllers
 
         public void Draw(SpriteLayerD2D layer) { }
 
-        public int IndexOf(UIComponent child)
+        public int IndexOf(IUIComponent child)
         {
             throw new NotImplementedException();
         }
 
-        public bool Contains(UIComponent component) => Slots.Any(slot => slot.Component == component);
+        public bool Contains(IUIComponent component) => Slots.Any(slot => slot.Component == component);
     }
 
     public struct ControllerState : IEquatable<ControllerState>

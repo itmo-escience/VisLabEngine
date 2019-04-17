@@ -1,4 +1,6 @@
-﻿namespace Fusion.Engine.Frames2.Events
+﻿using Fusion.Engine.Frames2.Utils;
+
+namespace Fusion.Engine.Frames2.Events
 {
     public class UIEventsHolder : IUIInputAware
     {
@@ -23,85 +25,85 @@
         public event BlurEvent Blur;
 
         #region keyboard
-        internal void InvokeKeyDown(UIComponent sender, KeyEventArgs args)
+        internal void InvokeKeyDown(IUIComponent sender, KeyEventArgs args)
         {
             KeyDown?.Invoke(sender, args);
         }
 
-        internal void InvokeKeyUp(UIComponent sender, KeyEventArgs args)
+        internal void InvokeKeyUp(IUIComponent sender, KeyEventArgs args)
         {
             KeyUp?.Invoke(sender, args);
         }
 
-        internal void InvokeKeyPress(UIComponent sender, KeyPressEventArgs args)
+        internal void InvokeKeyPress(IUIComponent sender, KeyPressEventArgs args)
         {
             KeyPress?.Invoke(sender, args);
         }
         #endregion
 
         #region mouse
-        internal void InvokeMouseMove(UIComponent sender, MoveEventArgs args)
+        internal void InvokeMouseMove(IUIComponent sender, MoveEventArgs args)
         {
             MouseMove?.Invoke(sender, args);
         }
 
-        internal void InvokeMouseDrag(UIComponent sender, DragEventArgs args)
+        internal void InvokeMouseDrag(IUIComponent sender, DragEventArgs args)
         {
             MouseDrag?.Invoke(sender, args);
         }
 
-        internal void InvokeMouseDown(UIComponent sender, ClickEventArgs args)
+        internal void InvokeMouseDown(IUIComponent sender, ClickEventArgs args)
         {
             MouseDown?.Invoke(sender, args);
         }
 
-        internal void InvokeMouseDownOutside(UIComponent sender, ClickEventArgs args)
+        internal void InvokeMouseDownOutside(IUIComponent sender, ClickEventArgs args)
         {
             MouseDownOutside?.Invoke(sender, args);
         }
 
-        internal void InvokeMouseUp(UIComponent sender, ClickEventArgs args)
+        internal void InvokeMouseUp(IUIComponent sender, ClickEventArgs args)
         {
             MouseUp?.Invoke(sender, args);
         }
 
-        internal void InvokeMouseUpOutside(UIComponent sender, ClickEventArgs args)
+        internal void InvokeMouseUpOutside(IUIComponent sender, ClickEventArgs args)
         {
             MouseUpOutside?.Invoke(sender, args);
         }
 
-        internal void InvokeClick(UIComponent sender, ClickEventArgs args)
+        internal void InvokeClick(IUIComponent sender, ClickEventArgs args)
         {
             Click?.Invoke(sender, args);
         }
 
-        internal void InvokeDoubleClick(UIComponent sender, ClickEventArgs args)
+        internal void InvokeDoubleClick(IUIComponent sender, ClickEventArgs args)
         {
             DoubleClick?.Invoke(sender, args);
         }
 
-        internal void InvokeEnter(UIComponent sender)
+        internal void InvokeEnter(IUIComponent sender)
         {
             Enter?.Invoke(sender);
         }
 
-        internal void InvokeLeave(UIComponent sender)
+        internal void InvokeLeave(IUIComponent sender)
         {
             Leave?.Invoke(sender);
         }
 
-        internal void InvokeScroll(UIComponent sender, ScrollEventArgs args)
+        internal void InvokeScroll(IUIComponent sender, ScrollEventArgs args)
         {
             Scroll?.Invoke(sender, args);
         }
         #endregion
 
-        internal void InvokeFocus(UIComponent sender)
+        internal void InvokeFocus(IUIComponent sender)
         {
             Focus?.Invoke(sender);
         }
 
-        internal void InvokeBlur(UIComponent sender)
+        internal void InvokeBlur(IUIComponent sender)
         {
             Blur?.Invoke(sender);
         }

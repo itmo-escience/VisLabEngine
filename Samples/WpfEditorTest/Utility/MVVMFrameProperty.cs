@@ -1,4 +1,5 @@
 ﻿using Fusion.Engine.Frames2;
+using Fusion.Engine.Frames2.Utils;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -66,9 +67,9 @@ namespace WpfEditorTest.Utility
 				var convertedValue = Convert.ChangeType(value, PropInfo.PropertyType);
 
 				IEditorCommand command;
-				if (Obj.GetType().GetInterfaces().Contains(typeof(UIComponent)))
+				if (Obj.GetType().GetInterfaces().Contains(typeof(IUIComponent)))
 				{
-					command = new UIComponentPropertyChangeCommand(Obj as UIComponent, PropName, value);
+					command = new UIComponentPropertyChangeCommand(Obj as IUIComponent, PropName, value);
 				}
 				else
 				{

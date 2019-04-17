@@ -1,5 +1,6 @@
 ﻿using Fusion.Engine.Frames2;
 using Fusion.Engine.Frames2.Controllers;
+using Fusion.Engine.Frames2.Utils;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -17,12 +18,12 @@ namespace WpfEditorTest.Utility
 		public Visibility NeedStyle { get; set; } = Visibility.Collapsed;
 		public string StartStyle { get; set; } = null;
 		public List<MVVMComponentProperty> SlotProps { get; set; } = new List<MVVMComponentProperty>();
-		public UIComponent Component { get; set; }
+		public IUIComponent Component { get; set; }
 		public List<MVVMComponentProperty> ComponentProps { get; set; } = new List<MVVMComponentProperty>();
 
 		public event PropertyChangedEventHandler PropertyChanged;
 
-		public MVVMComponentDetails(UIComponent component)
+		public MVVMComponentDetails(IUIComponent component)
 		{
 			Component = component;
 			SlotName = component.Placement.GetType().Name;

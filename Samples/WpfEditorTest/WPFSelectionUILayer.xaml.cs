@@ -18,6 +18,8 @@ using CommandManager = WpfEditorTest.Commands.CommandManager;
 using Matrix3x2 = Fusion.Core.Mathematics.Matrix3x2;
 using Vector2 = Fusion.Core.Mathematics.Vector2;
 using Fusion.Engine.Frames2.Controllers;
+using Fusion.Engine.Frames2.Containers;
+using Fusion.Engine.Frames2.Utils;
 
 namespace WpfEditorTest
 {
@@ -26,7 +28,7 @@ namespace WpfEditorTest
 	/// </summary>
 	public partial class WPFSelectionUILayer : Grid
 	{
-		public Dictionary<UIComponent, FrameSelectionPanel> FrameSelectionPanelList = new Dictionary<UIComponent, FrameSelectionPanel>();
+		public Dictionary<IUIComponent, FrameSelectionPanel> FrameSelectionPanelList = new Dictionary<IUIComponent, FrameSelectionPanel>();
 		private List<StickCoordinateY> StickingCoordsY = new List<StickCoordinateY>();
 		private List<StickCoordinateX> StickingCoordsX = new List<StickCoordinateX>();
 
@@ -52,7 +54,7 @@ namespace WpfEditorTest
 
 		public struct FrameSelectionPair
 		{
-			public UIComponent Frame;
+			public IUIComponent Frame;
 			public FrameSelectionPanel Panel;
 		}
 		public event EventHandler<FrameSelectionPair> FrameSelected;
@@ -264,7 +266,7 @@ namespace WpfEditorTest
 			VisualGrid.Visibility = enable ? Visibility.Visible : Visibility.Collapsed;
 		}
 
-		private void SelectFrame( UIComponent frame )
+		private void SelectFrame( IUIComponent frame )
 		{
 			if (FrameSelectionPanelList.TryGetValue(frame, out var panel))
 			{
@@ -312,9 +314,9 @@ namespace WpfEditorTest
 			return group;
 		}
 
-		public UIComponent GetHoveredFrameOnScene( Point mousePos, bool ignoreScene, bool ignoreSelection )
+		public IUIComponent GetHoveredFrameOnScene( Point mousePos, bool ignoreScene, bool ignoreSelection )
 		{
-			UIComponent hoveredFrame;
+			IUIComponent hoveredFrame;
 			if (ignoreSelection)
 			{
 				hoveredFrame = UIHelper.GetLowestComponentInHierarchy(_uiManager, SceneFrame, new Vector2((float)mousePos.X, (float)mousePos.Y), SelectionManager.Instance.SelectedFrames);
@@ -345,9 +347,9 @@ namespace WpfEditorTest
 			}
 		}
 
-		public UIComponent GetChildFrameOnScene( Point mousePos, bool ignoreScene, bool ignoreSelection )
+		public IUIComponent GetChildFrameOnScene( Point mousePos, bool ignoreScene, bool ignoreSelection )
 		{
-			UIComponent hoveredFrame;
+			IUIComponent hoveredFrame;
 			if (ignoreSelection)
 			{
 				hoveredFrame = UIHelper.GetComponentInChildren(_uiManager, SceneFrame, new Vector2((float)mousePos.X, (float)mousePos.Y), SelectionManager.Instance.SelectedFrames);
@@ -383,7 +385,7 @@ namespace WpfEditorTest
 			return (panel.SelectedFrame.Placement.Width != panel.InitialFrameSize.Width) || (panel.SelectedFrame.Placement.Height != panel.InitialFrameSize.Height);
 		}
 
-		public void MoveFrameToDragField( UIComponent frame )
+		public void MoveFrameToDragField( IUIComponent frame )
 		{
 			//(frame.Parent() as IUIModifiableContainer<ISlot>)?.Remove(frame);
 
@@ -484,7 +486,7 @@ namespace WpfEditorTest
 
 		private void LocalGrid_MouseLeftButtonDown( object sender, MouseButtonEventArgs e )
 		{
-			UIComponent hovered;
+			IUIComponent hovered;
 			if (DeepClick())
 				hovered = GetChildFrameOnScene(e.GetPosition(this), true, false);
 			else
@@ -501,7 +503,7 @@ namespace WpfEditorTest
 					IEditorCommand command = null;
 					if (Keyboard.IsKeyDown(Key.LeftShift) || Keyboard.IsKeyDown(Key.RightShift))
 					{
-						var framesToSelect = new List<UIComponent>(SelectionManager.Instance.SelectedFrames);
+						var framesToSelect = new List<IUIComponent>(SelectionManager.Instance.SelectedFrames);
 						if (framesToSelect.Contains(hovered))
 						{
 							framesToSelect.Remove(hovered);
@@ -664,7 +666,7 @@ namespace WpfEditorTest
 			RememberStickingCoords(SceneFrame);
 		}
 
-		private void RememberStickingCoords( UIComponent frame )
+		private void RememberStickingCoords( IUIComponent frame )
 		{
 			if (!FrameSelectionPanelList.ContainsKey(frame))
 			{
@@ -898,19 +900,19 @@ namespace WpfEditorTest
 			return !(Keyboard.IsKeyDown(Key.LeftAlt) || Keyboard.IsKeyDown(Key.RightAlt));
 		}
 
-		private void AreaSelectionEnd( List<UIComponent> selectedFrames )
+		private void AreaSelectionEnd( List<IUIComponent> selectedFrames )
 		{
 			AreaSelectionEnabled = false;
 			if (_selectionRectangle != null)
 			{
-				var selectedframes = new List<UIComponent>(selectedFrames);
+				var selectedframes = new List<IUIComponent>(selectedFrames);
 				Fusion.Core.Mathematics.RectangleF selectedArea = new Fusion.Core.Mathematics.RectangleF(
 						(int)Canvas.GetLeft(_selectionRectangle),
 						(int)Canvas.GetTop(_selectionRectangle),
 						(int)_selectionRectangle.Width,
 						(int)_selectionRectangle.Height
 					);
-				foreach (UIComponent frame in SceneFrame.GetChildren())
+				foreach (IUIComponent frame in SceneFrame.GetChildren())
 				{
 					bool contains;
 					var bb = _uiManager.BoundingBox(frame.Placement);
@@ -943,7 +945,7 @@ namespace WpfEditorTest
 
 		private void Grid_PreviewDrop( object sender, System.Windows.DragEventArgs e )
 		{
-		    UIComponent createdFrame = null;
+		    IUIComponent createdFrame = null;
 			if (e.Data.GetDataPresent(DataFormats.StringFormat))
 			{
 				string dataString = (string)e.Data.GetData(DataFormats.StringFormat);
@@ -957,7 +959,7 @@ namespace WpfEditorTest
 		        Type dataType = (Type) e.Data.GetData(DataFormats.FileDrop);
 		        if (dataType != null)
 		        {
-		            createdFrame = Activator.CreateInstance(dataType) as UIComponent;
+		            createdFrame = Activator.CreateInstance(dataType) as IUIComponent;
 					createdFrame.DefaultInit(); 
 		        }
 		    }
@@ -969,7 +971,7 @@ namespace WpfEditorTest
 
 		        CommandManager.Instance.Execute(commands);
 
-		        foreach (UIComponent component in UIHelper.BFSTraverse(createdFrame))
+		        foreach (IUIComponent component in UIHelper.BFSTraverse(createdFrame))
 		        {
 		            UIManager.MakeComponentNameValid(component, SceneFrame, component);
 		        }

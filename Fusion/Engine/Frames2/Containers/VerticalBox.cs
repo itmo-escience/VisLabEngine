@@ -11,6 +11,7 @@ using Fusion.Core.Utils;
 using Fusion.Engine.Common;
 using Fusion.Engine.Frames2.Events;
 using Fusion.Engine.Frames2.Managing;
+using Fusion.Engine.Frames2.Utils;
 using Fusion.Engine.Graphics.SpritesD2D;
 
 namespace Fusion.Engine.Frames2.Containers
@@ -71,7 +72,7 @@ namespace Fusion.Engine.Frames2.Containers
         internal IUIModifiableContainer<VerticalBoxSlot> InternalHolder { get; }
         public IUIContainer Parent => InternalHolder;
 
-        public UIComponent Component
+        public IUIComponent Component
         {
             get;
             private set;
@@ -84,7 +85,7 @@ namespace Fusion.Engine.Frames2.Containers
 
         #region ISlotAttachable
 
-        public virtual void Attach(UIComponent newComponent)
+        public virtual void Attach(IUIComponent newComponent)
         {
             var old = Component;
 
@@ -197,7 +198,7 @@ namespace Fusion.Engine.Frames2.Containers
 
         public void Draw(SpriteLayerD2D layer) { }
 
-        public int IndexOf(UIComponent child)
+        public int IndexOf(IUIComponent child)
         {
             var idx = 0;
             foreach (var slot in _slots)
@@ -210,9 +211,9 @@ namespace Fusion.Engine.Frames2.Containers
             return idx;
         }
 
-        public bool Contains(UIComponent component) => _slots.Any(slot => slot.Component == component);
+        public bool Contains(IUIComponent component) => _slots.Any(slot => slot.Component == component);
 
-		public VerticalBoxSlot Insert( UIComponent child, int index )
+		public VerticalBoxSlot Insert( IUIComponent child, int index )
 		{
             var slot = new VerticalBoxSlot(this);
             slot.Attach(child);
@@ -227,12 +228,12 @@ namespace Fusion.Engine.Frames2.Containers
             return slot;
 		}
 
-		public VerticalBoxSlot Add( UIComponent child )
+		public VerticalBoxSlot Add( IUIComponent child )
 		{
 			return Insert(child, int.MaxValue);
 		}
 
-		public bool Remove(UIComponent child)
+		public bool Remove(IUIComponent child)
         {
             var slot = _slots.FirstOrDefault(s => s.Component == child);
             if (slot == null)

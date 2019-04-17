@@ -14,6 +14,7 @@ using System.Windows.Navigation;
 using System.Windows.Shapes;
 using Fusion.Engine.Frames2;
 using Fusion.Engine.Frames2.Managing;
+using Fusion.Engine.Frames2.Utils;
 
 namespace WpfEditorTest.Utility
 {
@@ -23,10 +24,10 @@ namespace WpfEditorTest.Utility
 	public partial class ParentHighlightPanel : Border
 	{
 
-		private UIComponent _selectedFrame;
+		private IUIComponent _selectedFrame;
 		private UIManager _uiManager;
 
-		public UIComponent SelectedFrame
+		public IUIComponent SelectedFrame
 		{
 			get => _selectedFrame;
 			set

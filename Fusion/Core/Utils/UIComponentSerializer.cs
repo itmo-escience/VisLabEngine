@@ -1,4 +1,5 @@
 ﻿using Fusion.Engine.Frames2;
+using Fusion.Engine.Frames2.Utils;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -20,7 +21,7 @@ namespace Fusion.Core.Utils
 
         private static XmlSerializer _formatter = SerializersStorage.GetSerializer(typeof(SeralizableObjectHolder));
 
-		public static void Write(UIComponent src, string filename )
+		public static void Write(IUIComponent src, string filename )
 		{
 			GetChildTypes(src);
 
@@ -45,7 +46,7 @@ namespace Fusion.Core.Utils
 			}
 		}
 
-		public static string WriteToString(UIComponent src )
+		public static string WriteToString(IUIComponent src )
 		{
 			GetChildTypes(src);
 
@@ -71,7 +72,7 @@ namespace Fusion.Core.Utils
 			}
 		}
 
-		private static void GetChildTypes(UIComponent src )
+		private static void GetChildTypes(IUIComponent src )
 		{
 			if (!frameTypes.Contains(src.GetType()))
 			{
@@ -86,7 +87,7 @@ namespace Fusion.Core.Utils
             }*/
 		}
 
-		public static UIComponent Read(string filename, out UIComponent destination )
+		public static IUIComponent Read(string filename, out IUIComponent destination )
 		{
 			destination = null;
 			// десериализация
@@ -102,9 +103,9 @@ namespace Fusion.Core.Utils
 			return destination;
 		}
 
-		public static UIComponent ReadFromString(string xmlFrame)
+		public static IUIComponent ReadFromString(string xmlFrame)
 		{
-            UIComponent destination = null;
+            IUIComponent destination = null;
 			// десериализация
 			using (StringReader sr = new StringReader(xmlFrame))
 			{
@@ -135,12 +136,12 @@ namespace Fusion.Core.Utils
 	{
 		[XmlElement("Version")]
 		public string Version { get; set; } = UIComponentSerializer.SerializerVersion;
-		public UIComponent SerializableFrame { get; set; }
+		public IUIComponent SerializableFrame { get; set; }
 
 		public string FrameTypeName;
         public string FrameAssemblyName;
 
-		public SeralizableObjectHolder(UIComponent frame)
+		public SeralizableObjectHolder(IUIComponent frame)
 		{
 			this.SerializableFrame = frame;
             FrameTypeName = frame.GetType().FullName;
@@ -175,7 +176,7 @@ namespace Fusion.Core.Utils
 
 			var frameSerializer = SerializersStorage.GetSerializer(frameType);
 
-			var frame = (UIComponent)frameSerializer.Deserialize(reader);
+			var frame = (IUIComponent)frameSerializer.Deserialize(reader);
 			SerializableFrame = frame;
 
             reader.ReadEndElement();
