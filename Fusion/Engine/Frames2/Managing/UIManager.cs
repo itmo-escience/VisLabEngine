@@ -94,6 +94,7 @@ namespace Fusion.Engine.Frames2.Managing
 
         public static readonly SolidBrushD2D DefaultDebugBrush = new SolidBrushD2D(new Color4(0, 1.0f, 0, 1.0f));
         public static readonly TextFormatD2D DefaultDebugTextFormat = new TextFormatD2D("Calibri", 10);
+        public static readonly float DefaultContainerSize = 20;
 
         public UIManager(RenderSystem rs)
         {

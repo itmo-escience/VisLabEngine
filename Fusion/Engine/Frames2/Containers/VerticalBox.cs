@@ -160,6 +160,13 @@ namespace Fusion.Engine.Frames2.Containers
 
         public void Update(GameTime gameTime)
         {
+            if (_slots.Count == 0)
+            {
+                DesiredWidth = UIManager.DefaultContainerSize;
+                DesiredHeight = UIManager.DefaultContainerSize;
+                return;
+            }
+
             float bottomBorder = 0;
             float maxChildWidth = 0;
             foreach (var slot in _slots)
