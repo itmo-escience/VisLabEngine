@@ -59,7 +59,7 @@ namespace Fusion.Engine.Frames2.Controllers
 			private set;
 		}
 
-        public SolidBrushD2D DebugBrush => UIManager.DefaultDebugBrush;
+        public SolidBrushD2D DebugBrush => UIManager.ControllerSlotDebugBrush;
         public TextFormatD2D DebugTextFormat => UIManager.DefaultDebugTextFormat;
 
         public event EventHandler<SlotAttachmentChangedEventArgs> ComponentAttached;

@@ -26,7 +26,7 @@ namespace Fusion.Engine.Frames2.Utils
 
         public IUIContainer Parent { get; }
         public IUIComponent Component { get; private set; }
-        public SolidBrushD2D DebugBrush { get; } = new SolidBrushD2D(Color4.White);
+        public SolidBrushD2D DebugBrush { get; } = UIManager.ControllerSlotDebugBrush;
         public TextFormatD2D DebugTextFormat => UIManager.DefaultDebugTextFormat;
 
         public string Name { get; private set; }
