@@ -958,10 +958,7 @@ namespace WpfEditorTest
 		        if (dataType != null)
 		        {
 		            createdFrame = Activator.CreateInstance(dataType) as UIComponent;
-					if (createdFrame is UIController controller)
-					{
-						controller.DefaultInit(); 
-					}
+					createdFrame.DefaultInit(); 
 		        }
 		    }
 

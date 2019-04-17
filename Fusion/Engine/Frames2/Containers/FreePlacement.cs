@@ -218,6 +218,13 @@ namespace Fusion.Engine.Frames2.Containers
 			return true;
         }
 
+        public void DefaultInit()
+        {
+            Name = this.GetType().Name;
+            DesiredWidth = 100;
+            DesiredHeight = 100;
+        }
+
         public XmlSchema GetSchema()
         {
             return null;

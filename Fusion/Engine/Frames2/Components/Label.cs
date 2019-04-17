@@ -158,6 +158,9 @@ namespace Fusion.Engine.Frames2.Components
 		public void DefaultInit()
 		{
 			Name = this.GetType().Name;
-		}
+            DesiredWidth = 100;
+            DesiredHeight = 25;
+            Text = "Label";
+        }
 	}
 }

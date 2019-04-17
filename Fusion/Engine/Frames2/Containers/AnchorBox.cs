@@ -276,6 +276,11 @@ namespace Fusion.Engine.Frames2.Containers
 			return true;
 		}
 
+        public void DefaultInit()
+        {
+            Name = this.GetType().Name;
+        }
+
         public XmlSchema GetSchema()
         {
             return null;

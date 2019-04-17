@@ -339,10 +339,7 @@ namespace WpfEditorTest.Utility
 				{
 					var component =
 					 Activator.CreateInstance(data.GetData(DataFormats.FileDrop) as Type) as UIComponent;
-					if (component is UIController controller)
-					{
-						controller.DefaultInit();
-					}
+					component.DefaultInit();
 					return component;
 				}
 			}

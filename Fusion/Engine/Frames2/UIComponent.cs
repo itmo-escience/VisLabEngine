@@ -21,6 +21,8 @@ namespace Fusion.Engine.Frames2
         object Tag { get; set; }
         string Name { get; set; }
 
+        void DefaultInit();
+
         void Update(GameTime gameTime);
 	}
 
