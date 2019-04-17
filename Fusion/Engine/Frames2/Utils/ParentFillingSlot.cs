@@ -18,7 +18,7 @@ namespace Fusion.Engine.Frames2.Utils
         public float Y => 0;
         public float Angle => 0;
         public float Width => Parent.Placement.Width;
-        public float Height => Parent.Placement.Width;
+        public float Height => Parent.Placement.Height;
         public float AvailableWidth => Width;
         public float AvailableHeight => Height;
         public bool Clip => true;

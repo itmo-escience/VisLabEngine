@@ -125,7 +125,7 @@ namespace Fusion.Engine.Frames2.Controllers
 
         public RadioButtonSlot RadioButton { get; private set; }
         public SimpleControllerSlot Body { get; private set;}
-        public SimpleControllerSlot Background { get; private set;}
+        public ParentFillingSlot Background { get; private set;}
 
         private RadioButtonGroup _group;
         [XmlIgnore]
@@ -154,7 +154,7 @@ namespace Fusion.Engine.Frames2.Controllers
         {
             RadioButton = new RadioButtonSlot("RadioButton", this);
             Body = new SimpleControllerSlot("Body", this);
-            Background = new SimpleControllerSlot("Background", this);
+            Background = new ParentFillingSlot("Background", this);
             MainControllerSlots = new List<IControllerSlot>() { Background, RadioButton, Body };
 
             Style = UIStyleManager.Instance.GetStyle(GetType());
@@ -176,7 +176,7 @@ namespace Fusion.Engine.Frames2.Controllers
         {
             DesiredWidth = 100;
             DesiredHeight = 25;
-            Background.Attach(new Border(Color.Gray, Color.White) { DesiredWidth = 100, DesiredHeight = 25});
+            Background.Attach(new Border(Color.Gray, Color.White));
             Body.Attach(body);
             RadioButton.Attach(new Border(Color.Blue, Color.White) { DesiredWidth = 25, DesiredHeight = 25});
         }
@@ -186,19 +186,14 @@ namespace Fusion.Engine.Frames2.Controllers
             base.DefaultInit();
             DesiredWidth = 100;
             DesiredHeight = 25;
-            Background.Attach(new Border(Color.Gray, Color.White) { DesiredWidth = 100, DesiredHeight = 25});
-            Body.Attach(new Label(Name, "Calibri", 14) { DesiredWidth = 75, DesiredHeight = 25});
+            Background.Attach(new Border(Color.Gray, Color.White));
+            Body.Attach(new Label(Name, "Calibri", 14) { DesiredWidth = -1, DesiredHeight = -1});
             RadioButton.Attach(new Border(Color.Blue, Color.White) { DesiredWidth = 25, DesiredHeight = 25});
         }
 
         public override void Update(GameTime gameTime)
         {
             base.Update(gameTime);
-
-            Background.X = 0;
-            Background.Y = 0;
-            Background.Width = Background.AvailableWidth;
-            Background.Height = Background.AvailableHeight;
 
             RadioButton.X = 0;
             RadioButton.Y = 0;
