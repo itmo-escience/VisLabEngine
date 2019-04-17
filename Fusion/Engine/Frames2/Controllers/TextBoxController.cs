@@ -19,7 +19,7 @@ namespace Fusion.Engine.Frames2.Controllers
     public class TextBoxController : UIController, IXmlSerializable
     {
         public static ControllerState Editing = new ControllerState("Editing");
-        protected override IEnumerable<ControllerState> NonDefaultStates { get; } = new List<ControllerState> { Editing };
+        protected override IReadOnlyCollection<ControllerState> NonDefaultStates { get; } = new List<ControllerState> { Editing };
 
         private readonly List<ParentFillingSlot> _slots;
         protected override IEnumerable<IControllerSlot> MainControllerSlots => _slots;

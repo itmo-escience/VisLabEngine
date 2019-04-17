@@ -121,7 +121,7 @@ namespace Fusion.Engine.Frames2.Controllers
         public static ControllerState CheckedPressed = new ControllerState("PressedChecked");
         public static ControllerState CheckedHovered = new ControllerState("HoveredChecked");
         public static ControllerState CheckedDisabled = new ControllerState("DisabledChecked");
-        protected override IEnumerable<ControllerState> NonDefaultStates { get; } = new[] { Pressed, Checked, CheckedHovered, CheckedDisabled };
+        protected override IReadOnlyCollection<ControllerState> NonDefaultStates { get; } = new[] { Pressed, Checked, CheckedHovered, CheckedDisabled };
 
         public RadioButtonSlot RadioButton { get; private set; }
         public SimpleControllerSlot Body { get; private set;}
