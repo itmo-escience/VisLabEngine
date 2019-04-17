@@ -49,6 +49,7 @@ namespace WpfEditorTest.Utility
 
 			DetailsScroll.DataContext = new MVVMComponentDetails(component);
 			DetailsScroll.Visibility = Visibility.Visible;
+			Title = component.GetType().Name + " details";
 
 		}
 	}
