@@ -98,5 +98,14 @@ namespace Fusion.Engine.Frames2.Containers
         {
             return container.Slots.Select(slot => slot.Component);
         }
+
+        public static void Clear(this IUIModifiableContainer<ISlot> c)
+        {
+            List<IUIComponent> components = new List<IUIComponent>(c.Slots.Select(s => s.Component));
+            foreach (var component in components)
+            {
+                c.Remove(component);
+            }
+        }
     }
 }

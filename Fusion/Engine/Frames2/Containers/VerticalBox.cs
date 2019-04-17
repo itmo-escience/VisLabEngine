@@ -247,21 +247,7 @@ namespace Fusion.Engine.Frames2.Containers
                 return false;
 
 			_slots.Remove(slot);
-			slot.Component.Placement = null;
-
-			var handler = slot.GetType().GetField("PropertyChanged", BindingFlags.NonPublic | BindingFlags.Instance).GetValue(slot) as Delegate;
-			if (handler == null)
-			{
-				//no subscribers
-			}
-			else
-			{
-				foreach (var subscriber in handler.GetInvocationList())
-				{
-					slot.PropertyChanged -= subscriber as PropertyChangedEventHandler;
-				}
-				//now you have the subscribers
-			}
+            slot.ReleaseComponent();
 
 			return true;
         }

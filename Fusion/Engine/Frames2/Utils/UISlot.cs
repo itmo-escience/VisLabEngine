@@ -1,5 +1,6 @@
 ﻿using System;
 using System.ComponentModel;
+using System.Reflection;
 using System.Xml;
 using Fusion.Core.Mathematics;
 using Fusion.Engine.Frames2.Containers;
@@ -68,6 +69,17 @@ namespace Fusion.Engine.Frames2.Utils
         //        : new RectangleF(0, 0, 0, 0);
         //    return rectangle;
         //}
+
+        public static void ReleaseComponent(this ISlot slot)
+        {
+            slot.Component.Placement = null;
+
+            if (slot.GetType().GetField("PropertyChanged", BindingFlags.NonPublic | BindingFlags.Instance).GetValue(slot) is Delegate handler) {
+                foreach (var subscriber in handler.GetInvocationList()) {
+                    slot.PropertyChanged -= subscriber as PropertyChangedEventHandler;
+                }
+            }
+        }
 
         public static bool IsInside(this ISlot slot, Vector2 point)
         {
