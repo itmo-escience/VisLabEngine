@@ -43,16 +43,13 @@
     <Reference Include="Triangle, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="0.2\Control.cs" />
-    <Compile Include="0.2\GlobeVisualizer.cs" />
-    <Compile Include="0.2\GraphVisualizer.cs" />
-    <Compile Include="0.2\IVisualizer.cs" />
-    <Compile Include="0.2\PolygonVisualizer.cs" />
-    <Compile Include="0.2\Routines.cs" />
-    <Compile Include="0.2\VisLayerHolder.cs" />
+    <Compile Include="Control.cs" />
     <Compile Include="GlobeVisualizer.cs" />
     <Compile Include="GraphVisualizer.cs" />
     <Compile Include="IVisualizer.cs" />
+    <Compile Include="PolygonVisualizer.cs" />
+    <Compile Include="Routines.cs" />
+    <Compile Include="VisLayerHolder.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

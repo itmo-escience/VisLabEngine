@@ -45,7 +45,6 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="DataModel\DataProcessor.cs" />
     <Compile Include="DataModel\DataSource.cs" />
     <Compile Include="DataModel\DataTypes.cs" />
     <Compile Include="DataModel\Public\DataChanneling.cs" />
@@ -54,13 +53,8 @@
     <Compile Include="EditorController\EditorConstructors\Routines.cs" />
     <Compile Include="DataModel\Public\Nodes.cs" />
     <Compile Include="EditorController\ReflectionHelpers.cs" />
-    <Compile Include="DataBlock.cs" />
-    <Compile Include="DataGeneration.cs" />
-    <Compile Include="DataMapping.cs" />
-    <Compile Include="DataTypes.cs" />
     <Compile Include="EditorController\EditorFunctions.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Data.cs" />
     <Compile Include="Utility\DataReaders\CSVLoader.cs" />
     <Compile Include="Utility\DataReaders\GeoJSONLoader.cs" />
     <Compile Include="Utility\SupportFactories\ChannelEnumeratorFactory.cs" />

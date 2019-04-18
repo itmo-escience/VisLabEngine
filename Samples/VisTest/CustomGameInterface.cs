@@ -203,17 +203,24 @@ namespace VisTest
 
             var colorCastNoce = FusionData._0._2.EditorConstructors.Basic_Nodes.ChannelConvertNode(typeof(decimal), typeof(float));
 
+	        var floorMultNode = FusionData._0._2.EditorConstructors.Basic_Nodes.NumericChannelMultiplyNode();
+	        floorMultNode.InputSlots.Find(a => a.Name == "B").Default = 0.004f;
+            var heightConvNode = FusionData._0._2.EditorConstructors.Basic_Nodes.ChannelConvertNode(typeof(IConvertible), typeof(float));
+
             EditorFunctions.LinkNodes(jsonSource, geomCastNode, "#Geometry", "Object");
 	        EditorFunctions.LinkNodes(geomCastNode, test, typeof(FDDVector2[][][]).Name, PolygonVisualizer.PolygonGeometryKey);
 
 	        EditorFunctions.LinkNodes(jsonSource, fllorsCastNode, "floors_all", "Object");
             EditorFunctions.LinkNodes(fllorsCastNode, floorILerpNode, "IConvertible", "A");
-	        EditorFunctions.LinkNodes(floorILerpNode, colorCastNoce, "Res", "Decimal");
+	        EditorFunctions.LinkNodes(fllorsCastNode, floorMultNode, "IConvertible", "A");
+            EditorFunctions.LinkNodes(floorILerpNode, colorCastNoce, "Res", "Decimal");
 	        EditorFunctions.LinkNodes(colorCastNoce, test, "Single", PolygonVisualizer.PolygonColorSatKey);
 
             EditorFunctions.LinkNodes(jsonSource, test, "#key", PolygonVisualizer.PolygonKey);
+	        EditorFunctions.LinkNodes(floorMultNode, heightConvNode, "Res", "IConvertible");
+	        EditorFunctions.LinkNodes(heightConvNode, test, "Single", PolygonVisualizer.PolygonHeightKey);
 
-	        test.ReCalc();
+            test.ReCalc();
             globeVis.ReCalc();
 
             Routines.AddVisLayers(viewLayer, globeVis.VisHolder);
