@@ -153,26 +153,18 @@ namespace Fusion.Engine.Frames2.Controllers
 
         private void OnMouseDown(IUIComponent sender, ClickEventArgs e)
         {
-            if (CurrentState == ControllerState.Disabled || CurrentState == CheckedDisabled)
-                return;
-
-            if (CurrentState == Pressed || CurrentState == CheckedPressed)
-                return;
-
+            if (CurrentState == ControllerState.Hovered)
+            {
+                ChangeState(Pressed);
+            }
             if (CurrentState == CheckedHovered)
             {
                 ChangeState(CheckedPressed);
-                return;
             }
-
-            ChangeState(Pressed);
         }
 
         private void OnMouseUp(IUIComponent sender, ClickEventArgs e)
         {
-            if (CurrentState == ControllerState.Disabled || CurrentState == CheckedDisabled)
-                return;
-
             if (CurrentState == Pressed || CurrentState == CheckedPressed)
             {
                 RadioButtonClick?.Invoke(this, new RadioButtonClickEventArgs(this));
@@ -183,7 +175,13 @@ namespace Fusion.Engine.Frames2.Controllers
         private void OnMouseUpOutside(IUIComponent sender, ClickEventArgs e)
         {
             if (CurrentState == Pressed)
+            {
                 ChangeState(ControllerState.Default);
+            }
+            if (CurrentState == CheckedPressed)
+            {
+                ChangeState(Checked);
+            }  
         }
 
         public event EventHandler<RadioButtonClickEventArgs> RadioButtonClick;
