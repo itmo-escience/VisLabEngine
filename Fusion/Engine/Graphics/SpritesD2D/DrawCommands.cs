@@ -149,6 +149,35 @@ namespace Fusion.Engine.Graphics.SpritesD2D
         }
     }
 
+    public sealed class RoundedRect : IDrawCommand
+    {
+        protected readonly float X, Y, W, H, RX, RY;
+        private readonly IBrushD2D _brush;
+        private RectangleF _rect;
+
+        public RoundedRect(float x, float y, float w, float h, float rx, float ry, IBrushD2D brush)
+        {
+            X = x;
+            Y = y;
+            W = w;
+            H = h;
+            RX = rx;
+            RY = ry;
+            _brush = brush;
+            _rect = new RectangleF(x, y, w, h);
+        }
+
+        public void Apply(RenderTargetD2D target)
+        {
+            target.DrawRoundedRect(_rect, RX, RY, _brush);
+        }
+
+        public override string ToString()
+        {
+            return $"RoundedRectangle ({X}, {Y}, {W}, {H}, {RX}, {RY})";
+        }
+    }
+
     public sealed class Circle : Ellipse
     {
         public Circle(float x, float y, float r, IBrushD2D brush) : base(x, y, r, r, brush) { }
@@ -262,6 +291,35 @@ namespace Fusion.Engine.Graphics.SpritesD2D
         public override string ToString()
         {
             return $"FillRectangle ({X}, {Y}, {W}, {H})";
+        }
+    }
+
+    public sealed class FillRoundedRect : IDrawCommand
+    {
+        protected readonly float X, Y, W, H, RX, RY;
+        private readonly IBrushD2D _brush;
+        private RectangleF _rect;
+
+        public FillRoundedRect(float x, float y, float w, float h, float rx, float ry, IBrushD2D brush)
+        {
+            X = x;
+            Y = y;
+            W = w;
+            H = h;
+            RX = rx;
+            RY = ry;
+            _brush = brush;
+            _rect = new RectangleF(x, y, w, h);
+        }
+
+        public void Apply(RenderTargetD2D target)
+        {
+            target.FillRoundedRect(_rect, RX, RY, _brush);
+        }
+
+        public override string ToString()
+        {
+            return $"FillRoundedRectangle ({X}, {Y}, {W}, {H})";
         }
     }
 

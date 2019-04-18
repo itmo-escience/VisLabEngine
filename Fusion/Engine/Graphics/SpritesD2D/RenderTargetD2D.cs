@@ -4,6 +4,7 @@ using SharpDX.Mathematics.Interop;
 using System.Drawing.Imaging;
 using System.Runtime.InteropServices;
 using SharpDX;
+using SharpDX.XAudio2;
 using Color4 = Fusion.Core.Mathematics.Color4;
 using Matrix3x2 = Fusion.Core.Mathematics.Matrix3x2;
 using PixelFormat = SharpDX.Direct2D1.PixelFormat;
@@ -97,11 +98,44 @@ namespace Fusion.Engine.Graphics.SpritesD2D
             RenderTarget.DrawRectangle(createAlignedRectangle(rectangle.ToRawRectangleF(), strokeWidth), _brushFactory.GetOrCreateBrush(brush), strokeWidth, new StrokeStyle(RenderTarget.Factory, prop));
         }
 
+        public void DrawRoundedRect(RectangleF rectangle, float radiusX, float radiusY, IBrushD2D brush)
+        {
+            var rect = new RoundedRectangle()
+            {
+                Rect = createAlignedRectangle(rectangle.ToRawRectangleF()),
+                RadiusX = radiusX,
+                RadiusY = radiusY
+            };
+            RenderTarget.DrawRoundedRectangle(rect, _brushFactory.GetOrCreateBrush(brush));
+        }
+
+        public void DrawRoundedRect(RectangleF rectangle, float radiusX, float radiusY, IBrushD2D brush, float strokeWidth)
+        {
+            var rect = new RoundedRectangle()
+            {
+                Rect = createAlignedRectangle(rectangle.ToRawRectangleF(), strokeWidth),
+                RadiusX = radiusX,
+                RadiusY = radiusY
+            };
+            RenderTarget.DrawRoundedRectangle(rect, _brushFactory.GetOrCreateBrush(brush), strokeWidth);
+        }
+
         public void FillEllipse(Vector2 center, float rX, float rY, IBrushD2D brush) =>
             RenderTarget.FillEllipse(new SharpDX.Direct2D1.Ellipse(center.ToRawVector2(), rX, rY), _brushFactory.GetOrCreateBrush(brush));
 
         public void FillRect(RectangleF rectangle, IBrushD2D brush) =>
             RenderTarget.FillRectangle(rectangle.ToRawRectangleF(), _brushFactory.GetOrCreateBrush(brush));
+
+        public void FillRoundedRect(RectangleF rectangle, float radiusX, float radiusY, IBrushD2D brush)
+        {
+            var rect = new RoundedRectangle()
+            {
+                Rect = createAlignedRectangle(rectangle.ToRawRectangleF()),
+                RadiusX = radiusX,
+                RadiusY = radiusY
+            };
+            RenderTarget.FillRoundedRectangle(rect, _brushFactory.GetOrCreateBrush(brush));
+        }
 
         public void DrawText(string text, TextFormatD2D textFormat, RectangleF rectangleF, IBrushD2D brush) =>
             RenderTarget.DrawText(text, _dwFactory.CreateTextFormat(textFormat), rectangleF.ToRawRectangleF(), _brushFactory.GetOrCreateBrush(brush));
