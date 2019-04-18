@@ -19,8 +19,7 @@ namespace Fusion.Engine.Frames2.Controllers
         protected override IReadOnlyCollection<ControllerState> NonDefaultStates { get; } = new List<ControllerState> { Pressed };
 
         private readonly List<ParentFillingSlot> _slots;
-        protected override IEnumerable<IControllerSlot> MainControllerSlots => _slots;
-        protected override IEnumerable<IControllerSlot> AdditionalControllerSlots { get; } = new List<IControllerSlot>();
+        protected override IEnumerable<IControllerSlot> ControllerSlots => _slots;
 
         public ParentFillingSlot Foreground { get; private set; }
         public ParentFillingSlot Background { get; private set; }

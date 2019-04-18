@@ -19,8 +19,7 @@ namespace Fusion.Engine.Frames2.Controllers
 {
     public class RadioButtonController : UIController, IXmlSerializable
     {
-        protected override IEnumerable<IControllerSlot> MainControllerSlots { get; }
-        protected override IEnumerable<IControllerSlot> AdditionalControllerSlots { get; } = Enumerable.Empty<IControllerSlot>();
+        protected override IEnumerable<IControllerSlot> ControllerSlots { get; }
 
         public static ControllerState Pressed = new ControllerState("Pressed");
         public static ControllerState Checked = new ControllerState("Checked");
@@ -61,7 +60,7 @@ namespace Fusion.Engine.Frames2.Controllers
             RadioButton = new SimpleControllerSlot("RadioButton", this);
             Body = new SimpleControllerSlot("Body", this);
             Background = new ParentFillingSlot("Background", this);
-            MainControllerSlots = new List<IControllerSlot>() { Background, RadioButton, Body };
+            ControllerSlots = new List<IControllerSlot>() { Background, RadioButton, Body };
 
             Style = UIStyleManager.Instance.GetStyle(GetType());
 

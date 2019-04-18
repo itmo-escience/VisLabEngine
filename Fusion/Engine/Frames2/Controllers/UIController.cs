@@ -40,11 +40,9 @@ namespace Fusion.Engine.Frames2.Controllers
 
         protected virtual IReadOnlyCollection<ControllerState> NonDefaultStates { get; } = new List<ControllerState>();
 
-        public IEnumerable<ISlot> Slots => AllSlots;
-        private IEnumerable<IControllerSlot> AllSlots => MainControllerSlots.Concat(AdditionalControllerSlots);
+        public IEnumerable<ISlot> Slots => ControllerSlots;
 
-        protected abstract IEnumerable<IControllerSlot> MainControllerSlots { get; }
-        protected abstract IEnumerable<IControllerSlot> AdditionalControllerSlots { get; }
+        protected abstract IEnumerable<IControllerSlot> ControllerSlots { get; }
 
         protected void ChangeState(ControllerState newState)
         {
@@ -59,7 +57,7 @@ namespace Fusion.Engine.Frames2.Controllers
                 return;
             }
 
-            foreach (var slot in AllSlots)
+            foreach (var slot in ControllerSlots)
             {
                 var component = slot.Component;
 				if (component == null)
