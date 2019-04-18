@@ -67,6 +67,8 @@ namespace Fusion.Engine.Frames2.Components
 			Name = this.GetType().Name;
             DesiredWidth = 100;
             DesiredHeight = 100;
+            BackgroundColor = Color4.Zero;
+            BorderColor = Color4.White;
         }
 	}
 }
