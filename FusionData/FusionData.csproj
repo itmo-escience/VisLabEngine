@@ -21,6 +21,7 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <UseVSHostingProcess>true</UseVSHostingProcess>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -31,6 +32,9 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Newtonsoft.Json, Version=12.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <HintPath>..\..\VisLabProjects\packages\Newtonsoft.Json.12.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
@@ -41,20 +45,28 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="DataModel\DataProcessor.cs" />
+    <Compile Include="DataModel\DataSource.cs" />
+    <Compile Include="DataModel\DataTypes.cs" />
+    <Compile Include="DataModel\Public\DataChanneling.cs" />
+    <Compile Include="EditorController\EditorConstructors\Basic Nodes.cs" />
+    <Compile Include="EditorController\EditorConstructors\Remapper.cs" />
+    <Compile Include="EditorController\EditorConstructors\Routines.cs" />
+    <Compile Include="DataModel\Public\Nodes.cs" />
+    <Compile Include="EditorController\ReflectionHelpers.cs" />
     <Compile Include="DataBlock.cs" />
     <Compile Include="DataGeneration.cs" />
     <Compile Include="DataMapping.cs" />
     <Compile Include="DataTypes.cs" />
+    <Compile Include="EditorController\EditorFunctions.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Data.cs" />
     <Compile Include="Utility\DataReaders\CSVLoader.cs" />
     <Compile Include="Utility\DataReaders\GeoJSONLoader.cs" />
+    <Compile Include="Utility\SupportFactories\ChannelEnumeratorFactory.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Fusion\Fusion.csproj">
-      <Project>{085c9e62-cddf-4b95-994d-085c74fa90fc}</Project>
-      <Name>Fusion</Name>
-    </ProjectReference>
+    <None Include="packages.config" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

@@ -1,210 +1,233 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 using Fusion;
-using Fusion.Core.Mathematics;
 using Fusion.Engine.Common;
 using Fusion.Engine.Graphics;
 using Fusion.Engine.Graphics.Graph;
-using FusionData.Data;
+using FusionData.DataModel.Public;
+using FusionData._0._2;
+using Fusion.Core.Mathematics;
+using Fusion.Engine.Graphics.GIS.DataSystem.MapSources.OpenStreetMaps;
 
-namespace FusionVis
+namespace FusionVis._0._2
 {
-    public class GraphVisualiser : IVisualizer
+    class GraphVisualizer : IVisualizer
     {
 
-        private static string nodeIdKey = "NodeId";
-        private static string nodeColorHUEKey = "NodeColorHUE";
-        private static string nodeColorSaturationKey = "NodeColorSaturation";
-        private static string nodeColorBrightnessKey = "NodeColorBrightness";
-        private static string nodeColorAlphaKey = "NodeColorAlpha";
-        private static string nodeSizeKey = "NodeSize";
-        private static string nodeMassKey = "NodeMass";
-        private static string linkFirstNodeKey = "LinksInd1";
-        private static string linkSecondNodeKey = "LinksInd2";
-        private static string linkStrengthKey = "LinksStrength";
-        private static string linkLengthKey = "LinksLength";
-        private static string linkWidthKey = "LinksWidth";
-        private static string linkColorHUEKey = "LinkColorHUE";
-        private static string linkColorSaturationKey = "LinkColorSaturation";
-        private static string linkColorBrightnessKey = "LinkColorBrightness";
-        private static string linkColorAlphaKey = "LinkColorAlpha";
+        #region keys
 
-        private static string nodesSheetKey = "Vertices";
-        private static string linksSheetKey = "Edges";
+        private const string nodeIdKey = "NodeId";
+        private const string nodeColorHUEKey = "NodeColorHUE";
+        private const string nodeColorSaturationKey = "NodeColorSaturation";
+        private const string nodeColorBrightnessKey = "NodeColorBrightness";
+        private const string nodeColorAlphaKey = "NodeColorAlpha";
+        private const string nodeSizeKey = "NodeSize";
+        private const string nodeMassKey = "NodeMass";
 
-        public Dictionary<string, InputIndexSlot> IndexInputs { get; }= new List<InputIndexSlot>()
+        private static List<string> NodeChannelNames { get; }= new List<string>()
         {
-            new InputIndexSlot(nodesSheetKey),
+            nodeIdKey,
+            nodeColorHUEKey,
+            nodeColorSaturationKey,
+            nodeColorBrightnessKey,
+            nodeColorAlphaKey,
+            nodeSizeKey,
+            nodeMassKey
+        };
 
-            new InputIndexSlot(linksSheetKey),
-        }.ToDictionary(a => a.Name, a => a);
+        private const string linkFirstNodeKey = "LinksId1";
+        private const string linkSecondNodeKey = "LinksId2";
+        private const string linkStrengthKey = "LinksStrength";
+        private const string linkLengthKey = "LinksLength";
+        private const string linkWidthKey = "LinksWidth";
+        private const string linkColorHUEKey = "LinkColorHUE";
+        private const string linkColorSaturationKey = "LinkColorSaturation";
+        private const string linkColorBrightnessKey = "LinkColorBrightness";
+        private const string linkColorAlphaKey = "LinkColorAlpha";
 
-        public Dictionary<string, InputSlot> Inputs { get; }=
-            new List<InputSlot>()
-            {
-                new InputSlot(nodeIdKey, DataType.BasicTypes.Integer)
-                {
-                },
-                new InputSlot(nodeColorHUEKey, DataType.BasicTypes.Float)
-                {
-                    DefaultGen = () => new DataElement(0.0f, DataType.BasicTypes.Float)
-                },
-                new InputSlot(nodeColorSaturationKey, DataType.BasicTypes.Float)
-                {
-                    DefaultGen = () => new DataElement(0.0f, DataType.BasicTypes.Float)
-                },
-                new InputSlot(nodeColorBrightnessKey, DataType.BasicTypes.Float)
-                {
-                    DefaultGen = () => new DataElement(1.0f, DataType.BasicTypes.Float)
-                },
-                new InputSlot(nodeColorAlphaKey, DataType.BasicTypes.Float)
-                {
-                    DefaultGen = () => new DataElement(1.0f, DataType.BasicTypes.Float)
-                },
-                new InputSlot(nodeSizeKey, DataType.BasicTypes.Float)
-                {
-                    DefaultGen = () => new DataElement(10.0f, DataType.BasicTypes.Float)
-                },
-                new InputSlot(nodeMassKey, DataType.BasicTypes.Float)
-                {
-                    DefaultGen = () => new DataElement(1.0f, DataType.BasicTypes.Float)
-                },
-
-
-                new InputSlot(linkFirstNodeKey, DataType.BasicTypes.Integer)
-                {
-                },
-                new InputSlot(linkSecondNodeKey, DataType.BasicTypes.Integer)
-                {
-                },
-                new InputSlot(linkStrengthKey, DataType.BasicTypes.Float)
-                {
-                    DefaultGen = () => new DataElement(1.0f, DataType.BasicTypes.Float)
-                },
-                new InputSlot(linkLengthKey, DataType.BasicTypes.Float)
-                {
-                    DefaultGen = () => new DataElement(100.0f, DataType.BasicTypes.Float)
-                },
-                new InputSlot(linkWidthKey, DataType.BasicTypes.Float)
-                {
-                    DefaultGen = () => new DataElement(0.2f, DataType.BasicTypes.Float)
-                },
-                new InputSlot(linkColorHUEKey, DataType.BasicTypes.Float)
-                {
-                    DefaultGen = () => new DataElement(0.0f, DataType.BasicTypes.Float)
-                },
-                new InputSlot(linkColorSaturationKey, DataType.BasicTypes.Float)
-                {
-                    DefaultGen = () => new DataElement(0.0f, DataType.BasicTypes.Float)
-                },
-                new InputSlot(linkColorBrightnessKey, DataType.BasicTypes.Float)
-                {
-                    DefaultGen = () => new DataElement(1.0f, DataType.BasicTypes.Float)
-                },
-                new InputSlot(linkColorAlphaKey, DataType.BasicTypes.Float)
-                {
-                    DefaultGen = () => new DataElement(1.0f, DataType.BasicTypes.Float)
-                },
-
-            }.ToDictionary(a => a.Name, a => a);
-
-        public RenderLayer VisLayer { get; protected set; }
-
-        protected GraphLayer graph;
-        protected SimpleLayout layout;
-        public string LayoutName = "Graph/Shaders/SimpleLayout";
-
-        public void Prepare()
+        private List<string> LinkChannelNames { get; } = new List<string>()
         {
-            renderReady = false;
-            try
-            {
-                VisLayer = new RenderLayer(Game.Instance);
+            linkFirstNodeKey,
+            linkSecondNodeKey,
+            linkStrengthKey,
+            linkLengthKey,
+            linkWidthKey,
+            linkColorHUEKey,
+            linkColorSaturationKey,
+            linkColorBrightnessKey,
+            linkColorAlphaKey,
+        };
 
-                graph = new GraphLayer(Game.Instance);
-                graph.graph = new Graph();
-                LoadData();
-                graph.Camera = new GreatCircleCamera();
-                graph.Initialize();
-                VisLayer.GraphLayers.Add(graph);
-                graph.AddMaxParticles();
-                layout = new SimpleLayout(Game.Instance, graph, LayoutName);
-                renderReady = true;
-            }
-            catch (Exception e)
+        #endregion
+
+        private const string layoutShaderKey = "LinkColorAlpha";
+
+        public GraphVisualizer()
+        {
+            InputSlots = new List<ISlot>();
+            InputSlots.Add(new ChannelSlot<string>(nodeIdKey));
+            InputSlots.Add(new ChannelSlot<float>(nodeColorHUEKey)
             {
-                Log.Error(e.ToString());
-            }
+                Default = 0,
+            });
+            InputSlots.Add(new ChannelSlot<float>(nodeColorSaturationKey)
+            {
+                Default = 1,
+            });
+            InputSlots.Add(new ChannelSlot<float>(nodeColorBrightnessKey)
+            {
+                Default = 1,
+            });
+            InputSlots.Add(new ChannelSlot<float>(nodeColorAlphaKey)
+            {
+                Default = 1,
+            });
+            InputSlots.Add(new ChannelSlot<float>(nodeSizeKey)
+            {
+                Default = 1,
+            });
+            InputSlots.Add(new ChannelSlot<float>(nodeMassKey)
+            {
+                Default = 1,
+            });
+
+            InputSlots.Add(new ChannelSlot<string>(linkFirstNodeKey));
+            InputSlots.Add(new ChannelSlot<string>(linkSecondNodeKey));
+            InputSlots.Add(new ChannelSlot<float>(linkStrengthKey)
+            {
+                Default = 1,
+            });
+            InputSlots.Add(new ChannelSlot<float>(linkLengthKey)
+            {
+                Default = 1,
+            });
+            InputSlots.Add(new ChannelSlot<float>(linkWidthKey)
+            {
+                Default = 1,
+            });
+            InputSlots.Add(new ChannelSlot<float>(linkColorHUEKey)
+            {
+                Default = 1,
+            });
+            InputSlots.Add(new ChannelSlot<float>(linkColorSaturationKey)
+            {
+                Default = 1,
+            });
+            InputSlots.Add(new ChannelSlot<float>(linkColorBrightnessKey)
+            {
+                Default = 1,
+            });
+            InputSlots.Add(new ChannelSlot<float>(linkColorAlphaKey)
+            {
+                Default = 1,
+            });
+
+
+            InputSlots.Add(new ParameterSlot<string>(layoutShaderKey, "Graph/Shaders/SimpleLayout"));
         }
 
-        private Dictionary<int, Index> nodeIndexesById;
 
-        public void LoadData()
+        public bool CheckValidity()
         {
+            var iSDict = InputSlots.ToDictionary(a => a.Name, a => a);
 
-            dataReady = false;
-            if (!ValidateInputs()) return;
+            var linkSlots = LinkChannelNames.Select(a => iSDict[a]).ToList();
+            var nodeSlots = NodeChannelNames.Select(a => iSDict[a]).ToList();
 
-            try
+            return linkSlots.Cast<IChannelSlot>().All(a =>
+                       a.IsAssigned && (a.Content.Source == null || a.Content.Source == linkSlots.Cast<IChannelSlot>()
+                                            .First(c => c.Content.Source != null).Content.Source)) &&
+                   nodeSlots.Cast<IChannelSlot>().All(a =>
+                       a.IsAssigned && (a.Content.Source == null || a.Content.Source == nodeSlots.Cast<IChannelSlot>()
+                                            .First(c => c.Content.Source != null).Content.Source));
+
+        }
+
+        public void ReCalc()
+        {
+            InitGraph();
+            if (Dirty || AlwaysDirty)
             {
-                Dictionary<Index, Graph.Vertice> nodes = new Dictionary<Index, Graph.Vertice>();
-                nodeIndexesById = new Dictionary<int, Index>();
-                foreach (var i in IndexInputs[nodesSheetKey].Channel)
+                Dirty = false;
+                if (!CheckValidity()) return;
+                var iSDict = InputSlots.ToDictionary(a => a.Name, a => a);
+                var nodeKeyChannel = ((IChannelSlot) iSDict[nodeIdKey]).Content.Source.KeyChannel;
+                var nodeEnum = nodeKeyChannel.GetEnumerable();
+                Dictionary<object, Graph.Vertice> nodes = new Dictionary<object, Graph.Vertice>();
+                int i = 0;
+                foreach (var key in nodeEnum)
                 {
-                    nodeIndexesById.Add((int)DataType.BasicTypes.Integer.RecursiveCast(Inputs[nodeIdKey][i]).Item, i);
-                    nodes.Add(i, new Graph.Vertice()
+                    nodes.Add(((IChannelSlot)iSDict[nodeIdKey]), new Graph.Vertice()
                     {
-                        Size = Convert.ToSingle(DataType.BasicTypes.Float.RecursiveCast(Inputs[nodeSizeKey][i]).Item),
-                        Mass = Convert.ToSingle(DataType.BasicTypes.Float.RecursiveCast(Inputs[nodeMassKey][i]).Item),
+                        Size = (float)((IChannelSlot)iSDict[nodeSizeKey]).Content.Get(key.Key),
+                        Mass = (float)((IChannelSlot)iSDict[nodeMassKey]).Content.Get(key.Key),
                         Color = Color.FromHSB(
-                            Convert.ToSingle(DataType.BasicTypes.Float.RecursiveCast(Inputs[nodeColorHUEKey][i]).Item),
-                                Convert.ToSingle(DataType.BasicTypes.Float.RecursiveCast(Inputs[nodeColorSaturationKey][i])
-                                .Item),
-                                    Convert.ToSingle(DataType.BasicTypes.Float.RecursiveCast(Inputs[nodeColorBrightnessKey][i])
-                                .Item)).ToVector4(),
+                            (float)((IChannelSlot)iSDict[nodeColorHUEKey]).Content.Get(key.Key),
+                            (float)((IChannelSlot)iSDict[nodeColorSaturationKey]).Content.Get(key.Key),
+                            (float)((IChannelSlot)iSDict[nodeColorBrightnessKey]).Content.Get(key.Key)
+                                ).ToVector4(),
                         Force = Vector3.Zero,
                         Acceleration = Vector3.Zero,
                         Velocity = Vector3.Zero,
-                        Id = Convert.ToInt32(i.Ind),
+                        Id = i++,
                         Position = (GraphHelper.RadialRandomVector3D() * 100),
-                        //Dummy = new Vector3(int.Parse(userData[kv.Key][0]), 0, 0),
                     });
                 }
 
-                List<Graph.Link> links = new List<Graph.Link>();
-                foreach (var i in IndexInputs[linksSheetKey].Channel)
+                var linkKeyChannel = ((IChannelSlot)iSDict[linkFirstNodeKey]).Content.Source.KeyChannel;
+                var linkEnum = linkKeyChannel.GetEnumerable();
+                Dictionary<object, Graph.Link> links = new Dictionary<object, Graph.Link>();
+                foreach (var key in linkEnum)
                 {
-                    links.Add(new Graph.Link
+                    links.Add(key, new Graph.Link
                     {
-                        Par1 = (int) nodeIndexesById[Convert.ToInt32(Inputs[linkFirstNodeKey][i].Item)].Ind,
-                        Par2 = (int) nodeIndexesById[Convert.ToInt32(Inputs[linkSecondNodeKey][i].Item)].Ind,
-                        Strength = Convert.ToSingle(DataType.BasicTypes.Float.RecursiveCast(Inputs[linkStrengthKey][i])
-                            .Item),
-                        Width = Convert.ToSingle(DataType.BasicTypes.Float.RecursiveCast(Inputs[linkWidthKey][i]).Item),
-                        Length = Convert.ToSingle(DataType.BasicTypes.Float.RecursiveCast(Inputs[linkLengthKey][i]).Item),
+                        Par1 = nodes[((IChannelSlot)iSDict[linkFirstNodeKey]).Content.Get(key.Key)].Id,
+                        Par2 = nodes[((IChannelSlot)iSDict[linkSecondNodeKey]).Content.Get(key.Key)].Id,
+                        Strength = (float)((IChannelSlot)iSDict[linkStrengthKey]).Content.Get(key.Key),
+                        Width = (float)((IChannelSlot)iSDict[linkWidthKey]).Content.Get(key.Key),
+                        Length = (float)((IChannelSlot)iSDict[linkLengthKey]).Content.Get(key.Key),
                         Color = Color.FromHSB(
-                            Convert.ToSingle(DataType.BasicTypes.Float.RecursiveCast(Inputs[linkColorHUEKey][i]).Item),
-                            Convert.ToSingle(DataType.BasicTypes.Float.RecursiveCast(Inputs[linkColorSaturationKey][i])
-                                .Item),
-                            Convert.ToSingle(DataType.BasicTypes.Float.RecursiveCast(Inputs[linkColorBrightnessKey][i])
-                                .Item)).ToVector4(),
+                            (float)((IChannelSlot)iSDict[linkColorHUEKey]).Content.Get(key.Key),
+                            (float)((IChannelSlot)iSDict[linkColorSaturationKey]).Content.Get(key.Key),
+                            (float)((IChannelSlot)iSDict[linkColorBrightnessKey]).Content.Get(key.Key)
+                                ).ToVector4(),
                     });
                 }
 
-                graph.graph.Nodes = nodes.Values.ToList();
-                graph.graph.Links = links;
+                graph.graph.Nodes = nodes.Values.OrderBy(a => a.Id).ToList();
+                graph.graph.Links = links.Values.ToList();
                 graph.graph.NodesCount = graph.graph.Nodes.Count;
-                dataReady = true;
+                graph.AddMaxParticles();
+            }
+        }
+
+        protected GraphLayer graph;
+        protected SimpleLayout layout;
+        public string LayoutName => (string)InputSlots.Find(a => a.Name == layoutShaderKey).Content;
+
+        void InitGraph()
+        {
+            try
+            {
+                graph = new GraphLayer(Game.Instance);
+                graph.graph = new Graph();
+
+                graph.Camera = new GreatCircleCamera();
+                VisHolder.GraphLayers.Add(graph);
+                layout = new SimpleLayout(Game.Instance, graph, LayoutName);
+                graph.Initialize();
             }
             catch (Exception e)
             {
                 Log.Error(e.ToString());
             }
-
         }
 
-        public void UpdateFrame(GameTime gameTime)
+
+        public void UpdateVis(GameTime gameTime)
         {
             graph.Camera.Update(gameTime);
             if (graph.State == State.RUN)
@@ -213,29 +236,10 @@ namespace FusionVis
             }
         }
 
-        private bool renderReady;
-        private bool dataReady;
+        public bool Dirty { get; set; }
+        public bool AlwaysDirty { get; set; }
+        public List<ISlot> InputSlots { get; }
+        public VisLayerHolder VisHolder { get; }
 
-        public bool Ready => renderReady && dataReady;
-        public TargetTexture Render => VisLayer.Target;
-
-        public void SetScreenArea(int x, int y, int width, int height)
-        {
-            var oldTarget = VisLayer.Target;
-            oldTarget.Dispose();
-            var newTarget = VisLayer.Target = new TargetTexture(Game.Instance.RenderSystem, width, height,
-                TargetFormat.LowDynamicRangeMSAA);
-        }
-
-
-        public bool ValidateInputs()
-        {
-            var b = true;
-            b &= Inputs[linkFirstNodeKey].Channel.DataType.IsOfType(DataType.BasicTypes.Integer);
-            b &= Inputs[linkSecondNodeKey].Channel.DataType.IsOfType(DataType.BasicTypes.Integer);
-
-            return b;
-        }
     }
-
 }

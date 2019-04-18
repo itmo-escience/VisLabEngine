@@ -20,11 +20,14 @@ using Fusion;
 using Fusion.Core.Shell;
 using System.IO;
 using FusionData;
-using FusionData.Data;
+using FusionData.DataModel;
+using FusionData.Editor;
 using FusionData.Utility.DataReaders;
 using FusionVis;
+using FusionVis._0._2;
 using KeyEventArgs = Fusion.Engine.Input.KeyEventArgs;
 using Keys = Fusion.Engine.Input.Keys;
+using FDDVector2 = FusionData.DataModel.DataTypes.DVector2;
 
 
 namespace VisTest
@@ -114,7 +117,8 @@ namespace VisTest
 			userInterface	=	new FrameProcessor( game, @"Fonts\textFont" );
 		}
 
-	    GraphVisualiser vis;
+	    private GlobeVisualizer globeVis;
+	    private PolygonVisualizer test;
 
 	    /// <summary>
 	    ///
@@ -176,91 +180,45 @@ namespace VisTest
 	        viewLayer.SpriteLayers.Add(console.ConsoleSpriteLayer);
 	        viewLayer.SpriteLayers.Add(uiLayer);
 
-            //LoadBSPBTest();
-	    }
+	        var Loader = new GeoJSONLoader();
+	        Loader.geometryType = GeoJSONLoader.GeometryType.MultiPolygons;
+	        Loader.IsDegrees = true;
+            FusionData.DataModel.FileSource<object> jsonSource = new FileSource<object>(Loader, "Data/test.geojson", true, "");
+	        test = new PolygonVisualizer();
+	        globeVis = new GlobeVisualizer();
 
-	    void LoadBSPBTest()
-	    {
-            LocalRAMDatasheet users = LocalRAMDatasheet.CreateWithLoader(new CSVLoader()
-            {
-                delimeter = ',',
-                escape = '\\',
-                quote = '"',
-                hasHeader = true,
-            }, @"Data\followers_short_profile_29425083.csv");
+	        test.InputSlots.Find(a => a.Name == PolygonVisualizer.MultiGeometriesKey).Content = true;
+
+            var geomCastNode = FusionData._0._2.EditorConstructors.Basic_Nodes.ChannelCastNode(typeof(object), typeof(FDDVector2[][][]));
 
 
-            LocalRAMDatasheet edges = LocalRAMDatasheet.CreateWithLoader(new BSPBGraphListJSONLoader(),
-                @"Data\followers_communication_network_29425083.json");
+
+	        var fllorsCastNode =
+	            FusionData._0._2.EditorConstructors.Basic_Nodes.ChannelCastNode(typeof(object), typeof(IConvertible));
 
 
-            Recalculator edgeListRec = OnlineRecalculatorFactory.CreateRecalculatorForSingleChannel(edges.Indexer,
-                edges.outputs.First(a => a.Name == "ListId"), Recalculator.PresetRecFuncsFactory.UnrollList("Index", "ListId",
-                    "EdgeId", "Edge",
-                    DataType.BasicTypes.Integer));
+            var floorILerpNode = FusionData._0._2.EditorConstructors.Basic_Nodes.NumericChannelInverseLerpNode();
+	        floorILerpNode.InputSlots.Find(a => a.Name == "Min").Default = 0;
+	        floorILerpNode.InputSlots.Find(a => a.Name == "Max").Default = 10;
 
+            var colorCastNoce = FusionData._0._2.EditorConstructors.Basic_Nodes.ChannelConvertNode(typeof(decimal), typeof(float));
 
-            var edgesIndex = edgeListRec.IndexOutput["EdgeId"];
-            var edgesPair = edgeListRec.ChannelOutput["Edge"];
+            EditorFunctions.LinkNodes(jsonSource, geomCastNode, "#Geometry", "Object");
+	        EditorFunctions.LinkNodes(geomCastNode, test, typeof(FDDVector2[][][]).Name, PolygonVisualizer.PolygonGeometryKey);
 
-            Func<DataElement, DataElement> userColorFunc = d =>
-            {
-                Color.Cyan.ToHSB(out float hCyan, out float s, out float b);
-                Color.Magenta.ToHSB(out float hMagenta, out float s1, out float b1);
-                return new DataElement(Convert.ToInt32(d.Item) == 1 ? hMagenta : hCyan, DataType.BasicTypes.Float);
-            };
+	        EditorFunctions.LinkNodes(jsonSource, fllorsCastNode, "floors_all", "Object");
+            EditorFunctions.LinkNodes(fllorsCastNode, floorILerpNode, "IConvertible", "A");
+	        EditorFunctions.LinkNodes(floorILerpNode, colorCastNoce, "Res", "Decimal");
+	        EditorFunctions.LinkNodes(colorCastNoce, test, "Single", PolygonVisualizer.PolygonColorSatKey);
 
-            Recalculator userColorRec = OnlineRecalculatorFactory.CreateTransformRecalculatorForSingleChannel(users.Indexer, users.Outputs["sex"], userColorFunc, "ColorHue", DataType.BasicTypes.Float);
+            EditorFunctions.LinkNodes(jsonSource, test, "#key", PolygonVisualizer.PolygonKey);
 
+	        test.ReCalc();
+            globeVis.ReCalc();
 
-            Recalculator nodeIdToIntRec = OnlineRecalculatorFactory.CreateTransformRecalculatorForSingleChannel(
-                users.Indexer, users.Outputs["id"],
-                d => new DataElement(Convert.ToInt32(d.Item), DataType.BasicTypes.Integer), "id",
-                DataType.BasicTypes.Integer);
+            Routines.AddVisLayers(viewLayer, globeVis.VisHolder);
+	        Routines.AddVisLayers(viewLayer, test.VisHolder);
 
-
-            Recalculator sizeRec = OnlineRecalculatorFactory.CreateTransformRecalculatorForSingleChannel(users.Indexer,
-                users.Outputs["count_friends"],
-                d => new DataElement((float)Math.Pow(1 + float.Parse((string)d.Item), 0.5f) / 10,
-                    DataType.BasicTypes.Float), "Size", DataType.BasicTypes.Float);
-
-
-            Recalculator massRec = OnlineRecalculatorFactory.CreateTransformRecalculatorForSingleChannel(users.Indexer, users.Outputs["count_friends"],
-                d => new DataElement((float)Math.Log(float.Parse((string)d.Item) / 20), DataType.BasicTypes.Float),
-                "Size", DataType.BasicTypes.Float);
-
-            ConstChannel nodeSaturation = new ConstChannel("NodeColorSaturation", users.Indexer,
-                new DataElement(1, DataType.BasicTypes.Float));
-
-            ConstChannel linkWidth =
-                new ConstChannel("LinkWidth", edges.Indexer, new DataElement(0.05f, DataType.BasicTypes.Float));
-
-            ConstChannel linkColorAlpha =
-                new ConstChannel("LinkAlpha", edges.Indexer, new DataElement(0.75f, DataType.BasicTypes.Float));
-
-
-            vis = new GraphVisualiser();
-            vis.IndexInputs["Vertices"].Assign(users.Indexer);
-            vis.IndexInputs["Edges"].Assign(edgesIndex);
-
-            Log.Message("Assign NodeId: " + vis.Inputs["NodeId"].Assign(nodeIdToIntRec.ChannelOutput["id"]));
-            Log.Message("Assign LinksInd1: " + vis.Inputs["LinksInd1"].Assign(edges.Outputs["Id"]));
-            Log.Message("Assign LinksInd2: " + vis.Inputs["LinksInd2"].Assign(edgesPair));
-            Log.Message("Assign NodeSize: " + vis.Inputs["NodeSize"].Assign(sizeRec.ChannelOutput["Size"]));
-            Log.Message("Assign NodeMass: " + vis.Inputs["NodeMass"].Assign(massRec.ChannelOutput["Size"]));
-            Log.Message("Assign NodeColorHUE: " + vis.Inputs["NodeColorHUE"].Assign(userColorRec.ChannelOutput["ColorHue"]));
-            Log.Message("Assign NodeColorSat: " + vis.Inputs["NodeColorSaturation"].Assign(nodeSaturation));
-            Log.Message("Assign LinkWidth: " + vis.Inputs["LinksWidth"].Assign(linkWidth));
-            Log.Message("Assign LinkAlpha: " + vis.Inputs["LinkColorAlpha"].Assign(linkColorAlpha));
-            //vis.LoadData();
-            vis.Prepare();
-
-            Game.RenderSystem.AddLayer(vis.VisLayer);
-        }
-
-	    void LoadGridTest()
-	    {
-	        LocalRAMDatasheet users = LocalRAMDatasheet.CreateWithLoader(new VisgridLoader(), @"Data\GridTest\1514764800.json");
 
 
         }
@@ -335,7 +293,8 @@ namespace VisTest
 #endif
 
 			console.Update( gameTime );
-            vis.UpdateFrame(gameTime);
+            globeVis?.UpdateVis(gameTime);
+            test?.UpdateVis(gameTime);
             uiLayer.Clear();
 			float yPos = 0;
 			foreach (var mess in messages) {

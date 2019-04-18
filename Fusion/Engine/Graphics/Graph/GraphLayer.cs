@@ -23,7 +23,7 @@ using Keys = Fusion.Engine.Input.Keys;
 
 namespace Fusion.Engine.Graphics.Graph
 {
-	
+
 	public enum State
 	{
 		RUN,
@@ -99,7 +99,7 @@ namespace Fusion.Engine.Graphics.Graph
             set { param.Dummy = value; }
         }
         /// <summary>
-        /// 
+        ///
         /// </summary>
         /// <param name="game"></param>
         public GraphLayer(Game game)
@@ -130,7 +130,7 @@ namespace Fusion.Engine.Graphics.Graph
             linkPtrLists = new List<List<int>>();
 
 			nodeText = new List<string>();
-            
+
 			Log.Message("start graph");
 
 
@@ -152,10 +152,10 @@ namespace Fusion.Engine.Graphics.Graph
 
 
 		void Keyboard_KeyDown (object sender, Input.KeyEventArgs e)
-		{			
+		{
 		}
 
-			
+
 		//параметры для шейдера
 		void Enum ( PipelineState ps, Flags flag )
 		{
@@ -192,7 +192,7 @@ namespace Fusion.Engine.Graphics.Graph
 
 	        CreateLinks();
         }
-		
+
 
 		//новая итерация происходит тут
         public void CreateLinks()
@@ -243,7 +243,7 @@ namespace Fusion.Engine.Graphics.Graph
 		            LinksGpu?.Dispose();
 					LinksGpu = new StructuredBuffer(Game.GraphicsDevice, typeof(Graph.Link), LinksCpu.Length, StructuredBufferFlags.None);
 	            }
-				
+
 				LinksGpu.SetData(LinksCpu);
             }
 
@@ -315,11 +315,11 @@ namespace Fusion.Engine.Graphics.Graph
 					posProj /= posProj.W;
 
                     Vector2 diff = new Vector2(posProj.X - cursorProj.X, posProj.Y - cursorProj.Y);
-					
+
 					if (diff.Length() < threshold + delta) {
 						if (minZ > posProj.Z) {
                            minZ			= posProj.Z;
-                            
+
 							candidatesToSelect.Add(p.Id, diff.Length());
 							//Console.WriteLine(p.Id + " " + diff.Length());
 						}
@@ -339,7 +339,7 @@ namespace Fusion.Engine.Graphics.Graph
 		           // ls = new LayoutSystem(Game, Game.Content.Load<Ubershader>(@"Graph/NodeInCenter"))
 		            //{
 			           // NodeId = -1//selectedVertice
-		            //};                
+		            //};
 	            }
 	            else
 	            {
@@ -388,18 +388,18 @@ namespace Fusion.Engine.Graphics.Graph
             //
 
             param.MaxParticles = ParticlesCpu.Length;
-            ParamsCb.SetData(param); 
+            ParamsCb.SetData(param);
 
 
             device.ComputeShaderConstants[0] = ParamsCb;
-				
+
             // ------------------------------------------------------------------------------------
             //	Render: ---------------------------------------------------------------------------
             //
 			device.SetCSRWBuffer(0, null);
 
 
-			
+
 			device.GeometryShaderResources[1] = ParticlesGpu;
 			device.GeometryShaderResources[3] = LinksGpu;
 	        device.PixelShaderSamplers[0]	= SamplerState.LinearWrap;
@@ -417,7 +417,7 @@ namespace Fusion.Engine.Graphics.Graph
             device.PipelineState = factory[(int)Flags.DRAW | (int)Flags.POINT];
             device.Draw(ParticlesCpu.Length, 0);
 
-           
+
 
 
 

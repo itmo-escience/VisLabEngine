@@ -1,66 +1,20 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 using Fusion.Engine.Common;
-using Fusion.Engine.Graphics;
-using FusionData.Data;
+using FusionData._0._2;
 
-namespace FusionVis
+namespace FusionVis._0._2
 {
-
-
-
-    public struct VisualizerErrorType
+    public interface IVisualizer : FusionData.DataModel.Public.IDataConsumer
     {
-        //TODO
+        VisLayerHolder VisHolder { get; }
 
-        //temporary
-        public string ErrorText;
-    }
-
-
-    public interface IVisualizer
-    {
-        Dictionary<string, InputSlot> Inputs { get; }
-        Dictionary<string, InputIndexSlot> IndexInputs { get; }
-
-        RenderLayer VisLayer { get; }
-
-        bool ValidateInputs();
-
-        void Prepare();
-
-        void LoadData();
-        void UpdateFrame(GameTime gameTime);
-
-        bool Ready { get; }
-
-        TargetTexture Render { get; }
-
-        void SetScreenArea(int x, int y, int width, int height);
-
-
+        void UpdateVis(GameTime gameTime);
     }
 
 
 
-    //public abstract class VisualizerBase : IVisualizer
-    //{
-    //    public abstract List<InputSlot<DataOutputChannel>> Inputs { get; }
-    //    public abstract List<InputSlot<Indexer>> IndexInputs { get; }
-
-
-    //    public abstract RenderLayer VisLayer { get; protected set; }
-
-    //    public abstract bool ValidateInputs();
-
-    //    public abstract bool Prepare();
-
-    //    public abstract bool UpdateData();
-
-    //    public abstract bool UpdateFrame();
-
-
-
-    //    public abstract void Activate();
-    //    public abstract void Deactivate();
-    //}
 }

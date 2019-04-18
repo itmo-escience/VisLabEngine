@@ -36,7 +36,7 @@ namespace FusionUI.UI
         private int HeightExpand
         {
             get { return (int)(UnitHeightExpand * ScaleMultiplier); }
-            set { UnitHeightExpand = value / ScaleMultiplier; }            
+            set { UnitHeightExpand = value / ScaleMultiplier; }
         }
 
         public Color backColorMainNode;
@@ -66,7 +66,7 @@ namespace FusionUI.UI
             // for expand/collaps
             if (Text != "")
             {
-                this.ActionClick += (ControlActionArgs args, ref bool flag) => {                    
+                this.ActionClick += (ControlActionArgs args, ref bool flag) => {
                     if (!args.IsClick || args.IsAltClick) return;
                     if (args.Position.Y - this.GlobalRectangle.Y > HeightCollaps) return;
                     if (listNode?.Count > 0)
@@ -93,20 +93,20 @@ namespace FusionUI.UI
             sb.Draw(whiteTexture,
                     new Rectangle(this.GlobalRectangle.X, this.GlobalRectangle.Y, this.Width, this.HeightCollaps),
                     backColorMainNode, clipRectIndex);
-            
+
 
             var w = this.Width - (!(ExpandedPicture == null || CollapsedPicture == null) ? (int) (UnitSizeExpandButton * ScaleMultiplier) : 0) - PaddingLeft - TextOffsetX;
             var tw = Font.MeasureString(Text).Width;
             var dw = (float) w / tw;
             var text2 = (dw < 1) ? Text.Substring(0, (int) (dw * Text.Length) - 3).TrimEnd(' ') + "..." : Text;
 
-            Font.DrawString(sb, text2, xText, yText, ForeColor, clipRectIndex, 0, true);                
+            Font.DrawString(sb, text2, xText, yText, ForeColor, clipRectIndex, 0, true);
             if (!(ExpandedPicture == null || CollapsedPicture == null))
                 sb.Draw(IsExpand ? ExpandedPicture : CollapsedPicture,
                     new Rectangle(xButton, yButton, (int) (UnitSizeExpandButton * ScaleMultiplier),
-                        (int) (UnitSizeExpandButton * ScaleMultiplier)), UIConfig.ActiveTextColor, clipRectIndex);            
+                        (int) (UnitSizeExpandButton * ScaleMultiplier)), UIConfig.ActiveTextColor, clipRectIndex);
 
-        }        
+        }
 
         public void addNode(Frame node)
         {
@@ -157,7 +157,7 @@ namespace FusionUI.UI
             }
             else
             {
-                node.Y = this.Height;                
+                node.Y = this.Height;
             }
             this.HeightExpand += node.Height;
         }
@@ -165,7 +165,7 @@ namespace FusionUI.UI
         public void ExpandNodes(bool isExpand)
         {
             foreach (var node in listNode)
-            {                
+            {
                 if (isExpand)
                 {
                     node.Y = this.Height;
@@ -189,8 +189,9 @@ namespace FusionUI.UI
 
         public override void UpdateResize(bool UpdateChildren = true)
         {
+
             base.UpdateResize(UpdateChildren);
-            ResizeTree();
+            //ResizeTree();
         }
 
         public void ResizeTree()
@@ -207,7 +208,7 @@ namespace FusionUI.UI
                 var treeNode = (TreeNode)this.Parent;
                 treeNode.ResizeTree();
             }
-            
+
         }
 
         public override string Tooltip
@@ -229,7 +230,7 @@ namespace FusionUI.UI
         public Action<GameTime> UpdateFunc;
         public Checkbox Checkbox;
         public CheckboxNode(FrameProcessor ui, float x, float y, float w, float h, string text, Color backColor, Action<bool> checkboxAction, bool isChecked = false) : base(ui, x, y, w, h, text, backColor)
-        {            
+        {
             this.Add(Checkbox = new Checkbox(ui, 0, 0, h, h, "", Color.Zero)
             {
                 Checked = ui.Game.Content.Load<DiscTexture>(@"UI-new\fv-icons_checkbox-big-on"),
@@ -241,7 +242,7 @@ namespace FusionUI.UI
             UnitTextOffsetX = Checkbox.UnitWidth;
         }
 
-        
+
 
         protected override void Update(GameTime gameTime)
         {
@@ -265,7 +266,7 @@ namespace FusionUI.UI
                     if (parent == null) return;
                     foreach (var frame in parent.Children)
                     {
-                        if (!(frame is RadiobuttonNode) || frame == this) continue;                                                
+                        if (!(frame is RadiobuttonNode) || frame == this) continue;
                         ((RadiobuttonNode)frame).Checkbox.IsChecked = false;
                     }
                 }

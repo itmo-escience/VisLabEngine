@@ -444,6 +444,153 @@ namespace Fusion.Engine.Graphics.GIS
 	        }
 	    }
 
+	    public static PolyGisLayer CreateExtruded(Game engine, DVector2[] lonLatRad, Color color, float height, bool usePalette = true,
+	        List<DVector2[]> excludeRad = null, TriangulationAlgorithm method = TriangulationAlgorithm.Dwyer,
+	        bool holesCCW = false)
+	    {
+	        var triangulator = new TriangleNet.Mesh();
+	        triangulator.Behavior.Algorithm = method;
+	        InputGeometry ig = new InputGeometry();
+
+            try
+            {
+                int i = 5;
+                ig.AddPoint(lonLatRad[0].X, lonLatRad[0].Y);
+                for (int v = 1; v < lonLatRad.Length; v++)
+                {
+                    ig.AddPoint(lonLatRad[v].X, lonLatRad[v].Y);
+                    ig.AddSegment(v - 1, v);
+                }
+
+                i = lonLatRad.Length;
+                ig.AddSegment(lonLatRad.Length - 1, 0);
+                if ((lonLatRad.First() - lonLatRad.Last()).Length() < float.Epsilon) lonLatRad = lonLatRad.Skip(1).ToArray();
+                if (excludeRad != null && excludeRad.Count > 0)
+                {
+                    foreach (var list in excludeRad)
+                    {
+                        //var m = list.ToList().Aggregate(DVector2.Zero, (a, b) => a + b / list.Length);
+                        var p1 = list[0];
+                        var p2 = p1;
+                        for (int pi = 1; (p2 - p1).Length() < float.Epsilon; pi++)
+                        {
+                            p2 = list[pi];
+                        }
+
+                        var m1 = new DVector3(p1 + p2, 0) / 2 - 0.001 * DVector3.Cross(new DVector3(p2 - p1, 0), DVector3.ForwardLH);
+                        var m2 = new DVector3(p1 + p2, 0) / 2 + 0.001 * DVector3.Cross(new DVector3(p2 - p1, 0), DVector3.ForwardLH);
+                        var m = holesCCW ? m2 : m1;//GeoHelper.IsPointInPolygon(list, (DVector2) m1) ? m1 : m2;
+                        //if (!GeoHelper.IsPointInPolygon(list, (DVector2)m)) Log.Warning("mistake point selected");
+                        ig.AddPoint(list[0].X, list[0].Y);
+                        for (int v = 1; v < list.Length; v++)
+                        {
+                            ig.AddPoint(list[v].X, list[v].Y);
+                            ig.AddSegment(i + v - 1, i + v);
+                        }
+
+                        ig.AddSegment(i + list.Length - 1, i);
+                        ig.AddHole(m.X, m.Y);
+                        i += list.Length;
+                    }
+                }
+
+                triangulator.Triangulate(ig);
+
+
+                if (triangulator.Vertices.Count != lonLatRad.Length)
+                {
+                    //Log.Warning("Vertices count not match");
+                    //return null;
+                }
+
+
+                var points = new List<Gis.GeoPoint>();
+                foreach (var pp in triangulator.Vertices)
+                {
+                    points.Add(new Gis.GeoPoint
+                    {
+                        Lon = pp.X,
+                        Lat = pp.Y,
+                        Color = color,
+                        Tex1 = new Vector4(0, 0, 0, height),
+                    });
+                }
+
+
+                var indeces = new List<int>();
+                foreach (var tr in triangulator.Triangles)
+                {
+                    indeces.Add(tr.P0);
+                    indeces.Add(tr.P1);
+                    indeces.Add(tr.P2);
+                }
+
+                if (height != 0)
+                {
+                    var contList = new List<DVector2[]>() { lonLatRad };
+                    if (excludeRad != null) contList.AddRange(excludeRad);
+
+                    foreach (var contour in contList)
+                    {
+                        int zeroIndex = points.Count;
+
+                        for (int pi = 0; pi < contour.Length; pi++)
+                        {
+                            points.Add(new Gis.GeoPoint
+                            {
+                                Lon = contour[pi].X,
+                                Lat = contour[pi].Y,
+                                Color = color,
+                                Tex1 = new Vector4(0, 0, 0, height),
+                            });
+                            points.Add(new Gis.GeoPoint
+                            {
+                                Lon = contour[pi].X,
+                                Lat = contour[pi].Y,
+                                Color = color,
+                                Tex1 = new Vector4(0, 0, 0, 0),
+                            });
+                        }
+
+                        for (int pi = 0; pi < contour.Length; pi++)
+                        {
+                            indeces.Add(zeroIndex + pi * 2);
+                            indeces.Add(zeroIndex + (pi * 2 + 1) % (contour.Length * 2));
+                            indeces.Add(zeroIndex + (pi * 2 + 3) % (contour.Length * 2));
+
+                            indeces.Add(zeroIndex + pi * 2);
+                            indeces.Add(zeroIndex + (pi * 2 + 3) % (contour.Length * 2));
+                            indeces.Add(zeroIndex + (pi * 2 + 2) % (contour.Length * 2));
+                        }
+                    }
+                }
+
+                if (usePalette)
+                {
+                    return new PolyGisLayer(engine, points.ToArray(), indeces.ToArray(), false)
+                    {
+                        Flags = (int)(PolyFlags.NO_DEPTH | PolyFlags.DRAW_TEXTURED | PolyFlags.CULL_NONE |
+                                       PolyFlags.VERTEX_SHADER | PolyFlags.PIXEL_SHADER | PolyFlags.USE_PALETTE_COLOR)
+                    };
+                }
+                else
+                {
+                    return new PolyGisLayer(engine, points.ToArray(), indeces.ToArray(), false)
+                    {
+                        Flags = (int)(PolyFlags.NO_DEPTH | PolyFlags.DRAW_COLORED | PolyFlags.CULL_NONE |
+                                       PolyFlags.VERTEX_SHADER | PolyFlags.PIXEL_SHADER | PolyFlags.USE_VERT_COLOR)
+                    };
+                }
+
+
+            }
+            catch (Exception e)
+            {
+                return null;
+            }
+
+        }
+
         public static PolyGisLayer CreateFromContour(Game engine, DVector2[] lonLatRad, Color color, bool usePalette = true, List<DVector2[]> excludeRad = null, TriangulationAlgorithm method = TriangulationAlgorithm.Dwyer, bool holesCCW = false)
 		{
 			var triangulator = new TriangleNet.Mesh();

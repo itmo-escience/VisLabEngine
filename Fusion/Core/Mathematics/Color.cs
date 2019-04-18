@@ -742,8 +742,9 @@ namespace Fusion.Core.Mathematics
         /// <param name="h">A radian value of hue on color circle</param>
         /// <param name="s">A value of saturation</param>
         /// <param name="v">A value of brightness</param>
+        /// <param name="alpha">A value of alpha (optional) </param>
         /// <returns>A color.</returns>
-        public static Color FromHSB(float h, float s, float v)
+        public static Color FromHSB(float h, float s, float v, float alpha = 1)
         {
             h = MathUtil.RadiansToDegrees(h);
             h = (h + (float)Math.Ceiling(h / 360) * 360) % 360;
@@ -754,12 +755,12 @@ namespace Fusion.Core.Mathematics
             var vDec = v - a;
             switch (hi)
             {
-                case 0: return new Color(v, vInc, vMin);
-                case 1: return new Color(vDec, v, vInc);
-                case 2: return new Color(vMin, v, vInc);
-                case 3: return new Color(vMin, vDec, v);
-                case 4: return new Color(vInc, vMin, v);
-                case 5: return new Color(v, vMin, vDec);
+                case 0: return new Color(v, vInc, vMin, alpha);
+                case 1: return new Color(vDec, v, vInc, alpha);
+                case 2: return new Color(vMin, v, vInc, alpha);
+                case 3: return new Color(vMin, vDec, v, alpha);
+                case 4: return new Color(vInc, vMin, v, alpha);
+                case 5: return new Color(v, vMin, vDec, alpha);
                 default: return Color.Zero; //impossible
             }
 

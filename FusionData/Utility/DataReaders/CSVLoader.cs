@@ -2,17 +2,18 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using FusionData.Data;
+using FusionData.DataModel;
+using FusionData._0._2;
 
 namespace FusionData.Utility.DataReaders
 {
-    public class CSVLoader : LocalRAMDatasheet.SheetLoader
+    public class CSVLoader : FileSource<string>.SheetLoader
     {
         public char delimeter, escape, quote;
         public bool hasHeader;
-        public List<DataElement> ReadString(string input)
+        public List<string> ReadString(string input)
         {
-            List<DataElement> data = new List<DataElement>();
+            List<string> data = new List<string>();
             string item = "";
             bool isEscape = false;
             bool isQuote = false;
@@ -30,7 +31,7 @@ namespace FusionData.Utility.DataReaders
                     else isQuote = !isQuote;
                 } else if (input[i] == delimeter && !isQuote)
                 {
-                    data.Add(new DataElement(item, DataType.BasicTypes.String));
+                    data.Add(item);
                     item = "";
                 }
                 else
@@ -38,22 +39,22 @@ namespace FusionData.Utility.DataReaders
                     item += input[i];
                 }
             }
-            data.Add(new DataElement(item, DataType.BasicTypes.String));
+            data.Add(item);
 
             return data;
         }
 
-        public List<List<DataElement>> ReadData(string file)
+        public List<List<string>> ReadData(string file)
         {
             var list= (hasHeader ? File.ReadLines(file).Skip(1) : File.ReadLines(file)).Select((a, i) =>
             {
                 var o = ReadString(a);
                 return o;
             }).ToList();
-            var table = new List<List<DataElement>>();
+            var table = new List<List<string>>();
             for (int ci = 0; ci < list[0].Count; ci++)
             {
-                table.Add(new List<DataElement>());
+                table.Add(new List<string>());
                 for (int i = 0; i < list.Count; i++)
                 {
                     table[ci].Add(list[i][ci]);
@@ -63,9 +64,9 @@ namespace FusionData.Utility.DataReaders
             return table;
         }
 
-        public List<Tuple<string, DataType>> ReadHeader(string file)
+        public List<string> ReadHeader(string file)
         {
-            return ReadString(File.ReadLines(file).First()).Select(a => new Tuple<string, DataType>((String) a.Item, DataType.BasicTypes.String)).ToList();
+            return ReadString(File.ReadLines(file).First()).ToList();
         }
     }
 }

@@ -4,37 +4,42 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Fusion.Engine.Common;
-using Fusion.Engine.Graphics;
-using FusionData.Data;
+using Fusion.Engine.Graphics.GIS;
+using FusionData.DataModel.Public;
 
-namespace FusionVis
+namespace FusionVis._0._2
 {
-    class GlobeVisualizer : IVisualizer
+    public class GlobeVisualizer : IVisualizer
     {
-        public Dictionary<string, InputSlot> Inputs { get; }
-        public Dictionary<string, InputIndexSlot> IndexInputs { get; }
-        public RenderLayer VisLayer { get; }
-        public bool ValidateInputs()
+        public bool CheckValidity()
         {
             return true;
         }
 
-        public void Prepare()
+        public void ReCalc()
         {
+            if (Tiles == null)
+            {
+                Tiles = new TilesAtlasLayer(Game.Instance, GlobeCamera.Instance);
+            }
+            VisHolder.GisLayers.Clear();
+            VisHolder.GisLayers.Add(Tiles);
+
         }
 
-        public void LoadData()
-        {
-        }
+        private TilesAtlasLayer Tiles;
 
-        public void UpdateFrame(GameTime gameTime)
+        public List<ISlot> InputSlots { get; } = new List<ISlot>()
         {
-        }
-
-        public bool Ready { get; }
-        public TargetTexture Render { get; }
-        public void SetScreenArea(int x, int y, int width, int height)
+            new FiniteSetParameterSlot<TilesGisLayer.MapSource>("MapSource", new List<TilesGisLayer.MapSource>()
+            {
+                TilesGisLayer.MapSource.BingMap, TilesGisLayer.MapSource.BingMapSatellite, TilesGisLayer.MapSource.DarkV9, TilesGisLayer.MapSource.Yandex, TilesGisLayer.MapSource.YandexSatellite, TilesGisLayer.MapSource.OpenStreetMap
+            })
+        };
+        public VisLayerHolder VisHolder { get; } = new VisLayerHolder();
+        public void UpdateVis(GameTime gameTime)
         {
+            Tiles.Update(gameTime);
         }
     }
 }

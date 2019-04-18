@@ -15,7 +15,7 @@ namespace FusionUI.UI.Plots2_0
     {
         public bool SingleScale;
 
-        public PlotScale ActiveScale = null;        
+        public PlotScale ActiveScale = null;
 
         public PlotCanvas(FrameProcessor ui, float x, float y, float w, float h, Color backColor) : base(ui, x, y, w, h,
             "", backColor)
@@ -29,6 +29,7 @@ namespace FusionUI.UI.Plots2_0
 
         public void AddBoxActions()
         {
+            SuppressActions = true;
             IsDraggingBox = false;
             prevScales.Push(new RectangleD(0, 0, 1, 1));
             ActionClick += (ControlActionArgs args, ref bool flag) =>
@@ -56,7 +57,7 @@ namespace FusionUI.UI.Plots2_0
                     DragRect = new RectangleD(
                         ((float)args.X - GlobalRectangle.Left) / GlobalRectangle.Width,
                         ((float)args.Y - GlobalRectangle.Top) / GlobalRectangle.Height,
-                        0, 0);                    
+                        0, 0);
                     IsDraggingBox = true;
                 }
             };
@@ -75,7 +76,7 @@ namespace FusionUI.UI.Plots2_0
                     newRect.Right = DMathUtil.Clamp(newRect.Right, 0, 1);
                     newRect.Top = DMathUtil.Clamp(newRect.Top, 0, 1);
                     newRect.Bottom = DMathUtil.Clamp(newRect.Bottom, 0, 1);
-                    prevScales.Push(ScaleRect);                   
+                    prevScales.Push(ScaleRect);
                     ScaleRect = new RectangleD()
                     {
                         Left = DMathUtil.Lerp(ScaleRect.Left, ScaleRect.Right, Math.Min(newRect.Left, newRect.Right)),
@@ -95,7 +96,7 @@ namespace FusionUI.UI.Plots2_0
                     DragRect.Right = ((float) args.X - GlobalRectangle.Left) / GlobalRectangle.Width;
                     DragRect.Bottom = ((float) args.Y - GlobalRectangle.Top) / GlobalRectangle.Height;
                 }
-                if (args.IsClick)
+                else if (args.IsClick)
                 {
                     ScaleRect.X = (float)DMathUtil.Clamp(ScaleRect.X - args.DX * ScaleRect.Width / GlobalRectangle.Width, 0, 1 - ScaleRect.Width);
                     ScaleRect.Y = (float)DMathUtil.Clamp(ScaleRect.Y - args.DY * ScaleRect.Height/ GlobalRectangle.Height, 0, 1 - ScaleRect.Height);
@@ -109,10 +110,10 @@ namespace FusionUI.UI.Plots2_0
 
         public PlotContainer DataContainer;
 
-        public int PointCount = 1;        
+        public int PointCount = 1;
 
         public Color LineColor = Color.White;
-         
+
 
         protected override void DrawFrame(GameTime gameTime, SpriteLayer sb, int clipRectIndex)
         {
@@ -230,13 +231,13 @@ namespace FusionUI.UI.Plots2_0
 
         protected virtual void DrawMouseLine(SpriteLayer sb, int clipRectIndex, DiscTexture beamTex)
         {
-            
+
                 var x = ((float)Game.Mouse.Position.X - GlobalRectangle.Left) / GlobalRectangle.Width;
 
                 var p1 = new Vector2(this.GlobalRectangle.Left + this.GlobalRectangle.Width * x, this.GlobalRectangle.Top);
                 var p2 = new Vector2(this.GlobalRectangle.Left + this.GlobalRectangle.Width * x, this.GlobalRectangle.Bottom);
                 sb.DrawBeam(beamTex, p1, p2, UIConfig.ActiveColor, UIConfig.ActiveColor,
-                    UIConfig.UnitPlotLineWidth * ScaleMultiplier, clipRectIndex: clipRectIndex);            
+                    UIConfig.UnitPlotLineWidth * ScaleMultiplier, clipRectIndex: clipRectIndex);
         }
 
         public RectangleD ScaleRect = new RectangleD(0, 0, 1, 1);
@@ -252,7 +253,7 @@ namespace FusionUI.UI.Plots2_0
             if (!SingleScale)
             {
                 foreach (var pv in DataContainer.Data.Values)
-                {                    
+                {
                     if (!pv.IsPresent || pv.ActiveDepths.Count == 0) continue;
                     {
                         var l = pv.ActiveLimits;
@@ -298,8 +299,8 @@ namespace FusionUI.UI.Plots2_0
 
                 if (KeepZero)
                 {
-                    if (r == null) return;                    
-                    var v = r.Value;                    
+                    if (r == null) return;
+                    var v = r.Value;
                     if (v.Top < 0) v.Top = 0;
                     if (v.Bottom > 0) v.Bottom = 0;
                 }
@@ -339,7 +340,7 @@ namespace FusionUI.UI.Plots2_0
                 }
                 foreach (var pv in DataContainer.Data.Values)
                 {
-                    pv.LimitsAligned = r.Value;                    
+                    pv.LimitsAligned = r.Value;
                 }
             }
         }
@@ -353,11 +354,11 @@ namespace FusionUI.UI.Plots2_0
             var beamTex = Game.Content.Load<DiscTexture>(@"UI/beam");
             var whiteTex = Game.RenderSystem.WhiteTexture;
             var baseRect = new RectangleD(0, 0, 1, 1);
-            var pcNew = PointCount / ScaleRect.Width;            
-            
+            var pcNew = PointCount / ScaleRect.Width;
+
             foreach (var depth in pd.ActiveDepths)
             {
-                var points = pd[(int)pcNew, depth];                
+                var points = pd[(int)pcNew, depth];
                 var limits = pd.Variable.LimitsAligned;
                 var pointsX = points.ConvertAll(a => a.X);
                 var leftLim = limits.Left + ScaleRect.Left * limits.Width;
@@ -372,21 +373,21 @@ namespace FusionUI.UI.Plots2_0
                 var prevScreen = prevRect.ToVector2() * this.GlobalRectangle.Size + this.GlobalRectangle.TopLeft;
                 for (int i = left + 1; i < points.Count; i++)
                 {
-                    var next = points[i];                    
+                    var next = points[i];
                     if (double.IsNaN(next.X) || double.IsNaN(next.Y))
-                    {                        
+                    {
                         prevScreen = new Vector2(float.NaN, float.NaN);
                         continue;
-                    }                                
+                    }
                     var nextPlot = (next - limits.TopLeft) / limits.Size;
                     nextPlot.Y = 1 - nextPlot.Y;
 
                     var nextRect = (nextPlot - ScaleRect.TopLeft) / ScaleRect.Size;
-                    if (nextRect.X < 0 || prevRect.X > 1)                        
+                    if (nextRect.X < 0 || prevRect.X > 1)
                     {
                         prevScreen = new Vector2(float.NaN, float.NaN);
                         continue;
-                    }                   
+                    }
                     var nextScreen = nextRect.ToVector2() * this.GlobalRectangle.Size + this.GlobalRectangle.TopLeft;
                     if (!float.IsNaN(prevScreen.X) && !float.IsNaN(prevScreen.Y))
                     {
@@ -396,14 +397,14 @@ namespace FusionUI.UI.Plots2_0
                         //    Right = Math.Max(prevRect.X, nextRect.X),
                         //    Top = Math.Min(prevRect.Y, nextRect.Y),
                         //    Bottom = Math.Max(prevRect.Y, nextRect.Y),
-                        //};                        
+                        //};
                         if (!pd.ColorsByDepth.ContainsKey(depth))
                         {
                             DataContainer.RepairColors();
                             Log.Warning("Colors not yet initialized");
                         }
                         //if (baseRect.Intersects(r))
-                        //{                        
+                        //{
                         sb.DrawBeam(beamTex, prevScreen, nextScreen, pd.ColorsByDepth[depth],
                             pd.ColorsByDepth[depth],
                             UIConfig.UnitPlotLineWidth * ScaleMultiplier, clipRectIndex: clipRectIndex);
@@ -411,7 +412,7 @@ namespace FusionUI.UI.Plots2_0
                     }
                     else
                     {
-                        
+
                     }
                     prevPlot = nextPlot;
                     prevRect = nextRect;
@@ -425,7 +426,7 @@ namespace FusionUI.UI.Plots2_0
                     float x;
                     if (Game.Keyboard.IsKeyDown(Keys.LeftShift) || Game.Keyboard.IsKeyDown(Keys.RightShift) && GlobalRectangle.Contains(Game.Mouse.Position))
                     {
-                        x = ((float)Game.Mouse.Position.X - GlobalRectangle.Left) / GlobalRectangle.Width;                                                
+                        x = ((float)Game.Mouse.Position.X - GlobalRectangle.Left) / GlobalRectangle.Width;
                         x = (float)(ScaleRect.Left + x * ScaleRect.Width);
                     }
                     else
@@ -434,23 +435,23 @@ namespace FusionUI.UI.Plots2_0
                     }
                     if (x < 0 || x > 1) continue;
                     var i = pointsX.BinarySearch(limits.Left + x * limits.Width);
-                    if (i < 0) i = ~i - 1;                    
+                    if (i < 0) i = ~i - 1;
                     i = MathUtil.Clamp(i, 0, points.Count - 1);
                     var i1 = MathUtil.Clamp(i + 1, 0, points.Count - 1);
                     var v = points[i];
-                    var v1 = points[i1];                    
+                    var v1 = points[i1];
                     var factor = (limits.Left + x * limits.Width - v.X) / (v1.X - v.X);
                     if (factor < 0 || factor > 1) continue;
                     factor = DMathUtil.Clamp(factor, 0, 1);
                     var value = MathUtil.Lerp(v.Y, v1.Y, factor);
-                    
+
                     var pointPlot = new DVector2(x, 1 - (value - limits.Top) / limits.Height);
                     var pointRect = (pointPlot - ScaleRect.TopLeft) / ScaleRect.Size;
                     var pointScreen = pointRect.ToVector2() * this.GlobalRectangle.Size + this.GlobalRectangle.TopLeft;
                     var s = value.ToString("0.#####");
-                    hintPoints.Add(new Tuple<Vector2, string, double, PlotData>(pointScreen, s, depth, pd));                                        
+                    hintPoints.Add(new Tuple<Vector2, string, double, PlotData>(pointScreen, s, depth, pd));
                 }
-            }                        
+            }
         }
 
         public virtual void DrawBarChart(SpriteLayer sb, PlotData pd, int clipRectIndex, int plotIndex, int nBarCharts)
@@ -460,10 +461,10 @@ namespace FusionUI.UI.Plots2_0
             var beamTex = Game.Content.Load<DiscTexture>(@"UI/beam");
             var whiteTex = Game.RenderSystem.WhiteTexture;
             var baseRect = new RectangleD(0, 0, 1, 1);
-            var pcNew = PointCount / ScaleRect.Width;            
+            var pcNew = PointCount / ScaleRect.Width;
             foreach (var depth in pd.ActiveDepths)
             {
-                var points = pd[(int)pcNew, depth];                
+                var points = pd[(int)pcNew, depth];
                 var limits = pd.Variable.LimitsAligned;
                 float BarWidth = (0.7f - 0.1f * (nBarCharts - 1)) * Width / (float)limits.Width / nBarCharts;
 
@@ -500,7 +501,7 @@ namespace FusionUI.UI.Plots2_0
                         DataContainer.RepairColors();
                         Log.Warning("Colors not yet initialized");
                     }
-                    
+
                     sb.Draw(whiteTex, nextScreen.X + offset - BarWidth / 2, nextScreen.Y, BarWidth,
                         zeroScreen.Y - nextScreen.Y, pd.ColorsByDepth[depth], clipRectIndex);
                     //hintPoints.Add(new Tuple<Vector2, string, double, PlotData>(
@@ -511,7 +512,7 @@ namespace FusionUI.UI.Plots2_0
                     if (nextScreen.Y - (next.Y > 0 ? 4 : 4 - rect.Height) < GlobalRectangle.Y + rect.Height)
                     {
                         nextScreen.Y = GlobalRectangle.Y + rect.Height + (next.Y > 0 ? 4 : 4 - rect.Height);
-                    }                    
+                    }
 
                         Font.DrawString(sb, s, nextScreen.X + offset - rect.Width / 2, Math.Min(nextScreen.Y, zeroScreen.Y) - ((next.Y > 0.0f) ? 4 : 4),
                         /*pd.ColorsByDepth[depth]*/UIConfig.ActiveTextColor, clipRectIndex);
