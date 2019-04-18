@@ -2,7 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using FusionData.DataModel.Public;
-using FusionData._0._2;
+using FusionData;
 
 namespace FusionData.Utility.SupportFactories
 {

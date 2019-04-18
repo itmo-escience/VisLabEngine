@@ -5,7 +5,7 @@ using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using FusionData.DataModel.Public;
-using FusionData._0._2;
+using FusionData;
 
 namespace FusionData.Editor
 {
@@ -23,6 +23,11 @@ namespace FusionData.Editor
         {
             if (output is IDataChannel o) return o.Type;
             return output.GetType();
+        }
+
+        public static void AssignDefault(IDataConsumer to, string toSlotName, object value)
+        {
+            to.InputSlots.First(a => a.Name.Equals(toSlotName)).Default = value;
         }
 
         public static void LinkNodes(IDataProvider from, IDataConsumer to, string fromChannelName, string toSlotName)

@@ -8,7 +8,7 @@ using Fusion.Engine.Common;
 using Fusion.Engine.Graphics;
 using Fusion.Engine.Graphics.Graph;
 using FusionData.DataModel.Public;
-using FusionData._0._2;
+using FusionData;
 using Fusion.Core.Mathematics;
 using Fusion.Engine.Graphics.GIS.DataSystem.MapSources.OpenStreetMaps;
 

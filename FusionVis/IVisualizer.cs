@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Fusion.Engine.Common;
-using FusionData._0._2;
+using FusionData;
 
 namespace FusionVis._0._2
 {

@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace FusionData._0._2.EditorConstructors
+namespace FusionData.EditorConstructors
 {
     class Routines
     {

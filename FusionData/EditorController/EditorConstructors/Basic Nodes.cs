@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 using FusionData.DataModel.Public;
 using FusionData.Utility.SupportFactories;
 
-namespace FusionData._0._2.EditorConstructors
+namespace FusionData.EditorConstructors
 {
     [NodeFactory]
     public static class Basic_Nodes

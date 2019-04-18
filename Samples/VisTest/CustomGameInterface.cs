@@ -189,23 +189,23 @@ namespace VisTest
 
 	        test.InputSlots.Find(a => a.Name == PolygonVisualizer.MultiGeometriesKey).Content = true;
 
-            var geomCastNode = FusionData._0._2.EditorConstructors.Basic_Nodes.ChannelCastNode(typeof(object), typeof(FDDVector2[][][]));
+            var geomCastNode = FusionData.EditorConstructors.Basic_Nodes.ChannelCastNode(typeof(object), typeof(FDDVector2[][][]));
 
 
 
 	        var fllorsCastNode =
-	            FusionData._0._2.EditorConstructors.Basic_Nodes.ChannelCastNode(typeof(object), typeof(IConvertible));
+	            FusionData.EditorConstructors.Basic_Nodes.ChannelCastNode(typeof(object), typeof(IConvertible));
 
 
-            var floorILerpNode = FusionData._0._2.EditorConstructors.Basic_Nodes.NumericChannelInverseLerpNode();
-	        floorILerpNode.InputSlots.Find(a => a.Name == "Min").Default = 0;
-	        floorILerpNode.InputSlots.Find(a => a.Name == "Max").Default = 10;
+            var floorILerpNode = FusionData.EditorConstructors.Basic_Nodes.NumericChannelInverseLerpNode();
+            EditorFunctions.AssignDefault(floorILerpNode, "Min", 0);
+	        EditorFunctions.AssignDefault(floorILerpNode, "Max", 10);
 
-            var colorCastNoce = FusionData._0._2.EditorConstructors.Basic_Nodes.ChannelConvertNode(typeof(decimal), typeof(float));
+            var colorCastNoce = FusionData.EditorConstructors.Basic_Nodes.ChannelConvertNode(typeof(decimal), typeof(float));
 
-	        var floorMultNode = FusionData._0._2.EditorConstructors.Basic_Nodes.NumericChannelMultiplyNode();
-	        floorMultNode.InputSlots.Find(a => a.Name == "B").Default = 0.004f;
-            var heightConvNode = FusionData._0._2.EditorConstructors.Basic_Nodes.ChannelConvertNode(typeof(IConvertible), typeof(float));
+	        var floorMultNode = FusionData.EditorConstructors.Basic_Nodes.NumericChannelMultiplyNode();
+	        EditorFunctions.AssignDefault(floorMultNode, "B", 0.004f);
+            var heightConvNode = FusionData.EditorConstructors.Basic_Nodes.ChannelConvertNode(typeof(IConvertible), typeof(float));
 
             EditorFunctions.LinkNodes(jsonSource, geomCastNode, "#Geometry", "Object");
 	        EditorFunctions.LinkNodes(geomCastNode, test, typeof(FDDVector2[][][]).Name, PolygonVisualizer.PolygonGeometryKey);
