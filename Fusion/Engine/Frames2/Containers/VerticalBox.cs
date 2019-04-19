@@ -150,7 +150,7 @@ namespace Fusion.Engine.Frames2.Containers
             get;
             set;
         }
-        
+
         public enum HorizontalAlignment
         {
             Left, Center, Right
@@ -269,7 +269,6 @@ namespace Fusion.Engine.Frames2.Containers
             DesiredHeight = float.Parse(reader.GetAttribute("DesiredHeight"));
             Alignment = (HorizontalAlignment) Enum.Parse(typeof(HorizontalAlignment), reader.GetAttribute("Alignment"));
             reader.ReadStartElement("VerticalBox");
-            reader.ReadStartElement("Slots");
 
             _slots.Clear();
             if (!reader.IsEmptyElement)
@@ -281,14 +280,14 @@ namespace Fusion.Engine.Frames2.Containers
                     slot.ReadFromXml(reader);
                     _slots.Add(slot);
                 }
-                reader.ReadEndElement();
+                reader.ReadEndElement(); // Slots
             }
             else
             {
                 reader.ReadStartElement("Slots");
             }
 
-            reader.ReadEndElement();
+            reader.ReadEndElement(); // VerticalBox
         }
 
         public void WriteXml(XmlWriter writer)

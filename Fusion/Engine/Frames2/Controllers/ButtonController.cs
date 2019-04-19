@@ -124,6 +124,8 @@ namespace Fusion.Engine.Frames2.Controllers
             Background.ReadFromXml(reader);
             Foreground.ReadFromXml(reader);
             reader.ReadEndElement();
+
+            reader.ReadEndElement(); // ButtonController
         }
 
         public void WriteXml(XmlWriter writer)
