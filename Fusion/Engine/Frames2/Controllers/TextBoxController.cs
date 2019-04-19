@@ -1,15 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.ComponentModel;
 using System.Xml;
 using System.Xml.Schema;
 using System.Xml.Serialization;
-using Fusion.Core.Mathematics;
-using Fusion.Core.Utils;
 using Fusion.Engine.Frames2.Components;
 using Fusion.Engine.Frames2.Events;
-using Fusion.Engine.Frames2.Managing;
 using Fusion.Engine.Frames2.Utils;
 using Fusion.Engine.Graphics.SpritesD2D;
 using Label = Fusion.Engine.Frames2.Components.Label;
