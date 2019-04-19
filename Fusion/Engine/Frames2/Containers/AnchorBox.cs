@@ -24,11 +24,6 @@ namespace Fusion.Engine.Frames2.Containers
 		{
 			InternalHolder = holder;
             Fixators = fixators;
-			Fixators.PropertyChanged +=(s,e)=>{
-				Fixators.IsDirty = true;
-				PropertyChanged?.Invoke(s,new PropertyChangedEventArgs("Fixators"));
-				Fixators.IsDirty = false;
-			};
         }
 
         internal AnchorBoxSlot(AnchorBox holder) : this(holder, new Fixators()) {}
@@ -146,14 +141,7 @@ namespace Fusion.Engine.Frames2.Containers
 		public float Right { get; set; } = -1;
 		public float Bottom { get; set; } = -1;
 
-		public bool IsDirty = false;
-
 		public event PropertyChangedEventHandler PropertyChanged;
-
-		public override bool Equals( object obj )
-		{
-			return !IsDirty;
-		}
 	};
 
 	public class AnchorBox : IUIModifiableContainer<AnchorBoxSlot>, IXmlSerializable
