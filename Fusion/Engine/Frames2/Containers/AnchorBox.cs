@@ -22,6 +22,11 @@ namespace Fusion.Engine.Frames2.Containers
 		{
 			InternalHolder = holder;
             Fixators = fixators;
+			Fixators.PropertyChanged += (s, e) => {
+				Fixators.IsDirty = true;
+				PropertyChanged?.Invoke(this, new PropertyChangedEventArgs("Fixators"));
+				Fixators.IsDirty = false;
+			};
         }
 
         internal AnchorBoxSlot(AnchorBox holder) : this(holder, new Fixators()) {}
@@ -124,7 +129,8 @@ namespace Fusion.Engine.Frames2.Containers
         {
             reader.ReadStartElement("AnchorBoxSlot");
             Angle = UIComponentSerializer.ReadValue<float>(reader);
-            Fixators = UIComponentSerializer.ReadValue<Fixators>(reader);
+            var f = UIComponentSerializer.ReadValue<Fixators>(reader);
+            Fixators = f;
             Clip = UIComponentSerializer.ReadValue<bool>(reader);
             Visible = UIComponentSerializer.ReadValue<bool>(reader);
             Attach(UIComponentSerializer.ReadValue<SeralizableObjectHolder>(reader).SerializableFrame);
@@ -132,20 +138,12 @@ namespace Fusion.Engine.Frames2.Containers
         }
 	}
 
-	public class Fixators
+	public class Fixators : INotifyPropertyChanged
 	{
 	    private float _left   = 0;
 	    private float _right  = -1;
 	    private float _top    = 0;
 	    private float _bottom = -1;
-
-	    public Fixators(float left, float right, float top, float bottom)
-	    {
-	        _left = left;
-	        Right = right;
-	        _top = top;
-	        Bottom = bottom;
-	    }
 
 		public float Left
 		{
@@ -188,6 +186,7 @@ namespace Fusion.Engine.Frames2.Containers
 		        _right = value;
 		    }
 		}
+
 		public float Bottom
 		{
 		    get => _bottom;
@@ -201,7 +200,18 @@ namespace Fusion.Engine.Frames2.Containers
 		        _bottom = value;
 		    }
 	    }
-    }
+
+		public bool IsDirty = false;
+
+		public event PropertyChangedEventHandler PropertyChanged;
+
+		public override bool Equals( object obj )
+		{
+			return !IsDirty;
+		}
+
+	    public override string ToString() => $"Fixators: left={Left}, top={Top}, right={Right}, bottom={Bottom}";
+	};
 
 	public class AnchorBox : IUIModifiableContainer<AnchorBoxSlot>, IXmlSerializable
 	{
@@ -243,7 +253,7 @@ namespace Fusion.Engine.Frames2.Containers
 				{
                     Debug.Assert(slot.Fixators.Right >= 0);
 
-				    slot.X = Math.Max(0, Placement.Width - slot.Component.DesiredWidth);
+				    slot.X = Math.Max(0, Placement.Width - slot.Component.DesiredWidth - slot.Fixators.Right);
 				    slot.Width = Math.Min(slot.AvailableWidth, slot.Component.DesiredWidth);
 				}
 
@@ -265,7 +275,7 @@ namespace Fusion.Engine.Frames2.Containers
 			    {
 			        Debug.Assert(slot.Fixators.Bottom >= 0);
 
-			        slot.Y = Math.Max(0, Placement.Height - slot.Component.DesiredHeight);
+			        slot.Y = Math.Max(0, Placement.Height - slot.Component.DesiredHeight - slot.Fixators.Bottom);
 			        slot.Height = Math.Min(slot.AvailableHeight, slot.Component.DesiredHeight);
 			    }
 			}
