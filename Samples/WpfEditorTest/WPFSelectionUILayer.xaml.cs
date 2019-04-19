@@ -874,8 +874,8 @@ namespace WpfEditorTest
 				{
 					var fixators = abs.Fixators;
 
-					fixators.Left = fixators.Left >= 0 ? x : fixators.Left;
-					fixators.Top = fixators.Top >= 0 ? y : fixators.Top;
+					fixators.Left = fixators.Left >= 0 ? Math.Min(x, abs.Parent.Placement.Width - (float)FrameSelectionPanelList[component].InitialComponentSize.Width) : fixators.Left;
+					fixators.Top = fixators.Top >= 0 ?Math.Min(y, abs.Parent.Placement.Height - (float)FrameSelectionPanelList[component].InitialComponentSize.Height) : fixators.Top;
 					fixators.Right = fixators.Right >= 0 ? abs.Parent.Placement.Width - (x + (float)FrameSelectionPanelList[component].InitialComponentSize.Width) : fixators.Right;
 					fixators.Bottom = fixators.Bottom >= 0 ? abs.Parent.Placement.Height - (y + (float)FrameSelectionPanelList[component].InitialComponentSize.Height) : fixators.Bottom;
 

@@ -418,7 +418,7 @@
             <Border BorderThickness="1" BorderBrush="Gray" MinHeight="32" Width="auto" HorizontalAlignment="Stretch">
                 <Expander Header="{Binding PropName}" VerticalAlignment="Center" DataContext="{Binding}">
                     <ItemsControl ItemsSource="{Binding PropertyProps}" ItemTemplateSelector="{StaticResource propTemplateSelector}" 
-                              VirtualizingStackPanel.IsVirtualizing="True" Margin="15,0,0,0">
+                              VirtualizingStackPanel.IsVirtualizing="True">
                         <ItemsControl.ItemsPanel>
                             <ItemsPanelTemplate>
                                 <VirtualizingStackPanel />
