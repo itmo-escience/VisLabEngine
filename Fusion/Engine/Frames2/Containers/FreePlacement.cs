@@ -133,15 +133,30 @@ namespace Fusion.Engine.Frames2.Containers
         {
             foreach (var slot in _slots)
             {
-                // If it's not changed than it's strictly equal
-                // ReSharper disable once CompareOfFloatsByEqualityOperator
-                if (slot.Component.DesiredWidth >= 0 && slot.Width != slot.Component.DesiredWidth)
-                    slot.Width = slot.Component.DesiredWidth;
+                var component = slot.Component;
 
-                // If it's not changed than it's strictly equal
-                // ReSharper disable once CompareOfFloatsByEqualityOperator
-                if (slot.Component.DesiredHeight >= 0 && slot.Height != slot.Component.DesiredHeight)
-                    slot.Height = slot.Component.DesiredHeight;
+                if (component.DesiredWidth < 0)
+                {
+                    slot.Width = slot.AvailableWidth;
+                }
+                else {
+                    // If it's not changed than it's strictly equal
+                    // ReSharper disable once CompareOfFloatsByEqualityOperator
+                    if (component.DesiredWidth >= 0 && slot.Width != component.DesiredWidth)
+                        slot.Width = component.DesiredWidth;
+                }
+
+                if (component.DesiredHeight < 0)
+                {
+                    slot.Height = slot.AvailableHeight;
+                }
+                else
+                {
+                    // If it's not changed than it's strictly equal
+                    // ReSharper disable once CompareOfFloatsByEqualityOperator
+                    if (component.DesiredHeight >= 0 && slot.Height != component.DesiredHeight)
+                        slot.Height = component.DesiredHeight;
+                }
             }
         }
 
@@ -177,7 +192,7 @@ namespace Fusion.Engine.Frames2.Containers
 				if (index < _slots.Count)
 					_slots.Insert(index, slot);
 				else
-					_slots.Add(slot); 
+					_slots.Add(slot);
 			}
 			return slot;
 		}
