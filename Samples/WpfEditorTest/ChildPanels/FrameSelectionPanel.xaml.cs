@@ -172,9 +172,10 @@ namespace WpfEditorTest.Utility
 		public Matrix3x2 InitialTransform { get; internal set; }
 		public IUIModifiableContainer<ISlot> InitFrameParent { get; internal set; }
 		public Point InitPanelPosition { get; internal set; }
-		public Point InitFramePosition { get; internal set; }
-		public Size InitialFrameSize { get; internal set; }
-		public Point InitFrameScale { get; internal set; }
+		public Point InitComponentPosition { get; internal set; }
+		public Size InitialComponentSize { get; internal set; }
+		public Point InitComponentScale { get; internal set; }
+		public Point InitGlobalComponentPosition { get; internal set; }
 
 		public FrameSelectionPanel( UIManager uiManager )
 		{
@@ -193,30 +194,30 @@ namespace WpfEditorTest.Utility
 
 			SizeChanged += ( s, e ) =>
 			{
-				if (_selectedFrame == null) return;
+				//if (_selectedFrame == null) return;
 
-				_locked = true;
-				_selectedFrame.DesiredWidth = (float)Math.Max(0, Math.Abs(WidthBuffer));
-				_selectedFrame.DesiredHeight = (float)Math.Max(0, Math.Abs(HeightBuffer));
+				//_locked = true;
+				//_selectedFrame.DesiredWidth = (float)Math.Max(0, Math.Abs(WidthBuffer));
+				//_selectedFrame.DesiredHeight = (float)Math.Max(0, Math.Abs(HeightBuffer));
 
-				var transform = _selectedFrame.Placement.Transform();
+				//var transform = _selectedFrame.Placement.Transform();
 
-				if (_selectedFrame.Placement is FreePlacementSlot fpSlot)
-				{
-					fpSlot.SetTransform(new Matrix3x2(
-					Math.Sign(WidthBuffer) < 0 ? -1 : 1, transform.M12,
-					transform.M21, Math.Sign(HeightBuffer) < 0 ? -1 : 1,
-					transform.M31, transform.M32
-					)); 
-				}
-				_locked = false;
+				//if (_selectedFrame.Placement is FreePlacementSlot fpSlot)
+				//{
+				//	fpSlot.SetTransform(new Matrix3x2(
+				//	Math.Sign(WidthBuffer) < 0 ? -1 : 1, transform.M12,
+				//	transform.M21, Math.Sign(HeightBuffer) < 0 ? -1 : 1,
+				//	transform.M31, transform.M32
+				//	)); 
+				//}
+				//_locked = false;
 
 			};
 			LayoutUpdated += ( s, e ) =>
 			{
 				if (_selectedFrame != null && PositionChanged())
 				{
-					UpdateSelectedFramePosition();
+					//UpdateSelectedFramePosition();
 				}
 				UpdateAnchorLines();
 			};
@@ -225,26 +226,26 @@ namespace WpfEditorTest.Utility
 			_oldY = RenderTransform.Value.OffsetY;
 		}
 
-		public void UpdateSelectedFramePosition()
-		{
-			_locked = true;
+		//public void UpdateSelectedFramePosition()
+		//{
+		//	_locked = true;
 
-			var parent = _selectedFrame.Parent();
-			var parentMatrixInvert = Matrix3x2.Invert(_uiManager.GlobalTransform(parent.Placement));
-			var vectorHelper = Matrix3x2.TransformPoint(parentMatrixInvert, new Fusion.Core.Mathematics.Vector2((float)RenderTransform.Value.OffsetX, (float)RenderTransform.Value.OffsetY));
+		//	var parent = _selectedFrame.Parent();
+		//	var parentMatrixInvert = Matrix3x2.Invert(_uiManager.GlobalTransform(parent.Placement));
+		//	var vectorHelper = Matrix3x2.TransformPoint(parentMatrixInvert, new Fusion.Core.Mathematics.Vector2((float)RenderTransform.Value.OffsetX, (float)RenderTransform.Value.OffsetY));
 
-			if (_selectedFrame.Placement is FreePlacementSlot slot)
-			{
-				slot.X = vectorHelper.X;
-				slot.Y = vectorHelper.Y;
+		//	if (_selectedFrame.Placement is FreePlacementSlot slot)
+		//	{
+		//		slot.X = vectorHelper.X;
+		//		slot.Y = vectorHelper.Y;
 
-				_oldX = RenderTransform.Value.OffsetX;
-				_oldY = RenderTransform.Value.OffsetY; 
-			}
+		//		_oldX = RenderTransform.Value.OffsetX;
+		//		_oldY = RenderTransform.Value.OffsetY; 
+		//	}
 
-			UpdateAnchorLines();
-			_locked = false;
-		}
+		//	UpdateAnchorLines();
+		//	_locked = false;
+		//}
 
 		private void UpdateAnchorLines()
 		{

@@ -382,23 +382,23 @@ namespace WpfEditorTest
 
 		private bool HasFrameChangedSize( FrameSelectionPanel panel )
 		{
-			return (panel.SelectedFrame.Placement.Width != panel.InitialFrameSize.Width) || (panel.SelectedFrame.Placement.Height != panel.InitialFrameSize.Height);
+			return (panel.SelectedFrame.Placement.Width != panel.InitialComponentSize.Width) || (panel.SelectedFrame.Placement.Height != panel.InitialComponentSize.Height);
 		}
 
-		public void MoveFrameToDragField( IUIComponent frame )
-		{
-			//(frame.Parent() as IUIModifiableContainer<ISlot>)?.Remove(frame);
+		//public void MoveFrameToDragField( UIComponent frame )
+		//{
+		//	//(frame.Parent() as IUIModifiableContainer<ISlot>)?.Remove(frame);
 
-			//DragFieldFrame.Insert(frame,int.MaxValue);
+		//	//DragFieldFrame.Insert(frame,int.MaxValue);
 
-			CommandManager.Instance.ExecuteWithoutMemorising(
-				new UIComponentParentChangeCommand(frame, DragFieldFrame, frame.Parent() as IUIModifiableContainer<ISlot>)
-				);
+		//	CommandManager.Instance.ExecuteWithoutMemorising(
+		//		new UIComponentParentChangeCommand(frame, DragFieldFrame, frame.Parent() as IUIModifiableContainer<ISlot>)
+		//		);
 
-			var panel = FrameSelectionPanelList[frame];
+		//	var panel = FrameSelectionPanelList[frame];
 
-			panel.UpdateSelectedFramePosition();
-		}
+		//	panel.UpdateSelectedFramePosition();
+		//}
 
 
 		private CommandGroup ReleaseFrame( Point point, FrameSelectionPanel panel, bool needToChangeParent = false )
@@ -448,11 +448,11 @@ namespace WpfEditorTest
 				    );
 				    group.Append(new SlotPropertyChangeCommand(panel.SelectedFrame, "X",
 						commandX,
-				        (float) panel.InitFramePosition.X)
+				        (float) panel.InitComponentPosition.X)
 				    );
 					group.Append(new SlotPropertyChangeCommand(panel.SelectedFrame, "Y",
 						commandY,
-					    (float)panel.InitFramePosition.Y)
+					    (float)panel.InitComponentPosition.Y)
 					);
 					
 				}
@@ -463,15 +463,15 @@ namespace WpfEditorTest
 				        panel.InitialTransform)
 				    );
 				    group.Append(new UIComponentPropertyChangeCommand(panel.SelectedFrame, "DesiredWidth",
-				        panel.SelectedFrame.DesiredWidth, (float) panel.InitialFrameSize.Width)
+				        panel.SelectedFrame.DesiredWidth, (float) panel.InitialComponentSize.Width)
 				    );
 				    group.Append(new UIComponentPropertyChangeCommand(panel.SelectedFrame, "DesiredHeight",
-				        panel.SelectedFrame.DesiredHeight, (float) panel.InitialFrameSize.Height)
+				        panel.SelectedFrame.DesiredHeight, (float) panel.InitialComponentSize.Height)
 				    );
 				    group.Append(new SlotPropertyChangeCommand(panel.SelectedFrame, "X",
-				        panel.SelectedFrame.Placement.X, (float) panel.InitFramePosition.X));
+				        panel.SelectedFrame.Placement.X, (float) panel.InitComponentPosition.X));
 				    group.Append(new SlotPropertyChangeCommand(panel.SelectedFrame, "Y",
-                        panel.SelectedFrame.Placement.Y, (float)panel.InitFramePosition.Y)
+                        panel.SelectedFrame.Placement.Y, (float)panel.InitComponentPosition.Y)
                     );
 				}
 			}
@@ -568,20 +568,26 @@ namespace WpfEditorTest
 
                 selectionPanel.InitialTransform = frame.Placement.Transform();
 				selectionPanel.InitPanelPosition = new Point((float)selectionPanel.RenderTransform.Value.OffsetX, (float)selectionPanel.RenderTransform.Value.OffsetY);
-				selectionPanel.InitFramePosition = new Point(frame.Placement.X, frame.Placement.Y);
-				selectionPanel.InitFrameScale = new Point(frame.Placement.Transform().M11, frame.Placement.Transform().M22);
-				selectionPanel.InitialFrameSize = new Size(frame.Placement.Width, frame.Placement.Height);
+				selectionPanel.InitComponentPosition = new Point(frame.Placement.X, frame.Placement.Y);
+				selectionPanel.InitGlobalComponentPosition = new Point(_uiManager.GlobalTransform(frame.Placement).M31, _uiManager.GlobalTransform(frame.Placement).M32);
+				selectionPanel.InitComponentScale = new Point(frame.Placement.Transform().M11, frame.Placement.Transform().M22);
+				selectionPanel.InitialComponentSize = new Size(frame.Placement.Width, frame.Placement.Height);
 				selectionPanel.InitFrameParent = frame.Parent() as IUIModifiableContainer<ISlot>;
 			}
 
-			if (hovered != null && FrameSelectionPanelList.ContainsKey(hovered))
-			{
-				var panel = FrameSelectionPanelList[hovered];
+			//if (hovered != null && FrameSelectionPanelList.ContainsKey(hovered))
+			//{
+			//	var panel = FrameSelectionPanelList[hovered];
 
-				if (panel != null)
-					panel.MousePressed = true;
+			//	if (panel != null)
+			//		panel.MousePressed = true;
+			//	PrepareStickingCoords();
+			//	CheckForStickingLines();
+			//}
+			if (FrameSelectionPanelList.Count>0)
+			{
 				PrepareStickingCoords();
-				CheckForStickingLines();
+				CheckForStickingLines(); 
 			}
 
 			CaptureMouse();
@@ -791,34 +797,50 @@ namespace WpfEditorTest
 			FrameDragsPanel.Resize(_deltaX, _deltaY, isShiftPressed, isControlPressed, GridSizeMultiplier, NeedSnapping(), VisualGrid.Visibility,
 				StickingCoordsX, StickingCoordsY, out double heightMult, out double widthMult);
 
-			var dragsPanelX = FrameDragsPanel.NewDeziredPosition.X;
-			var dragsPanelY = FrameDragsPanel.NewDeziredPosition.Y;
-			foreach (var panel in FrameSelectionPanelList.Values)
+			float dragsPanelX = (float)FrameDragsPanel.NewDeziredPosition.X;
+			float dragsPanelY = (float)FrameDragsPanel.NewDeziredPosition.Y;
+
+			foreach (var component in FrameSelectionPanelList.Keys)
 			{
-				var initRect = FrameDragsPanel.InitialFramesRectangles[panel.SelectedFrame];
+				var initRect = FrameDragsPanel.InitialFramesRectangles[component];
+				var globalPosition = FrameSelectionPanelList[component].InitGlobalComponentPosition;
 
-				panel.WidthBuffer = initRect.Width * widthMult * panel.InitFrameScale.X;
-				panel.HeightBuffer = initRect.Height * heightMult * panel.InitFrameScale.Y;
-
-				TranslateTransform multedTransform = new TranslateTransform
+				if (component.Placement is FreePlacementSlot fps)
 				{
-					X = (float)dragsPanelX + initRect.X * widthMult,
-					Y = (float)dragsPanelY + initRect.Y * heightMult
-				};
+					fps.X = (float)FrameSelectionPanelList[component].InitComponentPosition.X - ((float)globalPosition.X - dragsPanelX) + initRect.X * (float)widthMult;
+					fps.Y = (float)FrameSelectionPanelList[component].InitComponentPosition.Y - ((float)globalPosition.Y - dragsPanelY) + initRect.Y * (float)heightMult;
+				}
+				else if (component.Placement is AnchorBoxSlot abs)
+				{
+					abs.Fixators.Left = dragsPanelX + initRect.X * (float)widthMult;
+					abs.Fixators.Top = dragsPanelY + initRect.Y * (float)heightMult;
+				}
 
-                var transform = new TransformGroup();
-				//TODO
-				//Get GlobalAngle back
-				//transform.Children.Add(new RotateTransform() { Angle = panel.SelectedFrame.Placement.GlobalAngle * (180 / Math.PI), CenterX = 0, CenterY = 0 });
-				transform.Children.Add(new ScaleTransform(Math.Sign(panel.WidthBuffer), Math.Sign(panel.HeightBuffer),0,0));
-				transform.Children.Add(multedTransform);
+				component.DesiredWidth = initRect.Width * (float)widthMult * (float)FrameSelectionPanelList[component].InitComponentScale.X;
+				component.DesiredHeight = initRect.Height * (float)heightMult * (float)FrameSelectionPanelList[component].InitComponentScale.Y;
 
-				var globaltransform = _uiManager.GlobalTransform(panel.SelectedFrame.Placement);
+				//panel.WidthBuffer = initRect.Width * widthMult * panel.InitComponentScale.X;
+				//panel.HeightBuffer = initRect.Height * heightMult * panel.InitComponentScale.Y;
 
-				panel.RenderTransform = new MatrixTransform(globaltransform.M11, globaltransform.M12,
-															globaltransform.M21, globaltransform.M22,
-															multedTransform.X, multedTransform.Y);// transform;
-				panel.UpdateLayout();
+				//TranslateTransform multedTransform = new TranslateTransform
+				//{
+				//	X = (float)dragsPanelX + initRect.X * widthMult,
+				//	Y = (float)dragsPanelY + initRect.Y * heightMult
+				//};
+
+				//            var transform = new TransformGroup();
+				////TODO
+				////Get GlobalAngle back
+				////transform.Children.Add(new RotateTransform() { Angle = panel.SelectedFrame.Placement.GlobalAngle * (180 / Math.PI), CenterX = 0, CenterY = 0 });
+				//transform.Children.Add(new ScaleTransform(Math.Sign(panel.WidthBuffer), Math.Sign(panel.HeightBuffer),0,0));
+				//transform.Children.Add(multedTransform);
+
+				//var globaltransform = _uiManager.GlobalTransform(panel.SelectedFrame.Placement);
+
+				//panel.RenderTransform = new MatrixTransform(globaltransform.M11, globaltransform.M12,
+				//											globaltransform.M21, globaltransform.M22,
+				//											multedTransform.X, multedTransform.Y);// transform;
+				//panel.UpdateLayout();
 			}
 		}
 
@@ -830,19 +852,30 @@ namespace WpfEditorTest
 			FrameDragsPanel.Reposition(_deltaX, _deltaY, isShiftPressed, isControlPressed, GridSizeMultiplier, NeedSnapping(), VisualGrid.Visibility,
 				StickingCoordsX, StickingCoordsY, out float dX, out float dY);
 
-			foreach (var panel in FrameSelectionPanelList.Values)
+			foreach (var component in FrameSelectionPanelList.Keys)
 			{
-				var transformDelta = new TranslateTransform((float)panel.InitPanelPosition.X + dX, (float)panel.InitPanelPosition.Y + dY);
-                var transform = new TransformGroup();
-				//TODO
-				//Get GlobalAngle back
-                //transform.Children.Add(new RotateTransform() { Angle= panel.SelectedFrame.GlobalAngle * (180/Math.PI), CenterX = 0, CenterY = 0 });
-				transform.Children.Add(new ScaleTransform(Math.Sign(panel.WidthBuffer), Math.Sign(panel.HeightBuffer)));
-				transform.Children.Add(transformDelta);
-                panel.RenderTransform = transform;
-				panel.UpdateLayout();
+				var panel = FrameSelectionPanelList[component];
+				if (component.Placement is FreePlacementSlot fps )
+				{
+					fps.X = (float)panel.InitComponentPosition.X + dX;
+					fps.Y = (float)panel.InitComponentPosition.Y + dY;
+				}
+				else if (component.Placement is AnchorBoxSlot abs)
+				{
+					abs.Fixators.Left = (float)panel.InitComponentPosition.X + dX;
+					abs.Fixators.Top = (float)panel.InitComponentPosition.Y + dY;
+				}
+				//var transformDelta = new TranslateTransform((float)panel.InitPanelPosition.X + dX, (float)panel.InitPanelPosition.Y + dY);
+    //            var transform = new TransformGroup();
+				////TODO
+				////Get GlobalAngle back
+    //            //transform.Children.Add(new RotateTransform() { Angle= panel.SelectedFrame.GlobalAngle * (180/Math.PI), CenterX = 0, CenterY = 0 });
+				//transform.Children.Add(new ScaleTransform(Math.Sign(panel.WidthBuffer), Math.Sign(panel.HeightBuffer)));
+				//transform.Children.Add(transformDelta);
+    //            panel.RenderTransform = transform;
+				//panel.UpdateLayout();
 			}
-			FrameDragsPanel.UpdateLayout();
+			//FrameDragsPanel.UpdateLayout();
 		}
 
 		private void ActivateStickingYLines(List<StickCoordinateY> stickingCoordsY, float minValue, float additionalValue )

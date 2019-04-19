@@ -342,6 +342,7 @@ namespace WpfEditorTest
 					{
 						_details.DetailsScroll.DataContext = null;
 						_details.DetailsScroll.Visibility = Visibility.Collapsed;
+						_details.Title = "Component details";
 					};
 					SelectionLayer.SizeChanged += ( s, e ) =>
 					{
