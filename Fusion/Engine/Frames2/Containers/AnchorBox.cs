@@ -22,10 +22,12 @@ namespace Fusion.Engine.Frames2.Containers
 		{
 			InternalHolder = holder;
             Fixators = fixators;
-			Fixators.PropertyChanged += (s, e) => {
-				Fixators.IsDirty = true;
-				PropertyChanged?.Invoke(this, new PropertyChangedEventArgs("Fixators"));
-				Fixators.IsDirty = false;
+
+			Fixators.PropertyChanged += (s, e) =>
+			{
+			    Fixators.IsDirty = true;
+			    PropertyChanged?.Invoke(this, new PropertyChangedEventArgs("Fixators"));
+			    Fixators.IsDirty = false;
 			};
         }
 
