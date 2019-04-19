@@ -805,19 +805,25 @@ namespace WpfEditorTest
 				var initRect = FrameDragsPanel.InitialFramesRectangles[component];
 				var globalPosition = FrameSelectionPanelList[component].InitGlobalComponentPosition;
 
+				var x = (float)FrameSelectionPanelList[component].InitComponentPosition.X - ((float)globalPosition.X - dragsPanelX) + initRect.X * (float)widthMult;
+				var y = (float)FrameSelectionPanelList[component].InitComponentPosition.Y - ((float)globalPosition.Y - dragsPanelY) + initRect.Y * (float)heightMult;
+				component.DesiredWidth = initRect.Width * (float)widthMult * (float)FrameSelectionPanelList[component].InitComponentScale.X;
+				component.DesiredHeight = initRect.Height * (float)heightMult * (float)FrameSelectionPanelList[component].InitComponentScale.Y;
+
 				if (component.Placement is FreePlacementSlot fps)
 				{
-					fps.X = (float)FrameSelectionPanelList[component].InitComponentPosition.X - ((float)globalPosition.X - dragsPanelX) + initRect.X * (float)widthMult;
-					fps.Y = (float)FrameSelectionPanelList[component].InitComponentPosition.Y - ((float)globalPosition.Y - dragsPanelY) + initRect.Y * (float)heightMult;
+					fps.X = x;
+					fps.Y = y;
 				}
 				else if (component.Placement is AnchorBoxSlot abs)
 				{
-					abs.Fixators.Left = dragsPanelX + initRect.X * (float)widthMult;
-					abs.Fixators.Top = dragsPanelY + initRect.Y * (float)heightMult;
-				}
+					var fixators = abs.Fixators;
 
-				component.DesiredWidth = initRect.Width * (float)widthMult * (float)FrameSelectionPanelList[component].InitComponentScale.X;
-				component.DesiredHeight = initRect.Height * (float)heightMult * (float)FrameSelectionPanelList[component].InitComponentScale.Y;
+					fixators.Left = fixators.Left >= 0 ? x : fixators.Left;
+					fixators.Top = fixators.Top >= 0 ? y : fixators.Top;
+					fixators.Right = fixators.Right >= 0 ? abs.Parent.Placement.Width - (x + component.DesiredWidth) : fixators.Right;
+					fixators.Bottom = fixators.Bottom >= 0 ? abs.Parent.Placement.Height - (y + component.DesiredHeight) : fixators.Bottom;
+				}
 
 				//panel.WidthBuffer = initRect.Width * widthMult * panel.InitComponentScale.X;
 				//panel.HeightBuffer = initRect.Height * heightMult * panel.InitComponentScale.Y;
@@ -855,15 +861,26 @@ namespace WpfEditorTest
 			foreach (var component in FrameSelectionPanelList.Keys)
 			{
 				var panel = FrameSelectionPanelList[component];
+
+				var x = (float)panel.InitComponentPosition.X + dX;
+				var y = (float)panel.InitComponentPosition.Y + dY;
+
 				if (component.Placement is FreePlacementSlot fps )
 				{
-					fps.X = (float)panel.InitComponentPosition.X + dX;
-					fps.Y = (float)panel.InitComponentPosition.Y + dY;
+					fps.X = x;
+					fps.Y = y;
 				}
 				else if (component.Placement is AnchorBoxSlot abs)
 				{
-					abs.Fixators.Left = (float)panel.InitComponentPosition.X + dX;
-					abs.Fixators.Top = (float)panel.InitComponentPosition.Y + dY;
+					var fixators = abs.Fixators;
+
+					fixators.Left = fixators.Left >= 0 ? x : fixators.Left;
+					fixators.Top = fixators.Top >= 0 ? y : fixators.Top;
+					fixators.Right = fixators.Right >= 0 ? abs.Parent.Placement.Width - (x + (float)FrameSelectionPanelList[component].InitialComponentSize.Width) : fixators.Right;
+					fixators.Bottom = fixators.Bottom >= 0 ? abs.Parent.Placement.Height - (y + (float)FrameSelectionPanelList[component].InitialComponentSize.Height) : fixators.Bottom;
+
+					//abs.Fixators.Left = (float)panel.InitComponentPosition.X + dX;
+					//abs.Fixators.Top = (float)panel.InitComponentPosition.Y + dY;
 				}
 				//var transformDelta = new TranslateTransform((float)panel.InitPanelPosition.X + dX, (float)panel.InitPanelPosition.Y + dY);
     //            var transform = new TransformGroup();
