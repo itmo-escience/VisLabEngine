@@ -13,6 +13,7 @@ using RectangleF = Fusion.Core.Mathematics.RectangleF;
 using Vector2 = Fusion.Core.Mathematics.Vector2;
 using Matrix3x2 = Fusion.Core.Mathematics.Matrix3x2;
 using Fusion.Engine.Frames2.Managing;
+using Fusion.Engine.Frames2.Utils;
 
 namespace WpfEditorTest.Utility
 {
@@ -46,7 +47,7 @@ namespace WpfEditorTest.Utility
 
 		public List<Border> Drags { get; set; }
 
-		public Dictionary<UIComponent, RectangleF> InitialFramesRectangles { get; private set; }
+		public Dictionary<IUIComponent, RectangleF> InitialFramesRectangles { get; private set; }
 
 		private bool _dragMousePressed;
 
@@ -129,7 +130,7 @@ namespace WpfEditorTest.Utility
 				SelectedGroupMaxX = _uiManager.BoundingBox(component.Placement).X + _uiManager.BoundingBox(component.Placement).Width;
 				SelectedGroupMaxY = _uiManager.BoundingBox(component.Placement).Y + _uiManager.BoundingBox(component.Placement).Height;
 
-				UIComponent frame = frames.First();
+				IUIComponent frame = frames.First();
 
 				//if (frame.Placement.GetType().GetProperty(nameof(Width)).GetSetMethod()!=null)
 				//{
@@ -157,10 +158,10 @@ namespace WpfEditorTest.Utility
 			BoundingBoxUpdated?.Invoke(this, null);
 		}
 
-		private void RememberSizeAndPosition( List<UIComponent> selectedFrames )
+		private void RememberSizeAndPosition( List<IUIComponent> selectedFrames )
 		{
-			InitialFramesRectangles = new Dictionary<UIComponent, RectangleF>();
-			foreach (UIComponent frame in selectedFrames)
+			InitialFramesRectangles = new Dictionary<IUIComponent, RectangleF>();
+			foreach (IUIComponent frame in selectedFrames)
 			{
 				var globalTransform = _uiManager.GlobalTransform(frame.Placement);
 

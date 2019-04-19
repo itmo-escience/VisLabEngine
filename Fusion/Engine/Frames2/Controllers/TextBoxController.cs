@@ -10,6 +10,7 @@ using Fusion.Core.Utils;
 using Fusion.Engine.Frames2.Components;
 using Fusion.Engine.Frames2.Events;
 using Fusion.Engine.Frames2.Managing;
+using Fusion.Engine.Frames2.Utils;
 using Fusion.Engine.Graphics.SpritesD2D;
 using Label = Fusion.Engine.Frames2.Components.Label;
 
@@ -18,11 +19,10 @@ namespace Fusion.Engine.Frames2.Controllers
     public class TextBoxController : UIController, IXmlSerializable
     {
         public static ControllerState Editing = new ControllerState("Editing");
-        protected override IEnumerable<ControllerState> NonDefaultStates => new List<ControllerState> { Editing };
+        protected override IReadOnlyCollection<ControllerState> NonDefaultStates { get; } = new List<ControllerState> { Editing };
 
         private readonly List<ParentFillingSlot> _slots;
-        protected override IEnumerable<IControllerSlot> MainControllerSlots => _slots;
-        protected override IEnumerable<IControllerSlot> AdditionalControllerSlots { get; } = new List<IControllerSlot>();
+        protected override IEnumerable<IControllerSlot> ControllerSlots => _slots;
 
         public ParentFillingSlot Text { get; private set; }
         public ParentFillingSlot Background { get; private set; }
@@ -84,7 +84,7 @@ namespace Fusion.Engine.Frames2.Controllers
         private const char BackspaceCharCode = (char)8;
         private const char EscapeCharCode = (char)27;
 
-        private void OnKeyPress(UIComponent sender, KeyPressEventArgs e)
+        private void OnKeyPress(IUIComponent sender, KeyPressEventArgs e)
         {
             if(CurrentState != Editing)
                 return;
@@ -102,25 +102,25 @@ namespace Fusion.Engine.Frames2.Controllers
             Input?.Invoke(this, new InputEventArgs(_label.Text));
         }
 
-        private void OnMouseDown(UIComponent sender, ClickEventArgs e)
+        private void OnMouseDown(IUIComponent sender, ClickEventArgs e)
         {
             if(CurrentState != ControllerState.Disabled)
                 ChangeState(Editing);
         }
 
-        private void OnMouseDownOutside(UIComponent sender, ClickEventArgs e)
+        private void OnMouseDownOutside(IUIComponent sender, ClickEventArgs e)
         {
             if(CurrentState == Editing)
                 ChangeState(ControllerState.Default);
         }
 
-        private void OnEnter(UIComponent sender)
+        private void OnEnter(IUIComponent sender)
         {
             if (CurrentState == ControllerState.Default)
                 ChangeState(ControllerState.Hovered);
         }
 
-        private void OnLeave(UIComponent sender)
+        private void OnLeave(IUIComponent sender)
         {
             if(CurrentState == ControllerState.Hovered)
                 ChangeState(ControllerState.Default);

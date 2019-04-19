@@ -9,17 +9,17 @@ using Fusion.Engine.Graphics.SpritesD2D;
 using System.Xml;
 using System.Xml.Schema;
 using System.Xml.Serialization;
+using Fusion.Engine.Frames2.Utils;
 
 namespace Fusion.Engine.Frames2.Controllers
 {
     public class ButtonController : UIController, IXmlSerializable
     {
         public static ControllerState Pressed = new ControllerState("Pressed");
-        protected override IEnumerable<ControllerState> NonDefaultStates => new List<ControllerState> { Pressed };
+        protected override IReadOnlyCollection<ControllerState> NonDefaultStates { get; } = new List<ControllerState> { Pressed };
 
         private readonly List<ParentFillingSlot> _slots;
-        protected override IEnumerable<IControllerSlot> MainControllerSlots => _slots;
-        protected override IEnumerable<IControllerSlot> AdditionalControllerSlots { get; } = new List<IControllerSlot>();
+        protected override IEnumerable<IControllerSlot> ControllerSlots => _slots;
 
         public ParentFillingSlot Foreground { get; private set; }
         public ParentFillingSlot Background { get; private set; }
@@ -55,12 +55,12 @@ namespace Fusion.Engine.Frames2.Controllers
 
         #region Events
 
-		private void OnMouseUpOutside(UIComponent sender, ClickEventArgs e)
+		private void OnMouseUpOutside(IUIComponent sender, ClickEventArgs e)
         {
             ChangeState(ControllerState.Default);
         }
 
-        private void OnEnter(UIComponent sender)
+        private void OnEnter(IUIComponent sender)
         {
             if (CurrentState == ControllerState.Default)
             {
@@ -68,7 +68,7 @@ namespace Fusion.Engine.Frames2.Controllers
             }
         }
 
-        private void OnLeave(UIComponent sender)
+        private void OnLeave(IUIComponent sender)
         {
             if (CurrentState == ControllerState.Hovered)
             {
@@ -76,7 +76,7 @@ namespace Fusion.Engine.Frames2.Controllers
             }
         }
 
-        private void OnMouseDown(UIComponent sender, ClickEventArgs e)
+        private void OnMouseDown(IUIComponent sender, ClickEventArgs e)
         {
             if(CurrentState == Pressed)
                 return;
@@ -84,7 +84,7 @@ namespace Fusion.Engine.Frames2.Controllers
             ChangeState(Pressed);
         }
 
-        private void OnMouseUp(UIComponent sender, ClickEventArgs e)
+        private void OnMouseUp(IUIComponent sender, ClickEventArgs e)
         {
             if(CurrentState == Pressed)
                 ButtonClick?.Invoke(this, new ButtonClickEventArgs(this));

@@ -12,7 +12,7 @@ using Fusion.Engine.Graphics.SpritesD2D;
 
 namespace Fusion.Engine.Frames2.Controllers
 {
-    public class RadioButtonManager
+    public static class RadioButtonManager
     {
         private static int _lastId = 0;
         internal static int GenerateId() => _lastId++;

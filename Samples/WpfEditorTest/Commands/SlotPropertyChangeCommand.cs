@@ -1,5 +1,6 @@
 ﻿using Fusion.Engine.Common;
 using Fusion.Engine.Frames2;
+using Fusion.Engine.Frames2.Utils;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -13,7 +14,7 @@ namespace WpfEditorTest.Commands
 	class SlotPropertyChangeCommand : IEditorCommand
 	{
 		private readonly AutoResetEvent _asyncThreadChangesDoneEvent = new AutoResetEvent(false);
-		private readonly UIComponent _component;
+		private readonly IUIComponent _component;
 		private readonly string _propertyName;
 		private readonly object _valueToSet;
 		private object _previousValue;
@@ -21,7 +22,7 @@ namespace WpfEditorTest.Commands
 
 		public bool IsDirty => true;
 
-		public SlotPropertyChangeCommand( UIComponent component, string propertyName, object valueToSet )
+		public SlotPropertyChangeCommand( IUIComponent component, string propertyName, object valueToSet )
 		{
 			_component = component;
 			_propertyName = propertyName;
@@ -29,7 +30,7 @@ namespace WpfEditorTest.Commands
 
 		}
 
-		public SlotPropertyChangeCommand( UIComponent component, string propertyName, object valueToSet, object forcedPreviousValue ) : this(component, propertyName, valueToSet)
+		public SlotPropertyChangeCommand( IUIComponent component, string propertyName, object valueToSet, object forcedPreviousValue ) : this(component, propertyName, valueToSet)
 		{
 			_previousValue = forcedPreviousValue;
 		}

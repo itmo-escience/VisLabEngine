@@ -2,7 +2,9 @@
 using System.Diagnostics;
 using System.Linq;
 using Fusion.Engine.Common;
+using Fusion.Engine.Frames2.Containers;
 using Fusion.Engine.Frames2.Managing;
+using Fusion.Engine.Frames2.Utils;
 using Fusion.Engine.Input;
 
 namespace Fusion.Engine.Frames2.Events
@@ -13,17 +15,17 @@ namespace Fusion.Engine.Frames2.Events
         public IUIContainer Root { get; internal set; }
         private readonly UIManager _manager;
 
-        private UIComponent _focusComponent;
+        private IUIComponent _focusComponent;
 
         private Keys _lastMouseKey;
 
-        private UIComponent _lastMouseDownComponent;
-        private UIComponent _lastClickComponent;
+        private IUIComponent _lastMouseDownComponent;
+        private IUIComponent _lastClickComponent;
 
         private readonly Stopwatch _clickStopwatch;
         private const long ClickDelay = 500;
 
-        private List<UIComponent> _componentsWithMouse;
+        private List<IUIComponent> _componentsWithMouse;
 
         internal UIEventProcessor(UIManager manager, IUIContainer root)
         {
@@ -32,7 +34,7 @@ namespace Fusion.Engine.Frames2.Events
             _manager = manager;
             _focusComponent = root;
             _clickStopwatch = new Stopwatch();
-            _componentsWithMouse = new List<UIComponent>();
+            _componentsWithMouse = new List<IUIComponent>();
 
             SubscribeToInputEvents();
         }
@@ -89,7 +91,7 @@ namespace Fusion.Engine.Frames2.Events
                 var mousePosition = _game.Mouse.Position;
                 var mouseArgs = (MoveEventArgs) args;
 
-                UIComponent s = null;
+                IUIComponent s = null;
                 foreach (var c in UIHelper.BFSTraverseForPoint(_manager, Root, mousePosition).Reverse())
                 {
                     if (s == null)
@@ -108,7 +110,7 @@ namespace Fusion.Engine.Frames2.Events
                 var mousePosition = _game.Mouse.Position;
                 var dragArgs = new DragEventArgs(_lastMouseKey, args);
 
-                UIComponent s = null;
+                IUIComponent s = null;
                 foreach (var c in UIHelper.BFSTraverseForPoint(_manager, Root, mousePosition).Reverse())
                 {
                     if (s == null) s = c;
@@ -127,7 +129,7 @@ namespace Fusion.Engine.Frames2.Events
                 var mousePosition = _game.Mouse.Position;
                 var clickArgs = new ClickEventArgs(args.Key, mousePosition);
 
-                UIComponent s = null;
+                IUIComponent s = null;
                 foreach (var c in UIHelper.BFSTraverseForPoint(_manager, Root, mousePosition).Reverse())
                 {
                     if (s == null) s = c;
@@ -155,7 +157,7 @@ namespace Fusion.Engine.Frames2.Events
 
                 var mousePosition = _game.Mouse.Position;
                 var clickArgs = new ClickEventArgs(args.Key, mousePosition);
-                UIComponent s = null;
+                IUIComponent s = null;
                 foreach (var c in UIHelper.BFSTraverseForPoint(_manager, Root, mousePosition).Reverse())
                 {
                     if (s == null) s = c;

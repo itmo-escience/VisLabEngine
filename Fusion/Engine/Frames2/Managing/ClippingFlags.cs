@@ -1,4 +1,5 @@
 ﻿using Fusion.Core.Mathematics;
+using Fusion.Engine.Frames2.Utils;
 using Fusion.Engine.Graphics.SpritesD2D;
 
 namespace Fusion.Engine.Frames2.Managing

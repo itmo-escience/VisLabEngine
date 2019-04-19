@@ -11,6 +11,7 @@ using Fusion.Core.Utils;
 using Fusion.Engine.Common;
 using Fusion.Engine.Frames2.Events;
 using Fusion.Engine.Frames2.Managing;
+using Fusion.Engine.Frames2.Utils;
 using Fusion.Engine.Graphics.SpritesD2D;
 
 namespace Fusion.Engine.Frames2.Containers
@@ -47,16 +48,16 @@ namespace Fusion.Engine.Frames2.Containers
 		internal IUIModifiableContainer<FreePlacementSlot> InternalHolder { get; }
         public IUIContainer Parent => InternalHolder;
 
-        public UIComponent Component { get; private set; }
+        public IUIComponent Component { get; private set; }
 
-		public SolidBrushD2D DebugBrush => new SolidBrushD2D(new Color4(0, 1.0f, 0, 1.0f));
-        public TextFormatD2D DebugTextFormat => new TextFormatD2D("Calibri", 10);
+        public SolidBrushD2D DebugBrush => UIManager.DefaultDebugBrush;
+        public TextFormatD2D DebugTextFormat => UIManager.DefaultDebugTextFormat;
         public void DebugDraw(SpriteLayerD2D layer) { }
         #endregion
 
         #region ISlotAttachable
 
-        public void Attach(UIComponent newComponent)
+        public void Attach(IUIComponent newComponent)
         {
             var old = Component;
 
@@ -146,7 +147,7 @@ namespace Fusion.Engine.Frames2.Containers
 
         public void Draw(SpriteLayerD2D layer) { }
 
-        public int IndexOf(UIComponent child)
+        public int IndexOf(IUIComponent child)
         {
             var idx = 0;
             foreach (var slot in _slots)
@@ -159,14 +160,14 @@ namespace Fusion.Engine.Frames2.Containers
             return idx;
         }
 
-        public bool Contains(UIComponent component) => _slots.Any(slot => slot.Component == component);
+        public bool Contains(IUIComponent component) => _slots.Any(slot => slot.Component == component);
 
-        public FreePlacementSlot Insert(UIComponent child, int index)
+        public FreePlacementSlot Insert(IUIComponent child, int index)
         {
 			return Insert(child, index, 0, 0);
 		}
 
-		public FreePlacementSlot Insert( UIComponent child, int index, float x, float y)
+		public FreePlacementSlot Insert( IUIComponent child, int index, float x, float y)
 		{
 			var slot = new FreePlacementSlot(this, x, y);
 			slot.Attach(child);
@@ -181,41 +182,34 @@ namespace Fusion.Engine.Frames2.Containers
 			return slot;
 		}
 
-		public FreePlacementSlot Add( UIComponent child)
+		public FreePlacementSlot Add( IUIComponent child)
 		{
 			return Insert(child, int.MaxValue);
 		}
 
-		public FreePlacementSlot Add( UIComponent child, float x, float y)
+		public FreePlacementSlot Add( IUIComponent child, float x, float y)
 		{
 			return Insert(child, int.MaxValue, x, y);
 		}
 
 
-		public bool Remove(UIComponent child)
+		public bool Remove(IUIComponent child)
         {
             var slot = _slots.FirstOrDefault(s => s.Component == child);
             if (slot == null)
                 return false;
 
 			_slots.Remove(slot);
-			slot.Component.Placement = null;
-
-			var handler = slot.GetType().GetField("PropertyChanged", BindingFlags.NonPublic | BindingFlags.Instance).GetValue(slot) as Delegate;
-			if (handler == null)
-			{
-				//no subscribers
-			}
-			else
-			{
-				foreach (var subscriber in handler.GetInvocationList())
-				{
-					slot.PropertyChanged -= subscriber as PropertyChangedEventHandler;
-				}
-				//now you have the subscribers
-			}
+			slot.ReleaseComponent();
 
 			return true;
+        }
+
+        public void DefaultInit()
+        {
+            Name = this.GetType().Name;
+            DesiredWidth = UIManager.DefaultContainerSize;
+            DesiredHeight = UIManager.DefaultContainerSize;
         }
 
         public XmlSchema GetSchema()

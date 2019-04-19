@@ -6,6 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 using Fusion.Engine.Frames2;
+using Fusion.Engine.Frames2.Utils;
 
 namespace WpfEditorTest.FrameSelection
 {
@@ -20,23 +21,23 @@ namespace WpfEditorTest.FrameSelection
 
 		public bool IsSingleElementSelected { get { return SelectedFrames.Count == 1; } }
 
-		public List<UIComponent> SelectedFrames { get; private set; } = new List<UIComponent>();
+		public List<IUIComponent> SelectedFrames { get; private set; } = new List<IUIComponent>();
 
-		public event EventHandler<List<UIComponent>> FrameSelected;
+		public event EventHandler<List<IUIComponent>> FrameSelected;
 
-		public event EventHandler<UIComponent> UIComponentUpdated;
-		public event EventHandler<UIComponent> PlacementRecreated;
+		public event EventHandler<IUIComponent> UIComponentUpdated;
+		public event EventHandler<IUIComponent> PlacementRecreated;
 		public event EventHandler<ISlot> SlotUpdated;
 
-		public void SelectFrame( List<UIComponent> frame )
+		public void SelectFrame( List<IUIComponent> frame )
 		{
-			foreach (UIComponent selectedFrame in SelectedFrames)
+			foreach (IUIComponent selectedFrame in SelectedFrames)
 			{
 				selectedFrame.PropertyChanged -= OnUIComponentUpdated;
 				selectedFrame.Placement.PropertyChanged -= OnSlotUpdated;
 			}
 			SelectedFrames = frame;
-			foreach (UIComponent selectedFrame in SelectedFrames)
+			foreach (IUIComponent selectedFrame in SelectedFrames)
 			{
 				selectedFrame.PropertyChanged += OnUIComponentUpdated;
 				selectedFrame.Placement.PropertyChanged += OnSlotUpdated;
@@ -52,17 +53,17 @@ namespace WpfEditorTest.FrameSelection
 
 		private void OnUIComponentUpdated( object frame, PropertyChangedEventArgs args)
 		{
-			if ((frame as UIComponent).Placement != null)
+			if ((frame as IUIComponent).Placement != null)
 			{
-				(frame as UIComponent).Placement.PropertyChanged += OnSlotUpdated;
+				(frame as IUIComponent).Placement.PropertyChanged += OnSlotUpdated;
 
 				if (args.PropertyName == "Placement")
 				{
-					Application.Current.Dispatcher.InvokeAsync(() => PlacementRecreated?.Invoke(this, (UIComponent)frame)); 
+					Application.Current.Dispatcher.InvokeAsync(() => PlacementRecreated?.Invoke(this, (IUIComponent)frame)); 
 				}
 			}
 
-		    Application.Current.Dispatcher.InvokeAsync(() => UIComponentUpdated?.Invoke(this, (UIComponent)frame));
+		    Application.Current.Dispatcher.InvokeAsync(() => UIComponentUpdated?.Invoke(this, (IUIComponent)frame));
 		}
 
 		protected void OnPropertyChanged( [System.Runtime.CompilerServices.CallerMemberName] string changedProperty = "" )

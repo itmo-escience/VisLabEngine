@@ -5,6 +5,7 @@ using System.Reflection;
 using System.Windows;
 using System.Windows.Media;
 using Fusion.Engine.Frames2;
+using Fusion.Engine.Frames2.Utils;
 
 namespace WpfEditorTest.Utility
 {
@@ -28,7 +29,7 @@ namespace WpfEditorTest.Utility
             Closing += (s, e) => {this.Hide(); e.Cancel = true; };
 		}
 
-	    public void SetSelectFrame(UIComponent component)
+	    public void SetSelectFrame(IUIComponent component)
 	    {
 			//      var publicProperties = frame.GetType().GetProperties(BindingFlags.Public | BindingFlags.Instance);
 

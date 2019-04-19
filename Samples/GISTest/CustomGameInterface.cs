@@ -23,6 +23,7 @@ using Fusion.Engine.Frames2;
 using Fusion.Engine.Frames2.Controllers;
 using Label = Fusion.Engine.Frames2.Components.Label;
 using System.Reflection;
+using Fusion.Engine.Frames2.Utils;
 
 namespace GISTest
 {
@@ -169,6 +170,7 @@ namespace GISTest
 
             
 
+
             #endregion
 
 			#endregion
@@ -278,7 +280,7 @@ namespace GISTest
 				var componentTypes = new List<Type>();
 				foreach (var item in ProjectAssembly.GetTypes())
 				{
-					if (item is UIComponent)
+					if (item is IUIComponent)
 					{
 						componentTypes.Add(item);
 					}

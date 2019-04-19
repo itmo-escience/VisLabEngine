@@ -5,6 +5,8 @@ using System.ComponentModel;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using Fusion.Core.Utils;
+using Fusion.Engine.Frames2.Containers;
+using Fusion.Engine.Frames2.Utils;
 
 namespace Fusion.Engine.Frames2.Managing
 {
@@ -41,11 +43,11 @@ namespace Fusion.Engine.Frames2.Managing
 
     public static class UIHelper
     {
-        public static IEnumerable<UIComponent> BFSTraverse(UIComponent root)
+        public static IEnumerable<IUIComponent> BFSTraverse(IUIComponent root)
         {
-            var queue = new Queue<UIComponent>();
+            var queue = new Queue<IUIComponent>();
             queue.Enqueue(root);
-            var result = new List<UIComponent>();
+            var result = new List<IUIComponent>();
 
             while (queue.Any())
             {
@@ -66,9 +68,9 @@ namespace Fusion.Engine.Frames2.Managing
             return result;
         }
 
-        public static IEnumerable<UIComponent> BFSTraverseForPoint(UIManager manager, UIComponent root, Vector2 point)
+        public static IEnumerable<IUIComponent> BFSTraverseForPoint(UIManager manager, IUIComponent root, Vector2 point)
         {
-            var queue = new Queue<UIComponent>();
+            var queue = new Queue<IUIComponent>();
 
             if (InsideComponent(manager, root, point)) queue.Enqueue(root);
 
@@ -88,7 +90,7 @@ namespace Fusion.Engine.Frames2.Managing
             }
         }
 
-        private static bool InsideComponent(UIManager manager, UIComponent component, Vector2 point)
+        private static bool InsideComponent(UIManager manager, IUIComponent component, Vector2 point)
         {
             if (component is IUIContainer container && !container.Placement.Clip)
             {
@@ -99,10 +101,10 @@ namespace Fusion.Engine.Frames2.Managing
             return manager.IsInsideSlotInternal(component.Placement, point);
         }
 
-        public static IEnumerable<UIComponent> DFSTraverse(UIComponent root)
+        public static IEnumerable<IUIComponent> DFSTraverse(IUIComponent root)
         {
-            var stack = new Stack<UIComponent>();
-            var stack2 = new Stack<UIComponent>();
+            var stack = new Stack<IUIComponent>();
+            var stack2 = new Stack<IUIComponent>();
             stack.Push(root);
 
             while (stack.Any())
@@ -119,7 +121,7 @@ namespace Fusion.Engine.Frames2.Managing
                 }
             }
 
-            var result = new List<UIComponent>();
+            var result = new List<IUIComponent>();
             while (stack2.Any())
             {
                 var c = stack2.Pop();
@@ -130,10 +132,10 @@ namespace Fusion.Engine.Frames2.Managing
             return result;
         }
 
-        public static IEnumerable<UIComponent> DFSTraverse(UIComponent root, Predicate<IUIContainer> shouldGoDeeper)
+        public static IEnumerable<IUIComponent> DFSTraverse(IUIComponent root, Predicate<IUIContainer> shouldGoDeeper)
         {
-            var stack = new Stack<UIComponent>();
-            var stack2 = new Stack<UIComponent>();
+            var stack = new Stack<IUIComponent>();
+            var stack2 = new Stack<IUIComponent>();
             stack.Push(root);
 
             while (stack.Any())
@@ -150,7 +152,7 @@ namespace Fusion.Engine.Frames2.Managing
                 }
             }
 
-            var result = new List<UIComponent>();
+            var result = new List<IUIComponent>();
             while (stack2.Any())
             {
                 var c = stack2.Pop();
@@ -161,12 +163,12 @@ namespace Fusion.Engine.Frames2.Managing
             return result;
         }
 
-		public static UIComponent GetLowestComponentInHierarchy( UIManager manager, IUIContainer root, Vector2 innerPoint)
+		public static IUIComponent GetLowestComponentInHierarchy( UIManager manager, IUIContainer root, Vector2 innerPoint)
 		{
-			return GetLowestComponentInHierarchy(manager, root, innerPoint, new List<UIComponent>());
+			return GetLowestComponentInHierarchy(manager, root, innerPoint, new List<IUIComponent>());
 		}
 
-		public static UIComponent GetLowestComponentInHierarchy( UIManager manager, IUIContainer root, Vector2 innerPoint, List<UIComponent> ignoreComponents )
+		public static IUIComponent GetLowestComponentInHierarchy( UIManager manager, IUIContainer root, Vector2 innerPoint, List<IUIComponent> ignoreComponents )
         {
             if (!InsideComponent(manager, root, innerPoint)) return null;
 
@@ -189,12 +191,12 @@ namespace Fusion.Engine.Frames2.Managing
             }
         }
 
-		public static UIComponent GetComponentInChildren( UIManager manager, IUIContainer root, Vector2 innerPoint )
+		public static IUIComponent GetComponentInChildren( UIManager manager, IUIContainer root, Vector2 innerPoint )
 		{
-			return GetComponentInChildren(manager, root, innerPoint, new List<UIComponent>());
+			return GetComponentInChildren(manager, root, innerPoint, new List<IUIComponent>());
 		}
 
-		public static UIComponent GetComponentInChildren( UIManager manager, IUIContainer root, Vector2 innerPoint, List<UIComponent> ignoreComponents )
+		public static IUIComponent GetComponentInChildren( UIManager manager, IUIContainer root, Vector2 innerPoint, List<IUIComponent> ignoreComponents )
 		{
 			if (!InsideComponent(manager, root, innerPoint)) return null;
 
@@ -206,7 +208,7 @@ namespace Fusion.Engine.Frames2.Managing
 				return component;
 		}
 
-		public static IEnumerable<IUIContainer> Ancestors(UIComponent component)
+		public static IEnumerable<IUIContainer> Ancestors(IUIComponent component)
         {
             if(component == null)
                 yield break;

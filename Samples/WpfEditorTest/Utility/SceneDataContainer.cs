@@ -1,5 +1,6 @@
 ﻿using Fusion.Engine.Frames2;
 using Fusion.Engine.Frames2.Containers;
+using Fusion.Engine.Frames2.Utils;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -29,7 +30,7 @@ namespace WpfEditorTest.Utility
 		public FreePlacement Scene { get; set; }
 		public bool IsDirty { get => _isDirty; set { _isDirty = value; SceneName = _sceneName; OnPropertyChanged(); ChangedDirty?.Invoke(this, _isDirty); } }
 		public double SceneZoom { get; set; }
-		public List<UIComponent> SceneSelection { get; set; }
+		public List<IUIComponent> SceneSelection { get; set; }
 		public Size SceneSize { get; set; }
 
 		#region UndoRedoStack
@@ -42,7 +43,7 @@ namespace WpfEditorTest.Utility
 		public SceneDataContainer()
 		{
 			SceneZoom = 1.0f;
-			SceneSelection = new List<UIComponent>();
+			SceneSelection = new List<IUIComponent>();
 		}
 
 		public SceneDataContainer( float width, float height ) : this()

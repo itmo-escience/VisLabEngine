@@ -12,6 +12,7 @@ using System.Text.RegularExpressions;
 using Fusion.Core.Utils;
 using Fusion.Engine.Frames2.Controllers;
 using System.Linq;
+using Fusion.Engine.Frames2.Utils;
 
 namespace Fusion.Engine.Frames2.Managing
 {
@@ -29,10 +30,10 @@ namespace Fusion.Engine.Frames2.Managing
         public bool Clip => false;
         public bool Visible => true;
         public IUIContainer Parent => null;
-        public UIComponent Component { get; private set; }
+        public IUIComponent Component { get; private set; }
 
-        public SolidBrushD2D DebugBrush => new SolidBrushD2D(Color4.White);
-        public TextFormatD2D DebugTextFormat => new TextFormatD2D("Calibri", 10);
+        public SolidBrushD2D DebugBrush { get; } = UIManager.DefaultDebugBrush;
+        public TextFormatD2D DebugTextFormat => UIManager.DefaultDebugTextFormat;
         public void DebugDraw(SpriteLayerD2D layer) {}
 
         internal RootSlot(float width, float height, IUIContainer rootContainer)
@@ -47,7 +48,7 @@ namespace Fusion.Engine.Frames2.Managing
         public event PropertyChangedEventHandler PropertyChanged;
         public event EventHandler<SlotAttachmentChangedEventArgs> ComponentAttached;
 
-        public void Attach(UIComponent component)
+        public void Attach(IUIComponent component)
         {
             var s = component.Placement;
 
@@ -64,7 +65,7 @@ namespace Fusion.Engine.Frames2.Managing
                 }
             }
 
-            UIComponent old = null;
+            IUIComponent old = null;
             if (Component != null)
             {
                 old = Component;
@@ -91,6 +92,11 @@ namespace Fusion.Engine.Frames2.Managing
         private readonly Dictionary<ISlot, Matrix3x2> _globalTransforms = new Dictionary<ISlot, Matrix3x2>();
         private readonly Dictionary<ISlot, bool> _dirtyTransforms = new Dictionary<ISlot, bool>();
 
+        public static readonly SolidBrushD2D DefaultDebugBrush = new SolidBrushD2D(new Color4(0, 1.0f, 0, 1.0f));
+        public static readonly SolidBrushD2D ControllerSlotDebugBrush = new SolidBrushD2D(Color4.White);
+        public static readonly TextFormatD2D DefaultDebugTextFormat = new TextFormatD2D("Calibri", 10);
+        public static readonly float DefaultContainerSize = 50;
+
         public UIManager(RenderSystem rs)
         {
             var root = new FreePlacement();
@@ -113,12 +119,12 @@ namespace Fusion.Engine.Frames2.Managing
         
         public void LoadRootFromFile(string filePath)
         {
-            UIComponentSerializer.Read(filePath, out UIComponent root);
+            UIComponentSerializer.Read(filePath, out IUIComponent root);
             _rootSlot.Attach(root);
             UIEventProcessor.Root = (IUIContainer)root;
         }
 
-        public UIComponent GetComponentByName(string name) => UIHelper.BFSTraverse(Root).Where(child => child.Name == name).FirstOrDefault();
+        public IUIComponent GetComponentByName(string name) => UIHelper.BFSTraverse(Root).Where(child => child.Name == name).FirstOrDefault();
 
         public void Update(GameTime gameTime)
         {
@@ -261,7 +267,7 @@ namespace Fusion.Engine.Frames2.Managing
             layer.Draw(TransformCommand.Identity);
         }
 
-        private void DrawRecursive(SpriteLayerD2D layer, UIComponent component)
+        private void DrawRecursive(SpriteLayerD2D layer, IUIComponent component)
         {
 			if (component == null || !_globalTransforms.TryGetValue(component.Placement, out var globalTransform))
 				return;
@@ -319,7 +325,7 @@ namespace Fusion.Engine.Frames2.Managing
             layer.Draw(new Text(debugText, new RectangleF(b.X, b.Y - symbolSize, symbolSize * debugText.Length, symbolSize), slot.DebugTextFormat, slot.DebugBrush));
         }
 
-        public static bool IsComponentNameValid(string name, UIComponent root, UIComponent ignoredComponent = null)
+        public static bool IsComponentNameValid(string name, IUIComponent root, IUIComponent ignoredComponent = null)
         {
             foreach (var component in UIHelper.BFSTraverse(root))
             {
@@ -329,7 +335,7 @@ namespace Fusion.Engine.Frames2.Managing
             return true;
         }
 
-        public static void MakeComponentNameValid(UIComponent component, UIComponent root, UIComponent ignoredComponent = null)
+        public static void MakeComponentNameValid(IUIComponent component, IUIComponent root, IUIComponent ignoredComponent = null)
         {
 			if (component.Name == null)
 				component.Name = component.GetType().Name;

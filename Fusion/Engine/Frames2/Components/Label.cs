@@ -3,11 +3,12 @@ using System.Xml.Serialization;
 using Fusion.Core.Mathematics;
 using Fusion.Engine.Common;
 using Fusion.Engine.Frames2.Events;
+using Fusion.Engine.Frames2.Utils;
 using Fusion.Engine.Graphics.SpritesD2D;
 
 namespace Fusion.Engine.Frames2.Components
 {
-    public sealed class Label : UIComponent
+    public sealed class Label : IUIComponent
     {
         private ISlot _placement;
         [XmlIgnore]
@@ -158,6 +159,9 @@ namespace Fusion.Engine.Frames2.Components
 		public void DefaultInit()
 		{
 			Name = this.GetType().Name;
-		}
+            DesiredWidth = 100;
+            DesiredHeight = 25;
+            Text = "Label";
+        }
 	}
 }

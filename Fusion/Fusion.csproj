@@ -131,6 +131,7 @@
     <Reference Include="System.ServiceModel" />
     <Reference Include="System.Windows" />
     <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.Xaml" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
@@ -268,6 +269,7 @@
     <Compile Include="Engine\Common\Commands\CrashServer.cs" />
     <Compile Include="Engine\Common\AtomAttribute.cs" />
     <Compile Include="Engine\Common\UserInterface.Internal.cs" />
+    <Compile Include="Engine\Frames2\Controllers\CheckBoxController.cs" />
     <Compile Include="Engine\Frames2\Controllers\RadioButtonController.cs" />
     <Compile Include="Engine\Frames2\Controllers\RadioButtonGroup.cs" />
     <Compile Include="Engine\Frames2\Containers\AnchorBox.cs" />
@@ -282,15 +284,17 @@
     <Compile Include="Engine\Frames2\Controllers\TextBoxController.cs" />
     <Compile Include="Engine\Frames2\Managing\EditionSceneManager.cs" />
     <Compile Include="Engine\Frames2\Managing\UIHelper.cs" />
-    <Compile Include="Engine\Frames2\IUIDrawable.cs" />
+    <Compile Include="Engine\Frames2\Utils\IUIDrawable.cs" />
     <Compile Include="Engine\Frames2\Controllers\UIStyleManager.cs" />
-    <Compile Include="Engine\Frames2\UISlot.cs" />
-    <Compile Include="Engine\Frames2\UIComponent.cs" />
+    <Compile Include="Engine\Frames2\Utils\ParentFillingSlot.cs" />
+    <Compile Include="Engine\Frames2\Utils\SimpleControllerSlot.cs" />
+    <Compile Include="Engine\Frames2\Utils\UISlot.cs" />
+    <Compile Include="Engine\Frames2\Utils\UIComponent.cs" />
     <Compile Include="Engine\Frames2\Controllers\UIController.cs" />
     <Compile Include="Engine\Frames2\Events\IUIInputAware.cs" />
     <Compile Include="Engine\Frames2\Components\Label.cs" />
     <Compile Include="Engine\Frames2\Managing\UIAnimator.cs" />
-    <Compile Include="Engine\Frames2\UIContainer.cs" />
+    <Compile Include="Engine\Frames2\Containers\UIContainer.cs" />
     <Compile Include="Engine\Frames2\Events\UIEventProcessor.cs" />
     <Compile Include="Engine\Frames2\Managing\UIManager.cs" />
     <Compile Include="Engine\Frames2\Controllers\ButtonController.cs" />

@@ -1,5 +1,6 @@
 ﻿using Fusion.Engine.Frames2;
 using Fusion.Engine.Frames2.Controllers;
+using Fusion.Engine.Frames2.Utils;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
@@ -13,11 +14,11 @@ namespace WpfEditorTest.WPFConverters
 	class DictionaryConverter : IValueConverter
 	{
 		private Dictionary<string, IUIStyle> _styles = new Dictionary<string, IUIStyle>();
-		private UIComponent _component;
+		private IUIComponent _component;
 
 		public object Convert( object value, Type targetType, object parameter, CultureInfo culture )
 		{
-			 _component = value as UIComponent;
+			 _component = value as IUIComponent;
 			if (_component.GetType().GetProperty("Style") != null)
 			{
 				_styles = UIStyleManager.Instance.GetStyles(_component.GetType());

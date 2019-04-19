@@ -4,11 +4,12 @@ using Fusion.Core.Mathematics;
 using Fusion.Drivers.Graphics;
 using Fusion.Engine.Common;
 using Fusion.Engine.Frames2.Events;
+using Fusion.Engine.Frames2.Utils;
 using Fusion.Engine.Graphics.SpritesD2D;
 
 namespace Fusion.Engine.Frames2.Components
 {
-    public sealed class Image : UIComponent
+    public sealed class Image : IUIComponent
     {
         [XmlIgnore]
         public ISlot Placement { get; set; }
@@ -86,6 +87,8 @@ namespace Fusion.Engine.Frames2.Components
 		public void DefaultInit()
 		{
 			Name = this.GetType().Name;
+            DesiredWidth = 100;
+            DesiredHeight = 100;
 		}
 	}
 }

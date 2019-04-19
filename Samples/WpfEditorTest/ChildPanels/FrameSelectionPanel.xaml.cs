@@ -11,6 +11,7 @@ using Matrix3x2 = Fusion.Core.Mathematics.Matrix3x2;
 using Fusion.Engine.Frames2.Managing;
 using Fusion.Engine.Frames2.Containers;
 using WpfEditorTest.FrameSelection;
+using Fusion.Engine.Frames2.Utils;
 
 namespace WpfEditorTest.Utility
 {
@@ -19,7 +20,7 @@ namespace WpfEditorTest.Utility
 	/// </summary>
 	public partial class FrameSelectionPanel : UserControl
 	{
-		private UIComponent _selectedFrame;
+		private IUIComponent _selectedFrame;
 		private double _widthBuffer;
 		private double _heightBuffer;
 
@@ -29,7 +30,7 @@ namespace WpfEditorTest.Utility
 		private bool _isInDragField;
 		private UIManager _uiManager;
 
-		public UIComponent SelectedFrame
+		public IUIComponent SelectedFrame
 		{
 			get => _selectedFrame;
 			set
@@ -65,7 +66,7 @@ namespace WpfEditorTest.Utility
 			}
 		}
 
-		private void ComponentDimensionsChange( object sender, UIComponent component )
+		private void ComponentDimensionsChange( object sender, IUIComponent component )
 		{
 			var selected = _selectedFrame;
 			if (_locked || selected == null) return;

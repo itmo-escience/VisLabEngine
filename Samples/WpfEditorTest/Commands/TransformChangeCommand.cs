@@ -1,5 +1,6 @@
 ﻿using Fusion.Core.Mathematics;
 using Fusion.Engine.Frames2;
+using Fusion.Engine.Frames2.Utils;
 using System;
 using System.Threading;
 

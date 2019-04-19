@@ -3,11 +3,12 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using Fusion.Core.Mathematics;
 using Fusion.Engine.Common;
+using Fusion.Engine.Frames2.Containers;
 using Fusion.Engine.Frames2.Events;
 
-namespace Fusion.Engine.Frames2
+namespace Fusion.Engine.Frames2.Utils
 {
-    public interface UIComponent : IUIDrawable, INotifyPropertyChanged //, IUIInputAware
+    public interface IUIComponent : IUIDrawable, INotifyPropertyChanged //, IUIInputAware
     {
         ISlot Placement { get; set; }
 
@@ -21,12 +22,14 @@ namespace Fusion.Engine.Frames2
         object Tag { get; set; }
         string Name { get; set; }
 
+        void DefaultInit();
+
         void Update(GameTime gameTime);
 	}
 
     public static class UIComponentExtensions
     {
-        public static IUIContainer Parent(this UIComponent component) => component.Placement?.Parent;
+        public static IUIContainer Parent(this IUIComponent component) => component.Placement?.Parent;
     }
 
     public static class UINameManager

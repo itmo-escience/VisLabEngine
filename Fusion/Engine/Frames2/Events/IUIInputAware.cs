@@ -1,5 +1,6 @@
 ﻿using System;
 using Fusion.Core.Mathematics;
+using Fusion.Engine.Frames2.Utils;
 using Fusion.Engine.Input;
 
 namespace Fusion.Engine.Frames2.Events
@@ -27,30 +28,30 @@ namespace Fusion.Engine.Frames2.Events
         event LeaveEvent Leave;
         event ScrollEvent Scroll;
     }
-    public delegate void KeyDownEvent(UIComponent sender, KeyEventArgs e);
-    public delegate void KeyUpEvent(UIComponent sender, KeyEventArgs e);
-    public delegate void KeyPressEvent(UIComponent sender, KeyPressEventArgs e);
+    public delegate void KeyDownEvent(IUIComponent sender, KeyEventArgs e);
+    public delegate void KeyUpEvent(IUIComponent sender, KeyEventArgs e);
+    public delegate void KeyPressEvent(IUIComponent sender, KeyPressEventArgs e);
 
-    public delegate void FocusEvent(UIComponent sender);
-    public delegate void BlurEvent(UIComponent sender);
+    public delegate void FocusEvent(IUIComponent sender);
+    public delegate void BlurEvent(IUIComponent sender);
 
 
-    public delegate void MouseMoveEvent(UIComponent sender, MoveEventArgs e);
+    public delegate void MouseMoveEvent(IUIComponent sender, MoveEventArgs e);
 
     //mouse + touch START
-    public delegate void MouseDragEvent(UIComponent sender, DragEventArgs e);
+    public delegate void MouseDragEvent(IUIComponent sender, DragEventArgs e);
 
-    public delegate void MouseDownEvent(UIComponent sender, ClickEventArgs e);
-    public delegate void MouseUpEvent(UIComponent sender, ClickEventArgs e);
+    public delegate void MouseDownEvent(IUIComponent sender, ClickEventArgs e);
+    public delegate void MouseUpEvent(IUIComponent sender, ClickEventArgs e);
 
-    public delegate void ClickEvent(UIComponent sender, ClickEventArgs e);
-    public delegate void DoubleClickEvent(UIComponent sender, ClickEventArgs e);
+    public delegate void ClickEvent(IUIComponent sender, ClickEventArgs e);
+    public delegate void DoubleClickEvent(IUIComponent sender, ClickEventArgs e);
 
-    public delegate void EnterEvent(UIComponent sender);
-    public delegate void LeaveEvent(UIComponent sender);
+    public delegate void EnterEvent(IUIComponent sender);
+    public delegate void LeaveEvent(IUIComponent sender);
     //mouse + touch END
 
-    public delegate void ScrollEvent(UIComponent sender, ScrollEventArgs e);
+    public delegate void ScrollEvent(IUIComponent sender, ScrollEventArgs e);
 
 
     public class BubblingEventArgs : EventArgs

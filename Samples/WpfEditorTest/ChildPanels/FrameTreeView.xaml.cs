@@ -9,8 +9,10 @@ using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
 using Fusion.Engine.Frames2;
+using Fusion.Engine.Frames2.Containers;
 using Fusion.Engine.Frames2.Controllers;
 using Fusion.Engine.Frames2.Managing;
+using Fusion.Engine.Frames2.Utils;
 using WpfEditorTest.Commands;
 using WpfEditorTest.Utility;
 using CommandManager = WpfEditorTest.Commands.CommandManager;
@@ -24,8 +26,8 @@ namespace WpfEditorTest.Utility
     {
 		private IUIModifiableContainer<ISlot> _scene { get; set; }
 
-        private UIComponent _selectedFrame;
-        public UIComponent SelectedFrame
+        private IUIComponent _selectedFrame;
+        public IUIComponent SelectedFrame
         {
             get => _selectedFrame;
             set
@@ -35,7 +37,7 @@ namespace WpfEditorTest.Utility
             }
         }
 
-        public EventHandler<UIComponent> SelectedFrameChangedInUI;
+        public EventHandler<IUIComponent> SelectedFrameChangedInUI;
 		public EventHandler<UIController> ControllerSlotSelected;
 		public EventHandler RequestFrameDeletionInUI;
 
@@ -92,7 +94,7 @@ namespace WpfEditorTest.Utility
 			}
 
 
-			var component = (UIComponent)(sender as TextBlock).Tag;
+			var component = (IUIComponent)(sender as TextBlock).Tag;
 
 			SelectedFrameChangedInUI?.Invoke(this, component);
 
@@ -114,7 +116,7 @@ namespace WpfEditorTest.Utility
 			}
 		}
 
-		public void SetSelected( ItemsControl parent, UIComponent child )
+		public void SetSelected( ItemsControl parent, IUIComponent child )
 		{
 			var currentFrame = child;
 			List<object> components = new List<object>();
@@ -187,7 +189,7 @@ namespace WpfEditorTest.Utility
 
 			e.Effects = DragDropEffects.None;
 
-			UIComponent component = CreateComponentFromDrop(e.Data);
+			IUIComponent component = CreateComponentFromDrop(e.Data);
 
 			if (component != null && treeViewItemHolder != this.initTreeViewItemHolder)
 			{
@@ -243,22 +245,22 @@ namespace WpfEditorTest.Utility
 			e.Handled = true;
 			var treeViewItemHolder = sender as TextBlock;
 
-			UIComponent component = CreateComponentFromDrop(e.Data);
+			IUIComponent component = CreateComponentFromDrop(e.Data);
 
-				if (component != null && treeViewItemHolder != this.initTreeViewItemHolder && treeViewItemHolder.Tag is UIComponent)
+				if (component != null && treeViewItemHolder != this.initTreeViewItemHolder && treeViewItemHolder.Tag is IUIComponent)
 				{
 					IEditorCommand command = null;
-					int index = (treeViewItemHolder.Tag as UIComponent).Parent().IndexOf((treeViewItemHolder.Tag as UIComponent));
+					int index = (treeViewItemHolder.Tag as IUIComponent).Parent().IndexOf((treeViewItemHolder.Tag as IUIComponent));
 					switch (IsOnEdges(treeViewItemHolder, e.GetPosition(treeViewItemHolder)))
 					{
 						case -1:
 							{
-								command = new UIComponentParentChangeCommand(component, (treeViewItemHolder.Tag as UIComponent).Parent() as IUIModifiableContainer<ISlot>, component.Parent() as IUIModifiableContainer<ISlot>, index);
+								command = new UIComponentParentChangeCommand(component, (treeViewItemHolder.Tag as IUIComponent).Parent() as IUIModifiableContainer<ISlot>, component.Parent() as IUIModifiableContainer<ISlot>, index);
 								break;
 							}
 						case 1:
 							{
-								command = new UIComponentParentChangeCommand(component, (treeViewItemHolder.Tag as UIComponent).Parent() as IUIModifiableContainer<ISlot>, component.Parent() as IUIModifiableContainer<ISlot>, index+1);
+								command = new UIComponentParentChangeCommand(component, (treeViewItemHolder.Tag as IUIComponent).Parent() as IUIModifiableContainer<ISlot>, component.Parent() as IUIModifiableContainer<ISlot>, index+1);
 								break;
 							}
 						case 0:
@@ -272,7 +274,7 @@ namespace WpfEditorTest.Utility
 					{
 						CommandManager.Instance.Execute(command);
 
-					foreach (UIComponent child in UIHelper.BFSTraverse(component))
+					foreach (IUIComponent child in UIHelper.BFSTraverse(component))
 					{
 						UIManager.MakeComponentNameValid(child, _scene, child);
 					}
@@ -299,14 +301,14 @@ namespace WpfEditorTest.Utility
 		{
 
 			IEditorCommand command;
-			UIComponent component = CreateComponentFromDrop(e.Data);
+			IUIComponent component = CreateComponentFromDrop(e.Data);
 
 			if (component != null)
 			{
 				command = new UIComponentParentChangeCommand(component, _scene, component.Parent() as IUIModifiableContainer<ISlot>);
 				CommandManager.Instance.Execute(command);
 
-				foreach (UIComponent child in UIHelper.BFSTraverse(component))
+				foreach (IUIComponent child in UIHelper.BFSTraverse(component))
 				{
 					UIManager.MakeComponentNameValid(child, _scene, child);
 				}
@@ -315,7 +317,7 @@ namespace WpfEditorTest.Utility
 			customAdorner.Visibility = Visibility.Hidden;
 		}
 
-		private UIComponent CreateComponentFromDrop( IDataObject data )
+		private IUIComponent CreateComponentFromDrop( IDataObject data )
 		{
 			if (data.GetDataPresent(DataFormats.StringFormat))
 			{
@@ -331,18 +333,15 @@ namespace WpfEditorTest.Utility
 			}
 			else
 			{
-				if (data.GetData(DataFormats.FileDrop) is UIComponent)
+				if (data.GetData(DataFormats.FileDrop) is IUIComponent)
 				{
-					return data.GetData(DataFormats.FileDrop) as UIComponent;
+					return data.GetData(DataFormats.FileDrop) as IUIComponent;
 				}
 				else
 				{
 					var component =
-					 Activator.CreateInstance(data.GetData(DataFormats.FileDrop) as Type) as UIComponent;
-					if (component is UIController controller)
-					{
-						controller.DefaultInit();
-					}
+					 Activator.CreateInstance(data.GetData(DataFormats.FileDrop) as Type) as IUIComponent;
+					component.DefaultInit();
 					return component;
 				}
 			}
@@ -353,9 +352,9 @@ namespace WpfEditorTest.Utility
 			//_parentHighlightPanel.SelectedFrame = null;
 		}
 
-		public UIComponent CreateFrameFromFile( string filePath )
+		public IUIComponent CreateFrameFromFile( string filePath )
 		{
-			UIComponent createdFrame = null;
+			IUIComponent createdFrame = null;
 			try
 			{
 				Fusion.Core.Utils.UIComponentSerializer.Read(filePath, out createdFrame);
