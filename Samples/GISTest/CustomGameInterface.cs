@@ -167,46 +167,7 @@ namespace GISTest
 
             #region UISerializationTesting
 
-            var testcontainer = new FreePlacement()
-            {
-                Name = "TestContainer",
-                DesiredWidth = 500,
-                DesiredHeight = 500,
-            };
-
-            //var testImage = new Image(image);
-            var testText = new Label("TestText", "Calibri", 14);
-            var testBorder = new Border();
-            var testFreePlacement = new FreePlacement()
-            {
-                Name = "TestFreePlacement",
-                DesiredWidth = 100,
-                DesiredHeight = 100,
-            };
-            var testFreePlacement2 = new FreePlacement()
-            {
-                Name = "TestFreePlacement2",
-                DesiredWidth = 10,
-                DesiredHeight = 10,
-            };
-
-            //var testImageSlot = testFreePlasement.Insert(testImage, 0);
-            testcontainer.Insert(testFreePlacement, 0);
-            testFreePlacement.Insert(testFreePlacement2, 0);
-            var testTextSlot = testcontainer.Insert(testText, 1);
-            var testBorderSlot = testcontainer.Insert(testBorder, 2);
-            //testcontainer.Alignment = VerticalBox.HorizontalAlignment.Right;
-            //testImageSlot.X = 10;
-            //testImageSlot.Y = 10;
-            /*testTextSlot.X = 20;
-            testTextSlot.Y = 20;
-            testBorderSlot.X = 30;
-            testBorderSlot.Y = 30;*/
-
-            var button = new RadioButtonController(new Border(), RadioButtonManager.CreateNewGroup("TestGroup"));
-
-            string str = UIComponentSerializer.WriteToString(testcontainer);
-            var comp = UIComponentSerializer.ReadFromString(str);
+            
 
             #endregion
 
