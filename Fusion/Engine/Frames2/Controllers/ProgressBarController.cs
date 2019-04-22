@@ -73,7 +73,7 @@ namespace Fusion.Engine.Frames2.Controllers
             {
                 var trackRatio = (Value - MinValue) / (MaxValue - MinValue);
                 Track.X = 0;
-                Track.Width = trackRatio * DesiredWidth;
+                Track.Width = trackRatio * Placement.Width;
             }
             else
             {
@@ -88,19 +88,19 @@ namespace Fusion.Engine.Frames2.Controllers
                 else
                 {
                     var trackRatio = (_indeterminateValue - MinValue) / (MaxValue - MinValue);
-                    Track.X = trackRatio * DesiredWidth;
+                    Track.X = trackRatio * Placement.Width;
                 }
 
                 var trackEndValue = _indeterminateValue + _indeterminateValuePart * (MaxValue - MinValue);
 
                 if (trackEndValue > MaxValue)
                 {
-                    Track.Width = DesiredWidth - Track.X;
+                    Track.Width = Placement.Width - Track.X;
                 }
                 else
                 {
                     var trackRatio = (trackEndValue - MinValue) / (MaxValue - MinValue);
-                    Track.Width = trackRatio * DesiredWidth - Track.X;
+                    Track.Width = trackRatio * Placement.Width - Track.X;
                 }
             }
         }

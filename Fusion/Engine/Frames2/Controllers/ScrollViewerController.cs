@@ -58,11 +58,11 @@ namespace Fusion.Engine.Frames2.Controllers
 
         public override void Update(GameTime gameTime)
         {
-            bool needVerticalScrollBar = Content.Component.DesiredHeight > DesiredHeight;
-            float borderX = !needVerticalScrollBar ? DesiredWidth : DesiredWidth - _verticalScrollBar.DesiredWidth;
+            bool needVerticalScrollBar = Content.Component.DesiredHeight > Placement.Height;
+            float borderX = !needVerticalScrollBar ? Placement.Width : Placement.Width - _verticalScrollBar.DesiredWidth;
 
             bool needHorizontalScrollBar = Content.Component.DesiredWidth > borderX;
-            float borderY = !needHorizontalScrollBar ? DesiredHeight : DesiredHeight - _horizontalScrollBar.DesiredHeight;
+            float borderY = !needHorizontalScrollBar ? Placement.Height : Placement.Height - _horizontalScrollBar.DesiredHeight;
 
             VerticalScrollBar.X = borderX;
             VerticalScrollBar.Width = _verticalScrollBar.DesiredWidth;
