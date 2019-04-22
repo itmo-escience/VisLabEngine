@@ -16,14 +16,26 @@ namespace Fusion.Engine.Graphics.SpritesD2D
 
         internal TextLayoutD2D(string text, TextFormatD2D textFormat, float maxWidth, float maxHeight)
         {
-            var size = TextLayoutFactory.Instance.MeasureString(text, textFormat, maxWidth, maxHeight);
+            var mw = Math.Max(maxWidth, 1);
+            var mh = Math.Max(maxHeight, 1);
+            var size = TextLayoutFactory.Instance.MeasureString(text, textFormat, mw, mh);
 
             Text = text;
             TextFormat = textFormat;
             Width = size.Width;
             Height = size.Height;
-            MaxWidth = maxWidth;
-            MaxHeight = maxHeight;
+            MaxWidth = mw;
+            MaxHeight = mh;
+        }
+
+        internal TextLayoutD2D(TextLayoutD2D source)
+        {
+            Text = source.Text;
+            Width = source.Width;
+            Height = source.Height;
+            MaxWidth = source.MaxWidth;
+            MaxHeight = source.MaxHeight;
+            TextFormat = new TextFormatD2D(source.TextFormat);
         }
 
         public bool Equals(TextLayoutD2D other)
@@ -34,7 +46,8 @@ namespace Fusion.Engine.Graphics.SpritesD2D
                    && Width.Equals(other.Width)
                    && Height.Equals(other.Height)
                    && MaxWidth.Equals(other.MaxWidth)
-                   && MaxHeight.Equals(other.MaxHeight);
+                   && MaxHeight.Equals(other.MaxHeight)
+                   && TextFormat.Equals(other.TextFormat);
         }
 
         public override bool Equals(object obj)
@@ -91,7 +104,9 @@ namespace Fusion.Engine.Graphics.SpritesD2D
             {
                 var tf = _formatFactory.CreateTextFormat(layout.TextFormat);
                 result = new TextLayout(_factory, layout.Text, tf, layout.MaxWidth, layout.MaxHeight);
-                _cache[layout] = result;
+
+                // Create copy to avoid key modification
+                _cache[new TextLayoutD2D(layout)] = result;
             }
 
             return result;

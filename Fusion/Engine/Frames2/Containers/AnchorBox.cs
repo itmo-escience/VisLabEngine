@@ -147,7 +147,6 @@ namespace Fusion.Engine.Frames2.Containers
                 if (_right < 0 && value < 0)
                 {
                     _right = 0;
-                    return;
                 }
 
                 _left = value;
@@ -161,7 +160,6 @@ namespace Fusion.Engine.Frames2.Containers
 	            if (_bottom < 0 && value < 0)
 	            {
 	                _bottom = 0;
-	                return;
 	            }
 
 	            _top = value;
@@ -175,7 +173,6 @@ namespace Fusion.Engine.Frames2.Containers
 		        if (_left < 0 && value < 0)
 		        {
 		            _left = 0;
-		            return;
 		        }
 
 		        _right = value;
@@ -189,7 +186,6 @@ namespace Fusion.Engine.Frames2.Containers
 		        if (_top < 0 && value < 0)
 		        {
 		            _top = 0;
-		            return;
 		        }
 
 		        _bottom = value;

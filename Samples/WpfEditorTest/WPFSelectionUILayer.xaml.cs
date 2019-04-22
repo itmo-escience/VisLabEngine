@@ -28,6 +28,8 @@ namespace WpfEditorTest
 	/// </summary>
 	public partial class WPFSelectionUILayer : Grid
 	{
+		public static RoutedCommand DoubleClickCmd = new RoutedCommand();
+
 		public Dictionary<IUIComponent, FrameSelectionPanel> FrameSelectionPanelList = new Dictionary<IUIComponent, FrameSelectionPanel>();
 		private List<StickCoordinateY> StickingCoordsY = new List<StickCoordinateY>();
 		private List<StickCoordinateX> StickingCoordsX = new List<StickCoordinateX>();
@@ -349,17 +351,28 @@ namespace WpfEditorTest
 
 		public IUIComponent GetChildFrameOnScene( Point mousePos, bool ignoreScene, bool ignoreSelection )
 		{
+			IUIContainer searchArea;
 			IUIComponent hoveredFrame;
+
+			if (SelectionManager.Instance.SelectedFrames.Count>0)
+			{
+				searchArea = SelectionManager.Instance.SelectedFrames.First().Placement.Parent;
+			}
+			else
+			{
+				searchArea = SceneFrame;
+			}
+
 			if (ignoreSelection)
 			{
-				hoveredFrame = UIHelper.GetComponentInChildren(_uiManager, SceneFrame, new Vector2((float)mousePos.X, (float)mousePos.Y), SelectionManager.Instance.SelectedFrames);
+				hoveredFrame = UIHelper.GetComponentInChildren(_uiManager, searchArea, new Vector2((float)mousePos.X, (float)mousePos.Y), SelectionManager.Instance.SelectedFrames);
 				if (hoveredFrame != null && SelectionManager.Instance.SelectedFrames.Contains(hoveredFrame))
 				{
 					hoveredFrame = hoveredFrame.Parent() as IUIModifiableContainer<ISlot>;
 				}
 			}
 			else
-				hoveredFrame = UIHelper.GetComponentInChildren(_uiManager, SceneFrame, new Vector2((float)mousePos.X, (float)mousePos.Y));
+				hoveredFrame = UIHelper.GetComponentInChildren(_uiManager, searchArea, new Vector2((float)mousePos.X, (float)mousePos.Y));
 
 			if (ignoreScene)
 			{
@@ -486,11 +499,32 @@ namespace WpfEditorTest
 
 		private void LocalGrid_MouseLeftButtonDown( object sender, MouseButtonEventArgs e )
 		{
-			IUIComponent hovered;
-			if (DeepClick())
-				hovered = GetChildFrameOnScene(e.GetPosition(this), true, false);
+			IUIComponent hovered = null;
+			var mousePos = e.GetPosition(this);
+
+			if (e.ChangedButton == MouseButton.Left && e.ClickCount >= 2)
+			{
+				if (SelectionManager.Instance.SelectedFrames.Count>0)
+				{
+					var selected = SelectionManager.Instance.SelectedFrames.First();
+
+					if (selected is IUIContainer container)
+					{
+						if (DeepClick())
+							hovered = UIHelper.GetComponentInChildren(_uiManager, container, new Vector2((float)mousePos.X, (float)mousePos.Y));
+						else
+							hovered = UIHelper.GetLowestComponentInHierarchy(_uiManager, container, new Vector2((float)mousePos.X, (float)mousePos.Y)); 
+					} 
+				}
+			}
 			else
-				hovered = GetHoveredFrameOnScene(e.GetPosition(this), true, false);
+			{
+				if (DeepClick())
+					hovered = GetChildFrameOnScene(mousePos, true, false);
+				else
+					hovered = GetHoveredFrameOnScene(mousePos, true, false);
+			}
+
 
 
 			var enableSelection = true;
@@ -531,7 +565,8 @@ namespace WpfEditorTest
 					}
 					else
 					{
-						if (!SelectionManager.Instance.SelectedFrames.Contains(hovered) && !FrameSelectionPanelList.Any(fsp => fsp.Value.MousePressed))
+						if (!SelectionManager.Instance.SelectedFrames.Contains(hovered)
+							/*&& !FrameSelectionPanelList.Any(fsp => fsp.Value.MousePressed)*/)
 						{
 							if (hovered.Parent() is UIController)
 								hovered = hovered.Parent();
@@ -542,6 +577,16 @@ namespace WpfEditorTest
 					if (command != null)
 					{
 						CommandManager.Instance.ExecuteWithoutSettingDirty(command);
+
+						if (hovered != null && FrameSelectionPanelList.ContainsKey(hovered))
+						{
+							var panel = FrameSelectionPanelList[hovered];
+
+							if (panel != null)
+								panel.MousePressed = true;
+							PrepareStickingCoords();
+							CheckForStickingLines();
+						}
 					}
 				}
 				else if(!FrameSelectionPanelList.Any(fsp => fsp.Value.MousePressed))
@@ -614,7 +659,7 @@ namespace WpfEditorTest
 
             foreach (var panel in FrameSelectionPanelList.Values)
             {
-                var release = this.ReleaseFrame(mousePosition, panel);
+                var release = this.ReleaseFrame(mousePosition, panel, panel.IsReadyToBeReparented);
                 if(!release.IsEmpty)
                     group.Append(release);
             }
@@ -638,24 +683,34 @@ namespace WpfEditorTest
 			{
 				RecalculateSelectionSize(e.MouseDevice.GetPosition(this));
 			}
-			else if (FrameSelectionPanelList.Any(fsp => fsp.Value.MousePressed))
+			else if (FrameSelectionPanelList.Any(fsp => fsp.Value.MousePressed) && !AreaSelectionEnabled)
 			{
 				var movedPanel = FrameSelectionPanelList.FirstOrDefault(fsp => fsp.Value.MousePressed).Value;
 				if (!movedPanel.IsInDragField && (Math.Abs(_deltaX) > float.Epsilon || Math.Abs(_deltaY) > float.Epsilon))
 				{
-					foreach (var panel in FrameSelectionPanelList.Values)
+					if (NeedAreaSelection())
 					{
-						//this.MoveFrameToDragField(panel.SelectedFrame);
-						panel.IsInDragField = true;
+						AreaSelectionEnabled = true;
 					}
-					FrameDragsPanel.SelectedGroupInitSize = new Size(FrameDragsPanel.Width, FrameDragsPanel.Height);
-					FrameDragsPanel.SelectedGroupInitPosition = new Point(FrameDragsPanel.RenderTransform.Value.OffsetX, FrameDragsPanel.RenderTransform.Value.OffsetY);
+					else
+					{
+						foreach (var panel in FrameSelectionPanelList.Values)
+						{
+							//this.MoveFrameToDragField(panel.SelectedFrame);
+							panel.IsInDragField = true;
+
+							panel.IsReadyToBeReparented = NeedReparenting();
+						}
+						FrameDragsPanel.SelectedGroupInitSize = new Size(FrameDragsPanel.Width, FrameDragsPanel.Height);
+						FrameDragsPanel.SelectedGroupInitPosition = new Point(FrameDragsPanel.RenderTransform.Value.OffsetX, FrameDragsPanel.RenderTransform.Value.OffsetY);
+
+					}
 				}
-				else if (Math.Abs(_deltaX) > float.Epsilon || Math.Abs(_deltaY) > float.Epsilon)
+				else if ((Math.Abs(_deltaX) > float.Epsilon || Math.Abs(_deltaY) > float.Epsilon))
 				{
 					RecalculateSelectionPosition(e.MouseDevice.GetPosition(this));
 				}
-				if (movedPanel.IsInDragField || PaletteWindow.SelectedFrameTemplate != null)
+				if (movedPanel.IsInDragField && movedPanel.IsReadyToBeReparented || PaletteWindow.SelectedFrameTemplate != null)
 				{
 					var hovered = GetHoveredFrameOnScene(e.GetPosition(this), true,true);
 					_parentHighlightPanel.SelectedFrame = hovered;
@@ -947,27 +1002,46 @@ namespace WpfEditorTest
 
 		private bool NeedReparenting()
 		{
-			return !(Keyboard.IsKeyDown(Key.LeftAlt) || Keyboard.IsKeyDown(Key.RightAlt));
+			return Keyboard.IsKeyDown(Key.LeftAlt) || Keyboard.IsKeyDown(Key.RightAlt);
+		}
+
+		private bool NeedAreaSelection()
+		{
+			return Keyboard.IsKeyDown(Key.LeftCtrl) || Keyboard.IsKeyDown(Key.RightCtrl);
 		}
 
 		private void AreaSelectionEnd( List<IUIComponent> selectedFrames )
 		{
 			AreaSelectionEnabled = false;
+
+			IUIContainer searchArea;
+
+			if (SelectionManager.Instance.SelectedFrames.Count > 0)
+			{
+				var component = SelectionManager.Instance.SelectedFrames.First();
+
+				searchArea = (component is IUIContainer container) ? container : component.Placement.Parent;
+			}
+			else
+			{
+				searchArea = SceneFrame;
+			}
+
 			if (_selectionRectangle != null)
 			{
-				var selectedframes = new List<IUIComponent>(selectedFrames);
+				var selectedframes = new List<IUIComponent>(/*selectedFrames*/);
 				Fusion.Core.Mathematics.RectangleF selectedArea = new Fusion.Core.Mathematics.RectangleF(
 						(int)Canvas.GetLeft(_selectionRectangle),
 						(int)Canvas.GetTop(_selectionRectangle),
 						(int)_selectionRectangle.Width,
 						(int)_selectionRectangle.Height
 					);
-				foreach (IUIComponent frame in SceneFrame.GetChildren())
+				foreach (IUIComponent frame in searchArea.GetChildren())
 				{
-					bool contains;
+					bool intersects;
 					var bb = _uiManager.BoundingBox(frame.Placement);
-					selectedArea.Contains(ref bb, out contains);
-					if (contains && !selectedframes.Contains(frame))
+					selectedArea.Intersects(ref bb, out intersects);
+					if (intersects && !selectedframes.Contains(frame))
 					{
 						selectedframes.Add(frame);
 					}
@@ -1028,5 +1102,10 @@ namespace WpfEditorTest
 		    }
 		    _parentHighlightPanel.SelectedFrame = null;
 		}
-    }
+
+		private void ExecutedDoubleClickCommand( object sender, ExecutedRoutedEventArgs e )
+		{
+			
+		}
+	}
 }
