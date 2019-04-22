@@ -176,6 +176,7 @@ namespace WpfEditorTest.Utility
 		public Size InitialComponentSize { get; internal set; }
 		public Point InitComponentScale { get; internal set; }
 		public Point InitGlobalComponentPosition { get; internal set; }
+		public bool IsReadyToBeReparented { get; internal set; }
 
 		public FrameSelectionPanel( UIManager uiManager )
 		{

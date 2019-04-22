@@ -111,7 +111,7 @@ namespace Fusion.Engine.Frames2.Controllers
                 Initialize();
         }
 
-        public void Draw(SpriteLayerD2D layer) { }
+        public virtual void Draw(SpriteLayerD2D layer) { }
 
         public int IndexOf(IUIComponent child)
         {

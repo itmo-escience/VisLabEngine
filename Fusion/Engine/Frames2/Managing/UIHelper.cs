@@ -90,7 +90,7 @@ namespace Fusion.Engine.Frames2.Managing
             }
         }
 
-        private static bool InsideComponent(UIManager manager, IUIComponent component, Vector2 point)
+        public static bool InsideComponent(UIManager manager, IUIComponent component, Vector2 point)
         {
             if (component is IUIContainer container && !container.Placement.Clip)
             {
