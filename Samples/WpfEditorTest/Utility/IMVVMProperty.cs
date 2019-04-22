@@ -20,5 +20,7 @@ namespace WpfEditorTest.Utility
 		string PropName { get; set; }
 
 		IList<object> EnumValues { get; set; }
+
+		List<MVVMComponentProperty> PropertyProps { get; set; }
 	}
 }

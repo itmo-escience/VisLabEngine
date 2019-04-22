@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Xml;
 using System.Xml.Schema;
 using System.Xml.Serialization;
@@ -8,12 +9,12 @@ using SharpDX.DirectWrite;
 
 namespace Fusion.Engine.Graphics.SpritesD2D
 {
-    public class TextFormatD2D : IEquatable<TextFormatD2D>, IXmlSerializable
+    public class TextFormatD2D : INotifyPropertyChanged, IEquatable<TextFormatD2D>, IXmlSerializable
     {
-        public string FontFamily { get; private set; }
-        public float Size { get; private set; }
-        public TextVertialAlignment VertialAlignment { get; private set; }
-        public TextHorizontalAlignment HorizontalAlignment { get; private set; }
+        public string FontFamily { get; set; }
+        public float Size { get; set; }
+        public TextVertialAlignment VertialAlignment { get; set; }
+        public TextHorizontalAlignment HorizontalAlignment { get; set; }
 
         public enum TextVertialAlignment
         {
@@ -36,7 +37,9 @@ namespace Fusion.Engine.Graphics.SpritesD2D
             HorizontalAlignment = horizontalAlignment;
         }
 
-        public bool Equals(TextFormatD2D other)
+		public event PropertyChangedEventHandler PropertyChanged;
+
+		public bool Equals(TextFormatD2D other)
         {
             if (ReferenceEquals(null, other)) return false;
             if (ReferenceEquals(this, other)) return true;

@@ -8,10 +8,8 @@ using Fusion.Engine.Graphics.SpritesD2D;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.Linq;
-using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
 using System.Xml;
 using System.Xml.Schema;
 using System.Xml.Serialization;
@@ -126,7 +124,8 @@ namespace Fusion.Engine.Frames2.Containers
         {
             reader.ReadStartElement("AnchorBoxSlot");
             Angle = UIComponentSerializer.ReadValue<float>(reader);
-            Fixators = UIComponentSerializer.ReadValue<Fixators>(reader);
+            var f = UIComponentSerializer.ReadValue<Fixators>(reader);
+            Fixators = f;
             Clip = UIComponentSerializer.ReadValue<bool>(reader);
             Visible = UIComponentSerializer.ReadValue<bool>(reader);
             Attach(UIComponentSerializer.ReadValue<SeralizableObjectHolder>(reader).SerializableFrame);
@@ -134,13 +133,73 @@ namespace Fusion.Engine.Frames2.Containers
         }
 	}
 
-	public class Fixators
+	public class Fixators : INotifyPropertyChanged
 	{
-		public float Left = -1;
-		public float Top = -1;
-		public float Right = -1;
-		public float Bottom = -1;
-    };
+	    private float _left   = 0;
+	    private float _right  = -1;
+	    private float _top    = 0;
+	    private float _bottom = -1;
+
+		public float Left
+		{
+		    get => _left;
+            set {
+                if (_right < 0 && value < 0)
+                {
+                    _right = 0;
+                    return;
+                }
+
+                _left = value;
+	        }
+		}
+
+	    public float Top
+	    {
+            get => _top;
+	        set {
+	            if (_bottom < 0 && value < 0)
+	            {
+	                _bottom = 0;
+	                return;
+	            }
+
+	            _top = value;
+	        }
+	    }
+
+		public float Right
+		{
+		    get => _right;
+		    set {
+		        if (_left < 0 && value < 0)
+		        {
+		            _left = 0;
+		            return;
+		        }
+
+		        _right = value;
+		    }
+		}
+
+		public float Bottom
+		{
+		    get => _bottom;
+		    set {
+		        if (_top < 0 && value < 0)
+		        {
+		            _top = 0;
+		            return;
+		        }
+
+		        _bottom = value;
+		    }
+	    }
+
+		public event PropertyChangedEventHandler PropertyChanged;
+
+	    public override string ToString() => $"Fixators: left={Left}, top={Top}, right={Right}, bottom={Bottom}";
+	};
 
 	public class AnchorBox : IUIModifiableContainer<AnchorBoxSlot>, IXmlSerializable
 	{
@@ -157,9 +216,9 @@ namespace Fusion.Engine.Frames2.Containers
 		public object Tag { get; set; }
 		public string Name { get; set; }
 
-		private readonly object _childrenAccessLock = new object();
-		public object ChildrenAccessLock => _childrenAccessLock;
-        public bool IsInside(Vector2 point) => Placement.IsInside(point);
+	    public object ChildrenAccessLock { get; } = new object();
+
+	    public bool IsInside(Vector2 point) => Placement.IsInside(point);
 
 		public void Update( GameTime gameTime )
 		{
@@ -169,48 +228,44 @@ namespace Fusion.Engine.Frames2.Containers
 				{
 					slot.X = slot.Fixators.Left;
 					if (slot.Fixators.Right >= 0)
-						slot.Width = DesiredWidth - slot.Fixators.Left - slot.Fixators.Right;
-					else
-						slot.Width = slot.Component.DesiredWidth;
-				}
-				else
-				{
-					if (slot.Fixators.Right >= 0)
-						slot.X = DesiredWidth - slot.Fixators.Right - slot.Component.DesiredWidth;
+						slot.Width = Placement.Width - (slot.Fixators.Left + slot.Fixators.Right);
 					else
 					{
-						slot.Fixators.Left = 0;
-						slot.X = slot.Fixators.Left;
+					    if (slot.Component.DesiredWidth < 0)
+					        slot.Width = slot.AvailableWidth;
+					    else
+					        slot.Width = Math.Min(slot.Component.DesiredWidth, slot.AvailableWidth);
 					}
-					slot.Width = slot.Component.DesiredWidth;
 				}
-
-
-				if (slot.Fixators.Top >= 0)
+				else // left < 0, right >=0
 				{
-					slot.Y = slot.Fixators.Top;
-					if (slot.Fixators.Bottom >= 0)
-						slot.Height = DesiredHeight - slot.Fixators.Top - slot.Fixators.Bottom;
-					else
-						slot.Height = slot.Component.DesiredHeight;
-				}
-				else
-				{
-					if (slot.Fixators.Bottom >= 0)
-						slot.Y = DesiredHeight - slot.Fixators.Bottom - slot.Component.DesiredHeight;
-					else
-					{
-						slot.Fixators.Top = 0;
-						slot.X = slot.Fixators.Top;
-					}
-					slot.Height = slot.Component.DesiredHeight;
+                    Debug.Assert(slot.Fixators.Right >= 0);
+
+				    slot.X = Math.Max(0, Placement.Width - slot.Component.DesiredWidth - slot.Fixators.Right);
+				    slot.Width = Math.Min(slot.AvailableWidth, slot.Component.DesiredWidth);
 				}
 
-				//if (slot.Component.DesiredWidth >= 0)
-				//	slot.Width = slot.Component.DesiredWidth;
 
-				//if (slot.Component.DesiredHeight >= 0)
-				//	slot.Height = slot.Component.DesiredHeight;
+			    if (slot.Fixators.Top >= 0)
+			    {
+			        slot.Y = slot.Fixators.Top;
+			        if (slot.Fixators.Bottom >= 0)
+			            slot.Height = Placement.Height - (slot.Fixators.Top + slot.Fixators.Bottom);
+			        else // top > 0, bottom <= 0
+			        {
+			            if (slot.Component.DesiredHeight < 0)
+			                slot.Height = slot.AvailableHeight;
+			            else
+			                slot.Height = Math.Min(slot.Component.DesiredHeight, slot.AvailableHeight);
+			        }
+			    }
+			    else // top < 0, bottom >=0
+			    {
+			        Debug.Assert(slot.Fixators.Bottom >= 0);
+
+			        slot.Y = Math.Max(0, Placement.Height - slot.Component.DesiredHeight - slot.Fixators.Bottom);
+			        slot.Height = Math.Min(slot.AvailableHeight, slot.Component.DesiredHeight);
+			    }
 			}
 		}
 
@@ -281,7 +336,6 @@ namespace Fusion.Engine.Frames2.Containers
             DesiredWidth = float.Parse(reader.GetAttribute("DesiredWidth"));
             DesiredHeight = float.Parse(reader.GetAttribute("DesiredHeight"));
             reader.ReadStartElement("AnchorBox");
-            reader.ReadStartElement("Slots");
 
             _slots.Clear();
             if (!reader.IsEmptyElement)

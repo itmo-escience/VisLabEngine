@@ -41,6 +41,23 @@ namespace WpfEditorTest.Utility
 			}
 
 			Obj.PropertyChanged += ( s, e ) => ChangeProperty(e);
+
+			if (PropType.IsClass && PropType != typeof(string) && PropType != typeof(object))
+			{
+				var propNotified = _prop as INotifyPropertyChanged;
+
+				var publicProperties = PropType.GetProperties(BindingFlags.Public | BindingFlags.Instance);
+
+				PropertyProps = (
+					from property in publicProperties
+					where property.GetMethod != null && property.SetMethod != null && property.SetMethod.IsPublic && !property.CustomAttributes.Any(ca => ca.AttributeType.Name == "XmlIgnoreAttribute")
+					select new MVVMComponentProperty(property, propNotified)
+				).ToList();
+
+				propNotified.PropertyChanged += ( s, e ) => {
+					OnPropertyChanged(nameof(_prop));
+				};
+			}
 		}
 
 		public void ChangeProperty( PropertyChangedEventArgs e )
@@ -66,17 +83,25 @@ namespace WpfEditorTest.Utility
 
 				var convertedValue = Convert.ChangeType(value, PropInfo.PropertyType);
 
-				IEditorCommand command;
+				IEditorCommand command=null;
 				if (Obj.GetType().GetInterfaces().Contains(typeof(IUIComponent)))
 				{
 					command = new UIComponentPropertyChangeCommand(Obj as IUIComponent, PropName, value);
 				}
-				else
+				else if (Obj.GetType().GetInterfaces().Contains(typeof(ISlot)))
 				{
 					command = new SlotPropertyChangeCommand((Obj as ISlot).Component, PropName, value);
 				}
 
-				CommandManager.Instance.Execute(command);
+				if (command!=null)
+				{
+					CommandManager.Instance.Execute(command); 
+				}
+				else
+				{
+					PropInfo.SetValue(Obj, convertedValue);
+					OnPropertyChanged(nameof(Prop));
+				}
 
 				//OnPropertyChanged();
 			}
@@ -89,6 +114,8 @@ namespace WpfEditorTest.Utility
 		public string PropName { get; set; }
 
 		public IList<object> EnumValues { get; set; }
+
+		public List<MVVMComponentProperty> PropertyProps { get; set; } = new List<MVVMComponentProperty>();
 
 		public event PropertyChangedEventHandler PropertyChanged;
 

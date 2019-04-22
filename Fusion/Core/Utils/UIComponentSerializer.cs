@@ -128,7 +128,8 @@ namespace Fusion.Core.Utils
         public static T ReadValue<T>(XmlReader writer)
         {
             var serializer = SerializersStorage.GetSerializer(typeof(T));
-            return (T)serializer.Deserialize(writer);
+            var deserialized = (T) serializer.Deserialize(writer);
+            return deserialized;
         }
 	}
 

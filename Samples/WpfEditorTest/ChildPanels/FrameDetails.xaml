@@ -413,6 +413,21 @@
                 </StackPanel>
             </DockPanel>
         </DataTemplate>
+
+        <DataTemplate x:Key="ComplexProp">
+            <Border BorderThickness="1" BorderBrush="Gray" MinHeight="32" Width="auto" HorizontalAlignment="Stretch">
+                <Expander Header="{Binding PropName}" VerticalAlignment="Center" DataContext="{Binding}">
+                    <ItemsControl ItemsSource="{Binding PropertyProps}" ItemTemplateSelector="{StaticResource propTemplateSelector}" 
+                              VirtualizingStackPanel.IsVirtualizing="True">
+                        <ItemsControl.ItemsPanel>
+                            <ItemsPanelTemplate>
+                                <VirtualizingStackPanel />
+                            </ItemsPanelTemplate>
+                        </ItemsControl.ItemsPanel>
+                    </ItemsControl>
+                </Expander>
+            </Border>
+        </DataTemplate>
     </Window.Resources>
 
     <ScrollViewer Name="DetailsScroll"
