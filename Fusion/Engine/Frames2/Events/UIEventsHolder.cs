@@ -9,6 +9,7 @@ namespace Fusion.Engine.Frames2.Events
         public event KeyPressEvent KeyPress;
 
         public event MouseMoveEvent MouseMove;
+        public event MouseMoveEvent MouseMoveOutside;
         public event MouseDragEvent MouseDrag;
         public event MouseDownEvent MouseDown;
         public event MouseDownEvent MouseDownOutside;
@@ -45,6 +46,11 @@ namespace Fusion.Engine.Frames2.Events
         internal void InvokeMouseMove(IUIComponent sender, MoveEventArgs args)
         {
             MouseMove?.Invoke(sender, args);
+        }
+
+        internal void InvokeMouseMoveOutside(IUIComponent sender, MoveEventArgs args)
+        {
+            MouseMoveOutside?.Invoke(sender, args);
         }
 
         internal void InvokeMouseDrag(IUIComponent sender, DragEventArgs args)

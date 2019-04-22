@@ -92,14 +92,21 @@ namespace Fusion.Engine.Frames2.Events
                 var mouseArgs = (MoveEventArgs) args;
 
                 IUIComponent s = null;
-                foreach (var c in UIHelper.BFSTraverseForPoint(_manager, Root, mousePosition).Reverse())
+                foreach (var c in UIHelper.BFSTraverse(Root).Reverse())
                 {
                     if (s == null)
                         s = c;
                     if (!mouseArgs.ShouldPropagate)
                         break;
 
-                    c.Events.InvokeMouseMove(s, mouseArgs);
+                    if (UIHelper.InsideComponent(_manager, Root, mousePosition))
+                    {
+                        c.Events.InvokeMouseMove(s, mouseArgs);
+                    }
+                    else
+                    {
+                        c.Events.InvokeMouseMoveOutside(s, mouseArgs);
+                    }
                 }
             };
 
