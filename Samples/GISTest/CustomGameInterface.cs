@@ -206,12 +206,13 @@ namespace GISTest
 
             var button = new RadioButtonController(new Border(), RadioButtonManager.CreateNewGroup("TestGroup"));
             var checkBox = new CheckBoxController();
-            checkBox.DefaultInit();
-            /*var checkBoxSlot = UIManager.Root.Add(checkBox);
-            checkBoxSlot.X = 200;
-            checkBoxSlot.Y = 200;*/
+            var slider = new SliderController();
+            slider.DefaultInit();
+            /*var sliderSlot = UIManager.Root.Add(slider);
+            sliderSlot.X = 200;
+            sliderSlot.Y = 200;*/
 
-            string str = UIComponentSerializer.WriteToString(checkBox);
+            string str = UIComponentSerializer.WriteToString(slider);
             var comp = UIComponentSerializer.ReadFromString(str);
 
 

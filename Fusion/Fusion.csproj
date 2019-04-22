@@ -273,6 +273,7 @@
     <Compile Include="Engine\Frames2\Controllers\RadioButtonController.cs" />
     <Compile Include="Engine\Frames2\Controllers\RadioButtonGroup.cs" />
     <Compile Include="Engine\Frames2\Containers\AnchorBox.cs" />
+    <Compile Include="Engine\Frames2\Controllers\SliderController.cs" />
     <Compile Include="Engine\Frames2\Events\UIEventsHolder.cs" />
     <Compile Include="Engine\Frames2\Managing\ClippingFlags.cs" />
     <Compile Include="Engine\Frames2\Components\Image.cs" />
