@@ -166,9 +166,9 @@
     - [ ] CheckBox
     - [ ] RadioButton
       - [ ] Указание группы в редакторе
-    - [ ] Slider
+    - [x] Slider
     - [ ] Dropdown
-    - [ ] Progressbar
+    - [x] Progressbar
     - [ ] Timeline
     - [ ] NumericBox
     - [ ] Compass
