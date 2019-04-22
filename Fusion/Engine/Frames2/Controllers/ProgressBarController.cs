@@ -61,7 +61,7 @@ namespace Fusion.Engine.Frames2.Controllers
             DesiredWidth = 200;
             DesiredHeight = 25;
             Background.Attach(new Border(Color.LightGray, Color.Gray));
-            Track.Attach(new Border(Color.Green, Color.Gray) { DesiredHeight = 25 });
+            Track.Attach(new Border(Color.Green, Color.Gray));
         }
 
         public override void Update(GameTime gameTime)
@@ -103,9 +103,6 @@ namespace Fusion.Engine.Frames2.Controllers
                     Track.Width = trackRatio * DesiredWidth - Track.X;
                 }
             }
-
-            Value++;
-            if (Value == MaxValue) Value = MinValue;
         }
 
         public XmlSchema GetSchema()
