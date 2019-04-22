@@ -123,9 +123,14 @@ namespace Fusion.Engine.Frames2.Components
 
         public bool IsInside(Vector2 point) => Placement.IsInside(point);
 
+        private TextLayoutD2D _latestLayout;
         public void Update(GameTime gameTime)
         {
-            if ((_textLayout != null) && ((_textLayout.MaxWidth != Placement.AvailableWidth) || (_textLayout.MaxHeight != Placement.AvailableHeight))) 
+            if (_textLayout == null
+                || _textLayout.MaxWidth != Placement.AvailableWidth
+                || _textLayout.MaxHeight != Placement.AvailableHeight
+                || !_textLayout.Equals(_latestLayout)
+            )
                 _isDirtyLayout = true;
 
             if (!_isDirtyLayout) return;
@@ -141,6 +146,8 @@ namespace Fusion.Engine.Frames2.Components
                 _textLayout = new TextLayoutD2D(_text, _textFormat, Placement.Width, Placement.Height);
             }
 
+            // Save copy to track changes
+            _latestLayout = new TextLayoutD2D(_textLayout);
             _textCommand = new LayoutedText(new Vector2(), _textLayout, new SolidBrushD2D(TextColor));
 
             _isDirtyLayout = false;
