@@ -200,13 +200,16 @@ namespace Fusion.Engine.Frames2.Controllers
             MinValue = float.Parse(reader.GetAttribute("MinValue"));
             MaxValue = float.Parse(reader.GetAttribute("MaxValue"));
             Value = float.Parse(reader.GetAttribute("Value"));
-            reader.ReadStartElement("SliderController");
+
+            reader.ReadStartElement();
 
             reader.ReadStartElement("Slots");
             Background.ReadFromXml(reader);
             LeftTrack.ReadFromXml(reader);
             RightTrack.ReadFromXml(reader);
             Thumb.ReadFromXml(reader);
+            reader.ReadEndElement();
+
             reader.ReadEndElement();
         }
 

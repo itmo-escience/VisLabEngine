@@ -61,7 +61,7 @@ namespace Fusion.Engine.Frames2.Controllers
             DesiredWidth = 200;
             DesiredHeight = 25;
             Background.Attach(new Border(Color.LightGray, Color.Gray));
-            Track.Attach(new Border(Color.Green, Color.Gray));
+            Track.Attach(new Border(Color.Green, Color.Gray) {DesiredHeight = 25});
         }
 
         public override void Update(GameTime gameTime)
@@ -119,11 +119,14 @@ namespace Fusion.Engine.Frames2.Controllers
             Style = UIStyleManager.Instance.GetStyle(GetType(), styleName);
             MinValue = float.Parse(reader.GetAttribute("MinValue"));
             MaxValue = float.Parse(reader.GetAttribute("MaxValue"));
-            reader.ReadStartElement("ProgressBarController");
+
+            reader.ReadStartElement();
 
             reader.ReadStartElement("Slots");
             Background.ReadFromXml(reader);
             Track.ReadFromXml(reader);
+            reader.ReadEndElement();
+
             reader.ReadEndElement();
         }
 

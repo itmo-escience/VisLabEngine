@@ -331,7 +331,8 @@ namespace Fusion.Engine.Frames2.Containers
             Name = reader.GetAttribute("Name");
             DesiredWidth = float.Parse(reader.GetAttribute("DesiredWidth"));
             DesiredHeight = float.Parse(reader.GetAttribute("DesiredHeight"));
-            reader.ReadStartElement("AnchorBox");
+
+            reader.ReadStartElement();
 
             _slots.Clear();
             if (!reader.IsEmptyElement)

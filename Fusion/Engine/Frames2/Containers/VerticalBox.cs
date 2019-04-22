@@ -268,7 +268,8 @@ namespace Fusion.Engine.Frames2.Containers
             DesiredWidth = float.Parse(reader.GetAttribute("DesiredWidth"));
             DesiredHeight = float.Parse(reader.GetAttribute("DesiredHeight"));
             Alignment = (HorizontalAlignment) Enum.Parse(typeof(HorizontalAlignment), reader.GetAttribute("Alignment"));
-            reader.ReadStartElement("VerticalBox");
+
+            reader.ReadStartElement();
 
             _slots.Clear();
             if (!reader.IsEmptyElement)

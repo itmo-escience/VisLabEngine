@@ -227,7 +227,8 @@ namespace Fusion.Engine.Frames2.Controllers
             Orintation = (ScrollBarOrintation) Enum.Parse(typeof(ScrollBarOrintation), reader.GetAttribute("Orintation"));
             BarSize = float.Parse(reader.GetAttribute("BarSize"));
             ContentSize = float.Parse(reader.GetAttribute("ContentSize"));
-            reader.ReadStartElement("ScrollBarController");
+
+            reader.ReadStartElement();
 
             reader.ReadStartElement("Slots");
             Background.ReadFromXml(reader);
