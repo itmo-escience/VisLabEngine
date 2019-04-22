@@ -106,17 +106,17 @@ namespace Fusion.Engine.Frames2.Controllers
             switch (Orintation)
             {
                 case ScrollBarOrintation.Horizontal:
-                    ScrollBar.X = positionRatio * DesiredWidth;
+                    ScrollBar.X = positionRatio * Placement.Width;
                     ScrollBar.Y = 0;
-                    ScrollBar.Width = BarSize / ContentSize * DesiredWidth;
-                    ScrollBar.Height = DesiredHeight;
+                    ScrollBar.Width = BarSize / ContentSize * Placement.Width;
+                    ScrollBar.Height = Placement.Height;
                     break;
 
                 case ScrollBarOrintation.Vertical:
                     ScrollBar.X = 0;
-                    ScrollBar.Y = positionRatio * DesiredHeight;
-                    ScrollBar.Width = DesiredWidth;
-                    ScrollBar.Height = BarSize / ContentSize * DesiredHeight;
+                    ScrollBar.Y = positionRatio * Placement.Height;
+                    ScrollBar.Width = Placement.Width;
+                    ScrollBar.Height = BarSize / ContentSize * Placement.Height;
                     break;
             }
         }
@@ -187,16 +187,15 @@ namespace Fusion.Engine.Frames2.Controllers
             {
                 case ScrollBarOrintation.Horizontal:
                     var desiredX = e.Position.X + _xyDelta;
-                    tracksRatio = desiredX / DesiredWidth;
+                    tracksRatio = desiredX / Placement.Width;
                     break;
                 case ScrollBarOrintation.Vertical:
                     var desiredY = e.Position.Y + _xyDelta;
-                    tracksRatio = desiredY / DesiredHeight;
+                    tracksRatio = desiredY / Placement.Height;
                     break;
             }
             
             ScrollPosition = tracksRatio * ContentSize;
-            Console.WriteLine(ScrollPosition);
         }
 
         public event EventHandler<SliderValueChangeEventArgs> ScrollPositionChange;
@@ -233,6 +232,8 @@ namespace Fusion.Engine.Frames2.Controllers
             reader.ReadStartElement("Slots");
             Background.ReadFromXml(reader);
             ScrollBar.ReadFromXml(reader);
+            reader.ReadEndElement();
+
             reader.ReadEndElement();
         }
 
