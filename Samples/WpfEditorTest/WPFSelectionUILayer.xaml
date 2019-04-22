@@ -3,6 +3,7 @@
       xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
       xmlns:zWpfLib="clr-namespace:ZWpfLib;assembly=ZWpfLib"
       xmlns:panels ="clr-namespace:WpfEditorTest.Utility"
+      xmlns:local="clr-namespace:WpfEditorTest"
       MouseMove="LocalGrid_MouseMove"
       MouseLeftButtonUp="LocalGrid_MouseLeftButtonUp"
       MouseLeftButtonDown="LocalGrid_MouseLeftButtonDown"
@@ -10,8 +11,16 @@
       PreviewDrop="Grid_PreviewDrop"
       MouseLeave="Grid_MouseLeave"
       >
+    <!--<Grid.CommandBindings>
+        <CommandBinding Command="{x:Static local:WPFSelectionUILayer.DoubleClickCmd}"
+                        Executed="ExecutedDoubleClickCommand"
+                        CanExecute="AlwaysCanExecute" />
+    </Grid.CommandBindings>
+    <Grid.InputBindings>
+        <MouseBinding Command="{x:Static local:WPFSelectionUILayer.DoubleClickCmd}" MouseAction=""/>
+    </Grid.InputBindings>-->
 
-    <zWpfLib:DXElement Grid.Row="1" Name="DxElem"
+        <zWpfLib:DXElement Grid.Row="1" Name="DxElem"
                        HorizontalAlignment="Left" VerticalAlignment="Top"
                        MinHeight="100" MaxHeight="10000"
                        MinWidth="100" MaxWidth="10000"/>
