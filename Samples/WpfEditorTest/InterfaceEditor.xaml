@@ -201,7 +201,7 @@
             <TabItem Header="tab4"></TabItem>
             <TabItem Header="tab5"></TabItem>-->
         </TabControl>
-        <ScrollViewer Name="ZoomerScroll" Grid.Row="2" HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto" Background="#FFA0A0A0" PreviewKeyDown="ZoomerScroll_PreviewKeyDown">
+        <ScrollViewer Name="ZoomerScroll" Grid.Row="2" HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto" Background="#FFA0A0A0" PreviewKeyDown="ZoomerScroll_PreviewKeyDown" PreviewMouseDown="ZoomerScroll_PreviewMouseDown" PreviewMouseUp="ZoomerScroll_PreviewMouseUp">
             <ScrollViewer.CommandBindings>
                 <CommandBinding Command="{x:Static local:InterfaceEditor.MoveFrameCmd}"
                         Executed="ExecutedMoveFrameCommand"
@@ -213,9 +213,14 @@
                 <KeyBinding Command="{x:Static local:InterfaceEditor.MoveFrameCmd}" CommandParameter="left" Key="Left"/>
                 <KeyBinding Command="{x:Static local:InterfaceEditor.MoveFrameCmd}" CommandParameter="right" Key="Right"/>
             </ScrollViewer.InputBindings>
-            <Viewbox Name="Zoomer" HorizontalAlignment="Center" VerticalAlignment="Center">
-                <!--<local:WPFSelectionUILayer x:Name="SelectionLayer">
-                </local:WPFSelectionUILayer>-->
+
+            <Viewbox Name="Zoomer" HorizontalAlignment="Center" VerticalAlignment="Center" RenderTransformOrigin="0.5,0.5">
+                <Grid Name="ZoomerContentHolder">
+                    <Border Name="ZoomerBackground" MouseLeftButtonDown="ZoomerBackground_MouseLeftButtonDown" Background="Transparent">
+                        <!--<local:WPFSelectionUILayer x:Name="SelectionLayer">
+                    </local:WPFSelectionUILayer>-->
+                    </Border>
+                </Grid>
             </Viewbox>
         </ScrollViewer>
     </Grid>

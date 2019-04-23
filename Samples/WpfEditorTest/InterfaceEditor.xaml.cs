@@ -326,7 +326,9 @@ namespace WpfEditorTest
 
 					#region SelectionLayer
 					SelectionLayer = new WPFSelectionUILayer(_uiManager);
-					Zoomer.Child = SelectionLayer;
+					//Zoomer.Child = SelectionLayer;
+					ZoomerContentHolder.Children.Add(SelectionLayer);
+
 					SelectionLayer.Window = this;
 					SelectionLayer.PaletteWindow = _palette;
 					SelectionLayer.FrameSelected += ( s, selection ) =>
@@ -1109,10 +1111,19 @@ namespace WpfEditorTest
 			SelectionLayer.Width = DefaultSceneWidth;
 			SelectionLayer.Height = DefaultSceneHeight;
 
-			Zoomer.Width = SelectionLayer.Width;
-			Zoomer.Height = SelectionLayer.Height;
+			ZoomerBackground.Width = SelectionLayer.Width;
+			ZoomerBackground.Height = SelectionLayer.Height;
+
+			ZoomerBackground.Width = DefaultSceneWidth * 2;
+			ZoomerBackground.Height = DefaultSceneHeight * 2;
+
+			Zoomer.Width = ZoomerBackground.Width;
+			Zoomer.Height = ZoomerBackground.Height;
 			Zoomer.Stretch = Stretch.Uniform;
 			ZoomerSlider.Value = double.Parse(ConfigurationManager.AppSettings.Get("SceneZoom"));
+
+			ZoomerScroll.ScrollToHorizontalOffset(DefaultSceneWidth / 2);
+			ZoomerScroll.ScrollToVerticalOffset(DefaultSceneHeight / 2);
 		}
 
 		private void Window_PreviewMouseWheel( object sender, MouseWheelEventArgs e )
@@ -1140,6 +1151,7 @@ namespace WpfEditorTest
             get => (double)GetValue(MouseYProperty);
             set => SetValue(MouseYProperty, value);
         }
+		public Point _initScrollOffsets { get; private set; }
 
 		private void Window_PreviewMouseMove( object sender, MouseEventArgs e )
         {
@@ -1165,7 +1177,17 @@ namespace WpfEditorTest
                 {
                     ZoomerScroll.ScrollToVerticalOffset(ZoomerScroll.ContentVerticalOffset + 1);
                 }
-            }
+            } else if (e.MiddleButton == MouseButtonState.Pressed)
+			{
+				var currentMousePosition = e.GetPosition(ZoomerScroll);
+				var _deltaX = (float)(currentMousePosition.X - _initScrollOffsets.X);
+				var _deltaY = (float)(currentMousePosition.Y - _initScrollOffsets.Y);
+				_initScrollOffsets = new Point(currentMousePosition.X, currentMousePosition.Y);
+
+
+				ZoomerScroll.ScrollToHorizontalOffset(ZoomerScroll.ContentHorizontalOffset- _deltaX);
+				ZoomerScroll.ScrollToVerticalOffset(ZoomerScroll.ContentVerticalOffset- _deltaY);
+			}
 		}
 
 		private void Slider_ValueChanged( object sender, RoutedPropertyChangedEventArgs<double> e )
@@ -1177,10 +1199,29 @@ namespace WpfEditorTest
 
 		private void ZoomScene( int sign )
 		{
+
+			var MouseX = Math.Round(System.Windows.Input.Mouse.GetPosition(ZoomerBackground).X);
+			var MouseY = Math.Round(System.Windows.Input.Mouse.GetPosition(ZoomerBackground).Y);
+
+			var newW = DefaultSceneWidth + (DefaultSceneWidth / sceneScale);
+			var newH = DefaultSceneHeight + (DefaultSceneHeight / sceneScale);
+
+			//var scale = ZoomerBackground.Width / newW;
+
+			//ZoomerBackground.Width = newW;
+			//ZoomerBackground.Height = newH;
+			//ZoomerBackground.UpdateLayout();
+
+			//MouseX /= scale;// Math.Round(System.Windows.Input.Mouse.GetPosition(ZoomerBackground).X);
+			//MouseY /= scale;// Math.Round(System.Windows.Input.Mouse.GetPosition(ZoomerBackground).Y);
+			//MouseX = Math.Round(System.Windows.Input.Mouse.GetPosition(ZoomerBackground).X);
+			//MouseY = Math.Round(System.Windows.Input.Mouse.GetPosition(ZoomerBackground).Y);
+
 			if (Zoomer != null)
 			{
-				Zoomer.Width = DefaultSceneWidth * sceneScale;
-				Zoomer.Height = DefaultSceneHeight * sceneScale;
+
+				Zoomer.Width = ZoomerBackground.Width * sceneScale;
+				Zoomer.Height = ZoomerBackground.Height * sceneScale;
 
 				var mousePosition = System.Windows.Input.Mouse.GetPosition(ZoomerScroll);
 				Point scaledTopLeftCornerPosition;
@@ -1190,12 +1231,15 @@ namespace WpfEditorTest
 				{
 					scaledTopLeftCornerPosition = new Point(ZoomerScroll.ViewportWidth / 2, ZoomerScroll.ViewportHeight / 2);
 
-					mousePosition = ZoomerScroll.TransformToVisual(SelectionLayer).Transform(scaledTopLeftCornerPosition);
+					mousePosition = ZoomerScroll.TransformToVisual(ZoomerBackground).Transform(scaledTopLeftCornerPosition);
 					scaledTopLeftCornerPosition = new Point(mousePosition.X * sceneScale - ZoomerScroll.ViewportWidth / 2, mousePosition.Y * sceneScale - ZoomerScroll.ViewportHeight / 2);
 				}
 
+
 				ZoomerScroll.ScrollToHorizontalOffset(scaledTopLeftCornerPosition.X);
 				ZoomerScroll.ScrollToVerticalOffset(scaledTopLeftCornerPosition.Y);
+
+
 
 			}
 		}
@@ -1270,6 +1314,30 @@ namespace WpfEditorTest
 		private void EnableDebug( bool isEnabled )
 		{
 			_uiManager.DebugEnabled = isEnabled;
+		}
+
+		private void ZoomerBackground_MouseLeftButtonDown( object sender, MouseButtonEventArgs e )
+		{
+			CommandManager.Instance.ExecuteWithoutMemorising(
+				new SelectFrameCommand()
+			);
+		}
+
+		private void ZoomerScroll_PreviewMouseDown( object sender, MouseButtonEventArgs e )
+		{
+			if (e.MiddleButton == MouseButtonState.Pressed)
+			{
+				_initScrollOffsets = e.GetPosition(ZoomerScroll);
+				ZoomerScroll.Cursor = System.Windows.Input.Cursors.Hand;
+			}
+		}
+
+		private void ZoomerScroll_PreviewMouseUp( object sender, MouseButtonEventArgs e )
+		{
+			if (e.MiddleButton == MouseButtonState.Released)
+			{
+				ZoomerScroll.Cursor = System.Windows.Input.Cursors.Arrow;
+			}
 		}
 	}
 }
