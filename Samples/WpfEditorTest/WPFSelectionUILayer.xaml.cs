@@ -1078,8 +1078,8 @@ namespace WpfEditorTest
 					createdFrame = Window.CreateFrameFromFile(System.IO.Path.Combine(ApplicationConfig.TemplatesPath, dataString) + ".xml");
                 }
 			}
-			else if (e.Data.GetDataPresent(DataFormats.FileDrop))
-		    {
+			else if (e.Data.GetDataPresent(DataFormats.FileDrop) && e.Data.GetData(DataFormats.FileDrop) is Type)
+			{
 		        Type dataType = (Type) e.Data.GetData(DataFormats.FileDrop);
 		        if (dataType != null)
 		        {
