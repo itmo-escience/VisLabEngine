@@ -63,21 +63,19 @@ namespace WpfEditorTest
 		public event EventHandler FramesDeselected;
 
 		private Stack<FrameSelectionPanel> _selectionPanelPool = new Stack<FrameSelectionPanel>();
-		private UIManager _uiManager;
 		private ParentHighlightPanel _parentHighlightPanel;
 		public FrameDragsPanel FrameDragsPanel;
 
 		public bool IsScrollExpected { get; set; }
 		private const float StickLinesTolerance = 0.0001f;
 
-		public WPFSelectionUILayer( UIManager uiManager )
+		public WPFSelectionUILayer()
 		{
 			InitializeComponent();
 
-			_uiManager = uiManager;
-			_parentHighlightPanel = new ParentHighlightPanel(_uiManager);
+			_parentHighlightPanel = new ParentHighlightPanel();
 			Children.Insert(3, _parentHighlightPanel);
-			FrameDragsPanel = new FrameDragsPanel(_uiManager);
+			FrameDragsPanel = new FrameDragsPanel();
 			Children.Add(FrameDragsPanel);
 
 			this.SizeChanged += ( s, e ) =>
@@ -91,7 +89,7 @@ namespace WpfEditorTest
 				{
 					var frame = frameAndPanel.Key;
 					var selectionPanel = frameAndPanel.Value;
-					var bb = _uiManager.BoundingBox(frame.Placement);
+					var bb = UIManager.BoundingBox(frame.Placement);
 
 					var commands = this.ResetSelectedFrame(new Point(bb.X, bb.Y), selectionPanel);
 					CommandManager.Instance.ExecuteWithoutMemorising(commands);
@@ -107,7 +105,7 @@ namespace WpfEditorTest
 				{
 					foreach (var frame in selectedFrames)
 					{
-						var frameSelectionPanel = _selectionPanelPool.Count > 0 ? _selectionPanelPool.Pop() : new FrameSelectionPanel(_uiManager);
+						var frameSelectionPanel = _selectionPanelPool.Count > 0 ? _selectionPanelPool.Pop() : new FrameSelectionPanel();
 
 						FrameSelectionPanelList.Add(frame, frameSelectionPanel);
 
@@ -321,14 +319,14 @@ namespace WpfEditorTest
 			IUIComponent hoveredFrame;
 			if (ignoreSelection)
 			{
-				hoveredFrame = UIHelper.GetLowestComponentInHierarchy(_uiManager, SceneFrame, new Vector2((float)mousePos.X, (float)mousePos.Y), SelectionManager.Instance.SelectedFrames);
+				hoveredFrame = UIHelper.GetLowestComponentInHierarchy(SceneFrame, new Vector2((float)mousePos.X, (float)mousePos.Y), SelectionManager.Instance.SelectedFrames);
 				if (hoveredFrame != null && SelectionManager.Instance.SelectedFrames.Contains(hoveredFrame))
 				{
 					hoveredFrame = hoveredFrame.Parent() as IUIModifiableContainer<ISlot>;
 				}
 			}
 			else
-				hoveredFrame = UIHelper.GetLowestComponentInHierarchy(_uiManager, SceneFrame, new Vector2((float)mousePos.X, (float)mousePos.Y));
+				hoveredFrame = UIHelper.GetLowestComponentInHierarchy(SceneFrame, new Vector2((float)mousePos.X, (float)mousePos.Y));
 
 			if (ignoreScene)
 			{
@@ -365,14 +363,14 @@ namespace WpfEditorTest
 
 			if (ignoreSelection)
 			{
-				hoveredFrame = UIHelper.GetComponentInChildren(_uiManager, searchArea, new Vector2((float)mousePos.X, (float)mousePos.Y), SelectionManager.Instance.SelectedFrames);
+				hoveredFrame = UIHelper.GetComponentInChildren(searchArea, new Vector2((float)mousePos.X, (float)mousePos.Y), SelectionManager.Instance.SelectedFrames);
 				if (hoveredFrame != null && SelectionManager.Instance.SelectedFrames.Contains(hoveredFrame))
 				{
 					hoveredFrame = hoveredFrame.Parent() as IUIModifiableContainer<ISlot>;
 				}
 			}
 			else
-				hoveredFrame = UIHelper.GetComponentInChildren(_uiManager, searchArea, new Vector2((float)mousePos.X, (float)mousePos.Y));
+				hoveredFrame = UIHelper.GetComponentInChildren(searchArea, new Vector2((float)mousePos.X, (float)mousePos.Y));
 
 			if (ignoreScene)
 			{
@@ -444,7 +442,7 @@ namespace WpfEditorTest
 						IUIModifiableContainer<ISlot> container = hoveredFrame as IUIModifiableContainer<ISlot>;
 
 						var mouseRelativeToSelected = RelativeToPoint(new Point(panel.SelectedFrame.Placement.X, panel.SelectedFrame.Placement.Y), point);
-						Matrix3x2 GlobalFrameMatrix = new Matrix3x2(_uiManager.GlobalTransform(hoveredFrame.Placement).ToArray());
+						Matrix3x2 GlobalFrameMatrix = new Matrix3x2(UIManager.GlobalTransform(hoveredFrame.Placement).ToArray());
 						GlobalFrameMatrix.Invert();
 						var vectorHelper = Matrix3x2.TransformPoint(GlobalFrameMatrix, new Vector2((float)point.X, (float)point.Y));
 						point = new Point(vectorHelper.X, vectorHelper.Y);
@@ -511,9 +509,9 @@ namespace WpfEditorTest
 					if (selected is IUIContainer container)
 					{
 						if (DeepClick())
-							hovered = UIHelper.GetComponentInChildren(_uiManager, container, new Vector2((float)mousePos.X, (float)mousePos.Y));
+							hovered = UIHelper.GetComponentInChildren(container, new Vector2((float)mousePos.X, (float)mousePos.Y));
 						else
-							hovered = UIHelper.GetLowestComponentInHierarchy(_uiManager, container, new Vector2((float)mousePos.X, (float)mousePos.Y)); 
+							hovered = UIHelper.GetLowestComponentInHierarchy(container, new Vector2((float)mousePos.X, (float)mousePos.Y)); 
 					} 
 				}
 			}
@@ -614,7 +612,7 @@ namespace WpfEditorTest
                 selectionPanel.InitialTransform = frame.Placement.Transform();
 				selectionPanel.InitPanelPosition = new Point((float)selectionPanel.RenderTransform.Value.OffsetX, (float)selectionPanel.RenderTransform.Value.OffsetY);
 				selectionPanel.InitComponentPosition = new Point(frame.Placement.X, frame.Placement.Y);
-				selectionPanel.InitGlobalComponentPosition = new Point(_uiManager.GlobalTransform(frame.Placement).M31, _uiManager.GlobalTransform(frame.Placement).M32);
+				selectionPanel.InitGlobalComponentPosition = new Point(UIManager.GlobalTransform(frame.Placement).M31, UIManager.GlobalTransform(frame.Placement).M32);
 				selectionPanel.InitComponentScale = new Point(frame.Placement.Transform().M11, frame.Placement.Transform().M22);
 				selectionPanel.InitialComponentSize = new Size(frame.Placement.Width, frame.Placement.Height);
 				selectionPanel.InitFrameParent = frame.Parent() as IUIModifiableContainer<ISlot>;
@@ -731,7 +729,7 @@ namespace WpfEditorTest
 		{
 			if (!FrameSelectionPanelList.ContainsKey(frame))
 			{
-				var bBox = _uiManager.BoundingBox(frame.Placement);
+				var bBox = UIManager.BoundingBox(frame.Placement);
 
 				StickingCoordsX.Add(new StickCoordinateX(bBox.X, bBox.Y, (bBox.Y + bBox.Height))
 				{
@@ -1039,7 +1037,7 @@ namespace WpfEditorTest
 				foreach (IUIComponent frame in searchArea.GetChildren())
 				{
 					bool intersects;
-					var bb = _uiManager.BoundingBox(frame.Placement);
+					var bb = UIManager.BoundingBox(frame.Placement);
 					selectedArea.Intersects(ref bb, out intersects);
 					if (intersects && !selectedframes.Contains(frame))
 					{

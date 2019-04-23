@@ -43,8 +43,6 @@ namespace WpfEditorTest.Utility
 
 		public Transform PreviousDragTransform { get; set; }
 
-		private UIManager _uiManager;
-
 		public List<Border> Drags { get; set; }
 
 		public Dictionary<IUIComponent, RectangleF> InitialFramesRectangles { get; private set; }
@@ -63,11 +61,9 @@ namespace WpfEditorTest.Utility
 
 		public Matrix3x2 GlobalFrameMatrix;
 
-		public FrameDragsPanel( Fusion.Engine.Frames2.Managing.UIManager uiManager )
+		public FrameDragsPanel()
 		{
 			InitializeComponent();
-
-			_uiManager = uiManager;
 
 			Drags = new List<Border>
 			{
@@ -110,10 +106,10 @@ namespace WpfEditorTest.Utility
 			if (frames.Count > 1)
 			{
 				Visibility = Visibility.Visible;
-				SelectedGroupMinX = frames.Select(f => _uiManager.BoundingBox(f.Placement).X).Min();
-				SelectedGroupMinY = frames.Select(f => _uiManager.BoundingBox(f.Placement).Y).Min();
-				SelectedGroupMaxX = frames.Select(f => _uiManager.BoundingBox(f.Placement).X + _uiManager.BoundingBox(f.Placement).Width).Max();
-				SelectedGroupMaxY = frames.Select(f => _uiManager.BoundingBox(f.Placement).Y + _uiManager.BoundingBox(f.Placement).Height).Max();
+				SelectedGroupMinX = frames.Select(f => UIManager.BoundingBox(f.Placement).X).Min();
+				SelectedGroupMinY = frames.Select(f => UIManager.BoundingBox(f.Placement).Y).Min();
+				SelectedGroupMaxX = frames.Select(f => UIManager.BoundingBox(f.Placement).X + UIManager.BoundingBox(f.Placement).Width).Max();
+				SelectedGroupMaxY = frames.Select(f => UIManager.BoundingBox(f.Placement).Y + UIManager.BoundingBox(f.Placement).Height).Max();
 				Width = Math.Max(SelectedGroupMaxX - SelectedGroupMinX, double.Epsilon);
 				Height = Math.Max(SelectedGroupMaxY - SelectedGroupMinY, double.Epsilon);
 				var delta = new TranslateTransform();
@@ -125,10 +121,10 @@ namespace WpfEditorTest.Utility
 			{
 				Visibility = Visibility.Visible;
 				var component = SelectionManager.Instance.SelectedFrames.First();
-				SelectedGroupMinX = _uiManager.BoundingBox(component.Placement).X;
-				SelectedGroupMinY = _uiManager.BoundingBox(component.Placement).Y;
-				SelectedGroupMaxX = _uiManager.BoundingBox(component.Placement).X + _uiManager.BoundingBox(component.Placement).Width;
-				SelectedGroupMaxY = _uiManager.BoundingBox(component.Placement).Y + _uiManager.BoundingBox(component.Placement).Height;
+				SelectedGroupMinX = UIManager.BoundingBox(component.Placement).X;
+				SelectedGroupMinY = UIManager.BoundingBox(component.Placement).Y;
+				SelectedGroupMaxX = UIManager.BoundingBox(component.Placement).X + UIManager.BoundingBox(component.Placement).Width;
+				SelectedGroupMaxY = UIManager.BoundingBox(component.Placement).Y + UIManager.BoundingBox(component.Placement).Height;
 
 				IUIComponent frame = frames.First();
 
@@ -138,7 +134,7 @@ namespace WpfEditorTest.Utility
 					Height = frame.Placement.Height < 0 ? 0 : frame.Placement.Height; 
 				//}
 
-				var globalTransform = _uiManager.GlobalTransform(frame.Placement);
+				var globalTransform = UIManager.GlobalTransform(frame.Placement);
 
 				var transform = new MatrixTransform(globalTransform.M11, globalTransform.M12,
 													globalTransform.M21, globalTransform.M22,
@@ -163,7 +159,7 @@ namespace WpfEditorTest.Utility
 			InitialFramesRectangles = new Dictionary<IUIComponent, RectangleF>();
 			foreach (IUIComponent frame in selectedFrames)
 			{
-				var globalTransform = _uiManager.GlobalTransform(frame.Placement);
+				var globalTransform = UIManager.GlobalTransform(frame.Placement);
 
 				InitialFramesRectangles.Add(
 					frame,
@@ -190,7 +186,7 @@ namespace WpfEditorTest.Utility
 			CenteredPivot = new Point((CurrentPivot.X + CurrentDragInitPosition.X) / 2, (CurrentPivot.Y + CurrentDragInitPosition.Y) / 2);
 			if (SelectionManager.Instance.SelectedFrames.Count == 1)
 			{
-				GlobalFrameMatrix = new Matrix3x2(_uiManager.GlobalTransform(SelectionManager.Instance.SelectedFrames.First().Placement).ToArray());
+				GlobalFrameMatrix = new Matrix3x2(UIManager.GlobalTransform(SelectionManager.Instance.SelectedFrames.First().Placement).ToArray());
 				GlobalFrameMatrix.Invert();
 
 				var vectorHelper = Matrix3x2.TransformPoint(GlobalFrameMatrix, new Vector2((float)CurrentPivot.X, (float)CurrentPivot.Y));
@@ -220,7 +216,7 @@ namespace WpfEditorTest.Utility
 			var offset = VisualTreeHelper.GetOffset(border);
 			double angle = 0;
 
-			var globalTransform = _uiManager.GlobalTransform(SelectionManager.Instance.SelectedFrames.First().Placement);
+			var globalTransform = UIManager.GlobalTransform(SelectionManager.Instance.SelectedFrames.First().Placement);
 
 			if (SelectionManager.Instance.SelectedFrames.Count == 1)
 			{

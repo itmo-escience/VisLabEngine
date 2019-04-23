@@ -78,29 +78,38 @@ namespace Fusion.Engine.Frames2.Managing
         }
     }
 
-    public class UIManager
+    public static class UIManager
     {
-        public UIEventProcessor UIEventProcessor { get; private set; }
-        public UIStyleManager StyleManager => UIStyleManager.Instance;
+        public static UIStyleManager StyleManager => UIStyleManager.Instance;
 
-        private readonly RootSlot _rootSlot;
-        public FreePlacement Root => (FreePlacement)_rootSlot.Component;
+        private static RootSlot _rootSlot;
+        public static StackOfPages Root => (StackOfPages)_rootSlot.Component;
+        private static ParentFillingSlot _mainComponentsRoot;
+        public static FreePlacement MainComponentsRoot => (FreePlacement)_mainComponentsRoot.Component;
+        private static ParentFillingSlot _popUpComponentsRoot;
+        public static FreePlacement PopUpComponentsRoot => (FreePlacement)_popUpComponentsRoot.Component;
 
-        public bool DebugEnabled { get; set; }
+        public static bool PopUpComponentsInFocus { get; set; } = false;
 
-        private readonly Dictionary<ISlot, Matrix3x2> _localTransforms = new Dictionary<ISlot, Matrix3x2>();
-        private readonly Dictionary<ISlot, Matrix3x2> _globalTransforms = new Dictionary<ISlot, Matrix3x2>();
-        private readonly Dictionary<ISlot, bool> _dirtyTransforms = new Dictionary<ISlot, bool>();
+        public static bool DebugEnabled { get; set; }
+
+        private static readonly Dictionary<ISlot, Matrix3x2> _localTransforms = new Dictionary<ISlot, Matrix3x2>();
+        private static readonly Dictionary<ISlot, Matrix3x2> _globalTransforms = new Dictionary<ISlot, Matrix3x2>();
+        private static readonly Dictionary<ISlot, bool> _dirtyTransforms = new Dictionary<ISlot, bool>();
 
         public static readonly SolidBrushD2D DefaultDebugBrush = new SolidBrushD2D(new Color4(0, 1.0f, 0, 1.0f));
         public static readonly SolidBrushD2D ControllerSlotDebugBrush = new SolidBrushD2D(Color4.White);
         public static readonly TextFormatD2D DefaultDebugTextFormat = new TextFormatD2D("Calibri", 10);
         public static readonly float DefaultContainerSize = 50;
 
-        public UIManager(RenderSystem rs)
+        public static void Initialize(RenderSystem rs)
         {
-            var root = new FreePlacement();
+            var root = new StackOfPages();
             root.Name = "Root";
+            var mainRoot = new FreePlacement();
+            mainRoot.Name = "MainComponentsRoot";
+            var popUpRoot = new FreePlacement();
+            popUpRoot.Name = "PopUpComponentsRoot";
 
             _rootSlot = new RootSlot(rs.DisplayBounds.Width, rs.DisplayBounds.Height, root);
             var t = _rootSlot.Transform();
@@ -108,7 +117,10 @@ namespace Fusion.Engine.Frames2.Managing
             _globalTransforms[_rootSlot] = Matrix3x2.Identity;
             _dirtyTransforms[_rootSlot] = false;
 
-            UIEventProcessor = new UIEventProcessor(this, Root);
+            _mainComponentsRoot = root.Add(mainRoot);
+            _popUpComponentsRoot = root.Add(popUpRoot);
+
+            UIEventProcessor.Initialize();
 
             rs.DisplayBoundsChanged += (s, e) =>
             {
@@ -117,16 +129,15 @@ namespace Fusion.Engine.Frames2.Managing
             };
         }
         
-        public void LoadRootFromFile(string filePath)
+        public static void LoadRootFromFile(string filePath)
         {
             UIComponentSerializer.Read(filePath, out IUIComponent root);
             _rootSlot.Attach(root);
-            UIEventProcessor.Root = (IUIContainer)root;
         }
 
-        public IUIComponent GetComponentByName(string name) => UIHelper.BFSTraverse(Root).Where(child => child.Name == name).FirstOrDefault();
+        public static IUIComponent GetComponentByName(string name) => UIHelper.BFSTraverse(Root).Where(child => child.Name == name).FirstOrDefault();
 
-        public void Update(GameTime gameTime)
+        public static void Update(GameTime gameTime)
         {
             UIEventProcessor.Update(gameTime);
 
@@ -144,12 +155,12 @@ namespace Fusion.Engine.Frames2.Managing
             RecalculateAllTransforms();
         }
 
-        private bool SlotTransformChanged(ISlot slot)
+        private static bool SlotTransformChanged(ISlot slot)
         {
             return !_localTransforms.TryGetValue(slot, out var storedTransform) || storedTransform != slot.Transform();
         }
 
-        public Matrix3x2 GlobalTransform(ISlot slot)
+        public static Matrix3x2 GlobalTransform(ISlot slot)
         {
             if (!_dirtyTransforms.TryGetValue(slot, out var isDirty))
             {
@@ -164,7 +175,7 @@ namespace Fusion.Engine.Frames2.Managing
             return _globalTransforms[slot];
         }
 
-		public RectangleF BoundingBox( ISlot slot )
+		public static RectangleF BoundingBox( ISlot slot )
 		{
 			var transform = GlobalTransform(slot);
 
@@ -176,7 +187,7 @@ namespace Fusion.Engine.Frames2.Managing
 			return RectangleF.Bounding(p0, p1, p2, p3);
 		}
 
-		private void InvalidateTransformsDown(ISlot slot)
+		private static void InvalidateTransformsDown(ISlot slot)
         {
             foreach (var component in UIHelper.DFSTraverse(slot.Component, c => !_dirtyTransforms.GetOrDefault(c.Placement, false)))
             {
@@ -184,7 +195,7 @@ namespace Fusion.Engine.Frames2.Managing
             }
         }
 
-        private void RecalculateTransformsUp(ISlot slot)
+        private static void RecalculateTransformsUp(ISlot slot)
         {
             if (slot == null) return;
 
@@ -207,7 +218,7 @@ namespace Fusion.Engine.Frames2.Managing
             _dirtyTransforms[slot] = false;
         }
 
-        private void RecalculateAllTransforms()
+        private static void RecalculateAllTransforms()
         {
             foreach (var component in UIHelper.BFSTraverse(Root))
             {
@@ -238,7 +249,7 @@ namespace Fusion.Engine.Frames2.Managing
         /// <param name="slot"></param>
         /// <param name="globalPoint"></param>
         /// <returns></returns>
-        internal bool IsInsideSlotInternal(ISlot slot, Vector2 globalPoint)
+        internal static bool IsInsideSlotInternal(ISlot slot, Vector2 globalPoint)
         {
             var invertTransform = GlobalTransform(slot);
             invertTransform.Invert();
@@ -252,12 +263,12 @@ namespace Fusion.Engine.Frames2.Managing
         /// <param name="slot"></param>
         /// <param name="point"></param>
         /// <returns></returns>
-        public bool IsPointInsideSlot(ISlot slot, Vector2 point)
+        public static bool IsPointInsideSlot(ISlot slot, Vector2 point)
         {
             throw new NotImplementedException();
         }
 
-        public void Draw(SpriteLayerD2D layer)
+        public static void Draw(SpriteLayerD2D layer)
         {
             layer.Clear();
 
@@ -267,7 +278,7 @@ namespace Fusion.Engine.Frames2.Managing
             layer.Draw(TransformCommand.Identity);
         }
 
-        private void DrawRecursive(SpriteLayerD2D layer, IUIComponent component)
+        private static void DrawRecursive(SpriteLayerD2D layer, IUIComponent component)
         {
 			if (component == null || !_globalTransforms.TryGetValue(component.Placement, out var globalTransform))
 				return;
@@ -311,7 +322,7 @@ namespace Fusion.Engine.Frames2.Managing
             }
         }
 
-        private void DebugDraw(SpriteLayerD2D layer, ISlot slot, Matrix3x2 transform)
+        private static void DebugDraw(SpriteLayerD2D layer, ISlot slot, Matrix3x2 transform)
         {
             layer.Draw(TransformCommand.Identity);
 

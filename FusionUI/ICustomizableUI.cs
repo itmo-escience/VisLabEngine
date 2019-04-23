@@ -8,7 +8,6 @@ namespace FusionUI
 {
 	public interface ICustomizableUI
 	{
-        UIManager GetUIManager();
 		Assembly ProjectAssembly { get; }
 		List<Type> CustomUIComponentTypes { get; }
 	}

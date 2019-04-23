@@ -82,7 +82,6 @@ namespace WpfEditorTest
 		private Binding _childrenBinding;
 
 		private readonly Game _engine;
-		private UIManager _uiManager;
 
 		public FreePlacement DragFieldFrame;
 		public FreePlacement SceneFrame;
@@ -321,11 +320,10 @@ namespace WpfEditorTest
 			{
 				Application.Current.Dispatcher.InvokeAsync(() =>
 				{
-					_uiManager = (_engine.GameInterface as ICustomizableUI)?.GetUIManager();
-					DebugCheckBox.IsChecked = _uiManager.DebugEnabled;
+					DebugCheckBox.IsChecked = UIManager.DebugEnabled;
 
 					#region SelectionLayer
-					SelectionLayer = new WPFSelectionUILayer(_uiManager);
+					SelectionLayer = new WPFSelectionUILayer();
 					Zoomer.Child = SelectionLayer;
 					SelectionLayer.Window = this;
 					SelectionLayer.PaletteWindow = _palette;
@@ -372,7 +370,7 @@ namespace WpfEditorTest
 					#endregion
 
 
-					RootFrame = _uiManager.Root;
+					RootFrame = UIManager.MainComponentsRoot;
 					if (RootFrame == null) {
 						throw new Exception("RootFrame is null, looks like GameInterface is not implementing ICustomizableUI");
 					}
@@ -533,8 +531,8 @@ namespace WpfEditorTest
 
 			var commands = new CommandGroup(
 				new UIComponentParentChangeCommand(createdFrame, container),
-				new SlotPropertyChangeCommand(createdFrame, "X", (int)point.X - _uiManager.BoundingBox(hoveredFrame.Placement).X),
-				new SlotPropertyChangeCommand(createdFrame, "Y", (int)point.Y - _uiManager.BoundingBox(hoveredFrame.Placement).Y)
+				new SlotPropertyChangeCommand(createdFrame, "X", (int)point.X - UIManager.BoundingBox(hoveredFrame.Placement).X),
+				new SlotPropertyChangeCommand(createdFrame, "Y", (int)point.Y - UIManager.BoundingBox(hoveredFrame.Placement).Y)
 			);
 
 			UIManager.MakeComponentNameValid(createdFrame, SceneFrame);
@@ -792,7 +790,7 @@ namespace WpfEditorTest
 			foreach (IUIComponent component in SelectionLayer.FrameSelectionPanelList.Keys)
 			{
 				_xmlComponentsBuffer.Add(Fusion.Core.Utils.UIComponentSerializer.WriteToString(component));
-				var globalTransform = _uiManager.GlobalTransform(component.Placement);
+				var globalTransform = UIManager.GlobalTransform(component.Placement);
 				_componentsOffsetBuffer.Add(new Point(globalTransform.M31,globalTransform.M32) - selectionLayerOffset);
 			}
 		}
@@ -1269,7 +1267,7 @@ namespace WpfEditorTest
 
 		private void EnableDebug( bool isEnabled )
 		{
-			_uiManager.DebugEnabled = isEnabled;
+            UIManager.DebugEnabled = isEnabled;
 		}
 	}
 }

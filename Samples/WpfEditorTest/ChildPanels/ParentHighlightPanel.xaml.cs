@@ -25,7 +25,6 @@ namespace WpfEditorTest.Utility
 	{
 
 		private IUIComponent _selectedFrame;
-		private UIManager _uiManager;
 
 		public IUIComponent SelectedFrame
 		{
@@ -43,7 +42,7 @@ namespace WpfEditorTest.Utility
 				Width = _selectedFrame.Placement.Width;
 				Height = _selectedFrame.Placement.Height;
 
-				var globalTransform = _uiManager.GlobalTransform(_selectedFrame.Placement);
+				var globalTransform = UIManager.GlobalTransform(_selectedFrame.Placement);
 
 				var transform = new MatrixTransform(globalTransform.M11, globalTransform.M12,
 													globalTransform.M21, globalTransform.M22,
@@ -54,10 +53,9 @@ namespace WpfEditorTest.Utility
 			}
 		}
 
-		public ParentHighlightPanel( Fusion.Engine.Frames2.Managing.UIManager uiManager )
+		public ParentHighlightPanel()
 		{
 			InitializeComponent();
-			_uiManager = uiManager;
 		}
 	}
 }
