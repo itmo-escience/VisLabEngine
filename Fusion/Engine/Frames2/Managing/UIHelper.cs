@@ -68,11 +68,11 @@ namespace Fusion.Engine.Frames2.Managing
             return result;
         }
 
-        public static IEnumerable<IUIComponent> BFSTraverseForPoint(UIManager manager, IUIComponent root, Vector2 point)
+        public static IEnumerable<IUIComponent> BFSTraverseForPoint(IUIComponent root, Vector2 point)
         {
             var queue = new Queue<IUIComponent>();
 
-            if (InsideComponent(manager, root, point)) queue.Enqueue(root);
+            if (InsideComponent(root, point)) queue.Enqueue(root);
 
             while (queue.Any())
             {
@@ -83,14 +83,14 @@ namespace Fusion.Engine.Frames2.Managing
                 {
                     foreach (var child in container.Slots.Select(s => s.Component))
                     {
-                        if (InsideComponent(manager, child, point))
+                        if (InsideComponent(child, point))
                             queue.Enqueue(child);
                     }
                 }
             }
         }
 
-        public static bool InsideComponent(UIManager manager, IUIComponent component, Vector2 point)
+        public static bool InsideComponent(IUIComponent component, Vector2 point)
         {
             if (component is IUIContainer container && !container.Placement.Clip)
             {
@@ -98,7 +98,7 @@ namespace Fusion.Engine.Frames2.Managing
             }
 			if (component == null)
 				return false;
-            return manager.IsInsideSlotInternal(component.Placement, point);
+            return UIManager.IsInsideSlotInternal(component.Placement, point);
         }
 
         public static IEnumerable<IUIComponent> DFSTraverse(IUIComponent root)
@@ -163,20 +163,20 @@ namespace Fusion.Engine.Frames2.Managing
             return result;
         }
 
-		public static IUIComponent GetLowestComponentInHierarchy( UIManager manager, IUIContainer root, Vector2 innerPoint)
+		public static IUIComponent GetLowestComponentInHierarchy(IUIContainer root, Vector2 innerPoint)
 		{
-			return GetLowestComponentInHierarchy(manager, root, innerPoint, new List<IUIComponent>());
+			return GetLowestComponentInHierarchy(root, innerPoint, new List<IUIComponent>());
 		}
 
-		public static IUIComponent GetLowestComponentInHierarchy( UIManager manager, IUIContainer root, Vector2 innerPoint, List<IUIComponent> ignoreComponents )
+		public static IUIComponent GetLowestComponentInHierarchy(IUIContainer root, Vector2 innerPoint, List<IUIComponent> ignoreComponents )
         {
-            if (!InsideComponent(manager, root, innerPoint)) return null;
+            if (!InsideComponent(root, innerPoint)) return null;
 
             var lowestContainer = root;
             while (true)
             {
                 var newLowest = lowestContainer.Slots.Where(c=> !ignoreComponents.Contains(c.Component))
-                    .LastOrDefault(c => InsideComponent(manager, c.Component, innerPoint))?
+                    .LastOrDefault(c => InsideComponent(c.Component, innerPoint))?
                     .Component;
 
                 if (newLowest == null) return lowestContainer;
@@ -191,18 +191,18 @@ namespace Fusion.Engine.Frames2.Managing
             }
         }
 
-		public static IUIComponent GetComponentInChildren( UIManager manager, IUIContainer root, Vector2 innerPoint )
+		public static IUIComponent GetComponentInChildren( IUIContainer root, Vector2 innerPoint )
 		{
-			return GetComponentInChildren(manager, root, innerPoint, new List<IUIComponent>());
+			return GetComponentInChildren(root, innerPoint, new List<IUIComponent>());
 		}
 
-		public static IUIComponent GetComponentInChildren( UIManager manager, IUIContainer root, Vector2 innerPoint, List<IUIComponent> ignoreComponents )
+		public static IUIComponent GetComponentInChildren( IUIContainer root, Vector2 innerPoint, List<IUIComponent> ignoreComponents )
 		{
-			if (!InsideComponent(manager, root, innerPoint)) return null;
+			if (!InsideComponent(root, innerPoint)) return null;
 
 			var container = root;
 			var component = container.Slots.Where(c => !ignoreComponents.Contains(c.Component))
-				.FirstOrDefault(c => InsideComponent(manager, c.Component, innerPoint))?
+				.FirstOrDefault(c => InsideComponent(c.Component, innerPoint))?
 				.Component;
 
 				return component;

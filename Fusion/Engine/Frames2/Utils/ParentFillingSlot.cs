@@ -37,6 +37,11 @@ namespace Fusion.Engine.Frames2.Utils
             Name = name;
         }
 
+        internal ParentFillingSlot(IUIContainer parent)
+        {
+            Parent = parent;
+        }
+
         public void DebugDraw(SpriteLayerD2D layer) { }
 
         public void Attach(IUIComponent component)

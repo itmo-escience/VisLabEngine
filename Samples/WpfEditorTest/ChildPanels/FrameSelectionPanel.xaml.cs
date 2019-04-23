@@ -28,7 +28,6 @@ namespace WpfEditorTest.Utility
 		private double _oldY;
 		private bool _locked = false;
 		private bool _isInDragField;
-		private UIManager _uiManager;
 
 		public IUIComponent SelectedFrame
 		{
@@ -49,7 +48,7 @@ namespace WpfEditorTest.Utility
 				//Height =
 				HeightBuffer = _selectedFrame.Placement.Height * Math.Sign(_selectedFrame.Placement.Transform().M22);
 
-				var globalTransform = _uiManager.GlobalTransform(_selectedFrame.Placement);
+				var globalTransform = UIManager.GlobalTransform(_selectedFrame.Placement);
 
 				var transform = new MatrixTransform(globalTransform.M11, globalTransform.M12,
                                                     globalTransform.M21, globalTransform.M22,
@@ -73,7 +72,7 @@ namespace WpfEditorTest.Utility
 
 			Application.Current.Dispatcher.InvokeAsync(() =>
 			{
-				var globalTransform = _uiManager.GlobalTransform(selected.Placement);
+				var globalTransform = UIManager.GlobalTransform(selected.Placement);
 
 				var transform = new MatrixTransform(globalTransform.M11, globalTransform.M12,
 													globalTransform.M21, globalTransform.M22,
@@ -93,7 +92,7 @@ namespace WpfEditorTest.Utility
 
 			Application.Current.Dispatcher.InvokeAsync(() =>
 			{
-				var globalTransform = _uiManager.GlobalTransform(selected.Placement);
+				var globalTransform = UIManager.GlobalTransform(selected.Placement);
 
 				WidthBuffer = selected.Placement.Width * Math.Sign(globalTransform.M11);
 				HeightBuffer = selected.Placement.Height * Math.Sign(globalTransform.M22);
@@ -178,11 +177,9 @@ namespace WpfEditorTest.Utility
 		public Point InitGlobalComponentPosition { get; internal set; }
 		public bool IsReadyToBeReparented { get; internal set; }
 
-		public FrameSelectionPanel( UIManager uiManager )
+		public FrameSelectionPanel()
 		{
 			InitializeComponent();
-
-			_uiManager = uiManager;
 
 			Height = ApplicationConfig.OptionsWindowSize; Width = ApplicationConfig.OptionsWindowSize;
 

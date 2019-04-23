@@ -160,7 +160,7 @@ namespace GISTest
 
 			#region UITesting
 			//----------
-			UIManager = new UIManager(Game.RenderSystem);
+			UIManager.Initialize(Game.RenderSystem);
 			UIManager.DebugEnabled = true;
 
 			
@@ -169,7 +169,6 @@ namespace GISTest
             #region UISerializationTesting
 
             
-
 
             #endregion
 
@@ -269,7 +268,6 @@ namespace GISTest
 		private Random _random;
 		private TextFormatD2D _textFormat;
 		private SolidBrushD2D _brush;
-		public UIManager UIManager { get; private set; }
 
 		public Assembly ProjectAssembly => this.GetType().Assembly;
 
@@ -320,11 +318,6 @@ namespace GISTest
         public IUIModifiableContainer<ISlot> GetUIRoot()
         {
             return UIManager.Root;
-        }
-
-        public UIManager GetUIManager()
-        {
-            return UIManager;
         }
 
         /// <summary>

@@ -269,6 +269,7 @@
     <Compile Include="Engine\Common\Commands\CrashServer.cs" />
     <Compile Include="Engine\Common\AtomAttribute.cs" />
     <Compile Include="Engine\Common\UserInterface.Internal.cs" />
+    <Compile Include="Engine\Frames2\Containers\StackOfPages.cs" />
     <Compile Include="Engine\Frames2\Controllers\CheckBoxController.cs" />
     <Compile Include="Engine\Frames2\Controllers\ProgressBarController.cs" />
     <Compile Include="Engine\Frames2\Controllers\RadioButtonController.cs" />
