@@ -90,20 +90,20 @@ namespace Fusion.Engine.Frames2.Controllers
             var tracksIndent = Thumb.Component.DesiredWidth / 2;
 
             var tracksRatio = (Value - MinValue) / (MaxValue - MinValue);
-            var valuePosition = tracksRatio * (DesiredWidth - 2 * tracksIndent) + tracksIndent;
+            var valuePosition = tracksRatio * (Placement.Width - 2 * tracksIndent) + tracksIndent;
 
             LeftTrack.X = tracksIndent;
-            LeftTrack.Y = (DesiredHeight - LeftTrack.Component.DesiredHeight) / 2;
+            LeftTrack.Y = (Placement.Height - LeftTrack.Component.DesiredHeight) / 2;
             LeftTrack.Width = valuePosition - tracksIndent;
             LeftTrack.Height = LeftTrack.Component.DesiredHeight;
 
             RightTrack.X = valuePosition;
-            RightTrack.Y = (DesiredHeight - RightTrack.Component.DesiredHeight) / 2;
-            RightTrack.Width = DesiredWidth - valuePosition - tracksIndent;
+            RightTrack.Y = (Placement.Height - RightTrack.Component.DesiredHeight) / 2;
+            RightTrack.Width = Placement.Width - valuePosition - tracksIndent;
             RightTrack.Height = RightTrack.Component.DesiredHeight;
 
             Thumb.X = valuePosition - Thumb.Component.DesiredWidth / 2;
-            Thumb.Y = (DesiredHeight - Thumb.Component.DesiredHeight) / 2;
+            Thumb.Y = (Placement.Height - Thumb.Component.DesiredHeight) / 2;
             Thumb.Width = Thumb.Component.DesiredWidth;
             Thumb.Height = Thumb.Component.DesiredHeight;
         }
@@ -200,13 +200,16 @@ namespace Fusion.Engine.Frames2.Controllers
             MinValue = float.Parse(reader.GetAttribute("MinValue"));
             MaxValue = float.Parse(reader.GetAttribute("MaxValue"));
             Value = float.Parse(reader.GetAttribute("Value"));
-            reader.ReadStartElement("SliderController");
+
+            reader.ReadStartElement();
 
             reader.ReadStartElement("Slots");
             Background.ReadFromXml(reader);
             LeftTrack.ReadFromXml(reader);
             RightTrack.ReadFromXml(reader);
             Thumb.ReadFromXml(reader);
+            reader.ReadEndElement();
+
             reader.ReadEndElement();
         }
 

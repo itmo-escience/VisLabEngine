@@ -61,7 +61,7 @@ namespace Fusion.Engine.Frames2.Controllers
             DesiredWidth = 200;
             DesiredHeight = 25;
             Background.Attach(new Border(Color.LightGray, Color.Gray));
-            Track.Attach(new Border(Color.Green, Color.Gray) { DesiredHeight = 25 });
+            Track.Attach(new Border(Color.Green, Color.Gray) {DesiredHeight = 25});
         }
 
         public override void Update(GameTime gameTime)
@@ -73,7 +73,7 @@ namespace Fusion.Engine.Frames2.Controllers
             {
                 var trackRatio = (Value - MinValue) / (MaxValue - MinValue);
                 Track.X = 0;
-                Track.Width = trackRatio * DesiredWidth;
+                Track.Width = trackRatio * Placement.Width;
             }
             else
             {
@@ -88,24 +88,21 @@ namespace Fusion.Engine.Frames2.Controllers
                 else
                 {
                     var trackRatio = (_indeterminateValue - MinValue) / (MaxValue - MinValue);
-                    Track.X = trackRatio * DesiredWidth;
+                    Track.X = trackRatio * Placement.Width;
                 }
 
                 var trackEndValue = _indeterminateValue + _indeterminateValuePart * (MaxValue - MinValue);
 
                 if (trackEndValue > MaxValue)
                 {
-                    Track.Width = DesiredWidth - Track.X;
+                    Track.Width = Placement.Width - Track.X;
                 }
                 else
                 {
                     var trackRatio = (trackEndValue - MinValue) / (MaxValue - MinValue);
-                    Track.Width = trackRatio * DesiredWidth - Track.X;
+                    Track.Width = trackRatio * Placement.Width - Track.X;
                 }
             }
-
-            Value++;
-            if (Value == MaxValue) Value = MinValue;
         }
 
         public XmlSchema GetSchema()
@@ -122,11 +119,14 @@ namespace Fusion.Engine.Frames2.Controllers
             Style = UIStyleManager.Instance.GetStyle(GetType(), styleName);
             MinValue = float.Parse(reader.GetAttribute("MinValue"));
             MaxValue = float.Parse(reader.GetAttribute("MaxValue"));
-            reader.ReadStartElement("ProgressBarController");
+
+            reader.ReadStartElement();
 
             reader.ReadStartElement("Slots");
             Background.ReadFromXml(reader);
             Track.ReadFromXml(reader);
+            reader.ReadEndElement();
+
             reader.ReadEndElement();
         }
 

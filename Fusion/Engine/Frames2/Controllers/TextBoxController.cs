@@ -135,7 +135,8 @@ namespace Fusion.Engine.Frames2.Controllers
             DesiredHeight = float.Parse(reader.GetAttribute("DesiredHeight"));
             var styleName = reader.GetAttribute("StyleName");
             Style = UIStyleManager.Instance.GetStyle(GetType(), styleName);
-            reader.ReadStartElement("TextBoxController");
+
+            reader.ReadStartElement();
 
             reader.ReadStartElement("Slots");
             Background.ReadFromXml(reader);
@@ -143,6 +144,8 @@ namespace Fusion.Engine.Frames2.Controllers
             reader.ReadEndElement();
 
             _label = (Label)Text.Component;
+
+            reader.ReadEndElement();
         }
 
         public void WriteXml(XmlWriter writer)

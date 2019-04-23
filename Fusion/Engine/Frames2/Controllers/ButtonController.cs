@@ -118,7 +118,7 @@ namespace Fusion.Engine.Frames2.Controllers
             DesiredHeight = float.Parse(reader.GetAttribute("DesiredHeight"));
             var styleName = reader.GetAttribute("StyleName");
             Style = UIStyleManager.Instance.GetStyle(GetType(), styleName);
-            reader.ReadStartElement("ButtonController");
+            reader.ReadStartElement();
 
             reader.ReadStartElement("Slots");
             Background.ReadFromXml(reader);
